@@ -18,7 +18,7 @@
         android:theme="@style/AppTheme" >
         <service
             android:name="com.alexbbb.uploadservice.UploadService"
-            android:exported="false" >
+            android:exported="true" >
         </service>
     </application>
 
