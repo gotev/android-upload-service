@@ -104,8 +104,8 @@ public class UploadService extends IntentService {
 
         if (requestHeaders == null) {
             throw new IllegalArgumentException("Request headers must not be null. " +
-            		                           "If you don't want to add any headers, " +
-            		                           "pass an empty list instead");
+                                               "If you don't want to add any headers, " +
+                                               "pass an empty list instead");
         }
 
         if (requestParameters == null) {
