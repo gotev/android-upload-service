@@ -10,9 +10,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -68,8 +65,8 @@ public class UploadService extends IntentService {
     public static void startUpload(final Context context,
                                    final String url,
                                    final ArrayList<FileToUpload> filesToUpload,
-                                   final HashMap<String, String> requestHeaders,
-                                   final HashMap<String, String> requestParameters)
+                                   final ArrayList<NameValue> requestHeaders,
+                                   final ArrayList<NameValue> requestParameters)
                                    throws IllegalArgumentException,
                                           MalformedURLException {
         validateParameters(url, filesToUpload, requestHeaders, requestParameters);
@@ -79,16 +76,16 @@ public class UploadService extends IntentService {
         intent.setAction(ACTION_UPLOAD);
         intent.putExtra(PARAM_URL, url);
         intent.putParcelableArrayListExtra(PARAM_FILES, filesToUpload);
-        intent.putExtra(PARAM_REQUEST_HEADERS, requestHeaders);
-        intent.putExtra(PARAM_REQUEST_PARAMETERS, requestParameters);
+        intent.putParcelableArrayListExtra(PARAM_REQUEST_HEADERS, requestHeaders);
+        intent.putParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS, requestParameters);
 
         context.startService(intent);
     }
 
     private static void validateParameters(final String url,
-                                           final List<FileToUpload> filesToUpload,
-                                           final Map<String, String> requestHeaders,
-                                           final Map<String, String> requestParameters)
+                                           final ArrayList<FileToUpload> filesToUpload,
+                                           final ArrayList<NameValue> requestHeaders,
+                                           final ArrayList<NameValue> requestParameters)
                                            throws MalformedURLException {
         if (url == null || "".equals(url)) {
             throw new IllegalArgumentException("Request URL cannot be either null or empty");
@@ -108,13 +105,13 @@ public class UploadService extends IntentService {
         if (requestHeaders == null) {
             throw new IllegalArgumentException("Request headers must not be null. " +
             		                           "If you don't want to add any headers, " +
-            		                           "pass an empty map instead");
+            		                           "pass an empty list instead");
         }
 
         if (requestParameters == null) {
             throw new IllegalArgumentException("Request parameters must not be null. " +
                                                "If you don't want to add any parameters, " +
-                                               "pass an empty map instead");
+                                               "pass an empty list instead");
         }
     }
 
@@ -137,10 +134,8 @@ public class UploadService extends IntentService {
             if (ACTION_UPLOAD.equals(action)) {
                 final String url = intent.getStringExtra(PARAM_URL);
                 final ArrayList<FileToUpload> files = intent.getParcelableArrayListExtra(PARAM_FILES);
-                final HashMap<String, String> headers =
-                        (HashMap<String, String>) intent.getSerializableExtra(PARAM_REQUEST_HEADERS);
-                final HashMap<String, String> parameters =
-                        (HashMap<String, String>) intent.getSerializableExtra(PARAM_REQUEST_PARAMETERS);
+                final ArrayList<NameValue> headers = intent.getParcelableArrayListExtra(PARAM_REQUEST_HEADERS);
+                final ArrayList<NameValue> parameters = intent.getParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS);
 
                 lastPublishedProgress = 0;
                 try {
@@ -154,8 +149,8 @@ public class UploadService extends IntentService {
 
     private void handleFileUpload(final String url,
                                   final ArrayList<FileToUpload> filesToUpload,
-                                  final HashMap<String, String> requestHeaders,
-                                  final HashMap<String, String> requestParameters)
+                                  final ArrayList<NameValue> requestHeaders,
+                                  final ArrayList<NameValue> requestParameters)
             throws IOException {
 
         final String boundary = getBoundary();
@@ -239,24 +234,23 @@ public class UploadService extends IntentService {
     }
 
     private void setRequestHeaders(final HttpURLConnection conn,
-                                   final HashMap<String, String> requestHeaders) {
+                                   final ArrayList<NameValue> requestHeaders) {
         if (!requestHeaders.isEmpty()) {
-            for (final String headerName : requestHeaders.keySet()) {
-                conn.setRequestProperty(headerName, requestHeaders.get(headerName));
+            for (final NameValue param : requestHeaders) {
+                conn.setRequestProperty(param.getName(), param.getValue());
             }
         }
     }
 
     private void setRequestParameters(final OutputStream requestStream,
-                                      final HashMap<String, String> requestParameters,
+                                      final ArrayList<NameValue> requestParameters,
                                       final byte[] boundaryBytes)
             throws IOException, UnsupportedEncodingException {
         if (!requestParameters.isEmpty()) {
 
-            for (final String parameter : requestParameters.keySet()) {
+            for (final NameValue parameter : requestParameters) {
                 requestStream.write(boundaryBytes, 0, boundaryBytes.length);
-                byte[] formItemBytes = getFormItemBytes(parameter,
-                                                        requestParameters.get(parameter));
+                byte[] formItemBytes = parameter.getBytes();
                 requestStream.write(formItemBytes, 0, formItemBytes.length);
             }
         }
@@ -294,21 +288,7 @@ public class UploadService extends IntentService {
         }
     }
 
-    private byte[] getFormItemBytes(final String paramName, final String paramValue)
-            throws UnsupportedEncodingException {
-        final StringBuilder builder = new StringBuilder();
-
-        builder.append("Content-Disposition: form-data; name=\"")
-               .append(paramName)
-               .append("\"")
-               .append(NEW_LINE)
-               .append(NEW_LINE)
-               .append(paramValue);
-
-        return builder.toString().getBytes("UTF-8");
-    }
-
-    private long getTotalBytes(final List<FileToUpload> filesToUpload) {
+    private long getTotalBytes(final ArrayList<FileToUpload> filesToUpload) {
         long total = 0;
 
         for (FileToUpload file : filesToUpload) {
