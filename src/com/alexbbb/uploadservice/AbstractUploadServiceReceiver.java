@@ -52,18 +52,18 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
      * Called when the upload progress changes.
      * @param progress value from 0 to 100
      */
-    abstract void onProgress(final int progress);
+    public abstract void onProgress(final int progress);
 
     /**
      * Called when an error happens during the upload.
      * @param exception exception that caused the error
      */
-    abstract void onError(final Exception exception);
+    public abstract void onError(final Exception exception);
 
     /**
      * Called when the upload is completed successfully.
      * @param serverResponseCode status code returned by the server
      * @param serverResponseMessage string containing the response received from the server
      */
-    abstract void onCompleted(final int serverResponseCode, final String serverResponseMessage);
+    public abstract void onCompleted(final int serverResponseCode, final String serverResponseMessage);
 }
