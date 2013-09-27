@@ -3,6 +3,7 @@ package com.alexbbb.uploadservice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * Abstract broadcast receiver from which to inherit when creating a receiver
@@ -18,6 +19,8 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        Log.e("BABBO", "RECEIVED INTENT");
 
         if (intent != null) {
             if (UploadService.BROADCAST_ACTION.equals(intent.getAction())) {

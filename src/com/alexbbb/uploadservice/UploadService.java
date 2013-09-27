@@ -334,10 +334,8 @@ public class UploadService extends IntentService {
         if (progress <= lastPublishedProgress) return;
         lastPublishedProgress = progress;
 
-        final Intent intent = new Intent();
+        final Intent intent = new Intent(BROADCAST_ACTION);
 
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setAction(BROADCAST_ACTION);
         intent.putExtra(STATUS, STATUS_IN_PROGRESS);
         intent.putExtra(PROGRESS, progress);
 
@@ -353,10 +351,8 @@ public class UploadService extends IntentService {
             filteredMessage = responseMessage;
         }
 
-        final Intent intent = new Intent();
+        final Intent intent = new Intent(BROADCAST_ACTION);
 
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setAction(BROADCAST_ACTION);
         intent.putExtra(STATUS, STATUS_COMPLETED);
         intent.putExtra(SERVER_RESPONSE_CODE, responseCode);
         intent.putExtra(SERVER_RESPONSE_MESSAGE, filteredMessage);
@@ -365,9 +361,8 @@ public class UploadService extends IntentService {
     }
 
     private void broadcastError(final Exception exception) {
-        final Intent intent = new Intent();
+        final Intent intent = new Intent(BROADCAST_ACTION);
 
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
         intent.setAction(BROADCAST_ACTION);
         intent.putExtra(STATUS, STATUS_ERROR);
         intent.putExtra(ERROR_EXCEPTION, exception);
