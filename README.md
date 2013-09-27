@@ -4,7 +4,7 @@ Android Upload Service
 ## Purpose
 I needed an easy and efficient way to upload multipart form data (HTTP parameters and files) to a server, and 
 I haven't found anything useful so far that suited my needs. I also needed that the upload got handled in the
-background and in the most efficient way on Android. More that that, I also needed to show upload status in the
+background and in the most efficient way on Android. More than that, I also needed to show upload status in the
 Android Notification Center.
 
 So, after some research on the web I found that the best way to do this is to implement an IntentService and notify
