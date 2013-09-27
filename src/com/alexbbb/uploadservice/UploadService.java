@@ -15,7 +15,8 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 
 /**
  * Service to upload files as a multi-part form data in background using HTTP POST
@@ -32,11 +33,12 @@ public class UploadService extends IntentService {
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
 
-    private static final String ACTION_UPLOAD = "com.alexbbb.uploadservice.action.upload";
-    private static final String PARAM_URL = "url";
-    private static final String PARAM_FILES = "files";
-    private static final String PARAM_REQUEST_HEADERS = "requestHeaders";
-    private static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
+    public static final String ACTION_UPLOAD = "com.alexbbb.uploadservice.action.upload";
+    public static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
+    public static final String PARAM_URL = "url";
+    public static final String PARAM_FILES = "files";
+    public static final String PARAM_REQUEST_HEADERS = "requestHeaders";
+    public static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
 
     public static final String BROADCAST_ACTION = "com.alexbbb.uploadservice.broadcast.status";
     public static final String STATUS = "status";
@@ -49,6 +51,8 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
     private NotificationManager notificationManager;
+    private Builder notification;
+    private UploadNotificationConfig notificationConfig;
     private int lastPublishedProgress;
 
     /**
@@ -64,17 +68,20 @@ public class UploadService extends IntentService {
      * @throws MalformedURLException if the server URL is not valid
      */
     public static void startUpload(final Context context,
+                                   final UploadNotificationConfig notificationConfig,
                                    final String url,
                                    final ArrayList<FileToUpload> filesToUpload,
                                    final ArrayList<NameValue> requestHeaders,
                                    final ArrayList<NameValue> requestParameters)
                                    throws IllegalArgumentException,
                                           MalformedURLException {
-        validateParameters(url, filesToUpload, requestHeaders, requestParameters);
+        validateParameters(notificationConfig, url, filesToUpload,
+                           requestHeaders, requestParameters);
 
         final Intent intent = new Intent(UploadService.class.getName());
 
         intent.setAction(ACTION_UPLOAD);
+        intent.putExtra(PARAM_NOTIFICATION_CONFIG, notificationConfig);
         intent.putExtra(PARAM_URL, url);
         intent.putParcelableArrayListExtra(PARAM_FILES, filesToUpload);
         intent.putParcelableArrayListExtra(PARAM_REQUEST_HEADERS, requestHeaders);
@@ -83,11 +90,16 @@ public class UploadService extends IntentService {
         context.startService(intent);
     }
 
-    private static void validateParameters(final String url,
+    private static void validateParameters(final UploadNotificationConfig notificationConfig,
+                                           final String url,
                                            final ArrayList<FileToUpload> filesToUpload,
                                            final ArrayList<NameValue> requestHeaders,
                                            final ArrayList<NameValue> requestParameters)
                                            throws MalformedURLException {
+        if (notificationConfig == null) {
+            throw new IllegalArgumentException("Notification configuration cannot be null");
+        }
+
         if (url == null || "".equals(url)) {
             throw new IllegalArgumentException("Request URL cannot be either null or empty");
         }
@@ -124,6 +136,7 @@ public class UploadService extends IntentService {
     public void onCreate() {
         super.onCreate();
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notification = new NotificationCompat.Builder(this);
     }
 
     @Override
@@ -132,6 +145,7 @@ public class UploadService extends IntentService {
             final String action = intent.getAction();
 
             if (ACTION_UPLOAD.equals(action)) {
+                notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
                 final String url = intent.getStringExtra(PARAM_URL);
                 final ArrayList<FileToUpload> files = intent.getParcelableArrayListExtra(PARAM_FILES);
                 final ArrayList<NameValue> headers = intent.getParcelableArrayListExtra(PARAM_REQUEST_HEADERS);
@@ -139,11 +153,7 @@ public class UploadService extends IntentService {
 
                 lastPublishedProgress = 0;
                 try {
-                    Log.d(SERVICE_NAME, "Upload service started.\n" +
-                    	 	            "  url: " + url + "\n" +
-                                        "  number of files: " + files.size() + "\n" +
-                    	 	            "  number of headers: " + headers.size() + "\n" +
-                                        "  number of params: " + parameters.size());
+                    createNotification();
                     handleFileUpload(url, files, headers, parameters);
                 } catch (Exception exception) {
                     broadcastError(exception);
@@ -334,11 +344,11 @@ public class UploadService extends IntentService {
         if (progress <= lastPublishedProgress) return;
         lastPublishedProgress = progress;
 
-        final Intent intent = new Intent(BROADCAST_ACTION);
+        updateNotificationProgress(progress);
 
+        final Intent intent = new Intent(BROADCAST_ACTION);
         intent.putExtra(STATUS, STATUS_IN_PROGRESS);
         intent.putExtra(PROGRESS, progress);
-
         sendBroadcast(intent);
     }
 
@@ -351,22 +361,55 @@ public class UploadService extends IntentService {
             filteredMessage = responseMessage;
         }
 
-        final Intent intent = new Intent(BROADCAST_ACTION);
+        updateNotificationCompleted();
 
+        final Intent intent = new Intent(BROADCAST_ACTION);
         intent.putExtra(STATUS, STATUS_COMPLETED);
         intent.putExtra(SERVER_RESPONSE_CODE, responseCode);
         intent.putExtra(SERVER_RESPONSE_MESSAGE, filteredMessage);
-
         sendBroadcast(intent);
     }
 
     private void broadcastError(final Exception exception) {
-        final Intent intent = new Intent(BROADCAST_ACTION);
 
+        updateNotificationError();
+
+        final Intent intent = new Intent(BROADCAST_ACTION);
         intent.setAction(BROADCAST_ACTION);
         intent.putExtra(STATUS, STATUS_ERROR);
         intent.putExtra(ERROR_EXCEPTION, exception);
-
         sendBroadcast(intent);
+    }
+
+    private void createNotification() {
+        notification.setContentTitle(notificationConfig.getTitle())
+                    .setContentText(notificationConfig.getMessage())
+                    .setSmallIcon(notificationConfig.getIconResourceID())
+                    .setProgress(100, 0, true);
+        notificationManager.notify(0, notification.build());
+    }
+
+    private void updateNotificationProgress(final int progress) {
+        notification.setContentTitle(notificationConfig.getTitle())
+                    .setContentText(notificationConfig.getMessage())
+                    .setSmallIcon(notificationConfig.getIconResourceID())
+                    .setProgress(100, progress, false);
+        notificationManager.notify(0, notification.build());
+    }
+
+    private void updateNotificationCompleted() {
+        notification.setContentTitle(notificationConfig.getTitle())
+                    .setContentText(notificationConfig.getCompleted())
+                    .setSmallIcon(notificationConfig.getIconResourceID())
+                    .setProgress(0, 0, false);
+        notificationManager.notify(0, notification.build());
+    }
+
+    private void updateNotificationError() {
+        notification.setContentTitle(notificationConfig.getTitle())
+                    .setContentText(notificationConfig.getError())
+                    .setSmallIcon(notificationConfig.getIconResourceID())
+                    .setProgress(0, 0, false);
+        notificationManager.notify(0, notification.build());
     }
 }
