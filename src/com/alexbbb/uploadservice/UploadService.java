@@ -15,6 +15,7 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * Service to upload files as a multi-part form data in background using HTTP POST
@@ -71,7 +72,7 @@ public class UploadService extends IntentService {
                                           MalformedURLException {
         validateParameters(url, filesToUpload, requestHeaders, requestParameters);
 
-        final Intent intent = new Intent(context, UploadService.class);
+        final Intent intent = new Intent(UploadService.class.getName());
 
         intent.setAction(ACTION_UPLOAD);
         intent.putExtra(PARAM_URL, url);
@@ -125,7 +126,6 @@ public class UploadService extends IntentService {
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -139,6 +139,11 @@ public class UploadService extends IntentService {
 
                 lastPublishedProgress = 0;
                 try {
+                    Log.d(SERVICE_NAME, "Upload service started.\n" +
+                    	 	            "  url: " + url + "\n" +
+                                        "  number of files: " + files.size() + "\n" +
+                    	 	            "  number of headers: " + headers.size() + "\n" +
+                                        "  number of params: " + parameters.size());
                     handleFileUpload(url, files, headers, parameters);
                 } catch (Exception exception) {
                     broadcastError(exception);
