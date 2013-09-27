@@ -62,6 +62,7 @@ Add the following to your project's AndroidManifest.xml file:
         
         try {
             //Utility method that creates the intent and starts the upload service in the background
+            //As soon as the service starts, you'll see upload status in Android Notification Center :)
             UploadService.startUpload(context, notificationConfig, serverUrl, files, headers, parameters);
         
         } catch (Exception exc) {
