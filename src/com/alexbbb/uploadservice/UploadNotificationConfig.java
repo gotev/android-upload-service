@@ -16,12 +16,14 @@ public class UploadNotificationConfig implements Parcelable {
     private final String message;
     private final String completed;
     private final String error;
+    private final boolean autoClearOnSuccess;
 
     public UploadNotificationConfig(final int iconResourceID,
                                     final String title,
                                     final String message,
                                     final String completed,
-                                    final String error)
+                                    final String error,
+                                    final boolean autoClearOnSuccess)
                                     throws IllegalArgumentException{
 
         if (title == null || message == null || completed == null || error == null) {
@@ -33,6 +35,7 @@ public class UploadNotificationConfig implements Parcelable {
         this.message = message;
         this.completed = completed;
         this.error = error;
+        this.autoClearOnSuccess = autoClearOnSuccess;
     }
 
     public final int getIconResourceID() {
@@ -53,6 +56,10 @@ public class UploadNotificationConfig implements Parcelable {
 
     public final String getError() {
         return error;
+    }
+
+    public final boolean isAutoClearOnSuccess() {
+        return autoClearOnSuccess;
     }
 
     // This is used to regenerate the object.
@@ -82,6 +89,7 @@ public class UploadNotificationConfig implements Parcelable {
         parcel.writeString(message);
         parcel.writeString(completed);
         parcel.writeString(error);
+        parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
     }
 
     private UploadNotificationConfig(Parcel in) {
@@ -90,5 +98,6 @@ public class UploadNotificationConfig implements Parcelable {
         message = in.readString();
         completed = in.readString();
         error = in.readString();
+        autoClearOnSuccess = in.readByte() == 1;
     }
 }

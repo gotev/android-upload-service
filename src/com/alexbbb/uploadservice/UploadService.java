@@ -398,11 +398,16 @@ public class UploadService extends IntentService {
     }
 
     private void updateNotificationCompleted() {
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getCompleted())
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(0, 0, false);
-        notificationManager.notify(0, notification.build());
+        if (notificationConfig.isAutoClearOnSuccess()) {
+            notificationManager.cancel(0);
+            return;
+        } else {
+            notification.setContentTitle(notificationConfig.getTitle())
+                        .setContentText(notificationConfig.getCompleted())
+                        .setSmallIcon(notificationConfig.getIconResourceID())
+                        .setProgress(0, 0, false);
+            notificationManager.notify(0, notification.build());
+        }
     }
 
     private void updateNotificationError() {
