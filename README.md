@@ -1,7 +1,18 @@
 Android Upload Service
 ======================
 
-WARNING!! This project is not stable yet because it's work in progress. So it's not recommended to use it in your own projects until you read this message.
+## Purpose
+I needed an easy and efficient way to upload multipart form data (HTTP parameters and files) to a server, and 
+I haven't found anything useful so far that suited my needs. I also needed that the upload got handled in the
+background and in the most efficient way on Android. More that that, I also needed to show upload status in the
+Android Notification Center.
+
+So, after some research on the web I found that the best way to do this is to implement an IntentService and notify
+status with broadcast intents. This way the logic is decoupled from the UI and it's much more reusable. By using an
+IntentService, you can do multiple uploads being sure that they will be performed sequentially, and so you don't 
+have to deal with the nightmare of concurrency. Also, an IntentService is much more efficient than an AsyncTask, it
+gets executed in the background and it's completely detached from the UI thread. If you need to show status in your UI,
+read further and you'll discover how to do it very easily.
 
 ## Installation
 
