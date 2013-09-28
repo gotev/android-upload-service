@@ -31,7 +31,7 @@ Add the following to your project's AndroidManifest.xml file:
 
 ## How to start android upload service to upload files
     public void updateSomething(final Context context) {
-        final UploadRequest request = new UploadRequest(context, "http://www.yourcompany.com/your/upload/script");
+        final UploadRequest request = new UploadRequest(context, "http://www.yoursite.com/your/script");
 
         request.addFileToUpload("/absolute/path/to/your/file", 
                                 "parameter-name", 
