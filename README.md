@@ -31,28 +31,23 @@ Add the following to your project's AndroidManifest.xml file:
 
 ## How to start android upload service to upload files
     public void updateSomething(final Context context) {
-        //The full URL to your server side HTTP multipart upload script
-        final String serverUrl = "http://www.yourcompany.com/your/upload/script";
-        
-        final ArrayList<FileToUpload> files = new ArrayList<FileToUpload>();
-        files.add(new FileToUpload("/absolute/path/to/your/file", 
-                                   "http-form-parameter-name", 
-                                   "content-type")); //You can find many common content types defined as static constants in the ContentType class
-    
-        //This is optional. If you don't want to add any specific headers, you can just leave the list empty
-        final ArrayList<NameValue> headers = new ArrayList<NameValue>();
-        headers.add(new NameValue("additional-header-name", "additional-header-value"));
-        
-        final ArrayList<NameValue> parameters = new ArrayList<NameValue>();
-        parameters.add(new NameValue("parameter-name", "parameter-value"));
+        final UploadRequest request = new UploadRequest(context, "http://www.yourcompany.com/your/upload/script");
+
+        request.addFileToUpload("/absolute/path/to/your/file", 
+                                "parameter-name", 
+                                "content-type")); //You can find many common content types defined as static constants in the ContentType class
+
+        //You can add your own custom headers
+        request.addHeader("your-custom-header", "your-custom-value");
+
+        request.addParameter("parameter-name", "parameter-value");
         
         //If you want to add an array of strings, you can simply to the following:
-        parameters.add(new NameValue("array-parameter-name", "value1"));
-        parameters.add(new NameValue("array-parameter-name", "value2"));
-        parameters.add(new NameValue("array-parameter-name", "valueN"));
-        
-        UploadNotificationConfig notificationConfig =
-            new UploadNotificationConfig(
+        request.addParameter("array-parameter-name", "value1");
+        request.addParameter("array-parameter-name", "value2");
+        request.addParameter("array-parameter-name", "valueN");
+
+        request.setNotificationConfig(
                 android.R.drawable.ic_menu_upload, //Notification icon. You can use your own app's R.drawable.your_resource
                 "notification title", //You can use your string resource with: context.getString(R.string.your_string)
                 "upload in progress text",
@@ -63,10 +58,9 @@ Add the following to your project's AndroidManifest.xml file:
         try {
             //Utility method that creates the intent and starts the upload service in the background
             //As soon as the service starts, you'll see upload status in Android Notification Center :)
-            UploadService.startUpload(context, notificationConfig, serverUrl, files, headers, parameters);
-        
+            UploadService.startUpload(request);
         } catch (Exception exc) {
-            //You will end up here only if you pass null parameters or an invalid server URL
+            //You will end up here only if you pass an incomplete UploadRequest
             Log.e("AndroidUploadService", exc.getLocalizedMessage(), exc);
         }
     }
