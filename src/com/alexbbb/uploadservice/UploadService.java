@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
@@ -33,12 +32,12 @@ public class UploadService extends IntentService {
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
 
-    public static final String ACTION_UPLOAD = "com.alexbbb.uploadservice.action.upload";
-    public static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
-    public static final String PARAM_URL = "url";
-    public static final String PARAM_FILES = "files";
-    public static final String PARAM_REQUEST_HEADERS = "requestHeaders";
-    public static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
+    protected static final String ACTION_UPLOAD = "com.alexbbb.uploadservice.action.upload";
+    protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
+    protected static final String PARAM_URL = "url";
+    protected static final String PARAM_FILES = "files";
+    protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
+    protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
 
     public static final String BROADCAST_ACTION = "com.alexbbb.uploadservice.broadcast.status";
     public static final String STATUS = "status";
@@ -59,72 +58,28 @@ public class UploadService extends IntentService {
      * Utility method that creates the intent that starts the background
      * file upload service.
      *
-     * @param context context from which to start the service
-     * @param url server URL where to upload the files
-     * @param filesToUpload list of the files to upload
-     * @param requestHeaders additional request headers
-     * @param requestParameters additional request parameters
+     * @param task object containing the upload request
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid
      */
-    public static void startUpload(final Context context,
-                                   final UploadNotificationConfig notificationConfig,
-                                   final String url,
-                                   final ArrayList<FileToUpload> filesToUpload,
-                                   final ArrayList<NameValue> requestHeaders,
-                                   final ArrayList<NameValue> requestParameters)
-                                   throws IllegalArgumentException,
-                                          MalformedURLException {
-        validateParameters(notificationConfig, url, filesToUpload,
-                           requestHeaders, requestParameters);
+    public static void startUpload(final UploadRequest task)
+            throws IllegalArgumentException,
+            MalformedURLException {
+        if (task == null) {
+            throw new IllegalArgumentException("Can't pass an empty task!");
+        } else {
+            task.validate();
 
-        final Intent intent = new Intent(UploadService.class.getName());
+            final Intent intent = new Intent(UploadService.class.getName());
 
-        intent.setAction(ACTION_UPLOAD);
-        intent.putExtra(PARAM_NOTIFICATION_CONFIG, notificationConfig);
-        intent.putExtra(PARAM_URL, url);
-        intent.putParcelableArrayListExtra(PARAM_FILES, filesToUpload);
-        intent.putParcelableArrayListExtra(PARAM_REQUEST_HEADERS, requestHeaders);
-        intent.putParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS, requestParameters);
+            intent.setAction(ACTION_UPLOAD);
+            intent.putExtra(PARAM_NOTIFICATION_CONFIG, task.getNotificationConfig());
+            intent.putExtra(PARAM_URL, task.getServerUrl());
+            intent.putParcelableArrayListExtra(PARAM_FILES, task.getFilesToUpload());
+            intent.putParcelableArrayListExtra(PARAM_REQUEST_HEADERS, task.getHeaders());
+            intent.putParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS, task.getParameters());
 
-        context.startService(intent);
-    }
-
-    private static void validateParameters(final UploadNotificationConfig notificationConfig,
-                                           final String url,
-                                           final ArrayList<FileToUpload> filesToUpload,
-                                           final ArrayList<NameValue> requestHeaders,
-                                           final ArrayList<NameValue> requestParameters)
-                                           throws MalformedURLException {
-        if (notificationConfig == null) {
-            throw new IllegalArgumentException("Notification configuration cannot be null");
-        }
-
-        if (url == null || "".equals(url)) {
-            throw new IllegalArgumentException("Request URL cannot be either null or empty");
-        }
-
-        if (url.startsWith("https")) {
-            throw new IllegalArgumentException("HTTPS is not supported yet");
-        }
-
-        //Check if the URL is valid
-        new URL(url);
-
-        if (filesToUpload == null || filesToUpload.isEmpty()) {
-            throw new IllegalArgumentException("You must pass a list with at least one file");
-        }
-
-        if (requestHeaders == null) {
-            throw new IllegalArgumentException("Request headers must not be null. " +
-                                               "If you don't want to add any headers, " +
-                                               "pass an empty list instead");
-        }
-
-        if (requestParameters == null) {
-            throw new IllegalArgumentException("Request parameters must not be null. " +
-                                               "If you don't want to add any parameters, " +
-                                               "pass an empty list instead");
+            task.getContext().startService(intent);
         }
     }
 

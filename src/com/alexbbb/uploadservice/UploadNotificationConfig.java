@@ -9,7 +9,7 @@ import android.os.Parcelable;
  * @author alexbbb (Alex Gotev)
  *
  */
-public class UploadNotificationConfig implements Parcelable {
+class UploadNotificationConfig implements Parcelable {
 
     private final int iconResourceID;
     private final String title;
@@ -17,6 +17,15 @@ public class UploadNotificationConfig implements Parcelable {
     private final String completed;
     private final String error;
     private final boolean autoClearOnSuccess;
+
+    public UploadNotificationConfig() {
+        iconResourceID = android.R.drawable.ic_menu_upload;
+        title = "File Upload";
+        message = "uploading in progress";
+        completed = "upload completed successfully!";
+        error = "error during upload";
+        autoClearOnSuccess = false;
+    }
 
     public UploadNotificationConfig(final int iconResourceID,
                                     final String title,

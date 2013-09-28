@@ -15,7 +15,7 @@ import android.os.Parcelable;
  * @author alexbbb (Alex Gotev)
  *
  */
-public class FileToUpload implements Parcelable {
+class FileToUpload implements Parcelable {
 
     private static final String NEW_LINE = "\r\n";
 
