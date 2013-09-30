@@ -7,9 +7,12 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -189,8 +192,25 @@ public class UploadService extends IntentService {
 
     private HttpURLConnection getMultipartHttpURLConnection(final String url,
                                                             final String boundary)
-            throws IOException, ProtocolException {
-        final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            throws IOException {
+        final HttpURLConnection conn;
+
+        if (url.startsWith("https")) {
+            AllCertificatesTruster.trustAllSSLCertificates();
+            final HttpsURLConnection https = (HttpsURLConnection) new URL(url).openConnection();
+            https.setHostnameVerifier(new HostnameVerifier() {
+
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+
+            });
+            conn = https;
+
+        } else {
+            conn = (HttpURLConnection) new URL(url).openConnection();
+        }
 
         conn.setDoInput(true);
         conn.setDoOutput(true);

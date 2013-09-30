@@ -47,8 +47,8 @@ public class UploadRequest {
             throw new IllegalArgumentException("Request URL cannot be either null or empty");
         }
 
-        if (url.startsWith("https")) {
-            throw new IllegalArgumentException("HTTPS is not supported yet");
+        if (!url.startsWith("http")) {
+            throw new IllegalArgumentException("Specify either http:// or https:// as protocol");
         }
 
         //Check if the URL is valid
