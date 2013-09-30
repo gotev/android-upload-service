@@ -35,6 +35,7 @@ Add the following to your project's AndroidManifest.xml file:
 
         request.addFileToUpload("/absolute/path/to/your/file", 
                                 "parameter-name", 
+                                "custom-file-name.extension",
                                 "content-type")); //You can find many common content types defined as static constants in the ContentType class
 
         //You can add your own custom headers
