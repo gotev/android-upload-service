@@ -3,6 +3,7 @@ package com.alexbbb.uploadservice;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 
@@ -72,6 +73,18 @@ public class UploadRequest {
 
     public void addParameter(final String paramName, final String paramValue) {
         parameters.add(new NameValue(paramName, paramValue));
+    }
+
+    public void addArrayParameter(final String paramName, final String... array) {
+        for (String value : array) {
+            parameters.add(new NameValue(paramName, value));
+        }
+    }
+
+    public void addArrayParameter(final String paramName, final List<String> list) {
+        for (String value : list) {
+            parameters.add(new NameValue(paramName, value));
+        }
     }
 
     protected String getServerUrl() {
