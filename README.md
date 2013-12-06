@@ -110,6 +110,11 @@ So to listen for the status of the upload service in an Activity for example, yo
     
     }
     
+## Do you use Android Upload Service in your project?
+Let me know, and I'll be glad to include a link in the following list :)
+
+- [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
+    
 ## License
 
     Copyright (C) 2013 Aleksandar Gotev
