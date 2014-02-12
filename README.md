@@ -20,6 +20,12 @@ Check out the project and add android-upload-service to your project as an [Andr
 
 Add the following to your project's AndroidManifest.xml file:
 
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    
+And before the tag: <pre></ application></pre> add the following:
+
     <service
         android:name="com.alexbbb.uploadservice.UploadService"
         android:enabled="true"
