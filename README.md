@@ -51,7 +51,7 @@ Upload it to your server and pass "uploaded_file" as the second parameter to the
     ?>
 
 ## How to start android upload service to upload files
-    public void updateSomething(final Context context) {
+    public void upload(final Context context) {
         final UploadRequest request = new UploadRequest(context, "http://www.yoursite.com/your/script");
 
         request.addFileToUpload("/absolute/path/to/your/file", 
