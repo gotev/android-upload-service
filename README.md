@@ -130,7 +130,9 @@ So to listen for the status of the upload service in an Activity for example, yo
         }
     
     }
-    
+
+If you want to monitor upload status in all of your activities, than just implement the BroadcastReceiver in your base activity class, from which all of your activities inherits and you're done.
+
 ## Do you use Android Upload Service in your project?
 Let me know, and I'll be glad to include a link in the following list :)
 
