@@ -34,14 +34,29 @@ And before the tag: <pre></ application></pre> add the following:
             <action android:name="com.alexbbb.uploadservice.action.upload"/>
         </intent-filter>
     </service>
+    
+## Simple PHP server-side script for testing
+Use this as your server side if you don't have one, and you just want to rapidly test the library.
+Upload it to your server and pass "uploaded_file" as the second parameter to the method addFileToUpload (read the next paragraph).
+
+    <?php
+        if ($_FILES["uploaded_file"]["error"] > 0) {
+            echo "Error: " . $_FILES["uploaded_file"]["error"] . "<br>";
+        } else {
+            echo "Upload: " . $_FILES["uploaded_file"]["name"] . "<br>";
+            echo "Type: " . $_FILES["uploaded_file"]["type"] . "<br>";
+            echo "Size: " . ($_FILES["uploaded_file"]["size"] / 1024) . " kB<br>";
+            echo "Stored in: " . $_FILES["uploaded_file"]["tmp_name"];
+        }
+    ?>
 
 ## How to start android upload service to upload files
     public void updateSomething(final Context context) {
         final UploadRequest request = new UploadRequest(context, "http://www.yoursite.com/your/script");
 
         request.addFileToUpload("/absolute/path/to/your/file", 
-                                "parameter-name", 
-                                "custom-file-name.extension",
+                                "parameter-name", //Name of the parameter that will contain file's data. E.g. data contained in $_FILES["uploaded_file"] of the test PHP script
+                                "custom-file-name.extension", //File name seen by the server. E.g. value of $_FILES["uploaded_file"]["name"] of the test PHP script
                                 "content-type")); //You can find many common content types defined as static constants in the ContentType class
 
         //You can add your own custom headers
