@@ -64,10 +64,21 @@ Upload it to your server and pass "uploaded_file" as the second parameter to the
 
         request.addParameter("parameter-name", "parameter-value");
         
-        //If you want to add an array of strings, you can simply to the following:
+        //If you want to add an array of strings, you can do the following:
         request.addParameter("array-parameter-name", "value1");
         request.addParameter("array-parameter-name", "value2");
         request.addParameter("array-parameter-name", "valueN");
+        
+        //or
+        String[] values = new String[] {"value1", "value2", "valueN"};
+        request.addArrayParameter("array-parameter-name", values);
+        
+        //or
+        List<String> valuesList = new ArrayList<String>();
+        valuesList.add("value1");
+        valuesList.add("value2");
+        valuesList.add("valueN");
+        request.addArrayParameter("array-parameter-name", valuesList);
 
         request.setNotificationConfig(
                 android.R.drawable.ic_menu_upload, //Notification icon. You can use your own app's R.drawable.your_resource
