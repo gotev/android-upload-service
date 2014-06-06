@@ -55,7 +55,7 @@ Upload it to your server and pass "uploaded_file" as the second parameter to the
         final UploadRequest request = new UploadRequest(context, "http://www.yoursite.com/your/script");
 
         request.addFileToUpload("/absolute/path/to/your/file", 
-                                "parameter-name", //Name of the parameter that will contain file's data. E.g. data contained in $_FILES["uploaded_file"] of the test PHP script
+                                "parameter-name", //Name of the parameter that will contain file's data. Pass "uploaded_file" if you're using the test PHP script
                                 "custom-file-name.extension", //File name seen by the server. E.g. value of $_FILES["uploaded_file"]["name"] of the test PHP script
                                 "content-type")); //You can find many common content types defined as static constants in the ContentType class
 
