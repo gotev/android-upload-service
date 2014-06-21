@@ -193,24 +193,7 @@ public class UploadService extends IntentService {
     private HttpURLConnection getMultipartHttpURLConnection(final String url,
                                                             final String boundary)
             throws IOException {
-        final HttpURLConnection conn;
-
-        if (url.startsWith("https")) {
-            AllCertificatesTruster.trustAllSSLCertificates();
-            final HttpsURLConnection https = (HttpsURLConnection) new URL(url).openConnection();
-            https.setHostnameVerifier(new HostnameVerifier() {
-
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-
-            });
-            conn = https;
-
-        } else {
-            conn = (HttpURLConnection) new URL(url).openConnection();
-        }
+        final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
         conn.setDoInput(true);
         conn.setDoOutput(true);
