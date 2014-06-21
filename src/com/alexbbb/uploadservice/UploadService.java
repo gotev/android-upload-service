@@ -144,7 +144,6 @@ public class UploadService extends IntentService {
 
             final byte[] trailer = getTrailerBytes(boundary);
             requestStream.write(trailer, 0, trailer.length);
-
             final int serverResponseCode = conn.getResponseCode();
             final String serverResponseMessage = conn.getResponseMessage();
 
@@ -227,7 +226,6 @@ public class UploadService extends IntentService {
                 requestStream.write(formItemBytes, 0, formItemBytes.length);
             }
         }
-        requestStream.write(boundaryBytes, 0, boundaryBytes.length);
     }
 
     private void uploadFiles(OutputStream requestStream,
@@ -241,6 +239,7 @@ public class UploadService extends IntentService {
         long uploadedBytes = 0;
 
         for (FileToUpload file : filesToUpload) {
+            requestStream.write(boundaryBytes, 0, boundaryBytes.length);
             byte[] headerBytes = file.getMultipartHeader();
             requestStream.write(headerBytes, 0, headerBytes.length);
 
@@ -257,7 +256,6 @@ public class UploadService extends IntentService {
             } finally {
                 closeInputStream(stream);
             }
-            requestStream.write(boundaryBytes, 0, boundaryBytes.length);
         }
     }
 
