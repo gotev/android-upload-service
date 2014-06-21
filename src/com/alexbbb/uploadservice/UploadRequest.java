@@ -17,13 +17,15 @@ public class UploadRequest {
 
     private UploadNotificationConfig notificationConfig;
     private final Context context;
+	private final String uploadId;
     private final String url;
     private final ArrayList<FileToUpload> filesToUpload;
     private final ArrayList<NameValue> headers;
     private final ArrayList<NameValue> parameters;
 
-    public UploadRequest(final Context context, final String serverUrl) {
+    public UploadRequest(final Context context, final String uploadId, final String serverUrl) {
         this.context = context;
+		this.uploadId = uploadId;
         notificationConfig = new UploadNotificationConfig();
         url = serverUrl;
         filesToUpload = new ArrayList<FileToUpload>();
@@ -86,6 +88,10 @@ public class UploadRequest {
             parameters.add(new NameValue(paramName, value));
         }
     }
+
+	protected String getUploadId() {
+		return uploadId;
+	}
 
     protected String getServerUrl() {
         return url;
