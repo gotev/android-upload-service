@@ -324,7 +324,10 @@ public class UploadService extends IntentService {
             filteredMessage = responseMessage;
         }
 
-        updateNotificationCompleted();
+		if (responseCode >= 200 && responseCode <= 299)
+	        updateNotificationCompleted();
+		else
+	        updateNotificationError();
 
         final Intent intent = new Intent(BROADCAST_ACTION);
         intent.putExtra(UPLOAD_ID, uploadId);
