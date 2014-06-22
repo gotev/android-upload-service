@@ -14,6 +14,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
+import android.os.PowerManager;
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
@@ -29,6 +30,7 @@ import android.support.v4.app.NotificationCompat.Builder;
 public class UploadService extends IntentService {
 
     private static final String SERVICE_NAME = UploadService.class.getName();
+	private static final String TAG = "AndroidUploadService";
 
 	private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
     private static final int BUFFER_SIZE = 4096;
@@ -55,6 +57,7 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
     private Builder notification;
+	private PowerManager.WakeLock wakeLock;
     private UploadNotificationConfig notificationConfig;
     private int lastPublishedProgress;
 
@@ -97,6 +100,8 @@ public class UploadService extends IntentService {
         super.onCreate();
         notification = new NotificationCompat.Builder(this)
 						.setOngoing(true);
+		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
     }
 
     @Override
@@ -113,12 +118,15 @@ public class UploadService extends IntentService {
                 final ArrayList<NameValue> parameters = intent.getParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS);
 
                 lastPublishedProgress = 0;
+				wakeLock.acquire();
                 try {
                     createNotification();
                     handleFileUpload(uploadId, url, files, headers, parameters);
                 } catch (Exception exception) {
                     broadcastError(uploadId, exception);
-                }
+                } finally {
+					wakeLock.release();
+				}
             }
         }
     }
