@@ -16,6 +16,7 @@ import android.content.Context;
 public class UploadRequest {
 
     private UploadNotificationConfig notificationConfig;
+	private String method = "POST";
     private final Context context;
 	private final String uploadId;
     private final String url;
@@ -88,6 +89,14 @@ public class UploadRequest {
             parameters.add(new NameValue(paramName, value));
         }
     }
+
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	protected String getMethod() {
+		return method;
+	}
 
 	protected String getUploadId() {
 		return uploadId;

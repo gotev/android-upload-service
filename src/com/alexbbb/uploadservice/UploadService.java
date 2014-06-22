@@ -43,6 +43,7 @@ public class UploadService extends IntentService {
     protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_URL = "url";
+    protected static final String PARAM_METHOD = "method";
     protected static final String PARAM_FILES = "files";
     protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
@@ -86,6 +87,7 @@ public class UploadService extends IntentService {
             intent.putExtra(PARAM_NOTIFICATION_CONFIG, task.getNotificationConfig());
             intent.putExtra(PARAM_ID, task.getUploadId());
             intent.putExtra(PARAM_URL, task.getServerUrl());
+            intent.putExtra(PARAM_METHOD, task.getMethod());
             intent.putParcelableArrayListExtra(PARAM_FILES, task.getFilesToUpload());
             intent.putParcelableArrayListExtra(PARAM_REQUEST_HEADERS, task.getHeaders());
             intent.putParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS, task.getParameters());
@@ -116,6 +118,7 @@ public class UploadService extends IntentService {
                 notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
 				final String uploadId = intent.getStringExtra(PARAM_ID);
                 final String url = intent.getStringExtra(PARAM_URL);
+                final String method = intent.getStringExtra(PARAM_METHOD);
                 final ArrayList<FileToUpload> files = intent.getParcelableArrayListExtra(PARAM_FILES);
                 final ArrayList<NameValue> headers = intent.getParcelableArrayListExtra(PARAM_REQUEST_HEADERS);
                 final ArrayList<NameValue> parameters = intent.getParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS);
@@ -124,7 +127,7 @@ public class UploadService extends IntentService {
 				wakeLock.acquire();
                 try {
                     createNotification();
-                    handleFileUpload(uploadId, url, files, headers, parameters);
+                    handleFileUpload(uploadId, url, method, files, headers, parameters);
                 } catch (Exception exception) {
                     broadcastError(uploadId, exception);
                 } finally {
@@ -136,6 +139,7 @@ public class UploadService extends IntentService {
 
     private void handleFileUpload(final String uploadId,
 								  final String url,
+								  final String method,
                                   final ArrayList<FileToUpload> filesToUpload,
                                   final ArrayList<NameValue> requestHeaders,
                                   final ArrayList<NameValue> requestParameters)
@@ -148,7 +152,7 @@ public class UploadService extends IntentService {
         OutputStream requestStream = null;
 
         try {
-            conn = getMultipartHttpURLConnection(url, boundary);
+            conn = getMultipartHttpURLConnection(url, method, boundary);
 
             setRequestHeaders(conn, requestHeaders);
 
@@ -205,6 +209,7 @@ public class UploadService extends IntentService {
     }
 
     private HttpURLConnection getMultipartHttpURLConnection(final String url,
+															final String method,
                                                             final String boundary)
             throws IOException {
         final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
@@ -212,7 +217,7 @@ public class UploadService extends IntentService {
         conn.setDoInput(true);
         conn.setDoOutput(true);
         conn.setUseCaches(false);
-        conn.setRequestMethod("POST");
+        conn.setRequestMethod(method);
         conn.setRequestProperty("Connection", "Keep-Alive");
         conn.setRequestProperty("ENCTYPE", "multipart/form-data");
         conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
