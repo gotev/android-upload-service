@@ -16,6 +16,7 @@ import javax.net.ssl.SSLSession;
 
 import android.os.PowerManager;
 import android.app.IntentService;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
@@ -33,6 +34,7 @@ public class UploadService extends IntentService {
 	private static final String TAG = "AndroidUploadService";
 
 	private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
+	private static final int UPLOAD_NOTIFICATION_ID_DONE = 1235; // Something unique
     private static final int BUFFER_SIZE = 4096;
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
@@ -56,6 +58,7 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
+	private NotificationManager notificationManager;
     private Builder notification;
 	private PowerManager.WakeLock wakeLock;
     private UploadNotificationConfig notificationConfig;
@@ -98,8 +101,8 @@ public class UploadService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        notification = new NotificationCompat.Builder(this)
-						.setOngoing(true);
+		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notification = new NotificationCompat.Builder(this);
 		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
 		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
     }
@@ -360,7 +363,8 @@ public class UploadService extends IntentService {
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getMessage())
                     .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(100, 0, true);
+                    .setProgress(100, 0, true)
+					.setOngoing(true);
         startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
@@ -368,27 +372,30 @@ public class UploadService extends IntentService {
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getMessage())
                     .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(100, progress, false);
+                    .setProgress(100, progress, false)
+					.setOngoing(true);
         startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
     private void updateNotificationCompleted() {
+		stopForeground(notificationConfig.isAutoClearOnSuccess());
         if (!notificationConfig.isAutoClearOnSuccess()) {
             notification.setContentTitle(notificationConfig.getTitle())
                         .setContentText(notificationConfig.getCompleted())
                         .setSmallIcon(notificationConfig.getIconResourceID())
-                        .setProgress(0, 0, false);
-            startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
+                        .setProgress(0, 0, false)
+						.setOngoing(false);
+            notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
         }
-		stopForeground(notificationConfig.isAutoClearOnSuccess());
     }
 
     private void updateNotificationError() {
+		stopForeground(false);
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getError())
                     .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(0, 0, false);
-        startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
-		stopForeground(false);
+                    .setProgress(0, 0, false)
+					.setOngoing(false);
+        notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
     }
 }
