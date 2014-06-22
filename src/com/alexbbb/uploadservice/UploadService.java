@@ -31,6 +31,7 @@ public class UploadService extends IntentService {
 
     private static final String SERVICE_NAME = UploadService.class.getName();
 
+	private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
     private static final int BUFFER_SIZE = 4096;
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
@@ -354,7 +355,7 @@ public class UploadService extends IntentService {
                     .setContentText(notificationConfig.getMessage())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(100, 0, true);
-        notificationManager.notify(0, notification.build());
+        notificationManager.notify(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
     private void updateNotificationProgress(final int progress) {
@@ -362,19 +363,19 @@ public class UploadService extends IntentService {
                     .setContentText(notificationConfig.getMessage())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(100, progress, false);
-        notificationManager.notify(0, notification.build());
+        notificationManager.notify(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
     private void updateNotificationCompleted() {
         if (notificationConfig.isAutoClearOnSuccess()) {
-            notificationManager.cancel(0);
+            notificationManager.cancel(UPLOAD_NOTIFICATION_ID);
             return;
         } else {
             notification.setContentTitle(notificationConfig.getTitle())
                         .setContentText(notificationConfig.getCompleted())
                         .setSmallIcon(notificationConfig.getIconResourceID())
                         .setProgress(0, 0, false);
-            notificationManager.notify(0, notification.build());
+            notificationManager.notify(UPLOAD_NOTIFICATION_ID, notification.build());
         }
     }
 
@@ -383,6 +384,6 @@ public class UploadService extends IntentService {
                     .setContentText(notificationConfig.getError())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(0, 0, false);
-        notificationManager.notify(0, notification.build());
+        notificationManager.notify(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 }
