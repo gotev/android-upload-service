@@ -238,7 +238,7 @@ org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_constructor_
 org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_enum_constant=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_for=insert
 org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_if=insert
-org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_method_declaration=insert
+org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_method_declaration=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_method_invocation=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_parenthesized_expression=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_switch=insert
