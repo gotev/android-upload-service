@@ -10,10 +10,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
 import android.os.PowerManager;
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -219,6 +215,7 @@ public class UploadService extends IntentService {
         conn.setDoInput(true);
         conn.setDoOutput(true);
         conn.setUseCaches(false);
+        conn.setChunkedStreamingMode(0);
         conn.setRequestMethod(method);
         conn.setRequestProperty("Connection", "Keep-Alive");
         conn.setRequestProperty("ENCTYPE", "multipart/form-data");
