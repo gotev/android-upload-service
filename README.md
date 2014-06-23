@@ -52,7 +52,9 @@ Upload it to your server and pass "uploaded_file" as the second parameter to the
 
 ## How to start android upload service to upload files
     public void upload(final Context context) {
-        final UploadRequest request = new UploadRequest(context, "http://www.yoursite.com/your/script");
+        final UploadRequest request = new UploadRequest(context, 
+                                                        "custom-upload-id", //This is used when receiving upload status
+                                                        "http://www.yoursite.com/your/script");
 
         request.addFileToUpload("/absolute/path/to/your/file", 
                                 "parameter-name", //Name of the parameter that will contain file's data. Pass "uploaded_file" if you're using the test PHP script
@@ -111,18 +113,21 @@ So to listen for the status of the upload service in an Activity for example, yo
         private final BroadcastReceiver uploadReceiver = new AbstractUploadServiceReceiver() {
 
             @Override
-            public void onProgress(int progress) {
-                Log.i("AndroidUploadService", "The progress is: " + progress);
+            public void onProgress(String uploadId, int progress) {
+                Log.i("AndroidUploadService", "The progress of the upload with ID " + uploadId 
+                                              + " is: " + progress);
             }
 
             @Override
-            public void onError(Exception exception) {
-                Log.e("AndroidUploadService", exception.getLocalizedMessage(), exception);
+            public void onError(String uploadId, Exception exception) {
+                Log.e("AndroidUploadService", "Error in upload with ID: " + uploadId + ". " 
+                                              + exception.getLocalizedMessage(), exception);
             }
 
             @Override
-            public void onCompleted(int serverResponseCode, String serverResponseMessage) {
-                Log.i("AndroidUploadService", "Upload completed: " + serverResponseCode + ", " + serverResponseMessage);
+            public void onCompleted(String uploadId, int serverResponseCode, String serverResponseMessage) {
+                Log.i("AndroidUploadService", "Upload with ID " + uploadId + " is completed: " 
+                                              + serverResponseCode + ", " + serverResponseMessage);
             }
         };
         
@@ -143,6 +148,13 @@ So to listen for the status of the upload service in an Activity for example, yo
     }
 
 If you want to monitor upload status in all of your activities, then just implement the BroadcastReceiver in your base activity class, from which all of your activities inherits and you're done.
+
+## Using HTTPS connection with self-signed certificates
+For security reasons, the library doesn't accept self-signed certificates by default when using HTTPS connections, but you can enable them by calling:
+
+    AllCertificatesAndHostsTruster.apply();
+    
+before starting the upload service.
 
 ## Do you use Android Upload Service in your project?
 Let me know, and I'll be glad to include a link in the following list :)
