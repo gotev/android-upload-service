@@ -149,31 +149,31 @@ public class UploadRequest {
      * Sets the HTTP method to use. By default it's set to POST.
      * @param method new HTTP method to use
      */
-	public void setMethod(final String method) {
-		if (method != null && method.length() > 0)
-			this.method = method;
-	}
+    public void setMethod(final String method) {
+        if (method != null && method.length() > 0)
+            this.method = method;
+    }
 
-	/**
-	 * Gets the HTTP method to use.
-	 * @return
-	 */
-	protected String getMethod() {
-		return method;
-	}
+    /**
+     * Gets the HTTP method to use.
+     * @return
+     */
+    protected String getMethod() {
+        return method;
+    }
 
-	/**
-	 * Gets the upload ID of this request.
-	 * @return
-	 */
-	protected String getUploadId() {
-		return uploadId;
-	}
+    /**
+     * Gets the upload ID of this request.
+     * @return
+     */
+    protected String getUploadId() {
+        return uploadId;
+    }
 
-	/**
-	 * Gets the URL of the server side script that will handle the multipart form upload.
-	 * @return
-	 */
+    /**
+     * Gets the URL of the server side script that will handle the multipart form upload.
+     * @return
+     */
     protected String getServerUrl() {
         return url;
     }
