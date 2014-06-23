@@ -371,7 +371,8 @@ public class UploadService extends IntentService {
                     .setContentText(notificationConfig.getMessage())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(100, 0, true)
-					.setOngoing(true);
+                    .setOngoing(true);
+        
         startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
@@ -380,7 +381,8 @@ public class UploadService extends IntentService {
                     .setContentText(notificationConfig.getMessage())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(100, progress, false)
-					.setOngoing(true);
+                    .setOngoing(true);
+        
         startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
