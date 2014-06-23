@@ -47,12 +47,13 @@ public class AllCertificatesAndHostsTruster implements TrustManager, X509TrustMa
             context.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
             HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-				
-				@Override
-				public boolean verify(String hostname, SSLSession session) {
-					return true;
-				}
-			});
+                
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        
         } catch (Exception e) {
             LOGGER.log(Level.INFO, SSL_FAILED);
         }
