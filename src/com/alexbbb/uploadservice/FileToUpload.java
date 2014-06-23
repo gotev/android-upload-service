@@ -39,6 +39,7 @@ class FileToUpload implements Parcelable {
         this.file = new File(path);
         this.paramName = parameterName;
         this.contentType = contentType;
+        
         if (fileName == null || "".equals(fileName)) {
             this.fileName = this.file.getName();
         } else {
@@ -61,10 +62,10 @@ class FileToUpload implements Parcelable {
                .append(NEW_LINE);
 		
         if (contentType != null) {
-			builder.append("Content-Type: ")
-			       .append(contentType)
-			       .append(NEW_LINE);
-		}
+            builder.append("Content-Type: ")
+                   .append(contentType)
+                   .append(NEW_LINE);
+        }
 		
         builder.append(NEW_LINE);
         
