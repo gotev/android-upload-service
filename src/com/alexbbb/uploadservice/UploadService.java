@@ -31,7 +31,7 @@ import android.support.v4.app.NotificationCompat.Builder;
 public class UploadService extends IntentService {
 
     private static final String SERVICE_NAME = UploadService.class.getName();
-	private static final String TAG = "AndroidUploadService";
+    private static final String TAG = "AndroidUploadService";
 
     private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
     private static final int UPLOAD_NOTIFICATION_ID_DONE = 1235; // Something unique
@@ -59,9 +59,9 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
-	private NotificationManager notificationManager;
+    private NotificationManager notificationManager;
     private Builder notification;
-	private PowerManager.WakeLock wakeLock;
+    private PowerManager.WakeLock wakeLock;
     private UploadNotificationConfig notificationConfig;
     private int lastPublishedProgress;
 
@@ -104,7 +104,8 @@ public class UploadService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notification = new NotificationCompat.Builder(this);
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
@@ -117,7 +118,7 @@ public class UploadService extends IntentService {
 
             if (ACTION_UPLOAD.equals(action)) {
                 notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
-				final String uploadId = intent.getStringExtra(PARAM_ID);
+                final String uploadId = intent.getStringExtra(PARAM_ID);
                 final String url = intent.getStringExtra(PARAM_URL);
                 final String method = intent.getStringExtra(PARAM_METHOD);
                 final ArrayList<FileToUpload> files = intent.getParcelableArrayListExtra(PARAM_FILES);
@@ -132,15 +133,15 @@ public class UploadService extends IntentService {
                 } catch (Exception exception) {
                     broadcastError(uploadId, exception);
                 } finally {
-                	wakeLock.release();
-				}
+                    wakeLock.release();
+                }
             }
         }
     }
 
     private void handleFileUpload(final String uploadId,
-								  final String url,
-								  final String method,
+                                  final String url,
+                                  final String method,
                                   final ArrayList<FileToUpload> filesToUpload,
                                   final ArrayList<NameValue> requestHeaders,
                                   final ArrayList<NameValue> requestParameters)
@@ -210,7 +211,7 @@ public class UploadService extends IntentService {
     }
 
     private HttpURLConnection getMultipartHttpURLConnection(final String url,
-															final String method,
+                                                            final String method,
                                                             final String boundary)
             throws IOException {
     	final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
@@ -384,25 +385,28 @@ public class UploadService extends IntentService {
     }
 
     private void updateNotificationCompleted() {
-		stopForeground(notificationConfig.isAutoClearOnSuccess());
+        stopForeground(notificationConfig.isAutoClearOnSuccess());
         
-		if (!notificationConfig.isAutoClearOnSuccess()) {
+        if (!notificationConfig.isAutoClearOnSuccess()) {
             notification.setContentTitle(notificationConfig.getTitle())
                         .setContentText(notificationConfig.getCompleted())
                         .setSmallIcon(notificationConfig.getIconResourceID())
                         .setProgress(0, 0, false)
                         .setOngoing(false);
+            
             notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
         }
     }
 
     private void updateNotificationError() {
-		stopForeground(false);
+        stopForeground(false);
+        
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getError())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(0, 0, false)
                     .setOngoing(false);
+        
         notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
     }
 }
