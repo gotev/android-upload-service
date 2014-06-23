@@ -14,7 +14,7 @@ have to deal with the nightmare of concurrency. Also, an IntentService is much m
 gets executed in the background and it's completely detached from the UI thread. If you need to show status in your UI,
 read further and you'll discover how to do it very easily.
 
-## Installation
+## Setup
 
 Check out the project and add android-upload-service to your project as an [Android Library Project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject).
 
@@ -24,7 +24,11 @@ Add the following to your project's AndroidManifest.xml file:
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     
-And before the tag: <pre></ application></pre> add the following:
+And before the tag: 
+
+    </ application>
+    
+add the following:
 
     <service
         android:name="com.alexbbb.uploadservice.UploadService"
@@ -51,22 +55,32 @@ Upload it to your server and pass "uploaded_file" as the second parameter to the
     ?>
 
 ## How to start android upload service to upload files
+For detailed explanation of each parameter, please check JavaDocs.
+
     public void upload(final Context context) {
         final UploadRequest request = new UploadRequest(context, 
-                                                        "custom-upload-id", //This is used when receiving upload status
-                                                        "http://www.yoursite.com/your/script");
+                                                        "custom-upload-id",                                                         
+                                                        "http://www.yoursite.com/yourscript");
 
+        /*
+         * parameter-name: is the name of the parameter that will contain file's data. 
+         * Pass "uploaded_file" if you're using the test PHP script
+         *
+         * custom-file-name.extension: is the file name seen by the server. 
+         * E.g. value of $_FILES["uploaded_file"]["name"] of the test PHP script
+         */
         request.addFileToUpload("/absolute/path/to/your/file", 
-                                "parameter-name", //Name of the parameter that will contain file's data. Pass "uploaded_file" if you're using the test PHP script
-                                "custom-file-name.extension", //File name seen by the server. E.g. value of $_FILES["uploaded_file"]["name"] of the test PHP script
-                                "content-type")); //You can find many common content types defined as static constants in the ContentType class
+                                "parameter-name",
+                                "custom-file-name.extension",
+                                "content-type"));
 
         //You can add your own custom headers
         request.addHeader("your-custom-header", "your-custom-value");
 
+        //and parameters
         request.addParameter("parameter-name", "parameter-value");
         
-        //If you want to add an array of strings, you can do the following:
+        //If you want to add a parameter with multiple values, you can do the following:
         request.addParameter("array-parameter-name", "value1");
         request.addParameter("array-parameter-name", "value2");
         request.addParameter("array-parameter-name", "valueN");
@@ -82,18 +96,18 @@ Upload it to your server and pass "uploaded_file" as the second parameter to the
         valuesList.add("valueN");
         request.addArrayParameter("array-parameter-name", valuesList);
 
-        request.setNotificationConfig(
-                android.R.drawable.ic_menu_upload, //Notification icon. You can use your own app's R.drawable.your_resource
-                "notification title", //You can use your string resource with: context.getString(R.string.your_string)
-                "upload in progress text",
-                "upload completed successfully text",
-                "upload error text",
-                false); //Set this to true if you want the notification to be automatically cleared when upload is successful
+        //configure the notification
+        request.setNotificationConfig(android.R.drawable.ic_menu_upload,
+                                      "notification title",
+                                      "upload in progress text",
+                                      "upload completed successfully text"
+                                      "upload error text",
+                                      false);
         
         try {
-            //Utility method that creates the intent and starts the upload service in the background
-            //As soon as the service starts, you'll see upload status in Android Notification Center :)
+            //Start upload service and display the notification
             UploadService.startUpload(request);
+        
         } catch (Exception exc) {
             //You will end up here only if you pass an incomplete UploadRequest
             Log.e("AndroidUploadService", exc.getLocalizedMessage(), exc);
@@ -108,41 +122,44 @@ So to listen for the status of the upload service in an Activity for example, yo
 
     public class YourActivity extends Activity {
     
+        private static final String TAG = "AndroidUploadService";
+        
         ...
         
         private final BroadcastReceiver uploadReceiver = new AbstractUploadServiceReceiver() {
 
             @Override
             public void onProgress(String uploadId, int progress) {
-                Log.i("AndroidUploadService", "The progress of the upload with ID " + uploadId 
-                                              + " is: " + progress);
+                Log.i(TAG, "The progress of the upload with ID " 
+                           + uploadId + " is: " + progress);
             }
 
             @Override
             public void onError(String uploadId, Exception exception) {
-                Log.e("AndroidUploadService", "Error in upload with ID: " + uploadId + ". " 
-                                              + exception.getLocalizedMessage(), exception);
+                Log.e(TAG, "Error in upload with ID: " + uploadId + ". " 
+                           + exception.getLocalizedMessage(), exception);
             }
 
             @Override
-            public void onCompleted(String uploadId, int serverResponseCode, String serverResponseMessage) {
-                Log.i("AndroidUploadService", "Upload with ID " + uploadId + " is completed: " 
-                                              + serverResponseCode + ", " + serverResponseMessage);
+            public void onCompleted(String uploadId,
+                                    int serverResponseCode, 
+                                    String serverResponseMessage) {
+                Log.i(TAG, "Upload with ID " + uploadId 
+                           + " is completed: " + serverResponseCode 
+                           + ", " + serverResponseMessage);
             }
         };
         
         @Override
         protected void onResume() {
             super.onResume();
-            final IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(UploadService.BROADCAST_ACTION);
-            registerReceiver(uploadReceiver, intentFilter);
+            uploadReceiver.register(this);
         }
         
         @Override
         protected void onPause() {
             super.onPause();
-            unregisterReceiver(uploadReceiver);
+            uploadReceiver.unregister(this);
         }
     
     }
