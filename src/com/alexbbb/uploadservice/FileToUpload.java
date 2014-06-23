@@ -50,10 +50,20 @@ class FileToUpload implements Parcelable {
     }
 
     public byte[] getMultipartHeader() throws UnsupportedEncodingException {
-        String header = "Content-Disposition: form-data; name=\""
-                      + paramName + "\"; filename=\"" + fileName + "\""
-                      + NEW_LINE + "Content-Type: " + contentType + NEW_LINE + NEW_LINE;
-        return header.getBytes("UTF-8");
+        StringBuilder builder = new StringBuilder()
+			.append("Content-Disposition: form-data; name=\"")
+        	.append(paramName)
+			.append("\"; filename=\"")
+			.append(fileName)
+			.append("\"")
+			.append(NEW_LINE);
+		if (contentType != null) {
+			builder.append("Content-Type: ")
+				.append(contentType)
+				.append(NEW_LINE);
+		}
+		builder.append(NEW_LINE);
+        return builder.toString().getBytes("UTF-8");
     }
 
     public long length() {

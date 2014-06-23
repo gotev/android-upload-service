@@ -14,6 +14,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
+import android.os.PowerManager;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -30,19 +31,25 @@ import android.support.v4.app.NotificationCompat.Builder;
 public class UploadService extends IntentService {
 
     private static final String SERVICE_NAME = UploadService.class.getName();
+	private static final String TAG = "AndroidUploadService";
 
+	private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
+	private static final int UPLOAD_NOTIFICATION_ID_DONE = 1235; // Something unique
     private static final int BUFFER_SIZE = 4096;
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
 
     protected static final String ACTION_UPLOAD = "com.alexbbb.uploadservice.action.upload";
     protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
+    protected static final String PARAM_ID = "id";
     protected static final String PARAM_URL = "url";
+    protected static final String PARAM_METHOD = "method";
     protected static final String PARAM_FILES = "files";
     protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
 
     public static final String BROADCAST_ACTION = "com.alexbbb.uploadservice.broadcast.status";
+    public static final String UPLOAD_ID = "id";
     public static final String STATUS = "status";
     public static final int STATUS_IN_PROGRESS = 1;
     public static final int STATUS_COMPLETED = 2;
@@ -52,8 +59,9 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
-    private NotificationManager notificationManager;
+	private NotificationManager notificationManager;
     private Builder notification;
+	private PowerManager.WakeLock wakeLock;
     private UploadNotificationConfig notificationConfig;
     private int lastPublishedProgress;
 
@@ -77,7 +85,9 @@ public class UploadService extends IntentService {
 
             intent.setAction(ACTION_UPLOAD);
             intent.putExtra(PARAM_NOTIFICATION_CONFIG, task.getNotificationConfig());
+            intent.putExtra(PARAM_ID, task.getUploadId());
             intent.putExtra(PARAM_URL, task.getServerUrl());
+            intent.putExtra(PARAM_METHOD, task.getMethod());
             intent.putParcelableArrayListExtra(PARAM_FILES, task.getFilesToUpload());
             intent.putParcelableArrayListExtra(PARAM_REQUEST_HEADERS, task.getHeaders());
             intent.putParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS, task.getParameters());
@@ -93,8 +103,10 @@ public class UploadService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notification = new NotificationCompat.Builder(this);
+		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
     }
 
     @Override
@@ -104,23 +116,30 @@ public class UploadService extends IntentService {
 
             if (ACTION_UPLOAD.equals(action)) {
                 notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
+				final String uploadId = intent.getStringExtra(PARAM_ID);
                 final String url = intent.getStringExtra(PARAM_URL);
+                final String method = intent.getStringExtra(PARAM_METHOD);
                 final ArrayList<FileToUpload> files = intent.getParcelableArrayListExtra(PARAM_FILES);
                 final ArrayList<NameValue> headers = intent.getParcelableArrayListExtra(PARAM_REQUEST_HEADERS);
                 final ArrayList<NameValue> parameters = intent.getParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS);
 
                 lastPublishedProgress = 0;
+				wakeLock.acquire();
                 try {
                     createNotification();
-                    handleFileUpload(url, files, headers, parameters);
+                    handleFileUpload(uploadId, url, method, files, headers, parameters);
                 } catch (Exception exception) {
-                    broadcastError(exception);
-                }
+                    broadcastError(uploadId, exception);
+                } finally {
+					wakeLock.release();
+				}
             }
         }
     }
 
-    private void handleFileUpload(final String url,
+    private void handleFileUpload(final String uploadId,
+								  final String url,
+								  final String method,
                                   final ArrayList<FileToUpload> filesToUpload,
                                   final ArrayList<NameValue> requestHeaders,
                                   final ArrayList<NameValue> requestParameters)
@@ -133,22 +152,21 @@ public class UploadService extends IntentService {
         OutputStream requestStream = null;
 
         try {
-            conn = getMultipartHttpURLConnection(url, boundary);
+            conn = getMultipartHttpURLConnection(url, method, boundary);
 
             setRequestHeaders(conn, requestHeaders);
 
             requestStream = conn.getOutputStream();
             setRequestParameters(requestStream, requestParameters, boundaryBytes);
 
-            uploadFiles(requestStream, filesToUpload, boundaryBytes);
+            uploadFiles(uploadId, requestStream, filesToUpload, boundaryBytes);
 
             final byte[] trailer = getTrailerBytes(boundary);
             requestStream.write(trailer, 0, trailer.length);
-
             final int serverResponseCode = conn.getResponseCode();
             final String serverResponseMessage = conn.getResponseMessage();
 
-            broadcastCompleted(serverResponseCode, serverResponseMessage);
+            broadcastCompleted(uploadId, serverResponseCode, serverResponseMessage);
 
         } finally {
             closeOutputStream(requestStream);
@@ -191,31 +209,15 @@ public class UploadService extends IntentService {
     }
 
     private HttpURLConnection getMultipartHttpURLConnection(final String url,
+															final String method,
                                                             final String boundary)
             throws IOException {
-        final HttpURLConnection conn;
-
-        if (url.startsWith("https")) {
-            AllCertificatesTruster.trustAllSSLCertificates();
-            final HttpsURLConnection https = (HttpsURLConnection) new URL(url).openConnection();
-            https.setHostnameVerifier(new HostnameVerifier() {
-
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-
-            });
-            conn = https;
-
-        } else {
-            conn = (HttpURLConnection) new URL(url).openConnection();
-        }
+        final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
         conn.setDoInput(true);
         conn.setDoOutput(true);
         conn.setUseCaches(false);
-        conn.setRequestMethod("POST");
+        conn.setRequestMethod(method);
         conn.setRequestProperty("Connection", "Keep-Alive");
         conn.setRequestProperty("ENCTYPE", "multipart/form-data");
         conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
@@ -244,10 +246,10 @@ public class UploadService extends IntentService {
                 requestStream.write(formItemBytes, 0, formItemBytes.length);
             }
         }
-        requestStream.write(boundaryBytes, 0, boundaryBytes.length);
     }
 
-    private void uploadFiles(OutputStream requestStream,
+    private void uploadFiles(final String uploadId,
+							 final OutputStream requestStream,
                              final ArrayList<FileToUpload> filesToUpload,
                              final byte[] boundaryBytes)
             throws UnsupportedEncodingException,
@@ -258,6 +260,7 @@ public class UploadService extends IntentService {
         long uploadedBytes = 0;
 
         for (FileToUpload file : filesToUpload) {
+            requestStream.write(boundaryBytes, 0, boundaryBytes.length);
             byte[] headerBytes = file.getMultipartHeader();
             requestStream.write(headerBytes, 0, headerBytes.length);
 
@@ -269,12 +272,11 @@ public class UploadService extends IntentService {
                 while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0) {
                     requestStream.write(buffer, 0, buffer.length);
                     uploadedBytes += bytesRead;
-                    broadcastProgress(uploadedBytes, totalBytes);
+                    broadcastProgress(uploadId, uploadedBytes, totalBytes);
                 }
             } finally {
                 closeInputStream(stream);
             }
-            requestStream.write(boundaryBytes, 0, boundaryBytes.length);
         }
     }
 
@@ -313,7 +315,7 @@ public class UploadService extends IntentService {
         }
     }
 
-    private void broadcastProgress(final long uploadedBytes, final long totalBytes) {
+    private void broadcastProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
 
         final int progress = (int) (uploadedBytes * 100 / totalBytes);
         if (progress <= lastPublishedProgress) return;
@@ -322,12 +324,13 @@ public class UploadService extends IntentService {
         updateNotificationProgress(progress);
 
         final Intent intent = new Intent(BROADCAST_ACTION);
+        intent.putExtra(UPLOAD_ID, uploadId);
         intent.putExtra(STATUS, STATUS_IN_PROGRESS);
         intent.putExtra(PROGRESS, progress);
         sendBroadcast(intent);
     }
 
-    private void broadcastCompleted(final int responseCode, final String responseMessage) {
+    private void broadcastCompleted(final String uploadId, final int responseCode, final String responseMessage) {
 
         final String filteredMessage;
         if (responseMessage == null) {
@@ -336,21 +339,26 @@ public class UploadService extends IntentService {
             filteredMessage = responseMessage;
         }
 
-        updateNotificationCompleted();
+		if (responseCode >= 200 && responseCode <= 299)
+	        updateNotificationCompleted();
+		else
+	        updateNotificationError();
 
         final Intent intent = new Intent(BROADCAST_ACTION);
+        intent.putExtra(UPLOAD_ID, uploadId);
         intent.putExtra(STATUS, STATUS_COMPLETED);
         intent.putExtra(SERVER_RESPONSE_CODE, responseCode);
         intent.putExtra(SERVER_RESPONSE_MESSAGE, filteredMessage);
         sendBroadcast(intent);
     }
 
-    private void broadcastError(final Exception exception) {
+    private void broadcastError(final String uploadId, final Exception exception) {
 
         updateNotificationError();
 
         final Intent intent = new Intent(BROADCAST_ACTION);
         intent.setAction(BROADCAST_ACTION);
+        intent.putExtra(UPLOAD_ID, uploadId);
         intent.putExtra(STATUS, STATUS_ERROR);
         intent.putExtra(ERROR_EXCEPTION, exception);
         sendBroadcast(intent);
@@ -360,36 +368,39 @@ public class UploadService extends IntentService {
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getMessage())
                     .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(100, 0, true);
-        notificationManager.notify(0, notification.build());
+                    .setProgress(100, 0, true)
+					.setOngoing(true);
+        startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
     private void updateNotificationProgress(final int progress) {
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getMessage())
                     .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(100, progress, false);
-        notificationManager.notify(0, notification.build());
+                    .setProgress(100, progress, false)
+					.setOngoing(true);
+        startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
     private void updateNotificationCompleted() {
-        if (notificationConfig.isAutoClearOnSuccess()) {
-            notificationManager.cancel(0);
-            return;
-        } else {
+		stopForeground(notificationConfig.isAutoClearOnSuccess());
+        if (!notificationConfig.isAutoClearOnSuccess()) {
             notification.setContentTitle(notificationConfig.getTitle())
                         .setContentText(notificationConfig.getCompleted())
                         .setSmallIcon(notificationConfig.getIconResourceID())
-                        .setProgress(0, 0, false);
-            notificationManager.notify(0, notification.build());
+                        .setProgress(0, 0, false)
+						.setOngoing(false);
+            notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
         }
     }
 
     private void updateNotificationError() {
+		stopForeground(false);
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getError())
                     .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(0, 0, false);
-        notificationManager.notify(0, notification.build());
+                    .setProgress(0, 0, false)
+					.setOngoing(false);
+        notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
     }
 }

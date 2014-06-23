@@ -22,22 +22,23 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
         if (intent != null) {
             if (UploadService.BROADCAST_ACTION.equals(intent.getAction())) {
                 final int status = intent.getIntExtra(UploadService.STATUS, 0);
+				final String uploadId = intent.getStringExtra(UploadService.UPLOAD_ID);
 
                 switch (status) {
                     case UploadService.STATUS_ERROR:
                         final Exception exception = (Exception) intent.getSerializableExtra(UploadService.ERROR_EXCEPTION);
-                        onError(exception);
+                        onError(uploadId, exception);
                         break;
 
                     case UploadService.STATUS_COMPLETED:
                         final int responseCode = intent.getIntExtra(UploadService.SERVER_RESPONSE_CODE, 0);
                         final String responseMsg = intent.getStringExtra(UploadService.SERVER_RESPONSE_MESSAGE);
-                        onCompleted(responseCode, responseMsg);
+                        onCompleted(uploadId, responseCode, responseMsg);
                         break;
 
                     case UploadService.STATUS_IN_PROGRESS:
                         final int progress = intent.getIntExtra(UploadService.PROGRESS, 0);
-                        onProgress(progress);
+                        onProgress(uploadId, progress);
                         break;
 
                     default:
@@ -52,18 +53,18 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
      * Called when the upload progress changes.
      * @param progress value from 0 to 100
      */
-    public abstract void onProgress(final int progress);
+    public abstract void onProgress(final String uploadId, final int progress);
 
     /**
      * Called when an error happens during the upload.
      * @param exception exception that caused the error
      */
-    public abstract void onError(final Exception exception);
+    public abstract void onError(final String uploadId, final Exception exception);
 
     /**
      * Called when the upload is completed successfully.
      * @param serverResponseCode status code returned by the server
      * @param serverResponseMessage string containing the response received from the server
      */
-    public abstract void onCompleted(final int serverResponseCode, final String serverResponseMessage);
+    public abstract void onCompleted(final String uploadId, final int serverResponseCode, final String serverResponseMessage);
 }
