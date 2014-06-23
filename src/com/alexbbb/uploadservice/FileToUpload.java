@@ -13,6 +13,7 @@ import android.os.Parcelable;
  * Represents a file to upload.
  *
  * @author alexbbb (Alex Gotev)
+ * @author eliasnaur
  *
  */
 class FileToUpload implements Parcelable {
@@ -50,19 +51,23 @@ class FileToUpload implements Parcelable {
     }
 
     public byte[] getMultipartHeader() throws UnsupportedEncodingException {
-        StringBuilder builder = new StringBuilder()
-			.append("Content-Disposition: form-data; name=\"")
-        	.append(paramName)
-			.append("\"; filename=\"")
-			.append(fileName)
-			.append("\"")
-			.append(NEW_LINE);
-		if (contentType != null) {
+        StringBuilder builder = new StringBuilder();
+        	
+        builder.append("Content-Disposition: form-data; name=\"")
+               .append(paramName)
+               .append("\"; filename=\"")
+               .append(fileName)
+               .append("\"")
+               .append(NEW_LINE);
+		
+        if (contentType != null) {
 			builder.append("Content-Type: ")
-				.append(contentType)
-				.append(NEW_LINE);
+			       .append(contentType)
+			       .append(NEW_LINE);
 		}
-		builder.append(NEW_LINE);
+		
+        builder.append(NEW_LINE);
+        
         return builder.toString().getBytes("UTF-8");
     }
 

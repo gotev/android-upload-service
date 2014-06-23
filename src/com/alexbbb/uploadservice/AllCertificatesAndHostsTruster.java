@@ -18,7 +18,7 @@ import javax.net.ssl.X509TrustManager;
  * Useful when the server has self signed certificates.
  * Use at your own risk.
  *
- * @author Alex Gotev
+ * @author alexbbb (Alex Gotev)
  */
 public class AllCertificatesAndHostsTruster implements TrustManager, X509TrustManager {
 

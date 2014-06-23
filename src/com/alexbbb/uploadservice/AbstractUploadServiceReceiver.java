@@ -12,6 +12,7 @@ import android.content.Intent;
  * from the upload service and dispatch them to the proper handler method.
  *
  * @author alexbbb (Alex Gotev)
+ * @author eliasnaur
  *
  */
 public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
@@ -51,18 +52,21 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
 
     /**
      * Called when the upload progress changes.
+     * @param uploadId unique ID of the upload request
      * @param progress value from 0 to 100
      */
     public abstract void onProgress(final String uploadId, final int progress);
 
     /**
      * Called when an error happens during the upload.
+     * @param uploadId unique ID of the upload request
      * @param exception exception that caused the error
      */
     public abstract void onError(final String uploadId, final Exception exception);
 
     /**
      * Called when the upload is completed successfully.
+     * @param uploadId unique ID of the upload request
      * @param serverResponseCode status code returned by the server
      * @param serverResponseMessage string containing the response received from the server
      */

@@ -26,15 +26,15 @@ import android.support.v4.app.NotificationCompat.Builder;
  * with notification center progress display.
  *
  * @author alexbbb (Alex Gotev)
- *
+ * @author eliasnaur
  */
 public class UploadService extends IntentService {
 
     private static final String SERVICE_NAME = UploadService.class.getName();
 	private static final String TAG = "AndroidUploadService";
 
-	private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
-	private static final int UPLOAD_NOTIFICATION_ID_DONE = 1235; // Something unique
+    private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
+    private static final int UPLOAD_NOTIFICATION_ID_DONE = 1235; // Something unique
     private static final int BUFFER_SIZE = 4096;
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
@@ -74,11 +74,12 @@ public class UploadService extends IntentService {
      * @throws MalformedURLException if the server URL is not valid
      */
     public static void startUpload(final UploadRequest task)
-            throws IllegalArgumentException,
-            MalformedURLException {
-        if (task == null) {
+            throws IllegalArgumentException, MalformedURLException {
+        
+    	if (task == null) {
             throw new IllegalArgumentException("Can't pass an empty task!");
-        } else {
+        
+    	} else {
             task.validate();
 
             final Intent intent = new Intent(UploadService.class.getName());
@@ -105,8 +106,8 @@ public class UploadService extends IntentService {
         super.onCreate();
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notification = new NotificationCompat.Builder(this);
-		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
     }
 
     @Override
@@ -124,14 +125,14 @@ public class UploadService extends IntentService {
                 final ArrayList<NameValue> parameters = intent.getParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS);
 
                 lastPublishedProgress = 0;
-				wakeLock.acquire();
+                wakeLock.acquire();
                 try {
                     createNotification();
                     handleFileUpload(uploadId, url, method, files, headers, parameters);
                 } catch (Exception exception) {
                     broadcastError(uploadId, exception);
                 } finally {
-					wakeLock.release();
+                	wakeLock.release();
 				}
             }
         }
@@ -212,7 +213,7 @@ public class UploadService extends IntentService {
 															final String method,
                                                             final String boundary)
             throws IOException {
-        final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+    	final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
         conn.setDoInput(true);
         conn.setDoOutput(true);
@@ -249,7 +250,7 @@ public class UploadService extends IntentService {
     }
 
     private void uploadFiles(final String uploadId,
-							 final OutputStream requestStream,
+                             final OutputStream requestStream,
                              final ArrayList<FileToUpload> filesToUpload,
                              final byte[] boundaryBytes)
             throws UnsupportedEncodingException,
@@ -340,9 +341,9 @@ public class UploadService extends IntentService {
         }
 
 		if (responseCode >= 200 && responseCode <= 299)
-	        updateNotificationCompleted();
+			updateNotificationCompleted();
 		else
-	        updateNotificationError();
+			updateNotificationError();
 
         final Intent intent = new Intent(BROADCAST_ACTION);
         intent.putExtra(UPLOAD_ID, uploadId);
@@ -384,12 +385,13 @@ public class UploadService extends IntentService {
 
     private void updateNotificationCompleted() {
 		stopForeground(notificationConfig.isAutoClearOnSuccess());
-        if (!notificationConfig.isAutoClearOnSuccess()) {
+        
+		if (!notificationConfig.isAutoClearOnSuccess()) {
             notification.setContentTitle(notificationConfig.getTitle())
                         .setContentText(notificationConfig.getCompleted())
                         .setSmallIcon(notificationConfig.getIconResourceID())
                         .setProgress(0, 0, false)
-						.setOngoing(false);
+                        .setOngoing(false);
             notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
         }
     }
@@ -400,7 +402,7 @@ public class UploadService extends IntentService {
                     .setContentText(notificationConfig.getError())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(0, 0, false)
-					.setOngoing(false);
+                    .setOngoing(false);
         notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
     }
 }
