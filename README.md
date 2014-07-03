@@ -23,6 +23,7 @@ Add the following to your project's AndroidManifest.xml file:
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     
 And before the tag: 
 
