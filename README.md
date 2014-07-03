@@ -126,7 +126,8 @@ So to listen for the status of the upload service in an Activity for example, yo
         
         ...
         
-        private final BroadcastReceiver uploadReceiver = new AbstractUploadServiceReceiver() {
+        private final AbstractUploadServiceReceiver uploadReceiver = 
+        new AbstractUploadServiceReceiver() {
 
             @Override
             public void onProgress(String uploadId, int progress) {
