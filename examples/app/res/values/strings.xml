@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Upload Service</string>
+    <string name="upload">Upload</string>
+    <string name="server_script_url">Server script URL</string>
+    <string name="file_to_upload_path">Path of the file to upload</string>
+    <string name="parameter_name">File parameter name</string>
+    <string name="parameter_name_hint">E.g. uploaded_file</string>
+    <string name="accept_self_signed_certs">Accept self-signed certificates</string>
+    <string name="upload_progress">Upload progress</string>
+    <string name="uploading">Uploading</string>
+    <string name="upload_success">Upload completed successfully</string>
+    <string name="upload_error">Error while uploading</string>
+    <string name="file_does_not_exist">The file to upload does not exist!</string>
+    <string name="provide_valid_server_url">Please provide a valid server URL</string>
+    <string name="provide_file_to_upload">Please provide a full path to a file to upload</string>
+    <string name="provide_param_name">Please provide the name of the form parameter that will contain file\'s data</string>
+    <string name="server_url_hint">http://company.com/path/to/script</string>
+    <string name="file_path_hint">/path/to/your/file.ext</string>
+
+</resources>

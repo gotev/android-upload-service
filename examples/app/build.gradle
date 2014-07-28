@@ -1,7 +1,9 @@
-apply plugin: 'android-library'
+apply plugin: 'android'
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
+    compile project(':android-upload-service')
+    compile project(':appcompat_v7')
 }
 
 android {
