@@ -40,20 +40,13 @@ add the following:
         </intent-filter>
     </service>
     
-## Simple PHP server-side script for testing
-Use this as your server side if you don't have one, and you just want to rapidly test the library.
-Upload it to your server and pass "uploaded_file" as the second parameter to the method addFileToUpload (read the next paragraph).
+## Examples
+In the <b>examples</b> folder you will find:
 
-    <?php
-        if ($_FILES["uploaded_file"]["error"] > 0) {
-            echo "Error: " . $_FILES["uploaded_file"]["error"] . "<br>";
-        } else {
-            echo "Upload: " . $_FILES["uploaded_file"]["name"] . "<br>";
-            echo "Type: " . $_FILES["uploaded_file"]["type"] . "<br>";
-            echo "Size: " . ($_FILES["uploaded_file"]["size"] / 1024) . " kB<br>";
-            echo "Stored in: " . $_FILES["uploaded_file"]["tmp_name"];
-        }
-    ?>
+* a demo server-side php script that handles multipart form upload
+* a simple demo application that uses this library 
+
+To be able to compile and deploy the demo application, you also need to have <b>appcompat_v7</b> library. You may need to change the path to that library in the demo application's properties.
 
 ## How to start android upload service to upload files
 For detailed explanation of each parameter, please check JavaDocs.
