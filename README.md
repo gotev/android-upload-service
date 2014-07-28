@@ -34,7 +34,7 @@ add the following:
     <service
         android:name="com.alexbbb.uploadservice.UploadService"
         android:enabled="true"
-        android:exported="true" >
+        android:exported="false" >
         <intent-filter>
             <action android:name="com.alexbbb.uploadservice.action.upload"/>
         </intent-filter>
