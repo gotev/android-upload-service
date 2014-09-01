@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import android.os.PowerManager;
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
@@ -366,6 +367,7 @@ public class UploadService extends IntentService {
     private void createNotification() {
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getMessage())
+                    .setContentIntent(PendingIntent.getBroadcast(this, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT))
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(100, 0, true)
                     .setOngoing(true);
