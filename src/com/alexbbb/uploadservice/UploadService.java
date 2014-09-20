@@ -10,18 +10,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import android.os.PowerManager;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
 /**
- * Service to upload files as a multi-part form data in background using HTTP POST
- * with notification center progress display.
- *
+ * Service to upload files as a multi-part form data in background using HTTP POST with notification center progress
+ * display.
+ * 
  * @author alexbbb (Alex Gotev)
  * @author eliasnaur
  */
@@ -36,7 +36,9 @@ public class UploadService extends IntentService {
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
 
-    protected static final String ACTION_UPLOAD = "com.alexbbb.uploadservice.action.upload";
+    public static String NAMESPACE = "com.alexbbb";
+
+    protected static final String ACTION_UPLOAD = NAMESPACE + ".uploadservice.action.upload";
     protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_URL = "url";
@@ -45,7 +47,7 @@ public class UploadService extends IntentService {
     protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
 
-    public static final String BROADCAST_ACTION = "com.alexbbb.uploadservice.broadcast.status";
+    public static final String BROADCAST_ACTION = NAMESPACE + ".uploadservice.broadcast.status";
     public static final String UPLOAD_ID = "id";
     public static final String STATUS = "status";
     public static final int STATUS_IN_PROGRESS = 1;
@@ -63,20 +65,18 @@ public class UploadService extends IntentService {
     private int lastPublishedProgress;
 
     /**
-     * Utility method that creates the intent that starts the background
-     * file upload service.
-     *
+     * Utility method that creates the intent that starts the background file upload service.
+     * 
      * @param task object containing the upload request
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid
      */
-    public static void startUpload(final UploadRequest task)
-            throws IllegalArgumentException, MalformedURLException {
-        
-    	if (task == null) {
+    public static void startUpload(final UploadRequest task) throws IllegalArgumentException, MalformedURLException {
+
+        if (task == null) {
             throw new IllegalArgumentException("Can't pass an empty task!");
-        
-    	} else {
+
+        } else {
             task.validate();
 
             final Intent intent = new Intent(UploadService.class.getName());
@@ -101,7 +101,7 @@ public class UploadService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        
+
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notification = new NotificationCompat.Builder(this);
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
@@ -136,13 +136,10 @@ public class UploadService extends IntentService {
         }
     }
 
-    private void handleFileUpload(final String uploadId,
-                                  final String url,
-                                  final String method,
+    private void handleFileUpload(final String uploadId, final String url, final String method,
                                   final ArrayList<FileToUpload> filesToUpload,
                                   final ArrayList<NameValue> requestHeaders,
-                                  final ArrayList<NameValue> requestParameters)
-            throws IOException {
+                                  final ArrayList<NameValue> requestParameters) throws IOException {
 
         final String boundary = getBoundary();
         final byte[] boundaryBytes = getBoundaryBytes(boundary);
@@ -176,42 +173,32 @@ public class UploadService extends IntentService {
     private String getBoundary() {
         final StringBuilder builder = new StringBuilder();
 
-        builder.append("---------------------------")
-               .append(System.currentTimeMillis());
+        builder.append("---------------------------").append(System.currentTimeMillis());
 
         return builder.toString();
     }
 
-    private byte[] getBoundaryBytes(final String boundary)
-            throws UnsupportedEncodingException {
+    private byte[] getBoundaryBytes(final String boundary) throws UnsupportedEncodingException {
         final StringBuilder builder = new StringBuilder();
 
-        builder.append(NEW_LINE)
-               .append(TWO_HYPHENS)
-               .append(boundary)
-               .append(NEW_LINE);
+        builder.append(NEW_LINE).append(TWO_HYPHENS).append(boundary).append(NEW_LINE);
 
         return builder.toString().getBytes("US-ASCII");
     }
 
-    private byte[] getTrailerBytes(final String boundary)
-            throws UnsupportedEncodingException {
+    private byte[] getTrailerBytes(final String boundary) throws UnsupportedEncodingException {
         final StringBuilder builder = new StringBuilder();
 
-        builder.append(NEW_LINE)
-               .append(TWO_HYPHENS)
-               .append(boundary)
-               .append(TWO_HYPHENS)
-               .append(NEW_LINE);
+        builder.append(NEW_LINE).append(TWO_HYPHENS).append(boundary).append(TWO_HYPHENS).append(NEW_LINE);
 
         return builder.toString().getBytes("US-ASCII");
     }
 
-    private HttpURLConnection getMultipartHttpURLConnection(final String url,
-                                                            final String method,
-                                                            final String boundary)
-            throws IOException {
-    	final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+    private
+            HttpURLConnection
+            getMultipartHttpURLConnection(final String url, final String method, final String boundary)
+                                                                                                       throws IOException {
+        final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
         conn.setDoInput(true);
         conn.setDoOutput(true);
@@ -225,8 +212,7 @@ public class UploadService extends IntentService {
         return conn;
     }
 
-    private void setRequestHeaders(final HttpURLConnection conn,
-                                   final ArrayList<NameValue> requestHeaders) {
+    private void setRequestHeaders(final HttpURLConnection conn, final ArrayList<NameValue> requestHeaders) {
         if (!requestHeaders.isEmpty()) {
             for (final NameValue param : requestHeaders) {
                 conn.setRequestProperty(param.getName(), param.getValue());
@@ -234,10 +220,8 @@ public class UploadService extends IntentService {
         }
     }
 
-    private void setRequestParameters(final OutputStream requestStream,
-                                      final ArrayList<NameValue> requestParameters,
-                                      final byte[] boundaryBytes)
-            throws IOException, UnsupportedEncodingException {
+    private void setRequestParameters(final OutputStream requestStream, final ArrayList<NameValue> requestParameters,
+                                      final byte[] boundaryBytes) throws IOException, UnsupportedEncodingException {
         if (!requestParameters.isEmpty()) {
 
             for (final NameValue parameter : requestParameters) {
@@ -248,13 +232,13 @@ public class UploadService extends IntentService {
         }
     }
 
-    private void uploadFiles(final String uploadId,
-                             final OutputStream requestStream,
-                             final ArrayList<FileToUpload> filesToUpload,
-                             final byte[] boundaryBytes)
-            throws UnsupportedEncodingException,
-                   IOException,
-                   FileNotFoundException {
+    private
+            void
+            uploadFiles(final String uploadId, final OutputStream requestStream,
+                        final ArrayList<FileToUpload> filesToUpload, final byte[] boundaryBytes)
+                                                                                                throws UnsupportedEncodingException,
+                                                                                                IOException,
+                                                                                                FileNotFoundException {
 
         final long totalBytes = getTotalBytes(filesToUpload);
         long uploadedBytes = 0;
@@ -294,7 +278,8 @@ public class UploadService extends IntentService {
         if (stream != null) {
             try {
                 stream.close();
-            } catch (Exception exc) { }
+            } catch (Exception exc) {
+            }
         }
     }
 
@@ -303,7 +288,8 @@ public class UploadService extends IntentService {
             try {
                 stream.flush();
                 stream.close();
-            } catch (Exception exc) { }
+            } catch (Exception exc) {
+            }
         }
     }
 
@@ -311,14 +297,16 @@ public class UploadService extends IntentService {
         if (connection != null) {
             try {
                 connection.disconnect();
-            } catch (Exception exc) { }
+            } catch (Exception exc) {
+            }
         }
     }
 
     private void broadcastProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
 
         final int progress = (int) (uploadedBytes * 100 / totalBytes);
-        if (progress <= lastPublishedProgress) return;
+        if (progress <= lastPublishedProgress)
+            return;
         lastPublishedProgress = progress;
 
         updateNotificationProgress(progress);
@@ -365,49 +353,39 @@ public class UploadService extends IntentService {
     }
 
     private void createNotification() {
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getMessage())
-                    .setContentIntent(PendingIntent.getBroadcast(this, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT))
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(100, 0, true)
-                    .setOngoing(true);
-        
+        notification.setContentTitle(notificationConfig.getTitle()).setContentText(notificationConfig.getMessage())
+                .setContentIntent(PendingIntent.getBroadcast(this, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT))
+                .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(100, 0, true).setOngoing(true);
+
         startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
     private void updateNotificationProgress(final int progress) {
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getMessage())
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(100, progress, false)
-                    .setOngoing(true);
-        
+        notification.setContentTitle(notificationConfig.getTitle()).setContentText(notificationConfig.getMessage())
+                .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(100, progress, false)
+                .setOngoing(true);
+
         startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
     }
 
     private void updateNotificationCompleted() {
         stopForeground(notificationConfig.isAutoClearOnSuccess());
-        
+
         if (!notificationConfig.isAutoClearOnSuccess()) {
             notification.setContentTitle(notificationConfig.getTitle())
-                        .setContentText(notificationConfig.getCompleted())
-                        .setSmallIcon(notificationConfig.getIconResourceID())
-                        .setProgress(0, 0, false)
-                        .setOngoing(false);
-            
+                    .setContentText(notificationConfig.getCompleted())
+                    .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(0, 0, false).setOngoing(false);
+
             notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
         }
     }
 
     private void updateNotificationError() {
         stopForeground(false);
-        
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getError())
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(0, 0, false)
-                    .setOngoing(false);
-        
+
+        notification.setContentTitle(notificationConfig.getTitle()).setContentText(notificationConfig.getError())
+                .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(0, 0, false).setOngoing(false);
+
         notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
     }
 }

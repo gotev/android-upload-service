@@ -66,6 +66,10 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Set your application namespace to avoid conflicts with other apps
+        // using this library
+        UploadService.NAMESPACE = "com.alexbbb";
+
         progressBar = (ProgressBar) findViewById(R.id.uploadProgress);
         serverUrl = (EditText) findViewById(R.id.serverURL);
         fileToUpload = (EditText) findViewById(R.id.fileToUpload);
