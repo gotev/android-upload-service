@@ -36,7 +36,7 @@ add the following:
         android:enabled="true"
         android:exported="false" >
         <intent-filter>
-            <action android:name="com.alexbbb.uploadservice.action.upload"/>
+            <action android:name="com.yourcompany.yourapp.uploadservice.action.upload"/>
         </intent-filter>
     </service>
 
