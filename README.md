@@ -29,14 +29,14 @@ And before the tag:
 
     </ application>
 
-add the following:
+add the following (by changing <b>com.yourcompany.yourapp</b> to your custom app namespace):
 
     <service
         android:name="com.alexbbb.uploadservice.UploadService"
         android:enabled="true"
         android:exported="false" >
         <intent-filter>
-            <action android:name="com.alexbbb.uploadservice.action.upload"/>
+            <action android:name="com.yourcompany.yourapp.uploadservice.action.upload"/>
         </intent-filter>
     </service>
 
