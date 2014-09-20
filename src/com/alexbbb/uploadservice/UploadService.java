@@ -38,7 +38,7 @@ public class UploadService extends IntentService {
 
     public static String NAMESPACE = "com.alexbbb";
 
-    protected static final String ACTION_UPLOAD = NAMESPACE + ".uploadservice.action.upload";
+    private static final String ACTION_UPLOAD_SUFFIX = ".uploadservice.action.upload";
     protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_URL = "url";
@@ -47,7 +47,7 @@ public class UploadService extends IntentService {
     protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
 
-    public static final String BROADCAST_ACTION = NAMESPACE + ".uploadservice.broadcast.status";
+    private static final String BROADCAST_ACTION_SUFFIX = ".uploadservice.broadcast.status";
     public static final String UPLOAD_ID = "id";
     public static final String STATUS = "status";
     public static final int STATUS_IN_PROGRESS = 1;
@@ -63,6 +63,14 @@ public class UploadService extends IntentService {
     private PowerManager.WakeLock wakeLock;
     private UploadNotificationConfig notificationConfig;
     private int lastPublishedProgress;
+
+    public static String getActionUpload() {
+        return NAMESPACE + ACTION_UPLOAD_SUFFIX;
+    }
+
+    public static String getActionBroadcast() {
+        return NAMESPACE + BROADCAST_ACTION_SUFFIX;
+    }
 
     /**
      * Utility method that creates the intent that starts the background file upload service.
@@ -81,7 +89,7 @@ public class UploadService extends IntentService {
 
             final Intent intent = new Intent(UploadService.class.getName());
 
-            intent.setAction(ACTION_UPLOAD);
+            intent.setAction(getActionUpload());
             intent.putExtra(PARAM_NOTIFICATION_CONFIG, task.getNotificationConfig());
             intent.putExtra(PARAM_ID, task.getUploadId());
             intent.putExtra(PARAM_URL, task.getServerUrl());
@@ -113,7 +121,7 @@ public class UploadService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
 
-            if (ACTION_UPLOAD.equals(action)) {
+            if (getActionUpload().equals(action)) {
                 notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
                 final String uploadId = intent.getStringExtra(PARAM_ID);
                 final String url = intent.getStringExtra(PARAM_URL);
@@ -311,7 +319,7 @@ public class UploadService extends IntentService {
 
         updateNotificationProgress(progress);
 
-        final Intent intent = new Intent(BROADCAST_ACTION);
+        final Intent intent = new Intent(getActionBroadcast());
         intent.putExtra(UPLOAD_ID, uploadId);
         intent.putExtra(STATUS, STATUS_IN_PROGRESS);
         intent.putExtra(PROGRESS, progress);
@@ -332,7 +340,7 @@ public class UploadService extends IntentService {
         else
             updateNotificationError();
 
-        final Intent intent = new Intent(BROADCAST_ACTION);
+        final Intent intent = new Intent(getActionBroadcast());
         intent.putExtra(UPLOAD_ID, uploadId);
         intent.putExtra(STATUS, STATUS_COMPLETED);
         intent.putExtra(SERVER_RESPONSE_CODE, responseCode);
@@ -344,8 +352,8 @@ public class UploadService extends IntentService {
 
         updateNotificationError();
 
-        final Intent intent = new Intent(BROADCAST_ACTION);
-        intent.setAction(BROADCAST_ACTION);
+        final Intent intent = new Intent(getActionBroadcast());
+        intent.setAction(getActionBroadcast());
         intent.putExtra(UPLOAD_ID, uploadId);
         intent.putExtra(STATUS, STATUS_ERROR);
         intent.putExtra(ERROR_EXCEPTION, exception);

@@ -22,7 +22,7 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         if (intent != null) {
-            if (UploadService.BROADCAST_ACTION.equals(intent.getAction())) {
+            if (UploadService.getActionBroadcast().equals(intent.getAction())) {
                 final int status = intent.getIntExtra(UploadService.STATUS, 0);
                 final String uploadId = intent.getStringExtra(UploadService.UPLOAD_ID);
 
@@ -59,7 +59,7 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
      */
     public void register(final Activity activity) {
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(UploadService.BROADCAST_ACTION);
+        intentFilter.addAction(UploadService.getActionBroadcast());
         activity.registerReceiver(this, intentFilter);
     }
 
