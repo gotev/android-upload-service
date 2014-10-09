@@ -87,7 +87,7 @@ public class UploadService extends IntentService {
         } else {
             task.validate();
 
-            final Intent intent = new Intent(UploadService.class.getName());
+            final Intent intent = new Intent(task.getContext(), UploadService.class);
 
             intent.setAction(getActionUpload());
             intent.putExtra(PARAM_NOTIFICATION_CONFIG, task.getNotificationConfig());
