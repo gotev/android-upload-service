@@ -145,9 +145,14 @@ So to listen for the status of the upload service in an Activity for example, yo
         new AbstractUploadServiceReceiver() {
 
             @Override
-            public void onProgress(String uploadId, int progress) {
-                Log.i(TAG, "The progress of the upload with ID "
-                           + uploadId + " is: " + progress);
+            final String uploadId, final int progressTask, final int progressCurrentFile,
+                                                final String fileNameBeingUploaded){
+                Log.i(TAG, "The progress of the upload task with ID "
+                           + uploadId + " is: " + progressTask);
+                 Log.i(TAG, "The progress of the upload file with Task ID "
+                           + uploadId + " is: " + progressCurrentFile);
+                 Log.i(TAG, "The name of the file being uploaded with Task ID "
+                           + uploadId + " is: " + fileNameBeingUploaded);
             }
 
             @Override
@@ -196,7 +201,7 @@ Let me know, and I'll be glad to include a link in the following list :)
 
 ## License
 
-    Copyright (C) 2013 Aleksandar Gotev, eliasnaur, AZ Aizaz
+    Copyright (C) 2015 Aleksandar Gotev, eliasnaur, AZ Aizaz
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
