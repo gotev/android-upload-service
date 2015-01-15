@@ -59,6 +59,7 @@ public class UploadService extends IntentService {
     public static final String PROGRESS_TASK = "progress_task";
     public static final String PROGRESS_FILE = "progress_file";
     public static final String FILE_NAME = "file_currently_downloading";
+    public static final String FILE_ID = "file_id";
     public static final String ERROR_EXCEPTION = "errorException";
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
@@ -284,20 +285,22 @@ public class UploadService extends IntentService {
             byte[] buffer = new byte[BUFFER_SIZE];
             long bytesRead;
             boolean isExceptionRaised = false;
+            String fileId = file.getFileId();
+            String fileName = file.getName();
 
             try {
                 while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0) {
                     requestStream.write(buffer, 0, buffer.length);
                     totalUploadedBytesOfAllFiles += bytesRead;
                     currentFileUploadedBytes += bytesRead;
-                    broadcastProgress(uploadId, totalUploadedBytesOfAllFiles, currentFileUploadedBytes,
-                                      totalBytesOfAllFiles, currentFileSize, file.getName());
+                    broadcastProgress(uploadId, fileId, totalUploadedBytesOfAllFiles, currentFileUploadedBytes,
+                                      totalBytesOfAllFiles, currentFileSize, fileName);
                 }
             } catch (IOException io) {
                 isExceptionRaised = true;
                 file.setUploaded(false);
             } finally {
-                if (!isExceptionRaised && currentFileSize != 0 && currentFileSize == currentFileUploadedBytes) {
+                if (!isExceptionRaised && currentFileSize != 0 && currentFileSize == currentFileUploadedBytes) {                   
                     file.setUploaded(true);
                 }
                 closeInputStream(stream);
@@ -346,6 +349,7 @@ public class UploadService extends IntentService {
     /**
      * 
      * @param uploadId uploadId of your {@link UploadRequest Task}
+     * @param fileId UUID (Unique Identifier) as file name can be same, can create problem in reporting progress of file
      * @param totalUploadedBytesOfAllTask Total uploaded bytes that includes calculation of all the files in a
      * {@link UploadRequest Task}
      * @param currentFileUploadBytes Current {@link FileToUpload File} uploaded byes of
@@ -353,14 +357,14 @@ public class UploadService extends IntentService {
      * @param totalSizeBytesOfCurrentFile Current File Size in Bytes
      * @param currentFileName File name of current {@link FileToUpload file} being uploaded
      */
-    private void broadcastProgress(final String uploadId, final long totalUploadedBytesOfAllTask,
+    private void broadcastProgress(final String uploadId, final String fileId, final long totalUploadedBytesOfAllTask,
                                    final long currentFileUploadBytes, final long totalSizeBytesOfAllFilesInTask,
                                    final long totalSizeBytesOfCurrentFile, final String currentFileName) {
 
         final int progress = (int) (totalUploadedBytesOfAllTask * 100 / totalSizeBytesOfAllFilesInTask);
         final int progressCurrentFile = (int) (currentFileUploadBytes * 100 / totalSizeBytesOfCurrentFile);
-        if (progress <= lastPublishedProgress)
-            return;
+//        if (progress <= lastPublishedProgress)
+//            return;
         lastPublishedProgress = progress;
 
         updateNotificationProgress(progress);
@@ -371,6 +375,7 @@ public class UploadService extends IntentService {
         intent.putExtra(PROGRESS_TASK, progress);
         intent.putExtra(PROGRESS_FILE, progressCurrentFile);
         intent.putExtra(FILE_NAME, currentFileName);
+        intent.putExtra(FILE_ID, fileId);
         sendBroadcast(intent);
     }
 

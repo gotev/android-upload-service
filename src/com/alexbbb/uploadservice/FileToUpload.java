@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.UUID;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -25,6 +26,7 @@ public class FileToUpload implements Parcelable {
     private final String paramName;
     private final String contentType;
     private boolean isUploaded = false;
+    private String fileId;
 
     /**
      * Create a new {@link FileToUpload} object.
@@ -37,12 +39,14 @@ public class FileToUpload implements Parcelable {
         this.file = new File(path);
         this.paramName = parameterName;
         this.contentType = contentType;
+        this.fileId = UUID.randomUUID().toString();
 
         if (fileName == null || "".equals(fileName)) {
             this.fileName = this.file.getName();
         } else {
             this.fileName = fileName;
         }
+
     }
 
     public final InputStream getStream() throws FileNotFoundException {
@@ -80,6 +84,10 @@ public class FileToUpload implements Parcelable {
         return file.getName();
     }
 
+    public String getFileId() {
+        return this.fileId;
+    }
+
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
     public static final Parcelable.Creator<FileToUpload> CREATOR = new Parcelable.Creator<FileToUpload>() {
@@ -106,6 +114,7 @@ public class FileToUpload implements Parcelable {
         parcel.writeString(contentType);
         parcel.writeString(fileName);
         parcel.writeString(String.valueOf(isUploaded));
+        parcel.writeString(fileId);
     }
 
     private FileToUpload(Parcel in) {
@@ -114,5 +123,6 @@ public class FileToUpload implements Parcelable {
         contentType = in.readString();
         fileName = in.readString();
         isUploaded = Boolean.valueOf(in.readString());
+        fileId = in.readString();
     }
 }
