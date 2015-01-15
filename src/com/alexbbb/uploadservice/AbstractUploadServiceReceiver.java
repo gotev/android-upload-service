@@ -78,7 +78,7 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
      * Called when the upload progress changes.
      * 
      * @param uploadId unique ID of the upload request
-     * @param progressTask value from 0 to 100
+     * @param progressTask value from 0 to 100, if there are 10 files one {@link UploadRequest Task}, then combined progress of all files
      * @param progressCurrentFile Progress from 0 to 100 of current file
      * @param fileNameBeingUploaded File name of file being uploaded
      */
