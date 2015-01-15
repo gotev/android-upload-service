@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.os.ResultReceiver;
+import android.support.annotation.NonNull;
 
 /**
  * Represents an upload request.
@@ -40,7 +41,7 @@ public class UploadRequest {
      * updates.
      * @param serverUrl URL of the server side script that handles the multipart form upload
      */
-    public UploadRequest(final Context context, final AbstractFileUploadResultReceiver resultReceiver, final String uploadId, final String serverUrl) {
+    public UploadRequest(@NonNull final Context context, @NonNull final AbstractFileUploadResultReceiver resultReceiver, @NonNull final String uploadId, @NonNull final String serverUrl) {
         this.context = context;
         this.resultReceiver = resultReceiver;
         this.uploadId = uploadId;
