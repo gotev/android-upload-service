@@ -63,6 +63,9 @@ public class UploadService extends IntentService {
     public static final String ERROR_EXCEPTION = "errorException";
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
+    public static final String KEY_RESULT_UPLAOD_FILES = "ResultFiles";
+    public static final String KEY_TASK_UUID = "TaskUUID";
+    public static final int CODE_RESULT_UPLOAD_FILES = 200;
 
     private NotificationManager notificationManager;
     private Builder notification;
@@ -157,8 +160,9 @@ public class UploadService extends IntentService {
                     } catch (Exception e) {
                     }
                     Bundle bundle = new Bundle();
-                    bundle.putParcelableArrayList(UploadRequest.KEY_RESULT_UPLAOD_FILES, files);
-                    task.getResultReceiver().send(UploadRequest.CODE_RESULT_UPLOAD_FILES, bundle);
+                    bundle.putParcelableArrayList(KEY_RESULT_UPLAOD_FILES, files);
+                    bundle.putString(KEY_TASK_UUID, uploadId);
+                    task.getResultReceiver().send(CODE_RESULT_UPLOAD_FILES, bundle);
                 }
             }
         }

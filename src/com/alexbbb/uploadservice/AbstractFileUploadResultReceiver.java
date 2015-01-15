@@ -22,13 +22,14 @@ public abstract class AbstractFileUploadResultReceiver extends ResultReceiver {
     protected void onReceiveResult(int resultCode, Bundle resultData) {
         super.onReceiveResult(resultCode, resultData);
         
-        if(resultCode == UploadRequest.CODE_RESULT_UPLOAD_FILES){
-            ArrayList<FileToUpload> list = resultData.getParcelableArrayList(UploadRequest.KEY_RESULT_UPLAOD_FILES);
-            this.onFilesUploadResultReceived(list);
+        if(resultCode == UploadService.CODE_RESULT_UPLOAD_FILES){
+            ArrayList<FileToUpload> list = resultData.getParcelableArrayList(UploadService.KEY_RESULT_UPLAOD_FILES);
+            String taskId = resultData.getString(UploadService.KEY_TASK_UUID); 
+            this.onFilesUploadResultReceived(list, taskId);
         }
         
     }
 
-    abstract public void onFilesUploadResultReceived(ArrayList<FileToUpload> files);
+    abstract public void onFilesUploadResultReceived(ArrayList<FileToUpload> files, final String taskid);
 
 }

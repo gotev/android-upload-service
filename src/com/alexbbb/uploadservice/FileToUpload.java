@@ -28,6 +28,11 @@ public class FileToUpload implements Parcelable {
     private boolean isUploaded = false;
     private String fileId;
 
+    // --in case you use it in your adapter so you need a place to store progress because this object is being passed
+    // through serialization.
+    // -- no need to serialize it
+    private volatile int progressPlaceHolder;
+
     /**
      * Create a new {@link FileToUpload} object.
      *
@@ -86,6 +91,19 @@ public class FileToUpload implements Parcelable {
 
     public String getFileId() {
         return this.fileId;
+    }
+
+    /**
+     * 
+     * @return You need to set value in it on where progress is being reported, just a place holder for saving temp
+     * progress values as being reported
+     */
+    public int getProgressPlaceHolder() {
+        return progressPlaceHolder;
+    }
+
+    public void setProgressPlaceHolder(int progressPlaceHolder) {
+        this.progressPlaceHolder = progressPlaceHolder;
     }
 
     // This is used to regenerate the object.

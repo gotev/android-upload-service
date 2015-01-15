@@ -30,8 +30,7 @@ public class UploadRequest {
     private boolean isSuccessful = false;
     private AbstractFileUploadResultReceiver resultReceiver;
     
-    public static final String KEY_RESULT_UPLAOD_FILES = "ResultFiles";
-    public static final int CODE_RESULT_UPLOAD_FILES = 200;
+    
 
     /**
      * Creates a new upload request.
