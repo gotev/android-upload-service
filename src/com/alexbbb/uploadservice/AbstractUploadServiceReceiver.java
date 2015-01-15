@@ -40,8 +40,10 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
                         break;
 
                     case UploadService.STATUS_IN_PROGRESS:
-                        final int progress = intent.getIntExtra(UploadService.PROGRESS, 0);
-                        onProgress(uploadId, progress);
+                        final int progressWholeTask = intent.getIntExtra(UploadService.PROGRESS_TASK, 0);
+                        final int progressCurrentFile = intent.getIntExtra(UploadService.PROGRESS_FILE, 0);
+                        final String fileNameBeingUploaded = intent.getStringExtra(UploadService.FILE_NAME);
+                        onProgress(uploadId, progressWholeTask, progressCurrentFile, fileNameBeingUploaded);
                         break;
 
                     default:
@@ -76,9 +78,12 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
      * Called when the upload progress changes.
      * 
      * @param uploadId unique ID of the upload request
-     * @param progress value from 0 to 100
+     * @param progressTask value from 0 to 100
+     * @param progressCurrentFile Progress from 0 to 100 of current file
+     * @param fileNameBeingUploaded File name of file being uploaded
      */
-    public abstract void onProgress(final String uploadId, final int progress);
+    public abstract void onProgress(final String uploadId, final int progressTask, final int progressCurrentFile,
+                                    final String fileNameBeingUploaded);
 
     /**
      * Called when an error happens during the upload.

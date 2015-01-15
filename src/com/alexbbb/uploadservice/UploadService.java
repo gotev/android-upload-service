@@ -56,7 +56,9 @@ public class UploadService extends IntentService {
     public static final int STATUS_IN_PROGRESS = 1;
     public static final int STATUS_COMPLETED = 2;
     public static final int STATUS_ERROR = 3;
-    public static final String PROGRESS = "progress";
+    public static final String PROGRESS_TASK = "progress_task";
+    public static final String PROGRESS_FILE = "progress_file";
+    public static final String FILE_NAME = "file_currently_downloading";
     public static final String ERROR_EXCEPTION = "errorException";
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
@@ -151,7 +153,7 @@ public class UploadService extends IntentService {
                     task.setRunning(false);
                     try {
                         wakeLock.release();
-                    } catch (Exception e) {                        
+                    } catch (Exception e) {
                     }
                     Bundle bundle = new Bundle();
                     bundle.putParcelableArrayList(UploadRequest.KEY_RESULT_UPLAOD_FILES, files);
@@ -266,14 +268,14 @@ public class UploadService extends IntentService {
                                                                                                 IOException,
                                                                                                 FileNotFoundException {
 
-        final long totalBytesOfAllFiles = getTotalBytes(filesToUpload);        
-        long uploadedBytes = 0;
-        long currentFileSize = 0; //length 0 means file doesn't exist
+        final long totalBytesOfAllFiles = getTotalBytes(filesToUpload);
+        long totalUploadedBytesOfAllFiles = 0;
+        long currentFileSize = 0; // length 0 means file doesn't exist
         long currentFileUploadedBytes;
-        
-        for (FileToUpload file : filesToUpload) {            
-            currentFileSize = file.length(); //get length for every file
-            currentFileUploadedBytes = 0; //for every file reinitialize it to ZERO           
+
+        for (FileToUpload file : filesToUpload) {
+            currentFileSize = file.length(); // get length for every file
+            currentFileUploadedBytes = 0; // for every file reinitialize it to ZERO
             requestStream.write(boundaryBytes, 0, boundaryBytes.length);
             byte[] headerBytes = file.getMultipartHeader();
             requestStream.write(headerBytes, 0, headerBytes.length);
@@ -282,19 +284,20 @@ public class UploadService extends IntentService {
             byte[] buffer = new byte[BUFFER_SIZE];
             long bytesRead;
             boolean isExceptionRaised = false;
-            
+
             try {
                 while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0) {
                     requestStream.write(buffer, 0, buffer.length);
-                    uploadedBytes += bytesRead;
+                    totalUploadedBytesOfAllFiles += bytesRead;
                     currentFileUploadedBytes += bytesRead;
-                    broadcastProgress(uploadId, uploadedBytes, totalBytesOfAllFiles);
+                    broadcastProgress(uploadId, totalUploadedBytesOfAllFiles, currentFileUploadedBytes,
+                                      totalBytesOfAllFiles, currentFileSize, file.getName());
                 }
             } catch (IOException io) {
                 isExceptionRaised = true;
                 file.setUploaded(false);
             } finally {
-                if (!isExceptionRaised && currentFileSize!=0 && currentFileSize == currentFileUploadedBytes) {
+                if (!isExceptionRaised && currentFileSize != 0 && currentFileSize == currentFileUploadedBytes) {
                     file.setUploaded(true);
                 }
                 closeInputStream(stream);
@@ -340,9 +343,22 @@ public class UploadService extends IntentService {
         }
     }
 
-    private void broadcastProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
+    /**
+     * 
+     * @param uploadId uploadId of your {@link UploadRequest Task}
+     * @param totalUploadedBytesOfAllTask Total uploaded bytes that includes calculation of all the files in a
+     * {@link UploadRequest Task}
+     * @param currentFileUploadBytes Current {@link FileToUpload File} uploaded byes of
+     * @param totalSizeBytesOfAllFilesInTask Total bytes of all file in a {@link UploadRequest Task}
+     * @param totalSizeBytesOfCurrentFile Current File Size in Bytes
+     * @param currentFileName File name of current {@link FileToUpload file} being uploaded
+     */
+    private void broadcastProgress(final String uploadId, final long totalUploadedBytesOfAllTask,
+                                   final long currentFileUploadBytes, final long totalSizeBytesOfAllFilesInTask,
+                                   final long totalSizeBytesOfCurrentFile, final String currentFileName) {
 
-        final int progress = (int) (uploadedBytes * 100 / totalBytes);
+        final int progress = (int) (totalUploadedBytesOfAllTask * 100 / totalSizeBytesOfAllFilesInTask);
+        final int progressCurrentFile = (int) (currentFileUploadBytes * 100 / totalSizeBytesOfCurrentFile);
         if (progress <= lastPublishedProgress)
             return;
         lastPublishedProgress = progress;
@@ -352,7 +368,9 @@ public class UploadService extends IntentService {
         final Intent intent = new Intent(getActionBroadcast());
         intent.putExtra(UPLOAD_ID, uploadId);
         intent.putExtra(STATUS, STATUS_IN_PROGRESS);
-        intent.putExtra(PROGRESS, progress);
+        intent.putExtra(PROGRESS_TASK, progress);
+        intent.putExtra(PROGRESS_FILE, progressCurrentFile);
+        intent.putExtra(FILE_NAME, currentFileName);
         sendBroadcast(intent);
     }
 
