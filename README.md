@@ -54,10 +54,26 @@ In the <b>examples</b> folder you will find:
 To be able to compile and deploy the demo application, you also need to have <b>appcompat_v7</b> library. You may need to change the path to that library in the demo application's properties.
 
 ## How to start android upload service to upload files
-For detailed explanation of each parameter, please check JavaDocs.
+For detailed explanation of each parameter, please check JavaDocs. 
+
+* One Task (UploadRequest) can contain multiple files to upload
+* You can push multiple Task (UploadRequest), each will run on background thread but process one file of one task at a time
+* If one file in a Task (UploadRequest) fails, it will try to upload next file but mark the Task (UploadRequest) as failed. You can get information about which files have failed in "onFilesUploadResultReceived(ArrayList<FileToUpload> files)" 
 
     public void upload(final Context context) {
-        final UploadRequest request = new UploadRequest(context,
+    	  AbstractFileUploadResultReceiver receiver = new AbstractFileUploadResultReceiver(
+				new Handler()) {
+
+			@Override
+			public void onFilesUploadResultReceived(
+					ArrayList<FileToUpload> files) {
+				for(FileToUpload file : files){
+					System.out.println("Is file successful " + file.isUploaded());					
+				}
+			}
+		};
+		
+        final UploadRequest request = new UploadRequest(context,receiver,
                                                         "custom-upload-id",
                                                         "http://www.yoursite.com/yourscript");
 
@@ -180,7 +196,7 @@ Let me know, and I'll be glad to include a link in the following list :)
 
 ## License
 
-    Copyright (C) 2013 Aleksandar Gotev
+    Copyright (C) 2013 Aleksandar Gotev, eliasnaur, AZ Aizaz
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
