@@ -14,7 +14,7 @@ import android.content.IntentFilter;
  * 
  * @author alexbbb (Alex Gotev)
  * @author eliasnaur
- * 
+ * @author AZ Aizaz
  */
 public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
 

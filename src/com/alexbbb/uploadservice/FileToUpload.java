@@ -14,9 +14,9 @@ import android.os.Parcelable;
  *
  * @author alexbbb (Alex Gotev)
  * @author eliasnaur
- *
+ * @author AZ Aizaz
  */
-class FileToUpload implements Parcelable {
+public class FileToUpload implements Parcelable {
 
     private static final String NEW_LINE = "\r\n";
 
@@ -24,6 +24,7 @@ class FileToUpload implements Parcelable {
     private final String fileName;
     private final String paramName;
     private final String contentType;
+    private boolean isUploaded = false;
 
     /**
      * Create a new {@link FileToUpload} object.
@@ -75,6 +76,14 @@ class FileToUpload implements Parcelable {
     public long length() {
         return file.length();
     }
+    
+    public void setUploaded(boolean result) {
+        this.isUploaded = result;
+    }
+    
+    public boolean isUploaded(){
+        return this.isUploaded;
+    }
 
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
@@ -102,6 +111,7 @@ class FileToUpload implements Parcelable {
         parcel.writeString(paramName);
         parcel.writeString(contentType);
         parcel.writeString(fileName);
+        parcel.writeString(String.valueOf(isUploaded));
     }
 
     private FileToUpload(Parcel in) {
@@ -109,5 +119,6 @@ class FileToUpload implements Parcelable {
         paramName = in.readString();
         contentType = in.readString();
         fileName = in.readString();
+        isUploaded = Boolean.valueOf(in.readString());
     }
 }

@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.os.ResultReceiver;
 
 /**
  * Represents an upload request.
  * 
  * @author alexbbb (Alex Gotev)
  * @author eliasnaur
- * 
+ * @author AZ Aizaz
  */
 public class UploadRequest {
 
@@ -24,6 +25,12 @@ public class UploadRequest {
     private final ArrayList<FileToUpload> filesToUpload;
     private final ArrayList<NameValue> headers;
     private final ArrayList<NameValue> parameters;
+    private boolean isRunning = false;
+    private boolean isSuccessful = false;
+    private AbstractFileUploadResultReceiver resultReceiver;
+    
+    public static final String KEY_RESULT_UPLAOD_FILES = "ResultFiles";
+    public static final int CODE_RESULT_UPLOAD_FILES = 200;
 
     /**
      * Creates a new upload request.
@@ -33,8 +40,9 @@ public class UploadRequest {
      * updates.
      * @param serverUrl URL of the server side script that handles the multipart form upload
      */
-    public UploadRequest(final Context context, final String uploadId, final String serverUrl) {
+    public UploadRequest(final Context context, final AbstractFileUploadResultReceiver resultReceiver, final String uploadId, final String serverUrl) {
         this.context = context;
+        this.resultReceiver = resultReceiver;
         this.uploadId = uploadId;
         notificationConfig = new UploadNotificationConfig();
         url = serverUrl;
@@ -221,4 +229,30 @@ public class UploadRequest {
     protected Context getContext() {
         return context;
     }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean isRunning) {
+        this.isRunning = isRunning;
+    }
+
+    /**
+     * 
+     * @return true is all the files in the task are uploaded. You can see which file is not uploaded by {@link #FileToUpload} {@code isUploaded()}
+     * 
+     */
+    public boolean isSuccessful() {
+        return isSuccessful;
+    }
+
+    public void setSuccessful(boolean isSuccess) {
+        this.isSuccessful = isSuccess;
+    }    
+    
+    public ResultReceiver getResultReceiver(){
+        return this.resultReceiver;
+    }
+    
 }

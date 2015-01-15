@@ -14,7 +14,9 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.PowerManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
@@ -24,6 +26,7 @@ import android.support.v4.app.NotificationCompat.Builder;
  * 
  * @author alexbbb (Alex Gotev)
  * @author eliasnaur
+ * @author AZ Aizaz
  */
 public class UploadService extends IntentService {
 
@@ -64,6 +67,8 @@ public class UploadService extends IntentService {
     private UploadNotificationConfig notificationConfig;
     private int lastPublishedProgress;
 
+    private static UploadRequest task;
+
     public static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
     }
@@ -79,13 +84,15 @@ public class UploadService extends IntentService {
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid
      */
-    public static void startUpload(final UploadRequest task) throws IllegalArgumentException, MalformedURLException {
+    public static void startUpload(@NonNull final UploadRequest task) throws IllegalArgumentException,
+                                                                     MalformedURLException {
 
         if (task == null) {
             throw new IllegalArgumentException("Can't pass an empty task!");
 
         } else {
             task.validate();
+            UploadService.task = task;
 
             final Intent intent = new Intent(task.getContext(), UploadService.class);
 
@@ -122,6 +129,7 @@ public class UploadService extends IntentService {
             final String action = intent.getAction();
 
             if (getActionUpload().equals(action)) {
+                task.setRunning(true);
                 notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
                 final String uploadId = intent.getStringExtra(PARAM_ID);
                 final String url = intent.getStringExtra(PARAM_URL);
@@ -135,10 +143,19 @@ public class UploadService extends IntentService {
                 try {
                     createNotification();
                     handleFileUpload(uploadId, url, method, files, headers, parameters);
+                    task.setSuccessful(true);
                 } catch (Exception exception) {
+                    task.setSuccessful(false);
                     broadcastError(uploadId, exception);
                 } finally {
-                    wakeLock.release();
+                    task.setRunning(false);
+                    try {
+                        wakeLock.release();
+                    } catch (Exception e) {                        
+                    }
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelableArrayList(UploadRequest.KEY_RESULT_UPLAOD_FILES, files);
+                    task.getResultReceiver().send(UploadRequest.CODE_RESULT_UPLOAD_FILES, bundle);
                 }
             }
         }
@@ -175,6 +192,7 @@ public class UploadService extends IntentService {
         } finally {
             closeOutputStream(requestStream);
             closeConnection(conn);
+
         }
     }
 
@@ -248,10 +266,14 @@ public class UploadService extends IntentService {
                                                                                                 IOException,
                                                                                                 FileNotFoundException {
 
-        final long totalBytes = getTotalBytes(filesToUpload);
+        final long totalBytesOfAllFiles = getTotalBytes(filesToUpload);        
         long uploadedBytes = 0;
-
-        for (FileToUpload file : filesToUpload) {
+        long currentFileSize = 0; //length 0 means file doesn't exist
+        long currentFileUploadedBytes;
+        
+        for (FileToUpload file : filesToUpload) {            
+            currentFileSize = file.length(); //get length for every file
+            currentFileUploadedBytes = 0; //for every file reinitialize it to ZERO           
             requestStream.write(boundaryBytes, 0, boundaryBytes.length);
             byte[] headerBytes = file.getMultipartHeader();
             requestStream.write(headerBytes, 0, headerBytes.length);
@@ -259,14 +281,22 @@ public class UploadService extends IntentService {
             final InputStream stream = file.getStream();
             byte[] buffer = new byte[BUFFER_SIZE];
             long bytesRead;
-
+            boolean isExceptionRaised = false;
+            
             try {
                 while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0) {
                     requestStream.write(buffer, 0, buffer.length);
                     uploadedBytes += bytesRead;
-                    broadcastProgress(uploadId, uploadedBytes, totalBytes);
+                    currentFileUploadedBytes += bytesRead;
+                    broadcastProgress(uploadId, uploadedBytes, totalBytesOfAllFiles);
                 }
+            } catch (IOException io) {
+                isExceptionRaised = true;
+                file.setUploaded(false);
             } finally {
+                if (!isExceptionRaised && currentFileSize!=0 && currentFileSize == currentFileUploadedBytes) {
+                    file.setUploaded(true);
+                }
                 closeInputStream(stream);
             }
         }
