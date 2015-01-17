@@ -9,12 +9,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -66,7 +68,13 @@ public class UploadService extends IntentService {
     public static final String KEY_RESULT_UPLAOD_FILES = "ResultFiles";
     public static final String KEY_TASK_UUID = "TaskUUID";
     public static final int CODE_RESULT_UPLOAD_FILES = 200;
-
+    
+    //updating Android Notification can cause lag
+    private long NotificationUpdateInterval = TimeUnit.SECONDS.toMillis(4);
+    private volatile boolean postedToHandler = false;
+    private UpdateNotificationRunnable notificationUpdaterRunnable = new UpdateNotificationRunnable();
+    private int progressToPost = 0;
+    private Handler handler = new Handler();
     private NotificationManager notificationManager;
     private Builder notification;
     private PowerManager.WakeLock wakeLock;
@@ -367,11 +375,19 @@ public class UploadService extends IntentService {
 
         final int progress = (int) (totalUploadedBytesOfAllTask * 100 / totalSizeBytesOfAllFilesInTask);
         final int progressCurrentFile = (int) (currentFileUploadBytes * 100 / totalSizeBytesOfCurrentFile);
-//        if (progress <= lastPublishedProgress)
-//            return;
+        progressToPost = progressCurrentFile;
+        //whole upload request (Task) progress
+        if (progress > lastPublishedProgress){
+            //just need to post once, handler is recursive
+            if(!postedToHandler){
+                postedToHandler = true;
+                handler.post(notificationUpdaterRunnable);
+            }
+        }
+            
         lastPublishedProgress = progress;
 
-        updateNotificationProgress(progress);
+//        updateNotificationProgress(progress);
 
         final Intent intent = new Intent(getActionBroadcast());
         intent.putExtra(UPLOAD_ID, uploadId);
@@ -434,6 +450,9 @@ public class UploadService extends IntentService {
     }
 
     private void updateNotificationCompleted() {
+
+        handler.removeCallbacks(notificationUpdaterRunnable);
+        postedToHandler = false;
         stopForeground(notificationConfig.isAutoClearOnSuccess());
 
         if (!notificationConfig.isAutoClearOnSuccess()) {
@@ -452,5 +471,15 @@ public class UploadService extends IntentService {
                 .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(0, 0, false).setOngoing(false);
 
         notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
+    }
+    
+    class UpdateNotificationRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            updateNotificationProgress(progressToPost);
+            handler.postDelayed(this, NotificationUpdateInterval);
+        }
+
     }
 }
