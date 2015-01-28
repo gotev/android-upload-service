@@ -1,6 +1,5 @@
 package com.alexbbb.uploadservice;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -55,21 +54,21 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
     /**
      * Register this upload receiver. It's recommended to register the receiver in Activity's onResume method.
      * 
-     * @param activity activity in which to register this receiver
+     * @param context context in which to register this receiver
      */
-    public void register(final Activity activity) {
+    public void register(final Context context) {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(UploadService.getActionBroadcast());
-        activity.registerReceiver(this, intentFilter);
+        context.registerReceiver(this, intentFilter);
     }
 
     /**
      * Unregister this upload receiver. It's recommended to unregister the receiver in Activity's onPause method.
      * 
-     * @param activity activity in which to unregister this receiver
+     * @param context context in which to unregister this receiver
      */
-    public void unregister(final Activity activity) {
-        activity.unregisterReceiver(this);
+    public void unregister(final Context context) {
+        context.unregisterReceiver(this);
     }
 
     /**
