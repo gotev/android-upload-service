@@ -1,8 +1,10 @@
 package com.alexbbb.uploadservice;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -154,6 +156,7 @@ public class UploadService extends IntentService {
 
         HttpURLConnection conn = null;
         OutputStream requestStream = null;
+        InputStream responseStream = null;
 
         try {
             conn = getMultipartHttpURLConnection(url, method, boundary);
@@ -168,14 +171,42 @@ public class UploadService extends IntentService {
             final byte[] trailer = getTrailerBytes(boundary);
             requestStream.write(trailer, 0, trailer.length);
             final int serverResponseCode = conn.getResponseCode();
-            final String serverResponseMessage = conn.getResponseMessage();
+
+            if (serverResponseCode / 100 == 2) {
+                responseStream = conn.getInputStream();
+            } else { // getErrorStream if the response code is not 2xx
+                responseStream = conn.getErrorStream();
+            }
+            final String serverResponseMessage = getResponseBodyAsString(responseStream);
 
             broadcastCompleted(uploadId, serverResponseCode, serverResponseMessage);
 
         } finally {
             closeOutputStream(requestStream);
+            closeInputStream(responseStream);
             closeConnection(conn);
         }
+    }
+
+    private String getResponseBodyAsString(final InputStream inputStream) {
+        StringBuilder outString = new StringBuilder();
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                outString.append(line);
+            }
+        } catch (Exception exc) {
+            try {
+                if (reader != null)
+                    reader.close();
+            } catch (Exception readerExc) {
+            }
+        }
+
+        return outString.toString();
     }
 
     private String getBoundary() {
