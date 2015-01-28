@@ -289,11 +289,11 @@ public class UploadService extends IntentService {
 
             final InputStream stream = file.getStream();
             byte[] buffer = new byte[BUFFER_SIZE];
-            long bytesRead;
+            int bytesRead;
 
             try {
                 while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0) {
-                    requestStream.write(buffer, 0, buffer.length);
+                    requestStream.write(buffer, 0, bytesRead);
                     uploadedBytes += bytesRead;
                     broadcastProgress(uploadId, uploadedBytes, totalBytes);
                 }
