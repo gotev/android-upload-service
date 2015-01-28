@@ -20,30 +20,36 @@ Check out the project and add android-upload-service to your project as an [Andr
 
 Add the following to your project's AndroidManifest.xml file:
 
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+```
 
 And before the tag:
 
-    </ application>
+```xml
+</ application>
+```
 
 add the following (by changing <b>com.yourcompany.yourapp</b> to your custom app namespace):
 
-    <service
-        android:name="com.alexbbb.uploadservice.UploadService"
-        android:enabled="true"
-        android:exported="false" >
-        <intent-filter>
-            <action android:name="com.yourcompany.yourapp.uploadservice.action.upload"/>
-        </intent-filter>
-    </service>
+```xml
+<service
+    android:name="com.alexbbb.uploadservice.UploadService"
+    android:enabled="true"
+    android:exported="false" >
+    <intent-filter>
+        <action android:name="com.yourcompany.yourapp.uploadservice.action.upload"/>
+    </intent-filter>
+</service>
+```
 
 In your application's initialization code (for example in the onCreate method of your android.app.Application subclass), add:
 
-    UploadService.NAMESPACE = "com.yourcompany.yourapp";
-
+```java
+UploadService.NAMESPACE = "com.yourcompany.yourapp";
+```
 
 ## Examples
 In the <b>examples</b> folder you will find:
@@ -56,62 +62,64 @@ To be able to compile and deploy the demo application, you also need to have <b>
 ## How to start android upload service to upload files
 For detailed explanation of each parameter, please check JavaDocs.
 
-    public void upload(final Context context) {
-        final UploadRequest request = new UploadRequest(context,
-                                                        "custom-upload-id",
-                                                        "http://www.yoursite.com/yourscript");
+```java
+public void upload(final Context context) {
+    final UploadRequest request = new UploadRequest(context,
+                                                    "custom-upload-id",
+                                                    "http://www.yoursite.com/yourscript");
 
-        /*
-         * parameter-name: is the name of the parameter that will contain file's data.
-         * Pass "uploaded_file" if you're using the test PHP script
-         *
-         * custom-file-name.extension: is the file name seen by the server.
-         * E.g. value of $_FILES["uploaded_file"]["name"] of the test PHP script
-         */
-        request.addFileToUpload("/absolute/path/to/your/file",
-                                "parameter-name",
-                                "custom-file-name.extension",
-                                "content-type"));
+    /*
+     * parameter-name: is the name of the parameter that will contain file's data.
+     * Pass "uploaded_file" if you're using the test PHP script
+     *
+     * custom-file-name.extension: is the file name seen by the server.
+     * E.g. value of $_FILES["uploaded_file"]["name"] of the test PHP script
+     */
+    request.addFileToUpload("/absolute/path/to/your/file",
+                            "parameter-name",
+                            "custom-file-name.extension",
+                            "content-type"));
 
-        //You can add your own custom headers
-        request.addHeader("your-custom-header", "your-custom-value");
+    //You can add your own custom headers
+    request.addHeader("your-custom-header", "your-custom-value");
 
-        //and parameters
-        request.addParameter("parameter-name", "parameter-value");
+    //and parameters
+    request.addParameter("parameter-name", "parameter-value");
 
-        //If you want to add a parameter with multiple values, you can do the following:
-        request.addParameter("array-parameter-name", "value1");
-        request.addParameter("array-parameter-name", "value2");
-        request.addParameter("array-parameter-name", "valueN");
+    //If you want to add a parameter with multiple values, you can do the following:
+    request.addParameter("array-parameter-name", "value1");
+    request.addParameter("array-parameter-name", "value2");
+    request.addParameter("array-parameter-name", "valueN");
 
-        //or
-        String[] values = new String[] {"value1", "value2", "valueN"};
-        request.addArrayParameter("array-parameter-name", values);
+    //or
+    String[] values = new String[] {"value1", "value2", "valueN"};
+    request.addArrayParameter("array-parameter-name", values);
 
-        //or
-        List<String> valuesList = new ArrayList<String>();
-        valuesList.add("value1");
-        valuesList.add("value2");
-        valuesList.add("valueN");
-        request.addArrayParameter("array-parameter-name", valuesList);
+    //or
+    List<String> valuesList = new ArrayList<String>();
+    valuesList.add("value1");
+    valuesList.add("value2");
+    valuesList.add("valueN");
+    request.addArrayParameter("array-parameter-name", valuesList);
 
-        //configure the notification
-        request.setNotificationConfig(android.R.drawable.ic_menu_upload,
-                                      "notification title",
-                                      "upload in progress text",
-                                      "upload completed successfully text"
-                                      "upload error text",
-                                      false);
+    //configure the notification
+    request.setNotificationConfig(android.R.drawable.ic_menu_upload,
+                                  "notification title",
+                                  "upload in progress text",
+                                  "upload completed successfully text"
+                                  "upload error text",
+                                  false);
 
-        try {
-            //Start upload service and display the notification
-            UploadService.startUpload(request);
+    try {
+        //Start upload service and display the notification
+        UploadService.startUpload(request);
 
-        } catch (Exception exc) {
-            //You will end up here only if you pass an incomplete UploadRequest
-            Log.e("AndroidUploadService", exc.getLocalizedMessage(), exc);
-        }
+    } catch (Exception exc) {
+        //You will end up here only if you pass an incomplete UploadRequest
+        Log.e("AndroidUploadService", exc.getLocalizedMessage(), exc);
     }
+}
+```
 
 ## How to monitor upload status
 Once the service is started, it publishes the upload status with broadcast intents.
@@ -119,57 +127,65 @@ For the sake of simplicity and to not bother you with the writing of a broadcast
 an abstract broadcast receiver has been implemented for you and you just need to extend it and add your custom code.
 So to listen for the status of the upload service in an Activity for example, you just need to do the following:
 
-    public class YourActivity extends Activity {
+```java
+public class YourActivity extends Activity {
 
-        private static final String TAG = "AndroidUploadService";
+    private static final String TAG = "AndroidUploadService";
 
-        ...
+    ...
 
-        private final AbstractUploadServiceReceiver uploadReceiver =
-        new AbstractUploadServiceReceiver() {
-
-            @Override
-            public void onProgress(String uploadId, int progress) {
-                Log.i(TAG, "The progress of the upload with ID "
-                           + uploadId + " is: " + progress);
-            }
-
-            @Override
-            public void onError(String uploadId, Exception exception) {
-                Log.e(TAG, "Error in upload with ID: " + uploadId + ". "
-                           + exception.getLocalizedMessage(), exception);
-            }
-
-            @Override
-            public void onCompleted(String uploadId,
-                                    int serverResponseCode,
-                                    String serverResponseMessage) {
-                Log.i(TAG, "Upload with ID " + uploadId
-                           + " is completed: " + serverResponseCode
-                           + ", " + serverResponseMessage);
-            }
-        };
+    private final AbstractUploadServiceReceiver uploadReceiver =
+    new AbstractUploadServiceReceiver() {
 
         @Override
-        protected void onResume() {
-            super.onResume();
-            uploadReceiver.register(this);
+        public void onProgress(String uploadId, int progress) {
+            Log.i(TAG, "The progress of the upload with ID "
+                       + uploadId + " is: " + progress);
         }
 
         @Override
-        protected void onPause() {
-            super.onPause();
-            uploadReceiver.unregister(this);
+        public void onError(String uploadId, Exception exception) {
+            Log.e(TAG, "Error in upload with ID: " + uploadId + ". "
+                       + exception.getLocalizedMessage(), exception);
         }
 
+        @Override
+        public void onCompleted(String uploadId,
+                                int serverResponseCode,
+                                String serverResponseMessage) {
+            Log.i(TAG, "Upload with ID " + uploadId
+                       + " has been completed with HTTP " + serverResponseCode
+                       + ". Response from server: " + serverResponseMessage);
+            
+            //If your server responds with a JSON, you can parse it
+            //from serverResponseMessage string using a library 
+            //such as org.json (embedded in Android) or google's gson
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        uploadReceiver.register(this);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        uploadReceiver.unregister(this);
+    }
+
+}
+```
 
 If you want to monitor upload status in all of your activities, then just implement the BroadcastReceiver in your base activity class, from which all of your activities inherits and you're done.
 
 ## Using HTTPS connection with self-signed certificates
 For security reasons, the library doesn't accept self-signed certificates by default when using HTTPS connections, but you can enable them by calling:
 
-    AllCertificatesAndHostsTruster.apply();
+```java
+AllCertificatesAndHostsTruster.apply();
+```
 
 before starting the upload service.
 
@@ -180,7 +196,7 @@ Let me know, and I'll be glad to include a link in the following list :)
 
 ## License
 
-    Copyright (C) 2013 Aleksandar Gotev
+    Copyright (C) 2013-2015 Aleksandar Gotev
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
