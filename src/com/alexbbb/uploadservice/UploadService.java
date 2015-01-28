@@ -159,7 +159,7 @@ public class UploadService extends IntentService {
         InputStream responseStream = null;
 
         try {
-            conn = getMultipartHttpURLConnection(url, method, boundary);
+            conn = getMultipartHttpURLConnection(url, method, boundary, filesToUpload.size());
 
             setRequestHeaders(conn, requestHeaders);
 
@@ -233,10 +233,8 @@ public class UploadService extends IntentService {
         return builder.toString().getBytes("US-ASCII");
     }
 
-    private
-            HttpURLConnection
-            getMultipartHttpURLConnection(final String url, final String method, final String boundary)
-                                                                                                       throws IOException {
+    private HttpURLConnection getMultipartHttpURLConnection(final String url, final String method,
+                                                            final String boundary, int totalFiles) throws IOException {
         final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
         conn.setDoInput(true);
@@ -244,7 +242,11 @@ public class UploadService extends IntentService {
         conn.setUseCaches(false);
         conn.setChunkedStreamingMode(0);
         conn.setRequestMethod(method);
-        conn.setRequestProperty("Connection", "close");
+        if (totalFiles <= 1) {
+            conn.setRequestProperty("Connection", "close");
+        } else {
+            conn.setRequestProperty("Connection", "Keep-Alive");
+        }
         conn.setRequestProperty("ENCTYPE", "multipart/form-data");
         conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
