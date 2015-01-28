@@ -244,7 +244,7 @@ public class UploadService extends IntentService {
         conn.setUseCaches(false);
         conn.setChunkedStreamingMode(0);
         conn.setRequestMethod(method);
-        conn.setRequestProperty("Connection", "Keep-Alive");
+        conn.setRequestProperty("Connection", "close");
         conn.setRequestProperty("ENCTYPE", "multipart/form-data");
         conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
