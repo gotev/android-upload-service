@@ -145,8 +145,12 @@ So to listen for the status of the upload service in an Activity for example, yo
                                     int serverResponseCode,
                                     String serverResponseMessage) {
                 Log.i(TAG, "Upload with ID " + uploadId
-                           + " is completed: " + serverResponseCode
-                           + ", " + serverResponseMessage);
+                           + " has been completed with HTTP " + serverResponseCode
+                           + ". Response from server: " + serverResponseMessage);
+                
+                //If your server responds with a JSON, you can parse it
+                //from serverResponseMessage string using a library 
+                //such as org.json (embedded in Android) or google's gson
             }
         };
 
@@ -180,7 +184,7 @@ Let me know, and I'll be glad to include a link in the following list :)
 
 ## License
 
-    Copyright (C) 2013 Aleksandar Gotev
+    Copyright (C) 2013-2015 Aleksandar Gotev
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
