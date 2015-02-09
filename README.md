@@ -1,7 +1,7 @@
 Android Upload Service
 ======================
 
->Android library that provides an easy to use service to upload files with Android Notification Center integration. Added functionality to report status of files and upload request whether they have uploaded successfully or failed. You can push as much UploadRequest as you need, also each UplaodRequest can have multiple files but it will run one request at a time (you can queue as many requests are you want), it will update progress bar notification for each file after every 4 seconds. Please note that Examples project is outdated, see example in the description
+>Android library that provides an easy to use service to upload files with Android Notification Center integration. Added functionality to report status of files and upload request whether they have uploaded successfully or failed. You can push as much UploadRequest as you need, also each UplaodRequest can have multiple files but it will run one request (one file from request) at a time (you can queue as many requests are you want), it will update progress bar notification for each file after every 4 seconds. Please note that Examples project is outdated, see example in the description
 
 ## Purpose
 I needed an easy and efficient way to upload multipart form data (HTTP parameters and files) to a server, and
