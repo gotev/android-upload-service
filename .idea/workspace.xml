@@ -2,58 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b619983e-dd2f-46ad-90e8-bcdf7825eb61" name="Default" comment="Added updated demo project">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/0y3uACw.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/9PcLf86.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/DOGE-10.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/DOGE-16.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/DOGE-6.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/DgKWqio.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/P8hx3pg.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/libs/android-support-v4.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/e3LxhEC.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/ic_launcher-web.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/drawable-hdpi/ic_launcher.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/drawable-mdpi/ic_launcher.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/drawable-xhdpi/ic_launcher.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/drawable-xxhdpi/ic_launcher.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/p3jUQjI.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/assets/vSxLdXJ.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.classpath" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.gitignore" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.project" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/AndroidManifest.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/App.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/views/ExpandableHeightGridView.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/FileProgressListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/adapters/ImageGridAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/adapters/ImageGridSelectableAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/MainActivity.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/RequestProgressListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/views/SquareLayout.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/Tests.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/adapters/UploadRequestAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/src/com/alexbbb/uploadservice/demo/Utils.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/layout/activity_main.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/android-upload-service-demo.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/values/colors.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/compiler.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/values/dimens.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/values-w820dp/dimens.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/layout/image_item.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/layout/image_selectable_item.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.settings/org.eclipse.jdt.core.prefs" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/copyright/profiles_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/proguard-project.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/project.properties" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/values/strings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/res/layout/upload_request_item.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/android-upload-service-demo/.idea/workspace.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/media/Upload_Service_Demo.mp4" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="android-upload-service.iws" />
@@ -80,8 +29,8 @@
       <file leaf-file-name="README.md" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="4.135135" vertical-offset="0" max-vertical-offset="3808">
-              <caret line="207" column="24" selection-start-line="207" selection-start-column="24" selection-end-line="207" selection-end-column="24" />
+            <state vertical-scroll-proportion="0.27967098" vertical-offset="0" max-vertical-offset="3808">
+              <caret line="14" column="115" selection-start-line="14" selection-start-column="115" selection-end-line="14" selection-end-column="115" />
               <folding />
             </state>
           </provider>
@@ -164,47 +113,7 @@
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="examples">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="android-upload-service">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="examples">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="android-upload-service-demo">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="android-upload-service">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="examples">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="android-upload-service-demo">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="src/com/alexbbb/uploadservice/demo">
+            <PATH_ELEMENT USER_OBJECT="media">
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
@@ -233,7 +142,12 @@
     <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
     <property name="FullScreen" value="false" />
-    <property name="SearchEverywhereHistoryKey" value="Abstract&#9;FILE&#9;file://E:/Android-Workpsace-cloudforge_New/android-upload-service/src/com/alexbbb/uploadservice/AbstractFileUploadResultReceiver.java" />
+    <property name="SearchEverywhereHistoryKey" value="read&#9;FILE&#9;file://E:/Android-Workpsace-cloudforge_New/android-upload-service/README.md&#10;Abstract&#9;FILE&#9;file://E:/Android-Workpsace-cloudforge_New/android-upload-service/src/com/alexbbb/uploadservice/AbstractFileUploadResultReceiver.java" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Android-Workpsace-cloudforge_New\android-upload-service\media" />
+    </key>
   </component>
   <component name="RestoreUpdateTree">
     <UpdateInfo date="Moments ago" ActionInfo="_Update">
@@ -481,7 +395,15 @@
       <created>1421303926965</created>
       <updated>1421303926965</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added updated demo project">
+      <created>1423477282843</created>
+      <updated>1423477282843</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added updated demo project">
+      <created>1423478622280</created>
+      <updated>1423478622280</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -649,8 +571,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="4.135135" vertical-offset="0" max-vertical-offset="3808">
-          <caret line="207" column="24" selection-start-line="207" selection-start-column="24" selection-end-line="207" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.27967098" vertical-offset="0" max-vertical-offset="3808">
+          <caret line="14" column="115" selection-start-line="14" selection-start-column="115" selection-end-line="14" selection-end-column="115" />
           <folding />
         </state>
       </provider>
