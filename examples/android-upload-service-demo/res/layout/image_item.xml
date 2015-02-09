@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.alexbbb.uploadservice.demo.views.SquareLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical">
+
+    <ImageView android:id="@+id/imageView" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:scaleType="fitXY"
+        android:src="@drawable/ic_launcher" />
+    <TextView android:id="@+id/tv_progress" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:background="@color/transparent_black"
+        android:gravity="center" />
+</com.alexbbb.uploadservice.demo.views.SquareLayout>
