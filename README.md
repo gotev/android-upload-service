@@ -16,6 +16,11 @@ have to deal with the nightmare of concurrency. Also, an IntentService is much m
 gets executed in the background and it's completely detached from the UI thread. If you need to show status in your UI,
 read further and you'll discover how to do it very easily.
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=rXPDgkQBArQ
+" target="_blank"><img src="http://img.youtube.com/vi/rXPDgkQBArQ/0.jpg"
+alt="Demo sample video" width="240" height="180" border="10" /></a>
+
+
 ## Setup
 
 Check out the project and add android-upload-service to your project as an [Android Library Project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject).
