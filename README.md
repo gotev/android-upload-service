@@ -62,9 +62,9 @@ For detailed explanation of each parameter, please check JavaDocs.
 * You can push multiple Task (UploadRequest), each will run on background thread but process one file of one task at a time
 * If one file in a Task (UploadRequest) fails, it will try to upload next file but mark the Task (UploadRequest) as failed. You can get information about which files have failed in "onFilesUploadResultReceived(ArrayList<FileToUpload> files, final String taskid);" 
 
-    public void upload(final Context context) {
+    `public void upload(final Context context) {
     	  AbstractFileUploadResultReceiver receiver = new AbstractFileUploadResultReceiver(
-				new Handler()) {
+				new Handler()) {`
 
 			@Override
 			public void onFilesUploadResultReceived(
