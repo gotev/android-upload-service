@@ -55,7 +55,7 @@ UploadService.NAMESPACE = "com.yourcompany.yourapp";
 In the <b>examples</b> folder you will find:
 
 * Demo servers which handle multipart form upload in:
-  * <b>PHP</b>. You need a running web server (e.g. Apache + PHP) in which to put the script
+  * <b>PHP</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
   * <b>node.js</b>. You need to have node.js and npm installed. [Refer to this guide](https://github.com/joyent/node/wiki/installing-node.js-via-package-manager). To run the server, open a terminal, navigate to ```examples/server-nodejs``` folder and simply execute:
 
     ```
