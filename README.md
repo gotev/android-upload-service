@@ -54,8 +54,16 @@ UploadService.NAMESPACE = "com.yourcompany.yourapp";
 ## Examples
 In the <b>examples</b> folder you will find:
 
-* a demo server-side php script that handles multipart form upload
-* a simple demo application that uses this library
+* Demo servers which handle multipart form upload in:
+  * <b>PHP</b>. You need a running web server (e.g. Apache + PHP) in which to put the script
+  * <b>node.js</b>. You need to have node.js and npm installed. [Refer to this guide](https://github.com/joyent/node/wiki/installing-node.js-via-package-manager). To run the server, simply execute:
+
+    ```
+    npm install (only the first time)
+    npm start
+    ```
+
+* A simple Android application that uses this library
 
 To be able to compile and deploy the demo application, you also need to have <b>appcompat_v7</b> library. You may need to change the path to that library in the demo application's properties.
 
