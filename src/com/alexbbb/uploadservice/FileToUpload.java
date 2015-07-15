@@ -11,10 +11,10 @@ import android.os.Parcelable;
 
 /**
  * Represents a file to upload.
- *
+ * 
  * @author alexbbb (Alex Gotev)
  * @author eliasnaur
- *
+ * 
  */
 class FileToUpload implements Parcelable {
 
@@ -27,19 +27,16 @@ class FileToUpload implements Parcelable {
 
     /**
      * Create a new {@link FileToUpload} object.
-     *
+     * 
      * @param path absolute path to the file
      * @param parameterName parameter name to use in the multipart form
      * @param contentType content type of the file to send
      */
-    public FileToUpload(final String path,
-                        final String parameterName,
-                        final String fileName,
-                        final String contentType) {
+    public FileToUpload(final String path, final String parameterName, final String fileName, final String contentType) {
         this.file = new File(path);
         this.paramName = parameterName;
         this.contentType = contentType;
-        
+
         if (fileName == null || "".equals(fileName)) {
             this.fileName = this.file.getName();
         } else {
@@ -53,22 +50,16 @@ class FileToUpload implements Parcelable {
 
     public byte[] getMultipartHeader() throws UnsupportedEncodingException {
         StringBuilder builder = new StringBuilder();
-        	
-        builder.append("Content-Disposition: form-data; name=\"")
-               .append(paramName)
-               .append("\"; filename=\"")
-               .append(fileName)
-               .append("\"")
-               .append(NEW_LINE);
-		
+
+        builder.append("Content-Disposition: form-data; name=\"").append(paramName).append("\"; filename=\"")
+                .append(fileName).append("\"").append(NEW_LINE);
+
         if (contentType != null) {
-            builder.append("Content-Type: ")
-                   .append(contentType)
-                   .append(NEW_LINE);
+            builder.append("Content-Type: ").append(contentType).append(NEW_LINE);
         }
-		
+
         builder.append(NEW_LINE);
-        
+
         return builder.toString().getBytes("UTF-8");
     }
 
@@ -76,10 +67,22 @@ class FileToUpload implements Parcelable {
         return file.length();
     }
 
+    /**
+     * Get the total number of bytes needed by this file in the HTTP/Multipart request, considering that to send each
+     * file there is some overhead due to some bytes needed for the boundary and some bytes needed for the multipart
+     * headers
+     * 
+     * @param boundaryBytesLength length in bytes of the multipart boundary
+     * @return total number of bytes needed by this file in the HTTP/Multipart request
+     * @throws UnsupportedEncodingException
+     */
+    public long getTotalMultipartBytes(long boundaryBytesLength) throws UnsupportedEncodingException {
+        return boundaryBytesLength + getMultipartHeader().length + file.length();
+    }
+
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
-    public static final Parcelable.Creator<FileToUpload> CREATOR =
-            new Parcelable.Creator<FileToUpload>() {
+    public static final Parcelable.Creator<FileToUpload> CREATOR = new Parcelable.Creator<FileToUpload>() {
         @Override
         public FileToUpload createFromParcel(final Parcel in) {
             return new FileToUpload(in);

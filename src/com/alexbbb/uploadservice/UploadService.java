@@ -163,12 +163,17 @@ public class UploadService extends IntentService {
 
             setRequestHeaders(conn, requestHeaders);
 
-            requestStream = conn.getOutputStream();
-            setRequestParameters(requestStream, requestParameters, boundaryBytes);
+            // set the content length of the entire HTTP/Multipart request body
+            long parameterBytes = getRequestParametersBytes(requestParameters, boundaryBytes.length);
+            final long totalFileBytes = getFileBytes(filesToUpload, boundaryBytes.length);
+            final byte[] trailer = getTrailerBytes(boundary);
+            conn.setRequestProperty("Content-Length", Long.toString(parameterBytes + totalFileBytes + trailer.length));
 
+            requestStream = conn.getOutputStream();
+
+            setRequestParameters(requestStream, requestParameters, boundaryBytes);
             uploadFiles(uploadId, requestStream, filesToUpload, boundaryBytes);
 
-            final byte[] trailer = getTrailerBytes(boundary);
             requestStream.write(trailer, 0, trailer.length);
             final int serverResponseCode = conn.getResponseCode();
 
@@ -274,6 +279,23 @@ public class UploadService extends IntentService {
     }
 
     private
+            long
+            getRequestParametersBytes(final ArrayList<NameValue> requestParameters, final long boundaryBytesLength)
+                                                                                                                   throws UnsupportedEncodingException {
+        long parametersBytes = 0;
+
+        if (!requestParameters.isEmpty()) {
+            for (final NameValue parameter : requestParameters) {
+                // the bytes needed for every parameter are the sum of the boundary bytes
+                // and the bytes occupied by the parameter. Check setRequestParameters method
+                parametersBytes += boundaryBytesLength + parameter.getBytes().length;
+            }
+        }
+
+        return parametersBytes;
+    }
+
+    private
             void
             uploadFiles(final String uploadId, final OutputStream requestStream,
                         final ArrayList<FileToUpload> filesToUpload, final byte[] boundaryBytes)
@@ -310,6 +332,19 @@ public class UploadService extends IntentService {
 
         for (FileToUpload file : filesToUpload) {
             total += file.length();
+        }
+
+        return total;
+    }
+
+    private
+            long
+            getFileBytes(final ArrayList<FileToUpload> filesToUpload, long boundaryBytesLength)
+                                                                                               throws UnsupportedEncodingException {
+        long total = 0;
+
+        for (FileToUpload file : filesToUpload) {
+            total += file.getTotalMultipartBytes(boundaryBytesLength);
         }
 
         return total;
