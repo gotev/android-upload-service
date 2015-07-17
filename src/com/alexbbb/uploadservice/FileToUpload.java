@@ -23,7 +23,7 @@ class FileToUpload implements Parcelable {
     private final File file;
     private final String fileName;
     private final String paramName;
-    private final String contentType;
+    private String contentType;
 
     /**
      * Create a new {@link FileToUpload} object.
@@ -54,13 +54,13 @@ class FileToUpload implements Parcelable {
         builder.append("Content-Disposition: form-data; name=\"").append(paramName).append("\"; filename=\"")
                 .append(fileName).append("\"").append(NEW_LINE);
 
-        if (contentType != null) {
-            builder.append("Content-Type: ").append(contentType).append(NEW_LINE);
+        if (contentType == null) {
+            contentType = ContentType.APPLICATION_OCTET_STREAM;
         }
 
-        builder.append(NEW_LINE);
+        builder.append("Content-Type: ").append(contentType).append(NEW_LINE).append(NEW_LINE);
 
-        return builder.toString().getBytes("UTF-8");
+        return builder.toString().getBytes("US-ASCII");
     }
 
     public long length() {

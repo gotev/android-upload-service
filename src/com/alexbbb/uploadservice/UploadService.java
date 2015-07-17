@@ -245,7 +245,6 @@ public class UploadService extends IntentService {
         conn.setDoInput(true);
         conn.setDoOutput(true);
         conn.setUseCaches(false);
-        conn.setChunkedStreamingMode(0);
         conn.setRequestMethod(method);
         if (totalFiles <= 1) {
             conn.setRequestProperty("Connection", "close");
