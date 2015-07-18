@@ -48,6 +48,7 @@ public class UploadService extends IntentService {
     protected static final String PARAM_FILES = "files";
     protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
+    protected static final String PARAM_CUSTOM_USER_AGENT = "customUserAgent";
 
     private static final String BROADCAST_ACTION_SUFFIX = ".uploadservice.broadcast.status";
     public static final String UPLOAD_ID = "id";
@@ -96,6 +97,7 @@ public class UploadService extends IntentService {
             intent.putExtra(PARAM_ID, task.getUploadId());
             intent.putExtra(PARAM_URL, task.getServerUrl());
             intent.putExtra(PARAM_METHOD, task.getMethod());
+            intent.putExtra(PARAM_CUSTOM_USER_AGENT, task.getCustomUserAgent());
             intent.putParcelableArrayListExtra(PARAM_FILES, task.getFilesToUpload());
             intent.putParcelableArrayListExtra(PARAM_REQUEST_HEADERS, task.getHeaders());
             intent.putParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS, task.getParameters());
@@ -128,6 +130,7 @@ public class UploadService extends IntentService {
                 final String uploadId = intent.getStringExtra(PARAM_ID);
                 final String url = intent.getStringExtra(PARAM_URL);
                 final String method = intent.getStringExtra(PARAM_METHOD);
+                final String customUserAgent = intent.getStringExtra(PARAM_CUSTOM_USER_AGENT);
                 final ArrayList<FileToUpload> files = intent.getParcelableArrayListExtra(PARAM_FILES);
                 final ArrayList<NameValue> headers = intent.getParcelableArrayListExtra(PARAM_REQUEST_HEADERS);
                 final ArrayList<NameValue> parameters = intent.getParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS);
@@ -136,7 +139,7 @@ public class UploadService extends IntentService {
                 wakeLock.acquire();
                 try {
                     createNotification();
-                    handleFileUpload(uploadId, url, method, files, headers, parameters);
+                    handleFileUpload(uploadId, url, method, files, headers, parameters, customUserAgent);
                 } catch (Exception exception) {
                     broadcastError(uploadId, exception);
                 } finally {
@@ -146,10 +149,12 @@ public class UploadService extends IntentService {
         }
     }
 
-    private void handleFileUpload(final String uploadId, final String url, final String method,
-                                  final ArrayList<FileToUpload> filesToUpload,
-                                  final ArrayList<NameValue> requestHeaders,
-                                  final ArrayList<NameValue> requestParameters) throws IOException {
+    private
+            void
+            handleFileUpload(final String uploadId, final String url, final String method,
+                             final ArrayList<FileToUpload> filesToUpload, final ArrayList<NameValue> requestHeaders,
+                             final ArrayList<NameValue> requestParameters, final String customUserAgent)
+                                                                                                        throws IOException {
 
         final String boundary = getBoundary();
         final byte[] boundaryBytes = getBoundaryBytes(boundary);
@@ -160,6 +165,10 @@ public class UploadService extends IntentService {
 
         try {
             conn = getMultipartHttpURLConnection(url, method, boundary, filesToUpload.size());
+
+            if (customUserAgent != null && !customUserAgent.equals("")) {
+                requestHeaders.add(new NameValue("User-Agent", customUserAgent));
+            }
 
             setRequestHeaders(conn, requestHeaders);
 

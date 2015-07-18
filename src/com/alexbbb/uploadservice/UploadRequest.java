@@ -19,6 +19,7 @@ public class UploadRequest {
     private UploadNotificationConfig notificationConfig;
     private String method = "POST";
     private final Context context;
+    private String customUserAgent;
     private final String uploadId;
     private final String url;
     private final ArrayList<FileToUpload> filesToUpload;
@@ -220,5 +221,24 @@ public class UploadRequest {
      */
     protected Context getContext() {
         return context;
+    }
+
+    /**
+     * Gets the custom user agent defined for this upload request.
+     * 
+     * @return string representing the user agent or null if it's not defined
+     */
+    public final String getCustomUserAgent() {
+        return customUserAgent;
+    }
+
+    /**
+     * Sets the custom user agent to use for this upload request. Note! If you set the "User-Agent" header by using the
+     * "addHeader" method, that setting will be overwritten by the value set with this method.
+     * 
+     * @param customUserAgent custom user agent string
+     */
+    public final void setCustomUserAgent(String customUserAgent) {
+        this.customUserAgent = customUserAgent;
     }
 }

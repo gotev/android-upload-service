@@ -152,6 +152,9 @@ public class MainActivity extends ActionBarActivity {
                                       getString(R.string.uploading), getString(R.string.upload_success),
                                       getString(R.string.upload_error), false);
 
+        // if you comment the following line, the system default user-agent will be used
+        request.setCustomUserAgent("UploadServiceDemo/1.0");
+
         try {
             UploadService.startUpload(request);
         } catch (Exception exc) {

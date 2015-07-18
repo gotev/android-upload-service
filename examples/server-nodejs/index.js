@@ -28,6 +28,7 @@ app.get('/', function(req, res) {
 app.post('/upload', multerFiles, function(req, res) {
     if(fileUploadCompleted){
         fileUploadCompleted = false;
+        res.header('transfer-encoding', ''); // disable chunked transfer encoding
         res.end("Upload Ok!");
     }
 });
