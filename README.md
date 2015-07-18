@@ -123,6 +123,15 @@ public void upload(final Context context) {
                                   "upload completed successfully text"
                                   "upload error text",
                                   false);
+    
+    // set a custom user agent string for the upload request
+    // if you comment the following line, the system default user-agent will be used
+    request.setCustomUserAgent("UploadServiceDemo/1.0");
+ 
+    // set the intent to perform when the user taps on the upload notification.
+    // currently tested only with intents that launches an activity
+    // if you comment this line, no action will be performed when the user taps on the notification
+    request.setNotificationClickIntent(new Intent(context, YourActivity.class));
 
     try {
         //Start upload service and display the notification
