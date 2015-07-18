@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.UUID;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -154,6 +155,11 @@ public class MainActivity extends ActionBarActivity {
 
         // if you comment the following line, the system default user-agent will be used
         request.setCustomUserAgent("UploadServiceDemo/1.0");
+
+        // set the intent to perform when the user taps on the upload notification.
+        // currently tested only with intents that launches an activity
+        // if you comment this line, no action will be performed when the user taps on the notification
+        request.setNotificationClickIntent(new Intent(this, MainActivity.class));
 
         try {
             UploadService.startUpload(request);

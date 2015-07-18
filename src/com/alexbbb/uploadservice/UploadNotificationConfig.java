@@ -1,13 +1,16 @@
 package com.alexbbb.uploadservice;
 
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
  * Contains the configuration of the upload notification.
- *
+ * 
  * @author alexbbb (Alex Gotev)
- *
+ * 
  */
 class UploadNotificationConfig implements Parcelable {
 
@@ -17,6 +20,7 @@ class UploadNotificationConfig implements Parcelable {
     private final String completed;
     private final String error;
     private final boolean autoClearOnSuccess;
+    private Intent clickIntent;
 
     public UploadNotificationConfig() {
         iconResourceID = android.R.drawable.ic_menu_upload;
@@ -25,15 +29,12 @@ class UploadNotificationConfig implements Parcelable {
         completed = "upload completed successfully!";
         error = "error during upload";
         autoClearOnSuccess = false;
+        clickIntent = null;
     }
 
-    public UploadNotificationConfig(final int iconResourceID,
-                                    final String title,
-                                    final String message,
-                                    final String completed,
-                                    final String error,
-                                    final boolean autoClearOnSuccess)
-                                    throws IllegalArgumentException{
+    public UploadNotificationConfig(final int iconResourceID, final String title, final String message,
+            final String completed, final String error, final boolean autoClearOnSuccess)
+                                                                                         throws IllegalArgumentException {
 
         if (title == null || message == null || completed == null || error == null) {
             throw new IllegalArgumentException("You can't provide null parameters");
@@ -71,10 +72,21 @@ class UploadNotificationConfig implements Parcelable {
         return autoClearOnSuccess;
     }
 
+    public final PendingIntent getPendingIntent(Context context) {
+        if (clickIntent == null) {
+            return PendingIntent.getBroadcast(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+
+        return PendingIntent.getActivity(context, 1, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public final void setClickIntent(Intent clickIntent) {
+        this.clickIntent = clickIntent;
+    }
+
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
-    public static final Parcelable.Creator<UploadNotificationConfig> CREATOR =
-            new Parcelable.Creator<UploadNotificationConfig>() {
+    public static final Parcelable.Creator<UploadNotificationConfig> CREATOR = new Parcelable.Creator<UploadNotificationConfig>() {
         @Override
         public UploadNotificationConfig createFromParcel(final Parcel in) {
             return new UploadNotificationConfig(in);
@@ -99,6 +111,7 @@ class UploadNotificationConfig implements Parcelable {
         parcel.writeString(completed);
         parcel.writeString(error);
         parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
+        parcel.writeParcelable(clickIntent, 0);
     }
 
     private UploadNotificationConfig(Parcel in) {
@@ -108,5 +121,6 @@ class UploadNotificationConfig implements Parcelable {
         completed = in.readString();
         error = in.readString();
         autoClearOnSuccess = in.readByte() == 1;
+        clickIntent = in.readParcelable(Intent.class.getClassLoader());
     }
 }

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
@@ -452,7 +451,7 @@ public class UploadService extends IntentService {
 
     private void createNotification() {
         notification.setContentTitle(notificationConfig.getTitle()).setContentText(notificationConfig.getMessage())
-                .setContentIntent(PendingIntent.getBroadcast(this, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentIntent(notificationConfig.getPendingIntent(this))
                 .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(100, 0, true).setOngoing(true);
 
         startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
@@ -460,6 +459,7 @@ public class UploadService extends IntentService {
 
     private void updateNotificationProgress(final int progress) {
         notification.setContentTitle(notificationConfig.getTitle()).setContentText(notificationConfig.getMessage())
+                .setContentIntent(notificationConfig.getPendingIntent(this))
                 .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(100, progress, false)
                 .setOngoing(true);
 
@@ -472,6 +472,7 @@ public class UploadService extends IntentService {
         if (!notificationConfig.isAutoClearOnSuccess()) {
             notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getCompleted())
+                    .setContentIntent(notificationConfig.getPendingIntent(this))
                     .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(0, 0, false).setOngoing(false);
 
             notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
@@ -482,6 +483,7 @@ public class UploadService extends IntentService {
         stopForeground(false);
 
         notification.setContentTitle(notificationConfig.getTitle()).setContentText(notificationConfig.getError())
+                .setContentIntent(notificationConfig.getPendingIntent(this))
                 .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(0, 0, false).setOngoing(false);
 
         notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 
 /**
  * Represents an upload request.
@@ -240,5 +241,14 @@ public class UploadRequest {
      */
     public final void setCustomUserAgent(String customUserAgent) {
         this.customUserAgent = customUserAgent;
+    }
+
+    /**
+     * Sets the intent to be executed when the user taps on the upload progress notification.
+     * 
+     * @param intent
+     */
+    public final void setNotificationClickIntent(Intent intent) {
+        notificationConfig.setClickIntent(intent);
     }
 }
