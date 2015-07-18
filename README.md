@@ -51,6 +51,12 @@ In your application's initialization code (for example in the onCreate method of
 UploadService.NAMESPACE = "com.yourcompany.yourapp";
 ```
 
+## How to test upload
+You have the following choices:
+* Use your own server which handles HTTP/Multipart uploads
+* Use one of the server implementations provided in the examples (read below)
+* Use the excellent http://www.posttestserver.com/ (bear in mind that the data you post there is public!)
+
 ## Examples
 In the <b>examples</b> folder you will find:
 
