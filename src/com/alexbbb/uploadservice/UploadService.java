@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -149,6 +150,7 @@ public class UploadService extends IntentService {
         }
     }
 
+    @SuppressLint("NewApi")
     private
             void
             handleFileUpload(final String uploadId, final String url, final String method,
@@ -164,6 +166,18 @@ public class UploadService extends IntentService {
         InputStream responseStream = null;
 
         try {
+            // get the content length of the entire HTTP/Multipart request body
+            long parameterBytes = getRequestParametersBytes(requestParameters, boundaryBytes.length);
+            final long totalFileBytes = getFileBytes(filesToUpload, boundaryBytes.length);
+            final byte[] trailer = getTrailerBytes(boundary);
+            final long bodyLength = parameterBytes + totalFileBytes + trailer.length;
+
+            if (android.os.Build.VERSION.SDK_INT < 19 && bodyLength > Integer.MAX_VALUE)
+                throw new IOException("You need Android API version 19 or newer to "
+                        + "upload more than 2GB in a single request using "
+                        + "fixed size content length. Try switching to "
+                        + "chunked mode instead, but make sure your server side supports it!");
+
             conn = getMultipartHttpURLConnection(url, method, boundary, filesToUpload.size());
 
             if (customUserAgent != null && !customUserAgent.equals("")) {
@@ -172,11 +186,11 @@ public class UploadService extends IntentService {
 
             setRequestHeaders(conn, requestHeaders);
 
-            // set the content length of the entire HTTP/Multipart request body
-            long parameterBytes = getRequestParametersBytes(requestParameters, boundaryBytes.length);
-            final long totalFileBytes = getFileBytes(filesToUpload, boundaryBytes.length);
-            final byte[] trailer = getTrailerBytes(boundary);
-            conn.setRequestProperty("Content-Length", Long.toString(parameterBytes + totalFileBytes + trailer.length));
+            if (android.os.Build.VERSION.SDK_INT >= 19) {
+                conn.setFixedLengthStreamingMode(bodyLength);
+            } else {
+                conn.setFixedLengthStreamingMode((int) bodyLength);
+            }
 
             requestStream = conn.getOutputStream();
 
