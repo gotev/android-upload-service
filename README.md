@@ -203,6 +203,13 @@ public class YourActivity extends Activity {
 
 If you want to monitor upload status in all of your activities, then just implement the BroadcastReceiver in your base activity class, from which all of your activities inherits and you're done.
 
+## How to stop current upload
+Call this method from anywhere you want to stop the currently active upload task.
+```java
+UploadService.stopCurrentUpload();
+```
+After that the upload task is cancelled, you will receive a <b>java.net.ProtocolException</b> in your broadcast receiver's <b>onError</b> method and the notification will display the error message that you have set.
+
 ## Using HTTPS connection with self-signed certificates
 For security reasons, the library doesn't accept self-signed certificates by default when using HTTPS connections, but you can enable them by calling:
 
