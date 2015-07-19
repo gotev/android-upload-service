@@ -3,6 +3,7 @@
 
     <string name="app_name">Upload Service</string>
     <string name="upload">Upload</string>
+    <string name="cancel_upload">Cancel upload</string>
     <string name="server_script_url">Server script URL</string>
     <string name="file_to_upload_path">Path of the file to upload</string>
     <string name="parameter_name">File parameter name</string>

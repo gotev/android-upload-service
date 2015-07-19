@@ -31,6 +31,7 @@ public class MainActivity extends ActionBarActivity {
 
     private ProgressBar progressBar;
     private Button uploadButton;
+    private Button cancelUploadButton;
     private EditText serverUrl;
     private EditText fileToUpload;
     private EditText parameterName;
@@ -76,12 +77,21 @@ public class MainActivity extends ActionBarActivity {
         fileToUpload = (EditText) findViewById(R.id.fileToUpload);
         parameterName = (EditText) findViewById(R.id.parameterName);
         uploadButton = (Button) findViewById(R.id.uploadButton);
+        cancelUploadButton = (Button) findViewById(R.id.cancelUploadButton);
 
         uploadButton.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 onUploadButtonClick();
+            }
+        });
+
+        cancelUploadButton.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                onCancelUploadButtonClick();
             }
         });
 
@@ -166,5 +176,9 @@ public class MainActivity extends ActionBarActivity {
         } catch (Exception exc) {
             Toast.makeText(this, "Malformed upload request. " + exc.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void onCancelUploadButtonClick() {
+        UploadService.stopCurrentUpload();
     }
 }

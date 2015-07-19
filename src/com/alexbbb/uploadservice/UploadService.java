@@ -67,6 +67,9 @@ public class UploadService extends IntentService {
     private UploadNotificationConfig notificationConfig;
     private int lastPublishedProgress;
 
+    // indicates if the upload request should be continued
+    private static volatile boolean shouldContinue = true;
+
     public static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
     }
@@ -106,6 +109,13 @@ public class UploadService extends IntentService {
         }
     }
 
+    /**
+     * Stops the currently active upload task.
+     */
+    public static void stopCurrentUpload() {
+        shouldContinue = false;
+    }
+
     public UploadService() {
         super(SERVICE_NAME);
     }
@@ -136,6 +146,7 @@ public class UploadService extends IntentService {
                 final ArrayList<NameValue> parameters = intent.getParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS);
 
                 lastPublishedProgress = 0;
+                shouldContinue = true;
                 wakeLock.acquire();
                 try {
                     createNotification();
@@ -328,6 +339,9 @@ public class UploadService extends IntentService {
         long uploadedBytes = 0;
 
         for (FileToUpload file : filesToUpload) {
+            if (!shouldContinue)
+                continue;
+
             requestStream.write(boundaryBytes, 0, boundaryBytes.length);
             byte[] headerBytes = file.getMultipartHeader();
             requestStream.write(headerBytes, 0, headerBytes.length);
@@ -337,7 +351,7 @@ public class UploadService extends IntentService {
             int bytesRead;
 
             try {
-                while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0) {
+                while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0 && shouldContinue) {
                     requestStream.write(buffer, 0, bytesRead);
                     uploadedBytes += bytesRead;
                     broadcastProgress(uploadId, uploadedBytes, totalBytes);
