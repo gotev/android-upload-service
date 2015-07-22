@@ -134,6 +134,9 @@ public void upload(final Context context) {
     // currently tested only with intents that launches an activity
     // if you comment this line, no action will be performed when the user taps on the notification
     request.setNotificationClickIntent(new Intent(context, YourActivity.class));
+    
+    // set the maximum number of automatic upload retries on error
+    request.setMaxRetries(2);
 
     try {
         //Start upload service and display the notification
