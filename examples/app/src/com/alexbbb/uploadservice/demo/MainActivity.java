@@ -171,6 +171,9 @@ public class MainActivity extends ActionBarActivity {
         // if you comment this line, no action will be performed when the user taps on the notification
         request.setNotificationClickIntent(new Intent(this, MainActivity.class));
 
+        // set the maximum number of automatic upload retries on error
+        request.setMaxRetries(2);
+
         try {
             UploadService.startUpload(request);
         } catch (Exception exc) {

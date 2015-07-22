@@ -21,6 +21,7 @@ public class UploadRequest {
     private String method = "POST";
     private final Context context;
     private String customUserAgent;
+    private int maxRetries;
     private final String uploadId;
     private final String url;
     private final ArrayList<FileToUpload> filesToUpload;
@@ -43,6 +44,7 @@ public class UploadRequest {
         filesToUpload = new ArrayList<FileToUpload>();
         headers = new ArrayList<NameValue>();
         parameters = new ArrayList<NameValue>();
+        maxRetries = 0;
     }
 
     /**
@@ -251,4 +253,26 @@ public class UploadRequest {
     public final void setNotificationClickIntent(Intent intent) {
         notificationConfig.setClickIntent(intent);
     }
+
+    /**
+     * Get the maximum number of retries that the library will do if an error occurs, before returning an error.
+     * 
+     * @return
+     */
+    public final int getMaxRetries() {
+        return maxRetries;
+    }
+
+    /**
+     * Sets the maximum number of retries that the library will do if an error occurs, before returning an error.
+     * 
+     * @param maxRetries
+     */
+    public final void setMaxRetries(int maxRetries) {
+        if (maxRetries < 0)
+            this.maxRetries = 0;
+        else
+            this.maxRetries = maxRetries;
+    }
+
 }

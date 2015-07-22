@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
+import android.util.Log;
 
 /**
  * Service to upload files as a multi-part form data in background using HTTP POST with notification center progress
@@ -49,6 +50,7 @@ public class UploadService extends IntentService {
     protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
     protected static final String PARAM_CUSTOM_USER_AGENT = "customUserAgent";
+    protected static final String PARAM_MAX_RETRIES = "maxRetries";
 
     private static final String BROADCAST_ACTION_SUFFIX = ".uploadservice.broadcast.status";
     public static final String UPLOAD_ID = "id";
@@ -101,6 +103,7 @@ public class UploadService extends IntentService {
             intent.putExtra(PARAM_URL, task.getServerUrl());
             intent.putExtra(PARAM_METHOD, task.getMethod());
             intent.putExtra(PARAM_CUSTOM_USER_AGENT, task.getCustomUserAgent());
+            intent.putExtra(PARAM_MAX_RETRIES, task.getMaxRetries());
             intent.putParcelableArrayListExtra(PARAM_FILES, task.getFilesToUpload());
             intent.putParcelableArrayListExtra(PARAM_REQUEST_HEADERS, task.getHeaders());
             intent.putParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS, task.getParameters());
@@ -141,6 +144,7 @@ public class UploadService extends IntentService {
                 final String url = intent.getStringExtra(PARAM_URL);
                 final String method = intent.getStringExtra(PARAM_METHOD);
                 final String customUserAgent = intent.getStringExtra(PARAM_CUSTOM_USER_AGENT);
+                final int maxRetries = intent.getIntExtra(PARAM_MAX_RETRIES, 0);
                 final ArrayList<FileToUpload> files = intent.getParcelableArrayListExtra(PARAM_FILES);
                 final ArrayList<NameValue> headers = intent.getParcelableArrayListExtra(PARAM_REQUEST_HEADERS);
                 final ArrayList<NameValue> parameters = intent.getParcelableArrayListExtra(PARAM_REQUEST_PARAMETERS);
@@ -148,13 +152,21 @@ public class UploadService extends IntentService {
                 lastPublishedProgress = 0;
                 shouldContinue = true;
                 wakeLock.acquire();
-                try {
-                    createNotification();
-                    handleFileUpload(uploadId, url, method, files, headers, parameters, customUserAgent);
-                } catch (Exception exception) {
-                    broadcastError(uploadId, exception);
-                } finally {
-                    wakeLock.release();
+                int attempts = 0;
+
+                createNotification();
+
+                while (attempts <= maxRetries) {
+                    attempts++;
+                    try {
+                        handleFileUpload(uploadId, url, method, files, headers, parameters, customUserAgent);
+                    } catch (Exception exc) {
+                        if (attempts > maxRetries)
+                            broadcastError(uploadId, exc);
+                        else
+                            Log.w(getClass().getName(), "Error in uploadId " + uploadId + " on attempt " + attempts,
+                                  exc);
+                    }
                 }
             }
         }
@@ -449,6 +461,7 @@ public class UploadService extends IntentService {
         intent.putExtra(SERVER_RESPONSE_CODE, responseCode);
         intent.putExtra(SERVER_RESPONSE_MESSAGE, filteredMessage);
         sendBroadcast(intent);
+        wakeLock.release();
     }
 
     private void broadcastError(final String uploadId, final Exception exception) {
@@ -461,6 +474,8 @@ public class UploadService extends IntentService {
         intent.putExtra(STATUS, STATUS_ERROR);
         intent.putExtra(ERROR_EXCEPTION, exception);
         sendBroadcast(intent);
+        wakeLock.release();
+
     }
 
     private void createNotification() {
