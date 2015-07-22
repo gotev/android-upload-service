@@ -156,12 +156,12 @@ public class UploadService extends IntentService {
 
                 createNotification();
 
-                while (attempts <= maxRetries) {
+                while (attempts <= maxRetries && shouldContinue) {
                     attempts++;
                     try {
                         handleFileUpload(uploadId, url, method, files, headers, parameters, customUserAgent);
                     } catch (Exception exc) {
-                        if (attempts > maxRetries)
+                        if (attempts > maxRetries || !shouldContinue)
                             broadcastError(uploadId, exc);
                         else
                             Log.w(getClass().getName(), "Error in uploadId " + uploadId + " on attempt " + attempts,
