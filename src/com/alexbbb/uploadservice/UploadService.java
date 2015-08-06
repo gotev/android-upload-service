@@ -17,6 +17,7 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.util.Log;
@@ -153,6 +154,8 @@ public class UploadService extends IntentService {
                 shouldContinue = true;
                 wakeLock.acquire();
                 int attempts = 0;
+                int errorDelay = 1000;
+                int maxErrorDelay = 10 * 60 * 1000;
 
                 createNotification();
 
@@ -160,12 +163,21 @@ public class UploadService extends IntentService {
                     attempts++;
                     try {
                         handleFileUpload(uploadId, url, method, files, headers, parameters, customUserAgent);
+                        break;
                     } catch (Exception exc) {
-                        if (attempts > maxRetries || !shouldContinue)
+                        if (attempts > maxRetries || !shouldContinue) {
                             broadcastError(uploadId, exc);
-                        else
-                            Log.w(getClass().getName(), "Error in uploadId " + uploadId + " on attempt " + attempts,
+                        } else {
+                            Log.w(getClass().getName(), "Error in uploadId " + uploadId + " on attempt " + attempts
+                                    + ". Waiting " + errorDelay / 1000 + "s before next attempt",
                                   exc);
+                            SystemClock.sleep(errorDelay);
+
+                            errorDelay *= 10;
+                            if (errorDelay > maxErrorDelay) {
+                                errorDelay = maxErrorDelay;
+                            }
+                        }
                     }
                 }
             }
@@ -475,7 +487,6 @@ public class UploadService extends IntentService {
         intent.putExtra(ERROR_EXCEPTION, exception);
         sendBroadcast(intent);
         wakeLock.release();
-
     }
 
     private void createNotification() {
