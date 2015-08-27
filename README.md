@@ -228,6 +228,7 @@ before starting the upload service.
 Let me know, and I'll be glad to include a link in the following list :)
 
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
+- [DotShare](http://dot-share.com/index-en.html)
 
 ## License
 
