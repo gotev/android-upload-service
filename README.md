@@ -3,6 +3,8 @@ Android Upload Service
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161)
 
+[Gradle and Maven dependency instructions (with JitPack.io)](https://jitpack.io/#alexbbb/android-upload-service)
+
 ## Purpose
 I needed an easy and efficient way to upload multipart form data (HTTP parameters and files) to a server, and
 I haven't found anything useful so far that suited my needs. I also needed that the upload got handled in the
