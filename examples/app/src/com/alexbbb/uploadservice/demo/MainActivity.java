@@ -1,12 +1,8 @@
 package com.alexbbb.uploadservice.demo;
 
-import java.io.File;
-import java.net.URL;
-import java.util.UUID;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,15 +15,19 @@ import com.alexbbb.uploadservice.ContentType;
 import com.alexbbb.uploadservice.UploadRequest;
 import com.alexbbb.uploadservice.UploadService;
 
+import java.io.File;
+import java.net.URL;
+import java.util.UUID;
+
 /**
  * Activity that demonstrates how to use Android Upload Service.
- * 
+ *
  * @author Alex Gotev
- * 
+ *
  */
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "AndroidUploadServiceDemo";
+    private static final String TAG = "UploadServiceDemo";
 
     private ProgressBar progressBar;
     private Button uploadButton;
