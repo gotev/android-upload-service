@@ -13,8 +13,7 @@
         android:targetSdkVersion="21" />
 
     <application
-        android:allowBackup="true"
-        android:theme="@style/AppTheme" >
+        android:allowBackup="true" >
         
         <service
             android:name=".UploadService"
