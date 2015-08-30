@@ -13,7 +13,7 @@ buildscript {
 apply plugin: 'com.android.application'
 
 dependencies {
-    compile 'com.github.alexbbb:android-upload-service:73c4fea352'
+    compile 'com.github.alexbbb:android-upload-service:1.3.1'
 }
 
 android {
