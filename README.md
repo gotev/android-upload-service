@@ -20,7 +20,7 @@ read further and you'll discover how to do it very easily.
 
 ## Setup
 
-Check out the project and add android-upload-service to your project as an [Android Library Project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject).
+If you use Eclipse + ADT and you don't use Maven, check out the project and add android-upload-service to your project as an [Android Library Project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject).
 
 Add the following to your project's AndroidManifest.xml file:
 
@@ -75,7 +75,7 @@ In the <b>examples</b> folder you will find:
 
 * A simple Android application that uses this library
 
-To be able to compile and deploy the demo application, you also need to have <b>appcompat_v7</b> library. You may need to change the path to that library in the demo application's properties.
+If you use Eclipse + ADT, to be able to compile and deploy the demo application, you also need to have <b>appcompat_v7</b> library. You may need to change the path to that library in the demo application's properties. If you are using Android Studio, simply select File > Import Project and select the demo app's gradle build file.
 
 ## How to start android upload service to upload files
 For detailed explanation of each parameter, please check JavaDocs.
