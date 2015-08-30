@@ -7,7 +7,7 @@
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="21" />
-    
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -27,16 +27,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <service
 		    android:name="com.alexbbb.uploadservice.UploadService"
-		    android:enabled="true"
-		    android:exported="false" >
+		    android:enabled="true" >
 		    <intent-filter>
 		        <action android:name="com.alexbbb.uploadservice.action.upload"/>
 		    </intent-filter>
 		</service>
-        
+
     </application>
 
 </manifest>
