@@ -81,6 +81,10 @@ abstract class HttpUploadTask {
         }
     }
 
+    public void cancel() {
+        this.shouldContinue = false;
+    }
+
     protected void broadcastProgress(long uploadedBytes, long totalBytes) {
         this.service.broadcastProgress(uploadId, uploadedBytes, totalBytes);
     }

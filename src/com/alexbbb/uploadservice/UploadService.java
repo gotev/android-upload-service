@@ -69,8 +69,7 @@ public class UploadService extends IntentService {
     private UploadNotificationConfig notificationConfig;
     private long lastProgressNotificationTime;
 
-    // indicates if the upload request should be continued
-    private static volatile boolean shouldContinue = true;
+    private static HttpUploadTask currentTask;
 
     public static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
@@ -84,7 +83,9 @@ public class UploadService extends IntentService {
      * Stops the currently active upload task.
      */
     public static void stopCurrentUpload() {
-        shouldContinue = false;
+        if (currentTask != null) {
+            currentTask.cancel();
+        }
     }
 
     public UploadService() {
@@ -109,23 +110,21 @@ public class UploadService extends IntentService {
             if (getActionUpload().equals(action)) {
                 notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
 
-                HttpUploadTask task;
                 String type = intent.getStringExtra(PARAM_TYPE);
                 if (UPLOAD_MULTIPART.equals(type)) {
-                    task = new MultipartUploadTask(this, intent);
+                    currentTask = new MultipartUploadTask(this, intent);
                 } else if (UPLOAD_BINARY.equals(type)) {
-                    task = new BinaryUploadTask(this, intent);
+                    currentTask = new BinaryUploadTask(this, intent);
                 } else {
                     return;
                 }
 
                 lastProgressNotificationTime = 0;
-                shouldContinue = true;
                 wakeLock.acquire();
 
                 createNotification();
 
-                task.run();
+                currentTask.run();
             }
         }
     }
