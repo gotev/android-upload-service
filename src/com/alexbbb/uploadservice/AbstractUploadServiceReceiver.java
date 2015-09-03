@@ -41,6 +41,11 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
                     case UploadService.STATUS_IN_PROGRESS:
                         final int progress = intent.getIntExtra(UploadService.PROGRESS, 0);
                         onProgress(uploadId, progress);
+
+                        final long uploadedBytes = intent.getLongExtra(UploadService.PROGRESS_UPLOADED_BYTES, 0);
+                        final long totalBytes = intent.getLongExtra(UploadService.PROGRESS_TOTAL_BYTES, 1);
+                        onProgress(uploadId, uploadedBytes, totalBytes);
+
                         break;
 
                     default:
@@ -77,7 +82,18 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
      * @param uploadId unique ID of the upload request
      * @param progress value from 0 to 100
      */
-    public abstract void onProgress(final String uploadId, final int progress);
+    public void onProgress(final String uploadId, final int progress) {
+    }
+
+    /**
+     * Called when the upload progress changes.
+     *
+     * @param uploadId unique ID of the upload request
+     * @param uploadedBytes the count of the bytes uploaded so far
+     * @param totalBytes the total expected bytes to upload
+     */
+    public void onProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
+    }
 
     /**
      * Called when an error happens during the upload.
@@ -85,7 +101,8 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
      * @param uploadId unique ID of the upload request
      * @param exception exception that caused the error
      */
-    public abstract void onError(final String uploadId, final Exception exception);
+    public void onError(final String uploadId, final Exception exception) {
+    }
 
     /**
      * Called when the upload is completed successfully.
@@ -94,6 +111,7 @@ public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
      * @param serverResponseCode status code returned by the server
      * @param serverResponseMessage string containing the response received from the server
      */
-    public abstract void onCompleted(final String uploadId, final int serverResponseCode,
-                                     final String serverResponseMessage);
+    public void onCompleted(final String uploadId, final int serverResponseCode,
+                                     final String serverResponseMessage) {
+    }
 }

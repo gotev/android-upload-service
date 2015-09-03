@@ -1,9 +1,5 @@
 package com.alexbbb.uploadservice;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import android.os.Parcel;
@@ -16,24 +12,25 @@ import android.os.Parcelable;
  * @author eliasnaur
  * 
  */
-class FileToUpload implements Parcelable {
+class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
 
     private static final String NEW_LINE = "\r\n";
 
-    private final File file;
-    private final String fileName;
-    private final String paramName;
-    private String contentType;
+    protected final String paramName;
+    protected final String fileName;
+    protected String contentType;
 
     /**
-     * Create a new {@link FileToUpload} object.
+     * Create a new {@link MultipartUploadFile} object.
      * 
      * @param path absolute path to the file
      * @param parameterName parameter name to use in the multipart form
      * @param contentType content type of the file to send
      */
-    public FileToUpload(final String path, final String parameterName, final String fileName, final String contentType) {
-        this.file = new File(path);
+    public MultipartUploadFile(final String path, final String parameterName, final String fileName, final String contentType) {
+
+        super(path);
+
         this.paramName = parameterName;
         this.contentType = contentType;
 
@@ -42,10 +39,6 @@ class FileToUpload implements Parcelable {
         } else {
             this.fileName = fileName;
         }
-    }
-
-    public final InputStream getStream() throws FileNotFoundException {
-        return new FileInputStream(file);
     }
 
     public byte[] getMultipartHeader() throws UnsupportedEncodingException {
@@ -63,15 +56,11 @@ class FileToUpload implements Parcelable {
         return builder.toString().getBytes("US-ASCII");
     }
 
-    public long length() {
-        return file.length();
-    }
-
     /**
      * Get the total number of bytes needed by this file in the HTTP/Multipart request, considering that to send each
      * file there is some overhead due to some bytes needed for the boundary and some bytes needed for the multipart
      * headers
-     * 
+     *
      * @param boundaryBytesLength length in bytes of the multipart boundary
      * @return total number of bytes needed by this file in the HTTP/Multipart request
      * @throws UnsupportedEncodingException
@@ -82,15 +71,15 @@ class FileToUpload implements Parcelable {
 
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
-    public static final Parcelable.Creator<FileToUpload> CREATOR = new Parcelable.Creator<FileToUpload>() {
+    public static final Parcelable.Creator<MultipartUploadFile> CREATOR = new Parcelable.Creator<MultipartUploadFile>() {
         @Override
-        public FileToUpload createFromParcel(final Parcel in) {
-            return new FileToUpload(in);
+        public MultipartUploadFile createFromParcel(final Parcel in) {
+            return new MultipartUploadFile(in);
         }
 
         @Override
-        public FileToUpload[] newArray(final int size) {
-            return new FileToUpload[size];
+        public MultipartUploadFile[] newArray(final int size) {
+            return new MultipartUploadFile[size];
         }
     };
 
@@ -101,14 +90,14 @@ class FileToUpload implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int arg1) {
-        parcel.writeString(file.getAbsolutePath());
+        super.writeToParcel(parcel, arg1);
         parcel.writeString(paramName);
         parcel.writeString(contentType);
         parcel.writeString(fileName);
     }
 
-    private FileToUpload(Parcel in) {
-        file = new File(in.readString());
+    private MultipartUploadFile(Parcel in) {
+        super(in);
         paramName = in.readString();
         contentType = in.readString();
         fileName = in.readString();
