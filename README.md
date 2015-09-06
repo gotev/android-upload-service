@@ -5,6 +5,12 @@ Android Upload Service
 
 [Gradle and Maven dependency instructions (with JitPack.io)](https://jitpack.io/#alexbbb/android-upload-service/1.3.1)
 
+## Are you using Android Upload Service in your app?
+Let me know, and I'll be glad to include a link in the following list :)
+
+- [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
+- [DotShare](http://dot-share.com/index-en.html)
+
 ## Purpose
 I needed an easy and efficient way to upload multipart form data (HTTP parameters and files) to a server, and
 I haven't found anything useful so far that suited my needs. I also needed that the upload got handled in the
@@ -77,7 +83,7 @@ In the <b>examples</b> folder you will find:
 
 If you use Eclipse + ADT, to be able to compile and deploy the demo application, you also need to have <b>appcompat_v7</b> library. You may need to change the path to that library in the demo application's properties. If you are using Android Studio, simply select File > Import Project and select the demo app's gradle build file.
 
-## How to start android upload service to upload files
+## HTTP Multipart upload example
 For detailed explanation of each parameter, please check JavaDocs.
 
 ```java
@@ -167,10 +173,20 @@ public class YourActivity extends Activity {
     private final AbstractUploadServiceReceiver uploadReceiver =
     new AbstractUploadServiceReceiver() {
 
+        // you can override this progress method if you want to get 
+        // the completion progress in percent (0 to 100)
+        // or if you need to know exactly how many bytes have been transferred
+        // override the method below this one
         @Override
         public void onProgress(String uploadId, int progress) {
             Log.i(TAG, "The progress of the upload with ID "
                        + uploadId + " is: " + progress);
+        }
+        
+        @Override
+        public void onProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
+            Log.i(TAG, "Upload with ID "
+                       + uploadId + " uploaded bytes: " + uploadedBytes + ", total: " + totalBytes);
         }
 
         @Override
@@ -225,12 +241,6 @@ AllCertificatesAndHostsTruster.apply();
 ```
 
 before starting the upload service.
-
-## Do you use Android Upload Service in your project?
-Let me know, and I'll be glad to include a link in the following list :)
-
-- [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
-- [DotShare](http://dot-share.com/index-en.html)
 
 ## License
 
