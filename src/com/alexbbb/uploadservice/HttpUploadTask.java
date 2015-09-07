@@ -217,7 +217,7 @@ abstract class HttpUploadTask {
             reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
-                outString.append(line);
+                outString.append(line).append("\n");
             }
         } catch (Exception exc) {
             try {
