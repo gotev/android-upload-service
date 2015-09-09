@@ -225,9 +225,18 @@ public class UploadService extends IntentService {
                     .setContentText(notificationConfig.getCompleted())
                     .setContentIntent(notificationConfig.getPendingIntent(this))
                     .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(0, 0, false).setOngoing(false);
-
+            setRingtone();
             notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
         }
+    }
+
+    private void setRingtone() {
+
+        if(notificationConfig.isRingTone()) {
+            notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION));
+            notification.setOnlyAlertOnce(false);
+        }
+
     }
 
     private void updateNotificationError() {
@@ -236,7 +245,7 @@ public class UploadService extends IntentService {
         notification.setContentTitle(notificationConfig.getTitle()).setContentText(notificationConfig.getError())
                 .setContentIntent(notificationConfig.getPendingIntent(this))
                 .setSmallIcon(notificationConfig.getIconResourceID()).setProgress(0, 0, false).setOngoing(false);
-
+        setRingtone();
         notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
     }
 }
