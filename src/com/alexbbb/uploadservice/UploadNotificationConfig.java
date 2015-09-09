@@ -89,7 +89,7 @@ class UploadNotificationConfig implements Parcelable {
     public final void setClickIntent(Intent clickIntent) {
         this.clickIntent = clickIntent;
     }
-    public final void setRingTone(Boolean tone) {
+    public final void enableRingTone(Boolean tone) {
         this.ringTone = tone;
     }
 
