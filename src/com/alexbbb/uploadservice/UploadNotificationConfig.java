@@ -20,6 +20,7 @@ class UploadNotificationConfig implements Parcelable {
     private final String completed;
     private final String error;
     private final boolean autoClearOnSuccess;
+    private final boolean ringTone;
     private Intent clickIntent;
 
     public UploadNotificationConfig() {
@@ -30,6 +31,7 @@ class UploadNotificationConfig implements Parcelable {
         error = "error during upload";
         autoClearOnSuccess = false;
         clickIntent = null;
+        ringTone = false;
     }
 
     public UploadNotificationConfig(final int iconResourceID, final String title, final String message,
@@ -72,6 +74,10 @@ class UploadNotificationConfig implements Parcelable {
         return autoClearOnSuccess;
     }
 
+    public final boolean isRingTone() {
+        return ringTone;
+    }
+
     public final PendingIntent getPendingIntent(Context context) {
         if (clickIntent == null) {
             return PendingIntent.getBroadcast(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -83,6 +89,10 @@ class UploadNotificationConfig implements Parcelable {
     public final void setClickIntent(Intent clickIntent) {
         this.clickIntent = clickIntent;
     }
+    public final void enableRingTone(Boolean tone) {
+        this.ringTone = tone;
+    }
+
 
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
@@ -111,6 +121,7 @@ class UploadNotificationConfig implements Parcelable {
         parcel.writeString(completed);
         parcel.writeString(error);
         parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
+        parcel.writeByte((byte) (ringTone ? 1 : 0));
         parcel.writeParcelable(clickIntent, 0);
     }
 
@@ -121,6 +132,7 @@ class UploadNotificationConfig implements Parcelable {
         completed = in.readString();
         error = in.readString();
         autoClearOnSuccess = in.readByte() == 1;
+        ringTone = in.readByte() == 1;
         clickIntent = in.readParcelable(Intent.class.getClassLoader());
     }
 }
