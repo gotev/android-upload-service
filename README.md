@@ -10,6 +10,7 @@ Let me know, and I'll be glad to include a link in the following list :)
 
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
 - [DotShare](http://dot-share.com/index-en.html)
+- [NativeScript Background HTTP] (https://www.npmjs.com/package/nativescript-background-http)
 
 ## Purpose
 I needed an easy and efficient way to upload multipart form data (HTTP parameters and files) to a server, and
