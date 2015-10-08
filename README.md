@@ -158,6 +158,43 @@ public void upload(final Context context) {
 }
 ```
 
+## Binary Upload
+The binary upload uses a single file as the raw body of the upload request.
+
+``` java
+public void upload(final Context context) {
+    final BinaryUploadRequest request = new BinaryUploadRequest(context,
+                                                                "custom-upload-id",
+                                                                "http://www.yoursite.com/yourscript");
+    
+    // you can pass some data as request header, but you should be extremely careful
+    request.addHeader("file-name", paramNameString);
+    
+    request.setFileToUpload(fileToUploadPath);
+    
+    request.setNotificationConfig(R.drawable.ic_launcher, getString(R.string.app_name),
+                            getString(R.string.uploading), getString(R.string.upload_success),
+                            getString(R.string.upload_error), false);
+                            
+    // if you comment the following line, the system default user-agent will be used
+    request.setCustomUserAgent("UploadServiceDemo/1.0");
+    
+    // set the intent to perform when the user taps on the upload notification.
+    // currently tested only with intents that launches an activity
+    // if you comment this line, no action will be performed when the user taps on the notification
+    request.setNotificationClickIntent(new Intent(this, MainActivity.class));
+    
+    // set the maximum number of automatic upload retries on error
+    request.setMaxRetries(2);
+    
+    try {
+        UploadService.startUpload(request);
+    } catch (Exception exc) {
+        Toast.makeText(this, "Malformed upload request. " + exc.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+    }
+}
+```
+
 ## How to monitor upload status
 Once the service is started, it publishes the upload status with broadcast intents.
 For the sake of simplicity and to not bother you with the writing of a broadcast receiver,

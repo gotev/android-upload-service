@@ -1,4 +1,13 @@
-/bin
-/gen
+bin/
+gen/
 .DS_Store
 node_modules
+.gradle/
+.idea/
+build/
+gradle/
+gradlew
+gradlew.bat
+local.properties
+android-upload-service.iml
+app.iml
