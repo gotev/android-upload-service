@@ -68,12 +68,12 @@ You have the following choices:
 * Use one of the server implementations provided in the examples (read below)
 * Use the excellent http://www.posttestserver.com/ (bear in mind that the data you post there is public!)
 
-## Examples
+## Examples <a name="examples"></a>
 In the <b>examples</b> folder you will find:
 
-* Demo servers which handle multipart form upload in:
-  * <b>PHP</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
-  * <b>node.js</b>. You need to have node.js and npm installed. [Refer to this guide](https://github.com/joyent/node/wiki/installing-node.js-via-package-manager). To run the server, open a terminal, navigate to ```examples/server-nodejs``` folder and simply execute:
+* Demo servers which handle upload in:
+  * <b>PHP (HTTP Multipart only)</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
+  * <b>node.js (HTTP Multipart and Binary)</b>. You need to have node.js and npm installed. [Refer to this guide](https://github.com/joyent/node/wiki/installing-node.js-via-package-manager). To run the server, open a terminal, navigate to ```examples/server-nodejs``` folder and simply execute:
 
     ```
     npm install (only the first time)
@@ -159,7 +159,7 @@ public void upload(final Context context) {
 ```
 
 ## Binary Upload
-The binary upload uses a single file as the raw body of the upload request.
+The binary upload uses a single file as the raw body of the upload request. To test this kind of upload, you can use the provided node.js server implementation in the [examples](#examples).
 
 ``` java
 public void upload(final Context context) {
