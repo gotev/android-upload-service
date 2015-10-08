@@ -68,12 +68,19 @@
         android:ems="10" />
     
     <Button
-        android:id="@+id/uploadButton"
+        android:id="@+id/multipartUploadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="@string/upload" />
-    
+        android:text="@string/multipart_upload" />
+
+    <Button
+        android:id="@+id/binaryUploadButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/binary_upload" />
+
     <Button
         android:id="@+id/cancelUploadButton"
         android:layout_width="wrap_content"

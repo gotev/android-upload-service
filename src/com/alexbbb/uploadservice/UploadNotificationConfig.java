@@ -20,7 +20,7 @@ class UploadNotificationConfig implements Parcelable {
     private final String completed;
     private final String error;
     private final boolean autoClearOnSuccess;
-    private final boolean ringTone;
+    private boolean ringTone;
     private Intent clickIntent;
 
     public UploadNotificationConfig() {

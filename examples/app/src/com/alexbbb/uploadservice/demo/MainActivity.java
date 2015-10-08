@@ -14,6 +14,7 @@ import com.alexbbb.uploadservice.AbstractUploadServiceReceiver;
 import com.alexbbb.uploadservice.ContentType;
 import com.alexbbb.uploadservice.UploadRequest;
 import com.alexbbb.uploadservice.UploadService;
+import com.alexbbb.uploadservice.BinaryUploadRequest;
 
 import java.io.File;
 import java.net.URL;
@@ -30,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "UploadServiceDemo";
 
     private ProgressBar progressBar;
-    private Button uploadButton;
+    private Button multipartUploadButton;
+    private Button binaryUploadButton;
     private Button cancelUploadButton;
     private EditText serverUrl;
     private EditText fileToUpload;
@@ -76,19 +78,24 @@ public class MainActivity extends AppCompatActivity {
         serverUrl = (EditText) findViewById(R.id.serverURL);
         fileToUpload = (EditText) findViewById(R.id.fileToUpload);
         parameterName = (EditText) findViewById(R.id.parameterName);
-        uploadButton = (Button) findViewById(R.id.uploadButton);
+        multipartUploadButton = (Button) findViewById(R.id.multipartUploadButton);
+        binaryUploadButton = (Button) findViewById(R.id.binaryUploadButton);
         cancelUploadButton = (Button) findViewById(R.id.cancelUploadButton);
 
-        uploadButton.setOnClickListener(new Button.OnClickListener() {
-
+        multipartUploadButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 onUploadButtonClick();
             }
         });
+        binaryUploadButton.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                onUploadBinaryClick();
+            }
+        });
 
         cancelUploadButton.setOnClickListener(new Button.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
                 onCancelUploadButtonClick();
@@ -174,6 +181,43 @@ public class MainActivity extends AppCompatActivity {
         // set the maximum number of automatic upload retries on error
         request.setMaxRetries(2);
 
+        try {
+            UploadService.startUpload(request);
+        } catch (Exception exc) {
+            Toast.makeText(this, "Malformed upload request. " + exc.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    private void onUploadBinaryClick() {
+        final String serverUrlString = serverUrl.getText().toString();
+        final String fileToUploadPath = fileToUpload.getText().toString();
+        final String paramNameString = parameterName.getText().toString();
+
+        if (!userInputIsValid(serverUrlString, fileToUploadPath, paramNameString))
+            return;
+
+        final BinaryUploadRequest request = new BinaryUploadRequest(this, UUID.randomUUID().toString(), serverUrlString);
+        
+        // you can pass some data as request header, but you should be extremely careful
+        request.addHeader("file-name", paramNameString);
+        
+        request.setFileToUpload(fileToUploadPath);
+        
+        request.setNotificationConfig(R.drawable.ic_launcher, getString(R.string.app_name),
+                                getString(R.string.uploading), getString(R.string.upload_success),
+                                getString(R.string.upload_error), false);
+                                
+        // if you comment the following line, the system default user-agent will be used
+        request.setCustomUserAgent("UploadServiceDemo/1.0");
+        
+        // set the intent to perform when the user taps on the upload notification.
+        // currently tested only with intents that launches an activity
+        // if you comment this line, no action will be performed when the user taps on the notification
+        request.setNotificationClickIntent(new Intent(this, MainActivity.class));
+        
+        // set the maximum number of automatic upload retries on error
+        request.setMaxRetries(2);
+        
         try {
             UploadService.startUpload(request);
         } catch (Exception exc) {
