@@ -157,6 +157,7 @@ public void upload(final Context context) {
     }
 }
 ```
+If you want to start uploads or retry them based on the remote server's reachability status, [Android Host Monitor](https://github.com/alexbbb/android-host-monitor) may be useful to you in combination with this library.
 
 ## Binary Upload
 The binary upload uses a single file as the raw body of the upload request. To test this kind of upload, you can use the provided node.js server implementation in the [examples](#examples).
