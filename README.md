@@ -41,13 +41,13 @@ public class Initializer extends Application {
     }
 }
 ```
-
+and now you're ready to use the library!
 
 ## How to test upload
 You have the following choices:
 * Use your own server which handles HTTP/Multipart uploads
 * Use one of the server implementations provided in the examples (read below)
-* Use the excellent http://www.posttestserver.com/ (bear in mind that the data you post there is public!)
+* Use the excellent http://www.posttestserver.com/ (bear in mind that the data you post there is public!) for HTTP Multipart
 
 ## Examples <a name="examples"></a>
 In the <b>examples</b> folder you will find:
@@ -67,10 +67,11 @@ In the <b>examples</b> folder you will find:
 For detailed explanation of each parameter, please check JavaDocs.
 
 ```java
-public void upload(final Context context) {
-    final UploadRequest request = new UploadRequest(context,
-                                                    "custom-upload-id",
-                                                    "http://www.yoursite.com/yourscript");
+public void uploadMultipart(final Context context) {
+    final MultipartUploadRequest request = 
+                        new MultipartUploadRequest(context,
+                                                   "custom-upload-id",
+                                                   "http://www.yoursite.com/yourscript");
 
     /*
      * parameter-name: is the name of the parameter that will contain file's data.
@@ -128,10 +129,10 @@ public void upload(final Context context) {
 
     try {
         //Start upload service and display the notification
-        UploadService.startUpload(request);
+        request.startUpload();
 
     } catch (Exception exc) {
-        //You will end up here only if you pass an incomplete UploadRequest
+        //You will end up here only if you pass an incomplete upload request
         Log.e("AndroidUploadService", exc.getLocalizedMessage(), exc);
     }
 }
@@ -142,7 +143,7 @@ If you want to start uploads or retry them based on the remote server's reachabi
 The binary upload uses a single file as the raw body of the upload request. To test this kind of upload, you can use the provided node.js server implementation in the [examples](#examples).
 
 ``` java
-public void upload(final Context context) {
+public void uploadBinary(final Context context) {
     final BinaryUploadRequest request = new BinaryUploadRequest(context,
                                                                 "custom-upload-id",
                                                                 "http://www.yoursite.com/yourscript");
@@ -168,7 +169,7 @@ public void upload(final Context context) {
     request.setMaxRetries(2);
     
     try {
-        UploadService.startUpload(request);
+        request.startUpload();
     } catch (Exception exc) {
         Toast.makeText(this, "Malformed upload request. " + exc.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
     }
