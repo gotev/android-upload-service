@@ -17,7 +17,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.1'
 
     // NOTE: This is dependency on the official release, use this for reference in your projects.
-    compile 'com.github.alexbbb:android-upload-service:1.4'
+    compile 'com.github.alexbbb:android-upload-service:c5f0579a36'
 
     // NOTE: The android-upload-service project added as a dependency for development purposes.
     //compile project(':android-upload-service')
