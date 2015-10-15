@@ -27,40 +27,21 @@ read further and you'll discover how to do it very easily.
 
 ## Setup
 
-If you use Eclipse + ADT and you don't use Maven, check out the project and add android-upload-service to your project as an [Android Library Project](http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject).
-
-Add the following to your project's AndroidManifest.xml file:
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.WAKE_LOCK" />
-```
-
-And before the tag:
-
-```xml
-</ application>
-```
-
-add the following (by changing <b>com.yourcompany.yourapp</b> to your custom app namespace):
-
-```xml
-<service
-    android:name="com.alexbbb.uploadservice.UploadService"
-    android:enabled="true"
-    android:exported="false" >
-    <intent-filter>
-        <action android:name="com.yourcompany.yourapp.uploadservice.action.upload"/>
-    </intent-filter>
-</service>
-```
-
-In your application's initialization code (for example in the onCreate method of your android.app.Application subclass), add:
-
+Add the dependency to your project using maven or gradle. After that, do a clean and build to get the latest artifact. First of all, you have to initialize the library. I suggest you to do that in your Application subclass:
 ```java
-UploadService.NAMESPACE = "com.yourcompany.yourapp";
+public class Initializer extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // setup the broadcast action namespace string which will be used to notify
+        // upload status
+        UploadService.NAMESPACE = "com.yourcompany.yourapp";
+    }
+}
 ```
+
 
 ## How to test upload
 You have the following choices:
@@ -72,17 +53,15 @@ You have the following choices:
 In the <b>examples</b> folder you will find:
 
 * Demo servers which handle upload in:
-  * <b>PHP (HTTP Multipart only)</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
   * <b>node.js (HTTP Multipart and Binary)</b>. You need to have node.js and npm installed. [Refer to this guide](https://github.com/joyent/node/wiki/installing-node.js-via-package-manager). To run the server, open a terminal, navigate to ```examples/server-nodejs``` folder and simply execute:
 
     ```
     npm install (only the first time)
     npm start
     ```
+  * <b>PHP (HTTP Multipart only)</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
 
 * A simple Android application that uses this library
-
-If you use Eclipse + ADT, to be able to compile and deploy the demo application, you also need to have <b>appcompat_v7</b> library. You may need to change the path to that library in the demo application's properties. If you are using Android Studio, simply select File > Import Project and select the demo app's gradle build file.
 
 ## HTTP Multipart upload example
 For detailed explanation of each parameter, please check JavaDocs.
