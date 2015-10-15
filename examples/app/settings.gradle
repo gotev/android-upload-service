@@ -1,2 +1,1 @@
-include ':android-upload-service'
-project(':android-upload-service').projectDir = new File(settingsDir, '../../')
+include ':app'
