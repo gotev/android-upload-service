@@ -121,7 +121,8 @@ public void uploadMultipart(final Context context) {
  
     // set the intent to perform when the user taps on the upload notification.
     // currently tested only with intents that launches an activity
-    // if you comment this line, no action will be performed when the user taps on the notification
+    // if you comment this line, no action will be performed when the user taps 
+    // on the notification
     request.setNotificationClickIntent(new Intent(context, YourActivity.class));
     
     // set the maximum number of automatic upload retries on error
@@ -167,7 +168,8 @@ public void uploadBinary(final Context context) {
     
     // set the intent to perform when the user taps on the upload notification.
     // currently tested only with intents that launches an activity
-    // if you comment this line, no action will be performed when the user taps on the notification
+    // if you comment this line, no action will be performed when the user taps 
+    // on the notification
     request.setNotificationClickIntent(new Intent(context, YourActivity.class));
     
     // set the maximum number of automatic upload retries on error
