@@ -144,18 +144,23 @@ The binary upload uses a single file as the raw body of the upload request. To t
 
 ``` java
 public void uploadBinary(final Context context) {
-    final BinaryUploadRequest request = new BinaryUploadRequest(context,
-                                                                "custom-upload-id",
-                                                                "http://www.yoursite.com/yourscript");
+    final BinaryUploadRequest request = 
+                        new BinaryUploadRequest(context,
+                                                "custom-upload-id",
+                                                "http://www.yoursite.com/yourscript");
     
     // you can pass some data as request header, but you should be extremely careful
-    request.addHeader("file-name", paramNameString);
+    request.addHeader("your-custom-header", "your-custom-value");
     
-    request.setFileToUpload(fileToUploadPath);
+    request.setFileToUpload("/absolute/path/to/your/file");
     
-    request.setNotificationConfig(R.drawable.ic_launcher, getString(R.string.app_name),
-                            getString(R.string.uploading), getString(R.string.upload_success),
-                            getString(R.string.upload_error), false);
+    //configure the notification
+    request.setNotificationConfig(android.R.drawable.ic_menu_upload,
+                                  "notification title",
+                                  "upload in progress text",
+                                  "upload completed successfully text"
+                                  "upload error text",
+                                  false);
                             
     // if you comment the following line, the system default user-agent will be used
     request.setCustomUserAgent("UploadServiceDemo/1.0");
@@ -163,7 +168,7 @@ public void uploadBinary(final Context context) {
     // set the intent to perform when the user taps on the upload notification.
     // currently tested only with intents that launches an activity
     // if you comment this line, no action will be performed when the user taps on the notification
-    request.setNotificationClickIntent(new Intent(this, MainActivity.class));
+    request.setNotificationClickIntent(new Intent(context, YourActivity.class));
     
     // set the maximum number of automatic upload retries on error
     request.setMaxRetries(2);
@@ -171,7 +176,8 @@ public void uploadBinary(final Context context) {
     try {
         request.startUpload();
     } catch (Exception exc) {
-        Toast.makeText(this, "Malformed upload request. " + exc.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+        //You will end up here only if you pass an incomplete upload request
+        Log.e("AndroidUploadService", exc.getLocalizedMessage(), exc);
     }
 }
 ```
