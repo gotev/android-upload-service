@@ -203,9 +203,12 @@ public class YourActivity extends Activity {
         }
         
         @Override
-        public void onProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
+        public void onProgress(final String uploadId, 
+                               final long uploadedBytes, 
+                               final long totalBytes) {
             Log.i(TAG, "Upload with ID "
-                       + uploadId + " uploaded bytes: " + uploadedBytes + ", total: " + totalBytes);
+                       + uploadId + " uploaded bytes: " + uploadedBytes 
+                       + ", total: " + totalBytes);
         }
 
         @Override
