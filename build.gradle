@@ -11,6 +11,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
 
 dependencies {
     compile 'com.android.support:support-v4:23.0.1'
