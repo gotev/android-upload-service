@@ -3,7 +3,7 @@ Android Upload Service
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161)
 
-[Gradle and Maven dependency instructions (with JitPack.io)](https://jitpack.io/#alexbbb/android-upload-service/1.3.1)
+[Gradle and Maven dependency instructions (with JitPack.io)](https://jitpack.io/#alexbbb/android-upload-service/1.4)
 
 ## Are you using Android Upload Service in your app?
 Let me know, and I'll be glad to include a link in the following list :)
