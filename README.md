@@ -38,7 +38,7 @@ dependencies {
 }
 ```
 
-After that, do a clean and build to get the latest artifact. First of all, you have to initialize the library. I suggest you to do that in your Application subclass:
+and do a project sync. To start using the library, you have to initialize it. I suggest you to do that in your Application subclass:
 ```java
 public class Initializer extends Application {
 
@@ -52,7 +52,7 @@ public class Initializer extends Application {
     }
 }
 ```
-and now you're ready to use the library!
+and now you're ready to rock!
 
 ## How to test upload
 You have the following choices:
