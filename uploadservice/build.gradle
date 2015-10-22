@@ -4,7 +4,10 @@ apply plugin: 'com.jfrog.bintray'
 
 def siteUrl = 'https://github.com/alexbbb/android-upload-service'
 def gitUrl = 'https://github.com/alexbbb/android-upload-service.git'
-group = "com.alexbbb"
+def projectName = "android-upload-service"
+def projectDesc = "Easily upload files in the background with automatic Android Notification Center progress indication."
+def projectGroup = "com.alexbbb"
+group = projectGroup
 version = "1.4"
 
 android {
@@ -33,49 +36,50 @@ dependencies {
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            groupId projectGroup
+            version version
+            url siteUrl
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            developers {
+                developer {
+                    id 'alexbbb'
+                    name 'Alex Gotev'
+                }
+            }
+            scm {
+                connection gitUrl
+                developerConnection gitUrl
+                url siteUrl
 
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        name = "android-upload-service"
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
+            }
+        }
     }
 }
 
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                name 'Easily upload files in the background with automatic Android Notification Center progress indication.'
-                url siteUrl
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'alexbbb'
-                        name 'Alex Gotev'
-                        email 'alexgotev@gmail.com'
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-
-                }
-            }
-        }
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = projectName
+        desc = projectDesc
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        issueTrackerUrl = siteUrl + "/issues/"
+        licenses = ["Apache-2.0"]
+        labels = ['android', 'upload', 'service', 'library', 'background', 'notification']
+        publicDownloadNumbers = true
+        publish = true
     }
 }
 
@@ -93,6 +97,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
+
 artifacts {
     archives javadocJar
     archives sourcesJar
