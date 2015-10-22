@@ -33,6 +33,14 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.1'
 }
 
+// add the following information to the file: local.properties situated in the parent directory of
+// where this file is:
+//
+// bintray.user=alexbbb
+// bintray.apikey=api key got from the bintray profile
+//
+// be sure to add local.properties to the .gitignore!
+
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 

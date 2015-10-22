@@ -1,5 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+// To deploy the library to bintray and jcenter, edit the build.gradle file in the child folder
+// and then, from this folder execute:
+// ./gradlew bintrayUpload
+
 buildscript {
     repositories {
         jcenter()
