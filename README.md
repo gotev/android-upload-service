@@ -3,8 +3,6 @@ Android Upload Service
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161)
 
-[Gradle and Maven dependency instructions (with JitPack.io)](https://jitpack.io/#alexbbb/android-upload-service/1.4)
-
 ## Are you using Android Upload Service in your app?
 Let me know, and I'll be glad to include a link in the following list :)
 
@@ -26,8 +24,21 @@ gets executed in the background and it's completely detached from the UI thread.
 read further and you'll discover how to do it very easily.
 
 ## Setup
+Ensure that you have jcenter in your gradle build file:
+```
+repositories {
+    jcenter()
+}
+```
+then in your dependencies section add:
 
-Add the dependency to your project using maven or gradle. After that, do a clean and build to get the latest artifact. First of all, you have to initialize the library. I suggest you to do that in your Application subclass:
+```
+dependencies {
+    compile 'com.alexbbb:uploadservice:1.4'
+}
+```
+
+After that, do a clean and build to get the latest artifact. First of all, you have to initialize the library. I suggest you to do that in your Application subclass:
 ```java
 public class Initializer extends Application {
 
