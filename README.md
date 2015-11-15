@@ -70,6 +70,11 @@ In the <b>examples</b> folder you will find:
     npm install (only the first time)
     npm start
     ```
+    The following endpoints will be available for upload testing:
+    ```
+    HTTP/Multipart: http://YOUR_LOCAL_IP:3000/upload/multipart
+    Binary:         http://YOUR_LOCAL_IP:3000/upload/binary
+    ```
   * <b>PHP (HTTP Multipart only)</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
 
 * A simple Android application that uses this library
