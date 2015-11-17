@@ -127,7 +127,7 @@ public void uploadMultipart(final Context context) {
     request.setNotificationConfig(android.R.drawable.ic_menu_upload,
                                   "notification title",
                                   "upload in progress text",
-                                  "upload completed successfully text"
+                                  "upload completed successfully text",
                                   "upload error text",
                                   false);
     
@@ -175,7 +175,7 @@ public void uploadBinary(final Context context) {
     request.setNotificationConfig(android.R.drawable.ic_menu_upload,
                                   "notification title",
                                   "upload in progress text",
-                                  "upload completed successfully text"
+                                  "upload completed successfully text",
                                   "upload error text",
                                   false);
                             
