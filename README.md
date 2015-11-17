@@ -47,7 +47,9 @@ public class Initializer extends Application {
         super.onCreate();
 
         // setup the broadcast action namespace string which will be used to notify
-        // upload status
+        // upload status. gradle automatically generates proper variable as below.
+        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+        // Or, you can define it manually.
         UploadService.NAMESPACE = "com.yourcompany.yourapp";
     }
 }
