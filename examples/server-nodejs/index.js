@@ -52,4 +52,7 @@ app.post('/upload/binary', function(req, res) {
 var server = app.listen(SERVER_PORT, function() {
     console.log("Web server started. Listening on " +
                 server.address().address + ":" + server.address().port);
+    console.log("\nThe following endpoints are available for upload testing:\n" +
+                "HTTP/Multipart: http://YOUR_LOCAL_IP:3000/upload/multipart\n" +
+                "Binary:         http://YOUR_LOCAL_IP:3000/upload/binary\n");
 });
