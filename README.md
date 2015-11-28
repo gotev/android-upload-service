@@ -124,6 +124,9 @@ public void uploadMultipart(final Context context) {
     request.addArrayParameter("array-parameter-name", valuesList);
 
     //configure the notification
+    //the last two boolean parameters sets:
+    // - whether or not to auto clear the notification after a successful upload
+    // - whether or not to clear the notification after the user taps on it
     request.setNotificationConfig(android.R.drawable.ic_menu_upload,
                                   "notification title",
                                   "upload in progress text",
