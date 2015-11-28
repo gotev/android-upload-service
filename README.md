@@ -47,7 +47,9 @@ public class Initializer extends Application {
         super.onCreate();
 
         // setup the broadcast action namespace string which will be used to notify
-        // upload status
+        // upload status. gradle automatically generates proper variable as below.
+        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+        // Or, you can define it manually.
         UploadService.NAMESPACE = "com.yourcompany.yourapp";
     }
 }
@@ -124,12 +126,15 @@ public void uploadMultipart(final Context context) {
     request.addArrayParameter("array-parameter-name", valuesList);
 
     //configure the notification
+    //the last two boolean parameters sets:
+    // - whether or not to auto clear the notification after a successful upload
+    // - whether or not to clear the notification after the user taps on it
     request.setNotificationConfig(android.R.drawable.ic_menu_upload,
                                   "notification title",
                                   "upload in progress text",
-                                  "upload completed successfully text"
+                                  "upload completed successfully text",
                                   "upload error text",
-                                  false);
+                                  false, true);
 
     // set a custom user agent string for the upload request
     // if you comment the following line, the system default user-agent will be used
@@ -178,7 +183,7 @@ public void uploadBinary(final Context context) {
     request.setNotificationConfig(android.R.drawable.ic_menu_upload,
                                   "notification title",
                                   "upload in progress text",
-                                  "upload completed successfully text"
+                                  "upload completed successfully text",
                                   "upload error text",
                                   false, true);
 
