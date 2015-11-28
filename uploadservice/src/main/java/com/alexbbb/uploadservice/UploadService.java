@@ -133,6 +133,7 @@ public class UploadService extends IntentService {
     /**
      * Start the background file upload service.
      *
+     * @param request request object
      * @deprecated As of 1.4, use startUpload() method on the upload request object
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid

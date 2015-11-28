@@ -179,7 +179,7 @@ abstract class HttpUploadTask {
         if (responseStream != null) {
             try {
                 responseStream.close();
-            } catch (Exception exc) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -189,7 +189,7 @@ abstract class HttpUploadTask {
             try {
                 requestStream.flush();
                 requestStream.close();
-            } catch (Exception exc) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -198,7 +198,7 @@ abstract class HttpUploadTask {
         if (connection != null) {
             try {
                 connection.disconnect();
-            } catch (Exception exc) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -225,7 +225,7 @@ abstract class HttpUploadTask {
             try {
                 if (reader != null)
                     reader.close();
-            } catch (Exception readerExc) {
+            } catch (Exception ignored) {
             }
         }
 

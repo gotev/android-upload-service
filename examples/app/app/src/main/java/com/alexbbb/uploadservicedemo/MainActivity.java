@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                                       getString(R.string.uploading),
                                       getString(R.string.upload_success),
                                       getString(R.string.upload_error),
-                                      false);
+                                      false, true);
 
         // if you comment the following line, the system default user-agent will be used
         request.setCustomUserAgent("UploadServiceDemo/1.0");

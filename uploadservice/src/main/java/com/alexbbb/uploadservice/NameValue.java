@@ -32,16 +32,8 @@ class NameValue implements Parcelable {
     }
 
     public byte[] getBytes() throws UnsupportedEncodingException {
-        final StringBuilder builder = new StringBuilder();
-
-        builder.append("Content-Disposition: form-data; name=\"")
-                .append(name)
-                .append("\"")
-                .append(NEW_LINE)
-                .append(NEW_LINE)
-                .append(value);
-
-        return builder.toString().getBytes("UTF-8");
+        return ("Content-Disposition: form-data; name=\"" + name + "\""
+                + NEW_LINE + NEW_LINE + value).getBytes("UTF-8");
     }
 
     @Override

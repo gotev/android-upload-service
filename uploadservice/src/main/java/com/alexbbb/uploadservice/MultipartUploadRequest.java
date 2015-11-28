@@ -110,18 +110,14 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     /**
-     * Gets the list of the parameters.
-     *
-     * @return
+     * @return Gets the list of the parameters.
      */
     protected ArrayList<NameValue> getParameters() {
         return parameters;
     }
 
     /**
-     * Gets the list of the files that has to be uploaded.
-     *
-     * @return
+     * @return Gets the list of the files that has to be uploaded.
      */
     protected ArrayList<MultipartUploadFile> getFilesToUpload() {
         return filesToUpload;

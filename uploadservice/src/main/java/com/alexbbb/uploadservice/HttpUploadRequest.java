@@ -103,7 +103,8 @@ public abstract class HttpUploadRequest {
      * @param error Text displayed in the notification when an error occurs
      * @param autoClearOnSuccess true if you want to automatically clear the notification when
      *                           the upload gets completed successfully
-     * @param
+     * @param autoClearOnAction true if you want to automatically clear the notification when
+     *                          the user taps on it
      */
     public void setNotificationConfig(final int iconResourceID, final String title, final String message,
                                       final String completed, final String error,
@@ -155,52 +156,42 @@ public abstract class HttpUploadRequest {
     /**
      * Gets the HTTP method to use.
      *
-     * @return
+     * @return HTTP method
      */
     protected String getMethod() {
         return method;
     }
 
     /**
-     * Gets the upload ID of this request.
-     *
-     * @return
+     * @return Gets the upload ID of this request.
      */
     protected String getUploadId() {
         return uploadId;
     }
 
     /**
-     * Gets the URL of the server side script that will handle the multipart form upload.
-     *
-     * @return
+     * @return Gets the URL of the server side script that will handle the multipart form upload.
      */
     protected String getServerUrl() {
         return url;
     }
 
     /**
-     * Gets the list of the headers.
-     *
-     * @return
+     * @return Gets the list of the headers.
      */
     protected ArrayList<NameValue> getHeaders() {
         return headers;
     }
 
     /**
-     * Gets the upload notification configuration.
-     *
-     * @return
+     * @return Gets the upload notification configuration.
      */
     protected UploadNotificationConfig getNotificationConfig() {
         return notificationConfig;
     }
 
     /**
-     * Gets the application context.
-     *
-     * @return
+     * @return Gets the application context.
      */
     protected Context getContext() {
         return context;
@@ -227,27 +218,25 @@ public abstract class HttpUploadRequest {
     }
 
     /**
-     * Sets the intent to be executed when the user taps on the upload progress notification.
-     *
-     * @param intent
+     * @param intent Sets the intent to be executed when the user taps on the upload progress notification.
      */
     public final void setNotificationClickIntent(Intent intent) {
         notificationConfig.setClickIntent(intent);
     }
 
     /**
-     * Get the maximum number of retries that the library will do if an error occurs, before returning an error.
-     *
-     * @return
+     * @return Get the maximum number of retries that the library will do if an error occurs,
+     * before returning an error.
      */
     public final int getMaxRetries() {
         return maxRetries;
     }
 
     /**
-     * Sets the maximum number of retries that the library will do if an error occurs, before returning an error.
+     * Sets the maximum number of retries that the library will do if an error occurs,
+     * before returning an error.
      *
-     * @param maxRetries
+     * @param maxRetries number of maximum retries on error
      */
     public final void setMaxRetries(int maxRetries) {
         if (maxRetries < 0)

@@ -57,21 +57,15 @@ class MultipartUploadTask extends HttpUploadTask {
     }
 
     private String getBoundary() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("---------------------------").append(System.currentTimeMillis());
-        return builder.toString();
+        return "---------------------------" + System.currentTimeMillis();
     }
 
     private byte[] getBoundaryBytes() throws UnsupportedEncodingException {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(NEW_LINE).append(TWO_HYPHENS).append(boundary).append(NEW_LINE);
-        return builder.toString().getBytes("US-ASCII");
+        return (NEW_LINE + TWO_HYPHENS + boundary + NEW_LINE).getBytes("US-ASCII");
     }
 
     private byte[] getTrailerBytes() throws UnsupportedEncodingException {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(NEW_LINE).append(TWO_HYPHENS).append(boundary).append(TWO_HYPHENS).append(NEW_LINE);
-        return builder.toString().getBytes("US-ASCII");
+        return (NEW_LINE + TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes("US-ASCII");
     }
 
     @Override
@@ -80,8 +74,7 @@ class MultipartUploadTask extends HttpUploadTask {
         long parameterBytes = getRequestParametersLength();
         final long totalFileBytes = getFilesLength();
 
-        final long bodyLength = parameterBytes + totalFileBytes + trailerBytes.length;
-        return bodyLength;
+        return (parameterBytes + totalFileBytes + trailerBytes.length);
     }
 
     private long getFilesLength() throws UnsupportedEncodingException {
