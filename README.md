@@ -84,7 +84,7 @@ For detailed explanation of each parameter, please check JavaDocs.
 
 ```java
 public void uploadMultipart(final Context context) {
-    final MultipartUploadRequest request = 
+    final MultipartUploadRequest request =
                         new MultipartUploadRequest(context,
                                                    "custom-upload-id",
                                                    "http://www.yoursite.com/yourscript");
@@ -130,17 +130,17 @@ public void uploadMultipart(final Context context) {
                                   "upload completed successfully text"
                                   "upload error text",
                                   false);
-    
+
     // set a custom user agent string for the upload request
     // if you comment the following line, the system default user-agent will be used
     request.setCustomUserAgent("UploadServiceDemo/1.0");
- 
+
     // set the intent to perform when the user taps on the upload notification.
     // currently tested only with intents that launches an activity
-    // if you comment this line, no action will be performed when the user taps 
+    // if you comment this line, no action will be performed when the user taps
     // on the notification
     request.setNotificationClickIntent(new Intent(context, YourActivity.class));
-    
+
     // set the maximum number of automatic upload retries on error
     request.setMaxRetries(2);
 
@@ -161,36 +161,39 @@ The binary upload uses a single file as the raw body of the upload request. To t
 
 ``` java
 public void uploadBinary(final Context context) {
-    final BinaryUploadRequest request = 
+    final BinaryUploadRequest request =
                         new BinaryUploadRequest(context,
                                                 "custom-upload-id",
                                                 "http://www.yoursite.com/yourscript");
-    
+
     // you can pass some data as request header, but you should be extremely careful
     request.addHeader("your-custom-header", "your-custom-value");
-    
+
     request.setFileToUpload("/absolute/path/to/your/file");
-    
+
     //configure the notification
+    //the last two boolean parameters sets:
+    // - whether or not to auto clear the notification after a successful upload
+    // - whether or not to clear the notification after the user taps on it
     request.setNotificationConfig(android.R.drawable.ic_menu_upload,
                                   "notification title",
                                   "upload in progress text",
                                   "upload completed successfully text"
                                   "upload error text",
-                                  false);
-                            
+                                  false, true);
+
     // if you comment the following line, the system default user-agent will be used
     request.setCustomUserAgent("UploadServiceDemo/1.0");
-    
+
     // set the intent to perform when the user taps on the upload notification.
     // currently tested only with intents that launches an activity
-    // if you comment this line, no action will be performed when the user taps 
+    // if you comment this line, no action will be performed when the user taps
     // on the notification
     request.setNotificationClickIntent(new Intent(context, YourActivity.class));
-    
+
     // set the maximum number of automatic upload retries on error
     request.setMaxRetries(2);
-    
+
     try {
         request.startUpload();
     } catch (Exception exc) {
@@ -216,7 +219,7 @@ public class YourActivity extends Activity {
     private final AbstractUploadServiceReceiver uploadReceiver =
     new AbstractUploadServiceReceiver() {
 
-        // you can override this progress method if you want to get 
+        // you can override this progress method if you want to get
         // the completion progress in percent (0 to 100)
         // or if you need to know exactly how many bytes have been transferred
         // override the method below this one
@@ -225,13 +228,13 @@ public class YourActivity extends Activity {
             Log.i(TAG, "The progress of the upload with ID "
                        + uploadId + " is: " + progress);
         }
-        
+
         @Override
-        public void onProgress(final String uploadId, 
-                               final long uploadedBytes, 
+        public void onProgress(final String uploadId,
+                               final long uploadedBytes,
                                final long totalBytes) {
             Log.i(TAG, "Upload with ID "
-                       + uploadId + " uploaded bytes: " + uploadedBytes 
+                       + uploadId + " uploaded bytes: " + uploadedBytes
                        + ", total: " + totalBytes);
         }
 
@@ -248,9 +251,9 @@ public class YourActivity extends Activity {
             Log.i(TAG, "Upload with ID " + uploadId
                        + " has been completed with HTTP " + serverResponseCode
                        + ". Response from server: " + serverResponseMessage);
-            
+
             //If your server responds with a JSON, you can parse it
-            //from serverResponseMessage string using a library 
+            //from serverResponseMessage string using a library
             //such as org.json (embedded in Android) or google's gson
         }
     };

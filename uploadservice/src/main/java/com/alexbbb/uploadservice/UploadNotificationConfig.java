@@ -19,6 +19,7 @@ class UploadNotificationConfig implements Parcelable {
     private final String completed;
     private final String error;
     private final boolean autoClearOnSuccess;
+    private final boolean autoClearOnAction;
     private boolean ringTone;
     private Intent clickIntent;
 
@@ -29,13 +30,21 @@ class UploadNotificationConfig implements Parcelable {
         completed = "upload completed successfully!";
         error = "error during upload";
         autoClearOnSuccess = false;
+        autoClearOnAction = false;
         clickIntent = null;
         ringTone = false;
     }
 
     public UploadNotificationConfig(final int iconResourceID, final String title,
                                     final String message, final String completed,
-                                    final String error, final boolean autoClearOnSuccess)
+                                    final String error, final boolean autoClearOnSuccess) {
+        this(iconResourceID, title, message, completed, error, autoClearOnSuccess, false);
+    }
+
+    public UploadNotificationConfig(final int iconResourceID, final String title,
+                                    final String message, final String completed,
+                                    final String error, final boolean autoClearOnSuccess,
+                                    final boolean autoClearOnAction)
             throws IllegalArgumentException {
 
         if (title == null || message == null || completed == null || error == null) {
@@ -48,6 +57,7 @@ class UploadNotificationConfig implements Parcelable {
         this.completed = completed;
         this.error = error;
         this.autoClearOnSuccess = autoClearOnSuccess;
+        this.autoClearOnAction = autoClearOnAction;
     }
 
     public final int getIconResourceID() {
@@ -72,6 +82,10 @@ class UploadNotificationConfig implements Parcelable {
 
     public final boolean isAutoClearOnSuccess() {
         return autoClearOnSuccess;
+    }
+
+    public final boolean isAutoClearOnAction() {
+        return autoClearOnAction;
     }
 
     public final boolean isRingTone() {
@@ -122,6 +136,7 @@ class UploadNotificationConfig implements Parcelable {
         parcel.writeString(completed);
         parcel.writeString(error);
         parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
+        parcel.writeByte((byte) (autoClearOnAction ? 1 : 0));
         parcel.writeByte((byte) (ringTone ? 1 : 0));
         parcel.writeParcelable(clickIntent, 0);
     }
@@ -133,6 +148,7 @@ class UploadNotificationConfig implements Parcelable {
         completed = in.readString();
         error = in.readString();
         autoClearOnSuccess = in.readByte() == 1;
+        autoClearOnAction = in.readByte() == 1;
         ringTone = in.readByte() == 1;
         clickIntent = in.readParcelable(Intent.class.getClassLoader());
     }

@@ -231,6 +231,7 @@ public class UploadService extends IntentService {
             notification.setContentTitle(notificationConfig.getTitle())
                         .setContentText(notificationConfig.getCompleted())
                         .setContentIntent(notificationConfig.getPendingIntent(this))
+                        .setAutoCancel(notificationConfig.isAutoClearOnAction())
                         .setSmallIcon(notificationConfig.getIconResourceID())
                         .setProgress(0, 0, false)
                         .setOngoing(false);
@@ -254,6 +255,7 @@ public class UploadService extends IntentService {
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getError())
                     .setContentIntent(notificationConfig.getPendingIntent(this))
+                    .setAutoCancel(notificationConfig.isAutoClearOnAction())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(0, 0, false).setOngoing(false);
         setRingtone();
