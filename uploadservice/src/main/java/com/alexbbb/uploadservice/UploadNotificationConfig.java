@@ -35,6 +35,7 @@ class UploadNotificationConfig implements Parcelable {
         ringTone = false;
     }
 
+    @Deprecated
     public UploadNotificationConfig(final int iconResourceID, final String title,
                                     final String message, final String completed,
                                     final String error, final boolean autoClearOnSuccess) {

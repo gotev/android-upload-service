@@ -83,11 +83,33 @@ public abstract class HttpUploadRequest {
      * @param error Text displayed in the notification when an error occurs
      * @param autoClearOnSuccess true if you want to automatically clear the notification when
      *                           the upload gets completed successfully
+     * @deprecated Replaced by {@link #setNotificationConfig(int, String, String, String, String, boolean, boolean)}.
+     * If you want the same behaviour, just pass false as the last parameter of the new method.
      */
+    @Deprecated
     public void setNotificationConfig(final int iconResourceID, final String title, final String message,
                                       final String completed, final String error, final boolean autoClearOnSuccess) {
+        setNotificationConfig(iconResourceID, title, message, completed, error, autoClearOnSuccess, false);
+    }
+
+    /**
+     * Sets custom notification configuration.
+     *
+     * @param iconResourceID ID of the notification icon.
+     *                       You can use your own app's R.drawable.your_resource
+     * @param title Notification title
+     * @param message Text displayed in the notification when the upload is in progress
+     * @param completed Text displayed in the notification when the upload is completed successfully
+     * @param error Text displayed in the notification when an error occurs
+     * @param autoClearOnSuccess true if you want to automatically clear the notification when
+     *                           the upload gets completed successfully
+     * @param
+     */
+    public void setNotificationConfig(final int iconResourceID, final String title, final String message,
+                                      final String completed, final String error,
+                                      final boolean autoClearOnSuccess, final boolean autoClearOnAction) {
         notificationConfig = new UploadNotificationConfig(iconResourceID, title, message, completed, error,
-                autoClearOnSuccess);
+                                                          autoClearOnSuccess, autoClearOnAction);
     }
 
     /**

@@ -132,13 +132,12 @@ public class UploadService extends IntentService {
 
     /**
      * Start the background file upload service.
-     * You can use the startUpload instance method of the HttpUploadRequest directly.
-     * The method is here for backward compatibility.
      *
-     * @deprecated As of 1.4, use startUpload() method on the request object
+     * @deprecated As of 1.4, use startUpload() method on the upload request object
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid
      */
+    @Deprecated
     public static void startUpload(HttpUploadRequest request)
             throws IllegalArgumentException, MalformedURLException {
         request.startUpload();
