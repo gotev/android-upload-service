@@ -132,7 +132,7 @@ public void uploadMultipart(final Context context) {
                                   "upload in progress text",
                                   "upload completed successfully text"
                                   "upload error text",
-                                  false);
+                                  false, true);
 
     // set a custom user agent string for the upload request
     // if you comment the following line, the system default user-agent will be used
