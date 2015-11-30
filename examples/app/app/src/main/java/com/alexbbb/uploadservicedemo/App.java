@@ -15,6 +15,6 @@ public class App extends Application {
 
         // Set your application namespace to avoid conflicts with other apps
         // using this library
-        UploadService.NAMESPACE = "com.alexbbb";
+        UploadService.NAMESPACE = "com.alexbbb.demoapp";
     }
 }

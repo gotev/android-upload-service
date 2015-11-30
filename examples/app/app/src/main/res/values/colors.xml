@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <!-- Material color palette: https://www.google.com/design/spec/style/color.html#color-color-palette -->
+    <color name="colorPrimary">#03a9f4</color> <!-- 500 -->
+    <color name="colorPrimaryDark">#0288d1</color> <!-- 700 -->
+    <color name="colorAccent">#40c4ff</color> <!-- A200 -->
 </resources>

@@ -4,22 +4,27 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.alexbbb.uploadservice.AbstractUploadServiceReceiver;
 import com.alexbbb.uploadservice.BinaryUploadRequest;
 import com.alexbbb.uploadservice.ContentType;
 import com.alexbbb.uploadservice.MultipartUploadRequest;
+import com.alexbbb.uploadservice.UploadNotificationConfig;
 import com.alexbbb.uploadservice.UploadService;
+import com.alexbbb.uploadservice.UploadServiceBroadcastReceiver;
+import com.alexbbb.uploadservice.demo.BuildConfig;
 import com.alexbbb.uploadservice.demo.R;
 
-import java.io.File;
-import java.net.URL;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 import java.util.UUID;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Activity that demonstrates how to use Android Upload Service.
@@ -30,16 +35,18 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "UploadServiceDemo";
+    private static final String USER_AGENT = "UploadServiceDemo/" + BuildConfig.VERSION_NAME;
 
-    private ProgressBar progressBar;
-    private Button multipartUploadButton;
-    private Button binaryUploadButton;
-    private Button cancelUploadButton;
-    private EditText serverUrl;
-    private EditText fileToUpload;
-    private EditText parameterName;
+    @Bind(R.id.uploadProgress) ProgressBar progressBar;
+    @Bind(R.id.multipartUploadButton) Button multipartUploadButton;
+    @Bind(R.id.binaryUploadButton) Button binaryUploadButton;
+    @Bind(R.id.cancelUploadButton) Button cancelUploadButton;
+    @Bind(R.id.serverURL) EditText serverUrl;
+    @Bind(R.id.fileToUpload) EditText fileToUpload;
+    @Bind(R.id.parameterName) EditText parameterName;
 
-    private final AbstractUploadServiceReceiver uploadReceiver = new AbstractUploadServiceReceiver() {
+    private final UploadServiceBroadcastReceiver uploadReceiver =
+            new UploadServiceBroadcastReceiver() {
 
         @Override
         public void onProgress(String uploadId, int progress) {
@@ -69,35 +76,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        progressBar = (ProgressBar) findViewById(R.id.uploadProgress);
-        serverUrl = (EditText) findViewById(R.id.serverURL);
-        fileToUpload = (EditText) findViewById(R.id.fileToUpload);
-        parameterName = (EditText) findViewById(R.id.parameterName);
-        multipartUploadButton = (Button) findViewById(R.id.multipartUploadButton);
-        binaryUploadButton = (Button) findViewById(R.id.binaryUploadButton);
-        cancelUploadButton = (Button) findViewById(R.id.cancelUploadButton);
-
-        multipartUploadButton.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                onUploadButtonClick();
-            }
-        });
-
-        binaryUploadButton.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                onUploadBinaryClick();
-            }
-        });
-
-        cancelUploadButton.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                onCancelUploadButtonClick();
-            }
-        });
+        ButterKnife.bind(this);
 
         progressBar.setMax(100);
         progressBar.setProgress(0);
@@ -123,120 +102,75 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-    private boolean userInputIsValid(final String serverUrlString, final String fileToUploadPath,
-                                     final String paramNameString) {
-        if (serverUrlString.length() == 0) {
-            showToast(getString(R.string.provide_valid_server_url));
-            return false;
-        }
-
-        try {
-            new URL(serverUrlString.toString());
-        } catch (Exception exc) {
-            showToast(getString(R.string.provide_valid_server_url));
-            return false;
-        }
-
-        if (fileToUploadPath.length() == 0) {
-            showToast(getString(R.string.provide_file_to_upload));
-            return false;
-        }
-
-        if (!new File(fileToUploadPath).exists()) {
-            showToast(getString(R.string.file_does_not_exist));
-            return false;
-        }
-
-        if (paramNameString.length() == 0) {
-            showToast(getString(R.string.provide_param_name));
-            return false;
-        }
-
-        return true;
+    private UploadNotificationConfig getNotificationConfig() {
+        return new UploadNotificationConfig()
+            .setIcon(R.drawable.ic_upload)
+            .setTitle(getString(R.string.app_name))
+            .setInProgressMessage(getString(R.string.uploading))
+            .setCompletedMessage(getString(R.string.upload_success))
+            .setErrorMessage(getString(R.string.upload_error))
+            .setAutoClearOnSuccess(false)
+            .setClickIntent(new Intent(this, MainActivity.class))
+            .setClearOnAction(true)
+            .setRingToneEnabled(true);
     }
 
-    private void onUploadButtonClick() {
+    @OnClick(R.id.multipartUploadButton)
+    void onMultipartUploadClick() {
         final String serverUrlString = serverUrl.getText().toString();
         final String fileToUploadPath = fileToUpload.getText().toString();
         final String paramNameString = parameterName.getText().toString();
 
-        if (!userInputIsValid(serverUrlString, fileToUploadPath, paramNameString))
-            return;
-
-        final MultipartUploadRequest request =
-                new MultipartUploadRequest(this, UUID.randomUUID().toString(), serverUrlString);
-
-        request.addFileToUpload(fileToUploadPath, paramNameString,
-                                "test", ContentType.APPLICATION_OCTET_STREAM);
-
-        request.setNotificationConfig(R.mipmap.ic_launcher,
-                                      getString(R.string.app_name),
-                                      getString(R.string.uploading),
-                                      getString(R.string.upload_success),
-                                      getString(R.string.upload_error),
-                                      false, true);
-
-        // if you comment the following line, the system default user-agent will be used
-        request.setCustomUserAgent("UploadServiceDemo/1.0");
-
-        // set the intent to perform when the user taps on the upload notification.
-        // currently tested only with intents that launches an activity
-        // if you comment this line, no action will be performed when the user taps
-        // on the notification
-        request.setNotificationClickIntent(new Intent(this, MainActivity.class));
-
-        // set the maximum number of automatic upload retries on error
-        request.setMaxRetries(2);
-
         try {
-            request.startUpload();
-        } catch (Exception exc) {
-            showToast("Malformed upload request. " + exc.getLocalizedMessage());
+            final String uploadID = UUID.randomUUID().toString();
+
+            new MultipartUploadRequest(this, uploadID, serverUrlString)
+                .addFileToUpload(fileToUploadPath, paramNameString, "test",
+                        ContentType.APPLICATION_OCTET_STREAM)
+                .setNotificationConfig(getNotificationConfig())
+                .setCustomUserAgent(USER_AGENT)
+                .setMaxRetries(2)
+                .startUpload();
+
+        // these are the different exceptions that may be thrown
+        } catch (FileNotFoundException exc) {
+            showToast(exc.getMessage());
+        } catch (IllegalArgumentException exc) {
+            showToast("Missing some arguments. " + exc.getMessage());
+        } catch (MalformedURLException exc) {
+            showToast(exc.getMessage());
         }
     }
 
-    private void onUploadBinaryClick() {
+    @OnClick(R.id.binaryUploadButton)
+    void onUploadBinaryClick() {
         final String serverUrlString = serverUrl.getText().toString();
         final String fileToUploadPath = fileToUpload.getText().toString();
         final String paramNameString = parameterName.getText().toString();
 
-        if (!userInputIsValid(serverUrlString, fileToUploadPath, paramNameString))
-            return;
-
-        final BinaryUploadRequest request =
-                new BinaryUploadRequest(this, UUID.randomUUID().toString(), serverUrlString);
-
-        // you can pass some data as request header, but you should be extremely careful
-        request.addHeader("file-name", paramNameString);
-
-        request.setFileToUpload(fileToUploadPath);
-
-        request.setNotificationConfig(R.mipmap.ic_launcher,
-                                      getString(R.string.app_name),
-                                      getString(R.string.uploading),
-                                      getString(R.string.upload_success),
-                                      getString(R.string.upload_error),
-                                      false);
-
-        // if you comment the following line, the system default user-agent will be used
-        request.setCustomUserAgent("UploadServiceDemo/1.0");
-
-        // set the intent to perform when the user taps on the upload notification.
-        // currently tested only with intents that launches an activity
-        // if you comment this line, no action will be performed when the user taps on the notification
-        request.setNotificationClickIntent(new Intent(this, MainActivity.class));
-
-        // set the maximum number of automatic upload retries on error
-        request.setMaxRetries(2);
-
         try {
-            request.startUpload();
-        } catch (Exception exc) {
-            showToast("Malformed upload request. " + exc.getLocalizedMessage());
+            final String uploadID = UUID.randomUUID().toString();
+
+            new BinaryUploadRequest(this, uploadID, serverUrlString)
+                .addHeader("file-name", paramNameString)
+                .setFileToUpload(fileToUploadPath)
+                .setNotificationConfig(getNotificationConfig())
+                .setCustomUserAgent(USER_AGENT)
+                .setMaxRetries(2)
+                .startUpload();
+
+        // these are the different exceptions that may be thrown
+        } catch (FileNotFoundException exc) {
+            showToast(exc.getMessage());
+        } catch (IllegalArgumentException exc) {
+            showToast("Missing some arguments. " + exc.getMessage());
+        } catch (MalformedURLException exc) {
+            showToast(exc.getMessage());
         }
     }
 
-    private void onCancelUploadButtonClick() {
+    @OnClick(R.id.cancelUploadButton)
+    void onCancelUploadButtonClick() {
         UploadService.stopCurrentUpload();
     }
 }
