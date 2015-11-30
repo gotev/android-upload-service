@@ -71,7 +71,7 @@ public class BinaryUploadRequest extends HttpUploadRequest {
                                                      String error, boolean autoClearOnSuccess,
                                                      boolean autoClearOnAction) {
         super.setNotificationConfig(iconResourceID, title, message, completed, error,
-                                    autoClearOnSuccess, autoClearOnAction);
+                autoClearOnSuccess, autoClearOnAction);
         return this;
     }
 
@@ -84,6 +84,18 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     @Override
     public BinaryUploadRequest setMethod(String method) {
         super.setMethod(method);
+        return this;
+    }
+
+    @Override
+    public BinaryUploadRequest setCustomUserAgent(String customUserAgent) {
+        super.setCustomUserAgent(customUserAgent);
+        return this;
+    }
+
+    @Override
+    public BinaryUploadRequest setNotificationClickIntent(Intent intent) {
+        super.setNotificationClickIntent(intent);
         return this;
     }
 

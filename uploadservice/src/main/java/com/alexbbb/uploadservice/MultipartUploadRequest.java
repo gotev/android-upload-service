@@ -138,6 +138,18 @@ public class MultipartUploadRequest extends HttpUploadRequest {
         return this;
     }
 
+    @Override
+    public MultipartUploadRequest setCustomUserAgent(String customUserAgent) {
+        super.setCustomUserAgent(customUserAgent);
+        return this;
+    }
+
+    @Override
+    public MultipartUploadRequest setNotificationClickIntent(Intent intent) {
+        super.setNotificationClickIntent(intent);
+        return this;
+    }
+
     /**
      * @return Gets the list of the parameters.
      */

@@ -198,7 +198,7 @@ public abstract class HttpUploadRequest {
      *
      * @param customUserAgent custom user agent string
      */
-    public final HttpUploadRequest setCustomUserAgent(String customUserAgent) {
+    public HttpUploadRequest setCustomUserAgent(String customUserAgent) {
         this.customUserAgent = customUserAgent;
         return this;
     }
@@ -206,7 +206,7 @@ public abstract class HttpUploadRequest {
     /**
      * @param intent Sets the intent to be executed when the user taps on the upload progress notification.
      */
-    public final HttpUploadRequest setNotificationClickIntent(Intent intent) {
+    public HttpUploadRequest setNotificationClickIntent(Intent intent) {
         notificationConfig.setClickIntent(intent);
         return this;
     }
