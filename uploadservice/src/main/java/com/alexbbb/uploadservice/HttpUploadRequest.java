@@ -83,34 +83,16 @@ public abstract class HttpUploadRequest {
      * @param error Text displayed in the notification when an error occurs
      * @param autoClearOnSuccess true if you want to automatically clear the notification when
      *                           the upload gets completed successfully
-     * @deprecated Replaced by {@link #setNotificationConfig(int, String, String, String, String, boolean, boolean)}.
-     * If you want the same behaviour, just pass false as the last parameter of the new method.
-     */
-    @Deprecated
-    public void setNotificationConfig(final int iconResourceID, final String title, final String message,
-                                      final String completed, final String error, final boolean autoClearOnSuccess) {
-        setNotificationConfig(iconResourceID, title, message, completed, error, autoClearOnSuccess, false);
-    }
-
-    /**
-     * Sets custom notification configuration.
-     *
-     * @param iconResourceID ID of the notification icon.
-     *                       You can use your own app's R.drawable.your_resource
-     * @param title Notification title
-     * @param message Text displayed in the notification when the upload is in progress
-     * @param completed Text displayed in the notification when the upload is completed successfully
-     * @param error Text displayed in the notification when an error occurs
-     * @param autoClearOnSuccess true if you want to automatically clear the notification when
-     *                           the upload gets completed successfully
      * @param autoClearOnAction true if you want to automatically clear the notification when
      *                          the user taps on it
      */
-    public void setNotificationConfig(final int iconResourceID, final String title, final String message,
-                                      final String completed, final String error,
-                                      final boolean autoClearOnSuccess, final boolean autoClearOnAction) {
+    public HttpUploadRequest setNotificationConfig(final int iconResourceID, final String title,
+                                                   final String message, final String completed,
+                                                   final String error, final boolean autoClearOnSuccess,
+                                                   final boolean autoClearOnAction) {
         notificationConfig = new UploadNotificationConfig(iconResourceID, title, message, completed, error,
                                                           autoClearOnSuccess, autoClearOnAction);
+        return this;
     }
 
     /**
@@ -139,8 +121,9 @@ public abstract class HttpUploadRequest {
      * @param headerName header name
      * @param headerValue header value
      */
-    public void addHeader(final String headerName, final String headerValue) {
+    public HttpUploadRequest addHeader(final String headerName, final String headerValue) {
         headers.add(new NameValue(headerName, headerValue));
+        return this;
     }
 
     /**
@@ -148,9 +131,11 @@ public abstract class HttpUploadRequest {
      *
      * @param method new HTTP method to use
      */
-    public void setMethod(final String method) {
+    public HttpUploadRequest setMethod(final String method) {
         if (method != null && method.length() > 0)
             this.method = method;
+
+        return this;
     }
 
     /**
@@ -213,15 +198,17 @@ public abstract class HttpUploadRequest {
      *
      * @param customUserAgent custom user agent string
      */
-    public final void setCustomUserAgent(String customUserAgent) {
+    public final HttpUploadRequest setCustomUserAgent(String customUserAgent) {
         this.customUserAgent = customUserAgent;
+        return this;
     }
 
     /**
      * @param intent Sets the intent to be executed when the user taps on the upload progress notification.
      */
-    public final void setNotificationClickIntent(Intent intent) {
+    public final HttpUploadRequest setNotificationClickIntent(Intent intent) {
         notificationConfig.setClickIntent(intent);
+        return this;
     }
 
     /**
@@ -238,10 +225,12 @@ public abstract class HttpUploadRequest {
      *
      * @param maxRetries number of maximum retries on error
      */
-    public final void setMaxRetries(int maxRetries) {
+    public final HttpUploadRequest setMaxRetries(int maxRetries) {
         if (maxRetries < 0)
             this.maxRetries = 0;
         else
             this.maxRetries = maxRetries;
+
+        return this;
     }
 }

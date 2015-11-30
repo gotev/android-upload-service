@@ -3,6 +3,7 @@ package com.alexbbb.uploadservice;
 import android.content.Context;
 import android.content.Intent;
 
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 
 /**
@@ -57,9 +58,33 @@ public class BinaryUploadRequest extends HttpUploadRequest {
      * Sets the file used as raw body of the upload request.
      *
      * @param path Absolute path to the file that you want to upload
+     * @throws FileNotFoundException if the file to upload does not exist
      */
-    public void setFileToUpload(String path) {
+    public BinaryUploadRequest setFileToUpload(String path) throws FileNotFoundException {
         file = new BinaryUploadFile(path);
+        return this;
+    }
+
+    @Override
+    public BinaryUploadRequest setNotificationConfig(int iconResourceID, String title,
+                                                     String message, String completed,
+                                                     String error, boolean autoClearOnSuccess,
+                                                     boolean autoClearOnAction) {
+        super.setNotificationConfig(iconResourceID, title, message, completed, error,
+                                    autoClearOnSuccess, autoClearOnAction);
+        return this;
+    }
+
+    @Override
+    public BinaryUploadRequest addHeader(String headerName, String headerValue) {
+        super.addHeader(headerName, headerValue);
+        return this;
+    }
+
+    @Override
+    public BinaryUploadRequest setMethod(String method) {
+        super.setMethod(method);
+        return this;
     }
 
     /**

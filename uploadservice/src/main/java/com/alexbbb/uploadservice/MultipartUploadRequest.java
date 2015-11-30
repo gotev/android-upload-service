@@ -3,6 +3,7 @@ package com.alexbbb.uploadservice;
 import android.content.Context;
 import android.content.Intent;
 
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +30,8 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      */
     public MultipartUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         super(context, uploadId, serverUrl);
-        filesToUpload = new ArrayList<MultipartUploadFile>();
-        parameters = new ArrayList<NameValue>();
+        filesToUpload = new ArrayList<>();
+        parameters = new ArrayList<>();
     }
 
     /**
@@ -69,10 +70,13 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * @param fileName File name seen by the server side script
      * @param contentType Content type of the file. Set this to null if you don't want to set a
      *                    content type.
+     * @throws FileNotFoundException if the file does not exist at the specified path
      */
-    public void addFileToUpload(final String path, final String parameterName, final String fileName,
-                                final String contentType) {
+    public MultipartUploadRequest addFileToUpload(final String path, final String parameterName,
+                                                  final String fileName, final String contentType)
+            throws FileNotFoundException {
         filesToUpload.add(new MultipartUploadFile(path, parameterName, fileName, contentType));
+        return this;
     }
 
     /**
@@ -81,8 +85,9 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * @param paramName parameter name
      * @param paramValue parameter value
      */
-    public void addParameter(final String paramName, final String paramValue) {
+    public MultipartUploadRequest addParameter(final String paramName, final String paramValue) {
         parameters.add(new NameValue(paramName, paramValue));
+        return this;
     }
 
     /**
@@ -91,10 +96,11 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * @param paramName parameter name
      * @param array values
      */
-    public void addArrayParameter(final String paramName, final String... array) {
+    public MultipartUploadRequest addArrayParameter(final String paramName, final String... array) {
         for (String value : array) {
             parameters.add(new NameValue(paramName, value));
         }
+        return this;
     }
 
     /**
@@ -103,10 +109,33 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * @param paramName parameter name
      * @param list values
      */
-    public void addArrayParameter(final String paramName, final List<String> list) {
+    public MultipartUploadRequest addArrayParameter(final String paramName, final List<String> list) {
         for (String value : list) {
             parameters.add(new NameValue(paramName, value));
         }
+        return this;
+    }
+
+    @Override
+    public MultipartUploadRequest setNotificationConfig(int iconResourceID, String title,
+                                                        String message, String completed,
+                                                        String error, boolean autoClearOnSuccess,
+                                                        boolean autoClearOnAction) {
+        super.setNotificationConfig(iconResourceID, title, message, completed, error,
+                                    autoClearOnSuccess, autoClearOnAction);
+        return this;
+    }
+
+    @Override
+    public MultipartUploadRequest addHeader(String headerName, String headerValue) {
+        super.addHeader(headerName, headerValue);
+        return this;
+    }
+
+    @Override
+    public MultipartUploadRequest setMethod(String method) {
+        super.setMethod(method);
+        return this;
     }
 
     /**

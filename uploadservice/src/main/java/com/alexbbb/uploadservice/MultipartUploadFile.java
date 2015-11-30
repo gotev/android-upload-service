@@ -3,6 +3,7 @@ package com.alexbbb.uploadservice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -28,7 +29,8 @@ class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
      * @param contentType content type of the file to send
      */
     public MultipartUploadFile(final String path, final String parameterName,
-                               final String fileName, final String contentType) {
+                               final String fileName, final String contentType)
+        throws FileNotFoundException {
 
         super(path);
 

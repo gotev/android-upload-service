@@ -3,11 +3,10 @@ package com.alexbbb.uploadservice;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
-import android.media.RingtoneManager;
-import java.net.MalformedURLException;
 
 /**
  * Service to upload files in background using HTTP POST with notification center progress
@@ -128,20 +127,6 @@ public class UploadService extends IntentService {
                 currentTask.run();
             }
         }
-    }
-
-    /**
-     * Start the background file upload service.
-     *
-     * @param request request object
-     * @deprecated As of 1.4, use startUpload() method on the upload request object
-     * @throws IllegalArgumentException if one or more arguments passed are invalid
-     * @throws MalformedURLException if the server URL is not valid
-     */
-    @Deprecated
-    public static void startUpload(HttpUploadRequest request)
-            throws IllegalArgumentException, MalformedURLException {
-        request.startUpload();
     }
 
     void broadcastProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {

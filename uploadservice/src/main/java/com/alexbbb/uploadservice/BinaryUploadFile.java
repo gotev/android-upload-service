@@ -17,8 +17,10 @@ class BinaryUploadFile implements Parcelable {
 
     protected final File file;
 
-    BinaryUploadFile(String path) {
-        this.file = new File(path);
+    BinaryUploadFile(String path) throws FileNotFoundException {
+        File file = new File(path);
+        if (!file.exists()) throw new FileNotFoundException();
+        this.file = file;
     }
 
     public long length() {
