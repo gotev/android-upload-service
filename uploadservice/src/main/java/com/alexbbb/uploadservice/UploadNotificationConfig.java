@@ -11,96 +11,161 @@ import android.os.Parcelable;
  *
  * @author alexbbb (Alex Gotev)
  */
-class UploadNotificationConfig implements Parcelable {
+public class UploadNotificationConfig implements Parcelable {
 
-    private final int iconResourceID;
-    private final String title;
-    private final String message;
-    private final String completed;
-    private final String error;
-    private final boolean autoClearOnSuccess;
-    private final boolean autoClearOnAction;
-    private boolean ringTone;
+    private int iconResourceID;
+    private String title;
+    private String inProgress;
+    private String completed;
+    private String error;
+    private boolean autoClearOnSuccess;
+    private boolean clearOnAction;
+    private boolean ringToneEnabled;
     private Intent clickIntent;
 
     public UploadNotificationConfig() {
         iconResourceID = android.R.drawable.ic_menu_upload;
         title = "File Upload";
-        message = "uploading in progress";
+        inProgress = "uploading in progress";
         completed = "upload completed successfully!";
         error = "error during upload";
         autoClearOnSuccess = false;
-        autoClearOnAction = false;
+        clearOnAction = false;
         clickIntent = null;
-        ringTone = false;
+        ringToneEnabled = false;
     }
 
-    public UploadNotificationConfig(final int iconResourceID, final String title,
-                                    final String message, final String completed,
-                                    final String error, final boolean autoClearOnSuccess,
-                                    final boolean autoClearOnAction)
-            throws IllegalArgumentException {
+    /**
+     * Sets the notification icon.
+     * @param resourceID Resource ID of the icon to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setIcon(int resourceID) {
+        this.iconResourceID = resourceID;
+        return this;
+    }
 
-        if (title == null || message == null || completed == null || error == null) {
-            throw new IllegalArgumentException("You can't provide null parameters");
-        }
-
-        this.iconResourceID = iconResourceID;
+    /**
+     * Sets the notification title.
+     * @param title Title to show in the notification icon
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setTitle(String title) {
         this.title = title;
-        this.message = message;
-        this.completed = completed;
-        this.error = error;
-        this.autoClearOnSuccess = autoClearOnSuccess;
-        this.autoClearOnAction = autoClearOnAction;
+        return this;
     }
 
-    public final int getIconResourceID() {
+    /**
+     * Sets the message to be shown while upload is in progress.
+     * @param message Message to show
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setInProgressMessage(String message) {
+        inProgress = message;
+        return this;
+    }
+
+    /**
+     * Sets the message to be shown if an error occurs.
+     * @param message Message to show
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setErrorMessage(String message) {
+        error = message;
+        return this;
+    }
+
+    /**
+     * Sets the message to be shown when the upload is completed.
+     * @param message Message to show
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setCompletedMessage(String message) {
+        completed = message;
+        return this;
+    }
+
+    /**
+     * Sets whether or not to auto clear the notification when the upload is completed successfully.
+     * @param clear true to automatically clear the notification, otherwise false
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setAutoClearOnSuccess(boolean clear) {
+        autoClearOnSuccess = clear;
+        return this;
+    }
+
+    /**
+     * Sets whether or not to clear the notification when the user taps on it.
+     * @param clear true to clear the notification, otherwise false
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setClearOnAction(boolean clear) {
+        clearOnAction = clear;
+        return this;
+    }
+
+    /**
+     * Sets the intent to be executed when the user taps on the notification.
+     * @param clickIntent {@link android.content.Intent}.
+     *                    For example: new Intent(context, YourActivity.class)
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setClickIntent(Intent clickIntent) {
+        this.clickIntent = clickIntent;
+        return this;
+    }
+
+    /**
+     * Sets whether or not to enable the notification sound when the upload gets completed with
+     * success or error
+     * @param enabled true to enable the default ringtone
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setRingToneEnabled(Boolean enabled) {
+        this.ringToneEnabled = enabled;
+        return this;
+    }
+
+    final int getIconResourceID() {
         return iconResourceID;
     }
 
-    public final String getTitle() {
+    final String getTitle() {
         return title;
     }
 
-    public final String getMessage() {
-        return message;
+    final String getInProgressMessage() {
+        return inProgress;
     }
 
-    public final String getCompleted() {
+    final String getCompletedMessage() {
         return completed;
     }
 
-    public final String getError() {
+    final String getErrorMessage() {
         return error;
     }
 
-    public final boolean isAutoClearOnSuccess() {
+    final boolean isAutoClearOnSuccess() {
         return autoClearOnSuccess;
     }
 
-    public final boolean isAutoClearOnAction() {
-        return autoClearOnAction;
+    final boolean isClearOnAction() {
+        return clearOnAction;
     }
 
-    public final boolean isRingTone() {
-        return ringTone;
+    final boolean isRingToneEnabled() {
+        return ringToneEnabled;
     }
 
-    public final PendingIntent getPendingIntent(Context context) {
+    final PendingIntent getPendingIntent(Context context) {
         if (clickIntent == null) {
             return PendingIntent.getBroadcast(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
         }
 
         return PendingIntent.getActivity(context, 1, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
-
-    public final void setClickIntent(Intent clickIntent) {
-        this.clickIntent = clickIntent;
-    }
-    public final void enableRingTone(Boolean tone) {
-        this.ringTone = tone;
-    }
-
 
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
@@ -126,24 +191,24 @@ class UploadNotificationConfig implements Parcelable {
     public void writeToParcel(Parcel parcel, int arg1) {
         parcel.writeInt(iconResourceID);
         parcel.writeString(title);
-        parcel.writeString(message);
+        parcel.writeString(inProgress);
         parcel.writeString(completed);
         parcel.writeString(error);
         parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
-        parcel.writeByte((byte) (autoClearOnAction ? 1 : 0));
-        parcel.writeByte((byte) (ringTone ? 1 : 0));
+        parcel.writeByte((byte) (clearOnAction ? 1 : 0));
+        parcel.writeByte((byte) (ringToneEnabled ? 1 : 0));
         parcel.writeParcelable(clickIntent, 0);
     }
 
     private UploadNotificationConfig(Parcel in) {
         iconResourceID = in.readInt();
         title = in.readString();
-        message = in.readString();
+        inProgress = in.readString();
         completed = in.readString();
         error = in.readString();
         autoClearOnSuccess = in.readByte() == 1;
-        autoClearOnAction = in.readByte() == 1;
-        ringTone = in.readByte() == 1;
+        clearOnAction = in.readByte() == 1;
+        ringToneEnabled = in.readByte() == 1;
         clickIntent = in.readParcelable(Intent.class.getClassLoader());
     }
 }

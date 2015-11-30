@@ -190,7 +190,7 @@ public class UploadService extends IntentService {
 
     private void createNotification() {
         notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getMessage())
+                    .setContentText(notificationConfig.getInProgressMessage())
                     .setContentIntent(notificationConfig.getPendingIntent(this))
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(100, 0, true).setOngoing(true);
@@ -200,7 +200,7 @@ public class UploadService extends IntentService {
 
     private void updateNotificationProgress(int uploadedBytes, int totalBytes) {
         notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getMessage())
+                    .setContentText(notificationConfig.getInProgressMessage())
                     .setContentIntent(notificationConfig.getPendingIntent(this))
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(totalBytes, uploadedBytes, false)
@@ -214,9 +214,9 @@ public class UploadService extends IntentService {
 
         if (!notificationConfig.isAutoClearOnSuccess()) {
             notification.setContentTitle(notificationConfig.getTitle())
-                        .setContentText(notificationConfig.getCompleted())
+                        .setContentText(notificationConfig.getCompletedMessage())
                         .setContentIntent(notificationConfig.getPendingIntent(this))
-                        .setAutoCancel(notificationConfig.isAutoClearOnAction())
+                        .setAutoCancel(notificationConfig.isClearOnAction())
                         .setSmallIcon(notificationConfig.getIconResourceID())
                         .setProgress(0, 0, false)
                         .setOngoing(false);
@@ -227,7 +227,7 @@ public class UploadService extends IntentService {
 
     private void setRingtone() {
 
-        if(notificationConfig.isRingTone()) {
+        if(notificationConfig.isRingToneEnabled()) {
             notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION));
             notification.setOnlyAlertOnce(false);
         }
@@ -238,9 +238,9 @@ public class UploadService extends IntentService {
         stopForeground(false);
 
         notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getError())
+                    .setContentText(notificationConfig.getErrorMessage())
                     .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setAutoCancel(notificationConfig.isAutoClearOnAction())
+                    .setAutoCancel(notificationConfig.isClearOnAction())
                     .setSmallIcon(notificationConfig.getIconResourceID())
                     .setProgress(0, 0, false).setOngoing(false);
         setRingtone();

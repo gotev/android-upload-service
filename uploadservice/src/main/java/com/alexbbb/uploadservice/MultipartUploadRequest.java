@@ -119,12 +119,8 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     @Override
-    public MultipartUploadRequest setNotificationConfig(int iconResourceID, String title,
-                                                        String message, String completed,
-                                                        String error, boolean autoClearOnSuccess,
-                                                        boolean autoClearOnAction) {
-        super.setNotificationConfig(iconResourceID, title, message, completed, error,
-                                    autoClearOnSuccess, autoClearOnAction);
+    public MultipartUploadRequest setNotificationConfig(UploadNotificationConfig config) {
+        super.setNotificationConfig(config);
         return this;
     }
 
@@ -143,12 +139,6 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     @Override
     public MultipartUploadRequest setCustomUserAgent(String customUserAgent) {
         super.setCustomUserAgent(customUserAgent);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest setNotificationClickIntent(Intent intent) {
-        super.setNotificationClickIntent(intent);
         return this;
     }
 

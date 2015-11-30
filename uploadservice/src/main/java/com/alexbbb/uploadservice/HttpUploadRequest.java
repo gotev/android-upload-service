@@ -38,7 +38,7 @@ public abstract class HttpUploadRequest {
         this.uploadId = uploadId;
         notificationConfig = new UploadNotificationConfig();
         url = serverUrl;
-        headers = new ArrayList<NameValue>();
+        headers = new ArrayList<>();
         maxRetries = 0;
     }
 
@@ -75,23 +75,10 @@ public abstract class HttpUploadRequest {
     /**
      * Sets custom notification configuration.
      *
-     * @param iconResourceID ID of the notification icon.
-     *                       You can use your own app's R.drawable.your_resource
-     * @param title Notification title
-     * @param message Text displayed in the notification when the upload is in progress
-     * @param completed Text displayed in the notification when the upload is completed successfully
-     * @param error Text displayed in the notification when an error occurs
-     * @param autoClearOnSuccess true if you want to automatically clear the notification when
-     *                           the upload gets completed successfully
-     * @param autoClearOnAction true if you want to automatically clear the notification when
-     *                          the user taps on it
+     * @param config the upload configuration object
      */
-    public HttpUploadRequest setNotificationConfig(final int iconResourceID, final String title,
-                                                   final String message, final String completed,
-                                                   final String error, final boolean autoClearOnSuccess,
-                                                   final boolean autoClearOnAction) {
-        notificationConfig = new UploadNotificationConfig(iconResourceID, title, message, completed, error,
-                                                          autoClearOnSuccess, autoClearOnAction);
+    public HttpUploadRequest setNotificationConfig(UploadNotificationConfig config) {
+        notificationConfig = config;
         return this;
     }
 
@@ -200,14 +187,6 @@ public abstract class HttpUploadRequest {
      */
     public HttpUploadRequest setCustomUserAgent(String customUserAgent) {
         this.customUserAgent = customUserAgent;
-        return this;
-    }
-
-    /**
-     * @param intent Sets the intent to be executed when the user taps on the upload progress notification.
-     */
-    public HttpUploadRequest setNotificationClickIntent(Intent intent) {
-        notificationConfig.setClickIntent(intent);
         return this;
     }
 
