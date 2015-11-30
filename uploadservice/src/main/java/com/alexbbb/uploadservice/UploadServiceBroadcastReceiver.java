@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 /**
- * Abstract broadcast receiver from which to inherit when creating a receiver for
+ * Broadcast receiver from which to inherit when creating a receiver for
  * {@link UploadService}.
  *
  * It provides the boilerplate code to properly handle broadcast messages coming from the
@@ -17,7 +17,7 @@ import android.content.IntentFilter;
  * @author cankov
  *
  */
-public abstract class AbstractUploadServiceReceiver extends BroadcastReceiver {
+public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
