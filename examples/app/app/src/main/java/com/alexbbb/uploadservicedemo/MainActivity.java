@@ -120,10 +120,9 @@ public class MainActivity extends AppCompatActivity {
         final String serverUrlString = serverUrl.getText().toString();
         final String fileToUploadPath = fileToUpload.getText().toString();
         final String paramNameString = parameterName.getText().toString();
+        final String uploadID = UUID.randomUUID().toString();
 
         try {
-            final String uploadID = UUID.randomUUID().toString();
-
             new MultipartUploadRequest(this, uploadID, serverUrlString)
                 .addFileToUpload(fileToUploadPath, paramNameString, "test",
                         ContentType.APPLICATION_OCTET_STREAM)
@@ -147,10 +146,9 @@ public class MainActivity extends AppCompatActivity {
         final String serverUrlString = serverUrl.getText().toString();
         final String fileToUploadPath = fileToUpload.getText().toString();
         final String paramNameString = parameterName.getText().toString();
+        final String uploadID = UUID.randomUUID().toString();
 
         try {
-            final String uploadID = UUID.randomUUID().toString();
-
             new BinaryUploadRequest(this, uploadID, serverUrlString)
                 .addHeader("file-name", paramNameString)
                 .setFileToUpload(fileToUploadPath)
