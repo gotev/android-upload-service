@@ -27,12 +27,18 @@ class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
      * @param path absolute path to the file
      * @param parameterName parameter name to use in the multipart form
      * @param contentType content type of the file to send
+     * @throws FileNotFoundException if the specified file is not found
+     * @throws IllegalArgumentException if one or more arguments passed are not valid
      */
     public MultipartUploadFile(final String path, final String parameterName,
                                final String fileName, final String contentType)
-        throws FileNotFoundException {
+        throws FileNotFoundException, IllegalArgumentException {
 
         super(path);
+
+        if (parameterName == null || "".equals(parameterName)) {
+            throw new IllegalArgumentException("Please specify parameterName value for file: " + path);
+        }
 
         this.paramName = parameterName;
         this.contentType = contentType;

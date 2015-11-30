@@ -67,14 +67,16 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      *
      * @param path Absolute path to the file that you want to upload
      * @param parameterName Name of the form parameter that will contain file's data
-     * @param fileName File name seen by the server side script
+     * @param fileName File name seen by the server side script. If null, the original file name
+     *                 will be used
      * @param contentType Content type of the file. Set this to null if you don't want to set a
      *                    content type.
      * @throws FileNotFoundException if the file does not exist at the specified path
+     * @throws IllegalArgumentException if one or more parameters are not valid
      */
     public MultipartUploadRequest addFileToUpload(final String path, final String parameterName,
                                                   final String fileName, final String contentType)
-            throws FileNotFoundException {
+            throws FileNotFoundException, IllegalArgumentException {
         filesToUpload.add(new MultipartUploadFile(path, parameterName, fileName, contentType));
         return this;
     }

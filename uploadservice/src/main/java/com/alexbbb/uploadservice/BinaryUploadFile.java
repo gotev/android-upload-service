@@ -17,9 +17,12 @@ class BinaryUploadFile implements Parcelable {
 
     protected final File file;
 
-    BinaryUploadFile(String path) throws FileNotFoundException {
+    BinaryUploadFile(String path) throws FileNotFoundException, IllegalArgumentException {
+        if (path == null || "".equals(path)) {
+            throw new IllegalArgumentException("Please specify a file path! Passed path value is: " + path);
+        }
         File file = new File(path);
-        if (!file.exists()) throw new FileNotFoundException();
+        if (!file.exists()) throw new FileNotFoundException("Could not find file at path: " + path);
         this.file = file;
     }
 
