@@ -150,6 +150,12 @@ public class MultipartUploadRequest extends HttpUploadRequest {
         return this;
     }
 
+    @Override
+    public MultipartUploadRequest setMaxRetries(int maxRetries) {
+        super.setMaxRetries(maxRetries);
+        return this;
+    }
+
     /**
      * @return Gets the list of the parameters.
      */

@@ -225,7 +225,7 @@ public abstract class HttpUploadRequest {
      *
      * @param maxRetries number of maximum retries on error
      */
-    public final HttpUploadRequest setMaxRetries(int maxRetries) {
+    public HttpUploadRequest setMaxRetries(int maxRetries) {
         if (maxRetries < 0)
             this.maxRetries = 0;
         else

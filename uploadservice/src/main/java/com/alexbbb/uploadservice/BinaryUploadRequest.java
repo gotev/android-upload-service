@@ -99,6 +99,12 @@ public class BinaryUploadRequest extends HttpUploadRequest {
         return this;
     }
 
+    @Override
+    public BinaryUploadRequest setMaxRetries(int maxRetries) {
+        super.setMaxRetries(maxRetries);
+        return this;
+    }
+
     /**
      * Gets the file used as raw body of the upload request.
      *
