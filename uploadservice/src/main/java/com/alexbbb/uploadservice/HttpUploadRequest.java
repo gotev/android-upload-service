@@ -36,7 +36,7 @@ public abstract class HttpUploadRequest {
     public HttpUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         this.context = context;
         this.uploadId = uploadId;
-        notificationConfig = new UploadNotificationConfig();
+        notificationConfig = null;
         url = serverUrl;
         headers = new ArrayList<>();
         maxRetries = 0;

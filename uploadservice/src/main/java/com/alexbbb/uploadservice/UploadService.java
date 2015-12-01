@@ -189,6 +189,8 @@ public class UploadService extends IntentService {
     }
 
     private void createNotification() {
+        if (notificationConfig == null) return;
+
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getInProgressMessage())
                     .setContentIntent(notificationConfig.getPendingIntent(this))
@@ -199,6 +201,8 @@ public class UploadService extends IntentService {
     }
 
     private void updateNotificationProgress(int uploadedBytes, int totalBytes) {
+        if (notificationConfig == null) return;
+
         notification.setContentTitle(notificationConfig.getTitle())
                     .setContentText(notificationConfig.getInProgressMessage())
                     .setContentIntent(notificationConfig.getPendingIntent(this))
@@ -210,6 +214,8 @@ public class UploadService extends IntentService {
     }
 
     private void updateNotificationCompleted() {
+        if (notificationConfig == null) return;
+
         stopForeground(notificationConfig.isAutoClearOnSuccess());
 
         if (!notificationConfig.isAutoClearOnSuccess()) {
@@ -235,6 +241,8 @@ public class UploadService extends IntentService {
     }
 
     private void updateNotificationError() {
+        if (notificationConfig == null) return;
+
         stopForeground(false);
 
         notification.setContentTitle(notificationConfig.getTitle())
