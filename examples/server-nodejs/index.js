@@ -27,8 +27,32 @@ app.get('/', function(req, res) {
     res.end("Android Upload Service Demo node.js server running!");
 });
 
+function printRequestHeaders(req) {
+    console.log("\nReceived headers");
+    console.log("----------------");
+
+    for (var key in req.headers) {
+        console.log(key + ": " + req.headers[key]);
+    }
+}
+
+function printRequestParameters(req) {
+    console.log("\nReceived Parameters");
+    console.log("-------------------");
+
+    for (var key in req.body) {
+        console.log(key + ": " + req.body[key]);
+    }
+
+    if (Object.keys(req.body).length === 0) console.log("no parameters\n");
+}
+
 // handle multipart uploads
 app.post('/upload/multipart', multerFiles, function(req, res) {
+    console.log("\n\nHTTP/Multipart Upload Request from: " + req.ip);
+    printRequestHeaders(req);
+    printRequestParameters(req);
+
     if (fileUploadCompleted) {
         fileUploadCompleted = false;
         res.header('transfer-encoding', ''); // disable chunked transfer encoding
@@ -38,13 +62,16 @@ app.post('/upload/multipart', multerFiles, function(req, res) {
 
 // handle binary uploads
 app.post('/upload/binary', function(req, res) {
+    console.log("\n\nBinary Upload Request from: " + req.ip);
+    printRequestHeaders(req);
+
     var filename = req.headers["file-name"];
     console.log("Started binary upload of: " + filename);
     var filepath = path.resolve(UPLOAD_PATH, filename);
     var out = fs.createWriteStream(filepath, { flags: 'w', encoding: null, fd: null, mode: 666 });
     req.pipe(out);
     req.on('end', function() {
-        console.log("Finished multipart upload of: " + filename + " to: " + filepath);
+        console.log("Finished binary upload of: " + filename + " to: " + filepath);
         res.sendStatus(200);
     });
 });
