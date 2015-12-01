@@ -74,8 +74,11 @@ public abstract class HttpUploadRequest {
 
     /**
      * Sets custom notification configuration.
+     * If you don't want to display a notification in Notification Center, either pass null
+     * as argument or don't call this method.
      *
-     * @param config the upload configuration object
+     * @param config the upload configuration object or null if you don't want a notification
+     *               to be displayed
      */
     public HttpUploadRequest setNotificationConfig(UploadNotificationConfig config) {
         notificationConfig = config;
