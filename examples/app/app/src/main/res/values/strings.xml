@@ -20,5 +20,6 @@
     <string name="provide_param_name">Please provide the name of the form parameter that will contain file\'s data</string>
     <string name="server_url_hint">http://company.com/path/to/script</string>
     <string name="file_path_hint">/path/to/your/file.ext</string>
+    <string name="display_notification">Display notification</string>
 
 </resources>

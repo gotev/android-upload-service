@@ -68,6 +68,14 @@
         android:layout_height="wrap_content"
         android:ems="10" />
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/display_notification"
+        android:id="@+id/displayNotification"
+        android:layout_gravity="center_horizontal"
+        android:checked="true" />
+
     <Button
         android:id="@+id/multipartUploadButton"
         android:layout_width="wrap_content"

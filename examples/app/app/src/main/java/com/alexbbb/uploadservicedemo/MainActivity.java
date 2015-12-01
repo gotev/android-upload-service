@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.serverURL) EditText serverUrl;
     @Bind(R.id.fileToUpload) EditText fileToUpload;
     @Bind(R.id.parameterName) EditText parameterName;
+    @Bind(R.id.displayNotification) CheckBox displayNotification;
 
     private final UploadServiceBroadcastReceiver uploadReceiver =
             new UploadServiceBroadcastReceiver() {
@@ -103,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private UploadNotificationConfig getNotificationConfig() {
+        if (!displayNotification.isChecked()) return null;
+
         return new UploadNotificationConfig()
             .setIcon(R.drawable.ic_upload)
             .setTitle(getString(R.string.app_name))

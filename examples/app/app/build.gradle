@@ -24,5 +24,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.jakewharton:butterknife:7.0.1'
     //compile 'com.alexbbb:uploadservice:1.5'
-    compile 'com.github.alexbbb:android-upload-service:25b2591848'
+    compile 'com.github.alexbbb:android-upload-service:971283b57a'
 }
