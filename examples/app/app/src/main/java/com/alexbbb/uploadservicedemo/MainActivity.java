@@ -11,7 +11,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alexbbb.uploadservice.BinaryUploadRequest;
-import com.alexbbb.uploadservice.ContentType;
 import com.alexbbb.uploadservice.MultipartUploadRequest;
 import com.alexbbb.uploadservice.UploadNotificationConfig;
 import com.alexbbb.uploadservice.UploadService;
@@ -19,6 +18,7 @@ import com.alexbbb.uploadservice.UploadServiceBroadcastReceiver;
 import com.alexbbb.uploadservice.demo.BuildConfig;
 import com.alexbbb.uploadservice.demo.R;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.UUID;
@@ -128,8 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             new MultipartUploadRequest(this, uploadID, serverUrlString)
-                .addFileToUpload(fileToUploadPath, paramNameString, "test",
-                        ContentType.APPLICATION_OCTET_STREAM)
+                .addFileToUpload(fileToUploadPath, paramNameString)
                 .setNotificationConfig(getNotificationConfig())
                 .setCustomUserAgent(USER_AGENT)
                 .setMaxRetries(2)
@@ -149,12 +148,11 @@ public class MainActivity extends AppCompatActivity {
     void onUploadBinaryClick() {
         final String serverUrlString = serverUrl.getText().toString();
         final String fileToUploadPath = fileToUpload.getText().toString();
-        final String paramNameString = parameterName.getText().toString();
         final String uploadID = UUID.randomUUID().toString();
 
         try {
             new BinaryUploadRequest(this, uploadID, serverUrlString)
-                .addHeader("file-name", paramNameString)
+                .addHeader("file-name", new File(fileToUploadPath).getName())
                 .setFileToUpload(fileToUploadPath)
                 .setNotificationConfig(getNotificationConfig())
                 .setCustomUserAgent(USER_AGENT)
