@@ -26,13 +26,13 @@ public class UploadNotificationConfig implements Parcelable {
     public UploadNotificationConfig() {
         iconResourceID = android.R.drawable.ic_menu_upload;
         title = "File Upload";
-        inProgress = "uploading in progress";
-        completed = "upload completed successfully!";
-        error = "error during upload";
+        inProgress = "Upload in progress";
+        completed = "Upload completed successfully!";
+        error = "Error during upload";
         autoClearOnSuccess = false;
         clearOnAction = false;
         clickIntent = null;
-        ringToneEnabled = false;
+        ringToneEnabled = true;
     }
 
     /**
