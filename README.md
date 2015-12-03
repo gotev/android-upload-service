@@ -23,7 +23,7 @@ then in your dependencies section add:
 
 ```
 dependencies {
-    compile 'com.alexbbb:uploadservice:1.5'
+    compile 'com.alexbbb:uploadservice:1.6'
 }
 ```
 
