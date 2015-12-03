@@ -39,3 +39,4 @@ examples/server-nodejs/node_modules
 examples/server-nodejs/uploads
 build
 npm-debug.log
+javadoc
