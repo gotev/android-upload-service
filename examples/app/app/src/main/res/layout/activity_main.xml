@@ -45,13 +45,26 @@
         android:paddingTop="10sp"
         android:text="@string/file_to_upload_path" />
 
-    <EditText
-        android:id="@+id/fileToUpload"
-        android:inputType="textUri"
-        android:hint="@string/file_path_hint"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10" />
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/fileToUpload"
+            android:inputType="textUri"
+            android:hint="@string/file_path_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/browse"
+            android:id="@+id/pickFile" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textView5"

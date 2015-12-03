@@ -1,7 +1,9 @@
 package com.alexbbb.uploadservicedemo;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
@@ -17,6 +19,7 @@ import com.alexbbb.uploadservice.UploadService;
 import com.alexbbb.uploadservice.UploadServiceBroadcastReceiver;
 import com.alexbbb.uploadservice.demo.BuildConfig;
 import com.alexbbb.uploadservice.demo.R;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "UploadServiceDemo";
     private static final String USER_AGENT = "UploadServiceDemo/" + BuildConfig.VERSION_NAME;
+    private static final int FILE_CODE = 1;
 
     @Bind(R.id.uploadProgress) ProgressBar progressBar;
     @Bind(R.id.multipartUploadButton) Button multipartUploadButton;
@@ -172,5 +176,32 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.cancelUploadButton)
     void onCancelUploadButtonClick() {
         UploadService.stopCurrentUpload();
+    }
+
+    @OnClick(R.id.pickFile)
+    void onPickFileClick() {
+        // Starts NoNonsense-FilePicker (https://github.com/spacecowboy/NoNonsense-FilePicker)
+        Intent intent = new Intent(this, FilePickerActivity.class);
+
+        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
+        intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+
+        // Configure initial directory by specifying a String.
+        // You could specify a String like "/storage/emulated/0/", but that can
+        // dangerous. Always use Android's API calls to get paths to the SD-card or
+        // internal memory.
+        intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
+                        Environment.getExternalStorageDirectory().getPath());
+
+        startActivityForResult(intent, FILE_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == FILE_CODE && resultCode == Activity.RESULT_OK) {
+            String absolutePath = new File(data.getData().getPath()).getAbsolutePath();
+            fileToUpload.setText(absolutePath);
+        }
     }
 }

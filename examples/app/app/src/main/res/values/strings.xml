@@ -6,6 +6,8 @@
     <string name="binary_upload">Binary Upload</string>
     <string name="cancel_upload">Cancel upload</string>
     <string name="server_script_url">Server script URL</string>
+    <string name="browse">Browse..</string>
+    <string name="select_file">Select file to upload</string>
     <string name="file_to_upload_path">Path of the file to upload</string>
     <string name="parameter_name">File parameter name</string>
     <string name="parameter_name_hint">E.g. uploaded_file</string>
