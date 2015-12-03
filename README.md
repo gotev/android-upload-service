@@ -1,27 +1,16 @@
 Android Upload Service
 ======================
 
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [ ![Download](https://api.bintray.com/packages/alexbbb/maven/android-upload-service/images/download.svg) ](https://bintray.com/alexbbb/maven/android-upload-service/_latestVersion) [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
-## Are you using Android Upload Service in your app?
-Let me know, and I'll be glad to include a link in the following list :)
-
-- [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
-- [DotShare](http://dot-share.com/index-en.html)
-- [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
+Easily upload files in the background with automatic Android Notification Center progress indication.
 
 ## Purpose
-I needed an easy and efficient way to upload multipart form data (HTTP parameters and files) to a server, and
-I haven't found anything useful so far that suited my needs. I also needed that the upload got handled in the
-background and in the most efficient way on Android. More than that, I also needed to show upload status in the
-Android Notification Center.
+* upload files to a server with an HTTP `multipart/form-data` or binary request
+* handle the operation in the background, even if the device is idle
+* show status in the Android Notification Center.
 
-So, after some research on the web I found that the best way to do this is to implement an IntentService and notify
-status with broadcast intents. This way the logic is decoupled from the UI and it's much more reusable. By using an
-IntentService, you can do multiple uploads being sure that they will be performed sequentially, and so you don't
-have to deal with the nightmare of concurrency. Also, an IntentService is much more efficient than an AsyncTask, it
-gets executed in the background and it's completely detached from the UI thread. If you need to show status in your UI,
-read further and you'll discover how to do it very easily.
+At the core of the library there is an `IntentService` which handles uploads in the background. It publishes broadcast intents to notify status. This way the logic is decoupled from the UI and it's much more reusable. You can do multiple uploads being sure that they will be performed sequentially, and so you don't have to deal with the nightmare of concurrency. Read further to learn how you can use it in your App.
 
 ## Setup
 Ensure that you have jcenter in your gradle build file:
@@ -46,8 +35,9 @@ public class Initializer extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // setup the broadcast action namespace string which will be used to notify
-        // upload status. gradle automatically generates proper variable as below.
+        // setup the broadcast action namespace string which will
+        // be used to notify upload status.
+        // Gradle automatically generates proper variable as below.
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
         // Or, you can define it manually.
         UploadService.NAMESPACE = "com.yourcompany.yourapp";
@@ -56,173 +46,63 @@ public class Initializer extends Application {
 ```
 and now you're ready to rock!
 
-## How to test upload
-You have the following choices:
-* Use your own server which handles HTTP/Multipart uploads
-* Use one of the server implementations provided in the examples (read below)
-* Use the excellent http://www.posttestserver.com/ (bear in mind that the data you post there is public!) for HTTP Multipart
+<em>I strongly encourage you to build and run the demo app that you can find in the [examples](#examples), together with one of the provided server implementations and to check JavaDocs.</em>
 
-## Examples <a name="examples"></a>
-In the <b>examples</b> folder you will find:
-
-* Demo servers which handle upload in:
-  * <b>node.js (HTTP Multipart and Binary)</b>. You need to have node.js and npm installed. [Refer to this guide](https://github.com/joyent/node/wiki/installing-node.js-via-package-manager). To run the server, open a terminal, navigate to ```examples/server-nodejs``` folder and simply execute:
-
-    ```
-    npm install (only the first time)
-    npm start
-    ```
-    The following endpoints will be available for upload testing:
-    ```
-    HTTP/Multipart: http://YOUR_LOCAL_IP:3000/upload/multipart
-    Binary:         http://YOUR_LOCAL_IP:3000/upload/binary
-    ```
-  * <b>PHP (HTTP Multipart only)</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
-
-* A simple Android application that uses this library
-
-## HTTP Multipart upload example
-For detailed explanation of each parameter, please check JavaDocs.
+### HTTP Multipart Upload
+This is the most common way to upload files on a server. It's the same kind of request that browsers do when you use the `<form>` tag with one or more files. Here's a minimal example:
 
 ```java
 public void uploadMultipart(final Context context) {
-    final MultipartUploadRequest request =
-                        new MultipartUploadRequest(context,
-                                                   "custom-upload-id",
-                                                   "http://www.yoursite.com/yourscript");
 
-    /*
-     * parameter-name: is the name of the parameter that will contain file's data.
-     * Pass "uploaded_file" if you're using the test PHP script
-     *
-     * custom-file-name.extension: is the file name seen by the server.
-     * E.g. value of $_FILES["uploaded_file"]["name"] of the test PHP script
-     */
-    request.addFileToUpload("/absolute/path/to/your/file",
-                            "parameter-name",
-                            "custom-file-name.extension",
-                            "content-type"));
-
-    //You can add your own custom headers
-    request.addHeader("your-custom-header", "your-custom-value");
-
-    //and parameters
-    request.addParameter("parameter-name", "parameter-value");
-
-    //If you want to add a parameter with multiple values, you can do the following:
-    request.addParameter("array-parameter-name", "value1");
-    request.addParameter("array-parameter-name", "value2");
-    request.addParameter("array-parameter-name", "valueN");
-
-    //or
-    String[] values = new String[] {"value1", "value2", "valueN"};
-    request.addArrayParameter("array-parameter-name", values);
-
-    //or
-    List<String> valuesList = new ArrayList<String>();
-    valuesList.add("value1");
-    valuesList.add("value2");
-    valuesList.add("valueN");
-    request.addArrayParameter("array-parameter-name", valuesList);
-
-    //configure the notification
-    //the last two boolean parameters sets:
-    // - whether or not to auto clear the notification after a successful upload
-    // - whether or not to clear the notification after the user taps on it
-    request.setNotificationConfig(android.R.drawable.ic_menu_upload,
-                                  "notification title",
-                                  "upload in progress text",
-                                  "upload completed successfully text",
-                                  "upload error text",
-                                  false, true);
-
-    // set a custom user agent string for the upload request
-    // if you comment the following line, the system default user-agent will be used
-    request.setCustomUserAgent("UploadServiceDemo/1.0");
-
-    // set the intent to perform when the user taps on the upload notification.
-    // currently tested only with intents that launches an activity
-    // if you comment this line, no action will be performed when the user taps
-    // on the notification
-    request.setNotificationClickIntent(new Intent(context, YourActivity.class));
-
-    // set the maximum number of automatic upload retries on error
-    request.setMaxRetries(2);
+    final String uploadID = UUID.randomUUID().toString();
+    final String serverUrlString = "http://www.yoursite.com/yourscript";
 
     try {
-        //Start upload service and display the notification
-        request.startUpload();
-
+        new MultipartUploadRequest(context, uploadID, serverUrlString)
+            .addFileToUpload("/absolute/path/to/your/file", "your-param-name")
+            .addHeader("your-custom-header-name", "your-custom-value")
+            .addParameter("your-param-name", "your-param-value")
+            .setNotificationConfig(new UploadNotificationConfig())
+            .setMaxRetries(2)
+            .startUpload();
     } catch (Exception exc) {
-        //You will end up here only if you pass an incomplete upload request
-        Log.e("AndroidUploadService", exc.getLocalizedMessage(), exc);
+        Log.e("AndroidUploadService", exc.getMessage(), exc);
     }
 }
 ```
-If you want to start uploads or retry them based on the remote server's reachability status, [Android Host Monitor](https://github.com/alexbbb/android-host-monitor) may be useful to you in combination with this library.
 
-## Binary Upload
-The binary upload uses a single file as the raw body of the upload request. To test this kind of upload, you can use the provided node.js server implementation in the [examples](#examples).
+### Binary Upload
+The binary upload uses a single file as the raw body of the upload request.
 
 ``` java
 public void uploadBinary(final Context context) {
-    final BinaryUploadRequest request =
-                        new BinaryUploadRequest(context,
-                                                "custom-upload-id",
-                                                "http://www.yoursite.com/yourscript");
 
-    // you can pass some data as request header, but you should be extremely careful
-    request.addHeader("your-custom-header", "your-custom-value");
-
-    request.setFileToUpload("/absolute/path/to/your/file");
-
-    //configure the notification
-    //the last two boolean parameters sets:
-    // - whether or not to auto clear the notification after a successful upload
-    // - whether or not to clear the notification after the user taps on it
-    request.setNotificationConfig(android.R.drawable.ic_menu_upload,
-                                  "notification title",
-                                  "upload in progress text",
-                                  "upload completed successfully text",
-                                  "upload error text",
-                                  false, true);
-
-    // if you comment the following line, the system default user-agent will be used
-    request.setCustomUserAgent("UploadServiceDemo/1.0");
-
-    // set the intent to perform when the user taps on the upload notification.
-    // currently tested only with intents that launches an activity
-    // if you comment this line, no action will be performed when the user taps
-    // on the notification
-    request.setNotificationClickIntent(new Intent(context, YourActivity.class));
-
-    // set the maximum number of automatic upload retries on error
-    request.setMaxRetries(2);
+    final String uploadID = UUID.randomUUID().toString();
+    final String serverUrlString = "http://www.yoursite.com/yourscript";
 
     try {
-        request.startUpload();
+        new BinaryUploadRequest(context, uploadID, serverUrlString)
+            .addHeader("your-custom-header-name", "your-custom-value")
+            .setFileToUpload("/absolute/path/to/your/file")
+            .setNotificationConfig(new UploadNotificationConfig())
+            .setMaxRetries(2)
+            .startUpload();
     } catch (Exception exc) {
-        //You will end up here only if you pass an incomplete upload request
-        Log.e("AndroidUploadService", exc.getLocalizedMessage(), exc);
+        Log.e("AndroidUploadService", exc.getMessage(), exc);
     }
 }
 ```
 
-## How to monitor upload status
-Once the service is started, it publishes the upload status with broadcast intents.
-For the sake of simplicity and to not bother you with the writing of a broadcast receiver,
-an abstract broadcast receiver has been implemented for you and you just need to extend it and add your custom code.
-So to listen for the status of the upload service in an Activity for example, you just need to do the following:
+### Monitoring upload status
+To listen for the status of the upload service, use the provided `UploadServiceBroadcastReceiver`. Override its methods to add your own business logic. Example on how to use it in an activity:
 
 ```java
 public class YourActivity extends Activity {
 
     private static final String TAG = "AndroidUploadService";
 
-    ...
-
-    private final AbstractUploadServiceReceiver uploadReceiver =
-    new AbstractUploadServiceReceiver() {
+    private final UploadServiceBroadcastReceiver uploadReceiver =
+    new UploadServiceBroadcastReceiver() {
 
         // you can override this progress method if you want to get
         // the completion progress in percent (0 to 100)
@@ -238,8 +118,8 @@ public class YourActivity extends Activity {
         public void onProgress(final String uploadId,
                                final long uploadedBytes,
                                final long totalBytes) {
-            Log.i(TAG, "Upload with ID "
-                       + uploadId + " uploaded bytes: " + uploadedBytes
+            Log.i(TAG, "Upload with ID " + uploadId +
+                       " uploaded bytes: " + uploadedBytes
                        + ", total: " + totalBytes);
         }
 
@@ -259,7 +139,7 @@ public class YourActivity extends Activity {
 
             //If your server responds with a JSON, you can parse it
             //from serverResponseMessage string using a library
-            //such as org.json (embedded in Android) or google's gson
+            //such as org.json (embedded in Android) or Google's gson
         }
     };
 
@@ -278,16 +158,16 @@ public class YourActivity extends Activity {
 }
 ```
 
-If you want to monitor upload status in all of your activities, then just implement the BroadcastReceiver in your base activity class, from which all of your activities inherits and you're done.
+If you want to monitor upload status in all of your activities, just implement the BroadcastReceiver in your base activity class from which all of your activities inherits and you're done.
 
-## How to stop current upload
+### Stop current upload
 Call this method from anywhere you want to stop the currently active upload task.
 ```java
 UploadService.stopCurrentUpload();
 ```
-After that the upload task is cancelled, you will receive a <b>java.net.ProtocolException</b> in your broadcast receiver's <b>onError</b> method and the notification will display the error message that you have set.
+After that the upload task is cancelled, you will receive a `java.net.ProtocolException` in your broadcast receiver's `onError` method and the notification will display the error message that you have set.
 
-## Using HTTPS connection with self-signed certificates
+### Using HTTPS connection with self-signed certificates
 For security reasons, the library doesn't accept self-signed certificates by default when using HTTPS connections, but you can enable them by calling:
 
 ```java
@@ -295,6 +175,68 @@ AllCertificatesAndHostsTruster.apply();
 ```
 
 before starting the upload service.
+
+### Upload only when a connection is available
+If you want to start uploads or retry them based on the remote server's reachability status, [Android Host Monitor](https://github.com/alexbbb/android-host-monitor) may be useful to you in combination with this library.
+
+### Testing upload
+You have the following choices:
+* Use your own server which handles HTTP/Multipart uploads
+* Use one of the server implementations provided in the examples (read below)
+* Use the excellent http://www.posttestserver.com/ (bear in mind that the data you post there is public!) for HTTP Multipart
+
+### Examples <a name="examples"></a>
+In the <b>examples</b> folder you will find:
+
+* A simple Android application that uses this library
+
+* Demo servers which handle upload in:
+  * <b>node.js (HTTP Multipart and Binary)</b>. You need to have node.js and npm installed. [Refer to this guide](https://github.com/joyent/node/wiki/installing-node.js-via-package-manager). To run the server, open a terminal, navigate to ```examples/server-nodejs``` folder and simply execute:
+
+    ```
+    npm install (only the first time)
+    npm start
+    ```
+    The following endpoints will be available for upload testing:
+    ```
+    HTTP/Multipart: http://YOUR_LOCAL_IP:3000/upload/multipart
+    Binary:         http://YOUR_LOCAL_IP:3000/upload/binary
+    ```
+  * <b>PHP (HTTP Multipart only)</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
+
+## Apps powered by Android Upload Service
+To be included in the following list, simply create an issue and provide the app name and a link.
+
+- [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
+- [DotShare](http://dot-share.com/index-en.html)
+- [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
+
+## Contribute
+* Do you have a new feature in mind?
+* Do you know how to improve existing docs or code?
+* Have you found a bug?
+
+Contributions are welcome and encouraged! Just fork the project and then send a pull request. Be ready to discuss your code and design decisions :)
+
+## Before asking for help...
+Let's face it, doing network programming is not easy as there are many things that can go wrong, but if upload doesn't work out of the box, consider the following things before posting a new issue:
+* Is the server URL correct?
+* Is the server URL reachable from your device? Check if there are firewalls or other kind of restrictions between your device and the server.
+* Are you sure that the server side is working properly?
+* Have you properly set up the request with all the headers, parameters and files that the server expects?
+* Have you tried to make an upload using the demo app and one of the provided server implementations? I use the node.js version which provides good feedback and supports both HTTP Multipart and binary uploads.
+
+If you've checked all the above and still something goes wrong...it's time to create a new issue! Be sure to include the following info:
+* Android API version
+* Device vendor and model
+* Code used to generate the request. Replace sensible data values.
+* LogCat output
+* Server output
+
+Please make use of Markdown styling when you post code or console output.
+
+## Do you like the project?
+Put a star, spread the word and if you want to offer me a free beer, [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## License
 

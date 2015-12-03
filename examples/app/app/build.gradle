@@ -8,7 +8,7 @@ android {
         applicationId "com.alexbbb.uploadservicedemo"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 7
+        versionCode 8
         versionName "1.6"
     }
     buildTypes {
@@ -24,6 +24,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.nononsenseapps:filepicker:2.4.2'
-    //compile 'com.alexbbb:uploadservice:1.5'
-    compile 'com.github.alexbbb:android-upload-service:fa31fdf6bd'
+    compile 'com.alexbbb:uploadservice:1.6'
 }

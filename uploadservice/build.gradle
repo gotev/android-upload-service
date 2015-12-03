@@ -8,7 +8,7 @@ def projectName = "android-upload-service"
 def projectDesc = "Easily upload files in the background with automatic Android Notification Center progress indication."
 def projectGroup = "com.alexbbb"
 group = projectGroup
-version = "1.5"
+version = "1.6"
 
 android {
     compileSdkVersion 23
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 11
+        versionCode 12
         versionName version
     }
     buildTypes {
@@ -30,6 +30,7 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:support-v4:23.1.1'
 }
 
 // add the following information to the file: local.properties situated in the parent directory of
@@ -96,8 +97,19 @@ task sourcesJar(type: Jar) {
 }
 
 task javadoc(type: Javadoc) {
+    title = "Android Upload Service $project.version API"
+    description "Generates Javadoc"
     source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += files(android.bootClasspath)
+    exclude '**/BuildConfig.java', '**/R.java'
+    options {
+        windowTitle("Android Upload Service $project.version Reference")
+        locale = 'en_US'
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        links("http://docs.oracle.com/javase/7/docs/api/");
+        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+    }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
