@@ -23,6 +23,19 @@ public class UploadNotificationConfig implements Parcelable {
     private boolean ringToneEnabled;
     private Intent clickIntent;
 
+    /**
+     * Creates a new upload notification configuration with default settings:
+     * <ul>
+     *     <li>{@code android.R.drawable.ic_menu_upload} will be used as the icon</li>
+     *     <li>If the user taps on the notification, nothing will happen</li>
+     *     <li>Once the operation is completed (either successfully or with an error):
+     *         <ul>
+     *             <li>the default notification sound will be emitted (or the default notification vibration if the device is in silent mode)</li>
+     *             <li>the notification will remain in the Notification Center until the user swipes it out</li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     */
     public UploadNotificationConfig() {
         iconResourceID = android.R.drawable.ic_menu_upload;
         title = "File Upload";

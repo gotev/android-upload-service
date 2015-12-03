@@ -71,11 +71,11 @@ public class UploadService extends IntentService {
 
     private static HttpUploadTask currentTask;
 
-    public static String getActionUpload() {
+    protected static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
     }
 
-    public static String getActionBroadcast() {
+    protected static String getActionBroadcast() {
         return NAMESPACE + BROADCAST_ACTION_SUFFIX;
     }
 

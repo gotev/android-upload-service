@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements an HTTP Multipart upload request.
+ * HTTP/Multipart upload request.
  *
  * @author alexbbb (Alex Gotev)
  * @author eliasnaur
@@ -24,9 +24,14 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * Creates a new multipart upload request.
      *
      * @param context application context
-     * @param uploadId unique ID to assign to this upload request.
-     *                 It's used in the broadcast receiver when receiving updates.
-     * @param serverUrl URL of the server side script that handles the multipart form upload
+     * @param uploadId unique ID to assign to this upload request.<br>
+     *                 It can be whatever string you want. For simplicity you can
+     *                 generate an UUID with {@code UUID.randomUUID().toString()}.<br>
+     *                 It's advised to keep a reference to it in your code, so when you receive
+     *                 status updates in {@link UploadServiceBroadcastReceiver}, you know to
+     *                 which upload they refer to.
+     * @param serverUrl URL of the server side script that will handle the multipart form upload.
+     *                  E.g.: http://www.yourcompany.com/your/script
      */
     public MultipartUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         super(context, uploadId, serverUrl);
@@ -35,13 +40,14 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     /**
-     * Validates the upload request and throws exceptions if one or more parameters are not properly set.
+     * Validates the upload request and throws exceptions if one or more parameters
+     * are not properly set.
      *
      * @throws IllegalArgumentException if request protocol or URL are not correctly set or if no files are added
      * @throws MalformedURLException if the provided server URL is not valid
      */
     @Override
-    public void validate() throws IllegalArgumentException, MalformedURLException {
+    protected void validate() throws IllegalArgumentException, MalformedURLException {
         super.validate();
 
         if (filesToUpload.isEmpty()) {
@@ -49,11 +55,6 @@ public class MultipartUploadRequest extends HttpUploadRequest {
         }
     }
 
-    /**
-     * Write any upload request data to the intent used to start the upload service.
-     *
-     * @param intent the intent used to start the upload service
-     */
     @Override
     protected void initializeIntent(Intent intent) {
         super.initializeIntent(intent);
@@ -69,10 +70,12 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * @param parameterName Name of the form parameter that will contain file's data
      * @param fileName File name seen by the server side script. If null, the original file name
      *                 will be used
-     * @param contentType Content type of the file. Set this to null if you don't want to set a
-     *                    content type.
+     * @param contentType Content type of the file. You can use constants defined in
+     *                    {@link ContentType} class. Set this to null if you don't want to
+     *                    explicitly set a content type.
      * @throws FileNotFoundException if the file does not exist at the specified path
      * @throws IllegalArgumentException if one or more parameters are not valid
+     * @return {@link MultipartUploadRequest}
      */
     public MultipartUploadRequest addFileToUpload(final String path, final String parameterName,
                                                   final String fileName, final String contentType)
@@ -82,14 +85,16 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     /**
-     * Adds a file to this upload request. If you want to manually set the file name seen by the
-     * server side script and the content type, please use
-     * {@rel addFileToUpload(String, String, String, String)}
+     * Adds a file to this upload request, without setting file name and content type.
+     * The original file name will be used instead. If you want to manually set the file name seen
+     * by the server side script and the content type, use
+     * {@link #addFileToUpload(String, String, String, String)}
      *
      * @param path Absolute path to the file that you want to upload
      * @param parameterName Name of the form parameter that will contain file's data
      * @throws FileNotFoundException if the file does not exist at the specified path
      * @throws IllegalArgumentException if one or more parameters are not valid
+     * @return {@link MultipartUploadRequest}
      */
     public MultipartUploadRequest addFileToUpload(final String path, final String parameterName)
             throws FileNotFoundException, IllegalArgumentException {
@@ -101,6 +106,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      *
      * @param paramName parameter name
      * @param paramValue parameter value
+     * @return {@link MultipartUploadRequest}
      */
     public MultipartUploadRequest addParameter(final String paramName, final String paramValue) {
         parameters.add(new NameValue(paramName, paramValue));
@@ -112,6 +118,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      *
      * @param paramName parameter name
      * @param array values
+     * @return {@link MultipartUploadRequest}
      */
     public MultipartUploadRequest addArrayParameter(final String paramName, final String... array) {
         for (String value : array) {
@@ -125,6 +132,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      *
      * @param paramName parameter name
      * @param list values
+     * @return {@link MultipartUploadRequest}
      */
     public MultipartUploadRequest addArrayParameter(final String paramName, final List<String> list) {
         for (String value : list) {

@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @author eliasnaur
  * @author cankov
  */
-public abstract class HttpUploadRequest {
+abstract class HttpUploadRequest {
 
     private UploadNotificationConfig notificationConfig;
     private String method = "POST";
@@ -79,6 +79,7 @@ public abstract class HttpUploadRequest {
      *
      * @param config the upload configuration object or null if you don't want a notification
      *               to be displayed
+     * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setNotificationConfig(UploadNotificationConfig config) {
         notificationConfig = config;
@@ -92,7 +93,7 @@ public abstract class HttpUploadRequest {
      * @throws IllegalArgumentException if request protocol or URL are not correctly set
      * @throws MalformedURLException if the provided server URL is not valid
      */
-    public void validate() throws IllegalArgumentException, MalformedURLException {
+    protected void validate() throws IllegalArgumentException, MalformedURLException {
         if (url == null || "".equals(url)) {
             throw new IllegalArgumentException("Request URL cannot be either null or empty");
         }
@@ -110,6 +111,7 @@ public abstract class HttpUploadRequest {
      *
      * @param headerName header name
      * @param headerValue header value
+     * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest addHeader(final String headerName, final String headerValue) {
         headers.add(new NameValue(headerName, headerValue));
@@ -120,6 +122,7 @@ public abstract class HttpUploadRequest {
      * Sets the HTTP method to use. By default it's set to POST.
      *
      * @param method new HTTP method to use
+     * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setMethod(final String method) {
         if (method != null && method.length() > 0)
@@ -177,7 +180,7 @@ public abstract class HttpUploadRequest {
      *
      * @return string representing the user agent or null if it's not defined
      */
-    public final String getCustomUserAgent() {
+    protected final String getCustomUserAgent() {
         return customUserAgent;
     }
 
@@ -187,6 +190,7 @@ public abstract class HttpUploadRequest {
      * that setting will be overwritten by the value set with this method.
      *
      * @param customUserAgent custom user agent string
+     * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setCustomUserAgent(String customUserAgent) {
         this.customUserAgent = customUserAgent;
@@ -197,7 +201,7 @@ public abstract class HttpUploadRequest {
      * @return Get the maximum number of retries that the library will do if an error occurs,
      * before returning an error.
      */
-    public final int getMaxRetries() {
+    protected final int getMaxRetries() {
         return maxRetries;
     }
 
@@ -206,6 +210,7 @@ public abstract class HttpUploadRequest {
      * before returning an error.
      *
      * @param maxRetries number of maximum retries on error
+     * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setMaxRetries(int maxRetries) {
         if (maxRetries < 0)

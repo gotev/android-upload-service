@@ -35,7 +35,8 @@ public class BinaryUploadRequest extends HttpUploadRequest {
      * if no file is set
      * @throws MalformedURLException if the provided server URL is not valid
      */
-    public void validate() throws IllegalArgumentException, MalformedURLException {
+    @Override
+    protected void validate() throws IllegalArgumentException, MalformedURLException {
         super.validate();
         if (file == null) {
             throw new IllegalArgumentException("You have to set a file to upload");
@@ -59,6 +60,7 @@ public class BinaryUploadRequest extends HttpUploadRequest {
      *
      * @param path Absolute path to the file that you want to upload
      * @throws FileNotFoundException if the file to upload does not exist
+     * @return {@link BinaryUploadRequest}
      */
     public BinaryUploadRequest setFileToUpload(String path) throws FileNotFoundException {
         file = new BinaryUploadFile(path);
@@ -100,7 +102,7 @@ public class BinaryUploadRequest extends HttpUploadRequest {
      *
      * @return The absolute path of the file that will be used for the upload
      */
-    public BinaryUploadFile getFile() {
+    protected BinaryUploadFile getFile() {
         return file;
     }
 }

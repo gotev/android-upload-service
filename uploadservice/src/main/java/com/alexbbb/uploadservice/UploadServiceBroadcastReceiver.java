@@ -81,7 +81,7 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Called when the upload progress changes.
+     * Called when the upload progress changes. Override this method to add your own logic.
      *
      * @param uploadId unique ID of the upload request
      * @param progress value from 0 to 100
@@ -90,7 +90,7 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Called when the upload progress changes.
+     * Called when the upload progress changes. Override this method to add your own logic.
      *
      * @param uploadId unique ID of the upload request
      * @param uploadedBytes the count of the bytes uploaded so far
@@ -100,7 +100,7 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Called when an error happens during the upload.
+     * Called when an error happens during the upload. Override this method to add your own logic.
      *
      * @param uploadId unique ID of the upload request
      * @param exception exception that caused the error
@@ -109,11 +109,14 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Called when the upload is completed successfully.
+     * Called when the upload is completed successfully. Override this method to add your own logic.
      *
      * @param uploadId unique ID of the upload request
      * @param serverResponseCode status code returned by the server
-     * @param serverResponseMessage string containing the response received from the server
+     * @param serverResponseMessage string containing the response received from the server.
+     *                              If your server responds with a JSON, you can parse it from
+     *                              this string using a library such as org.json
+     *                              (embedded in Android) or google's gson
      */
     public void onCompleted(final String uploadId, final int serverResponseCode,
                             final String serverResponseMessage) {

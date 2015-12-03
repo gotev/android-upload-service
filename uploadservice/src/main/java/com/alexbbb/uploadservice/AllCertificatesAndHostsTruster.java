@@ -15,8 +15,8 @@ import javax.net.ssl.X509TrustManager;
 
 /**
  * TrustManager that accepts all certificates and hosts.
- * Useful when the server has self signed certificates.
- * Use at your own risk.
+ * Useful when you want to use HTTPS but you have self-signed certificates.
+ * Use at your own risk and only for development.
  *
  * @author alexbbb (Alex Gotev)
  */
@@ -37,6 +37,9 @@ public class AllCertificatesAndHostsTruster implements TrustManager, X509TrustMa
         return new X509Certificate[0];
     }
 
+    /**
+     * Call this method once to accept all the self-signed certificates in HTTPS connections.
+     */
     public static void apply() {
         final TrustManager[] trustAllCerts =
                 new TrustManager[] {new AllCertificatesAndHostsTruster()};
