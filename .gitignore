@@ -2,3 +2,6 @@ local.properties
 .gradle
 uploadservice
 build
+examples
+.idea
+android-upload-service.iml
