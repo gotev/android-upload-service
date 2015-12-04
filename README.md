@@ -46,7 +46,7 @@ public class Initializer extends Application {
 ```
 and now you're ready to rock!
 
-<em>I strongly encourage you to build and run the demo app that you can find in the [examples](#examples), together with one of the provided server implementations and to check JavaDocs.</em>
+<em>I strongly encourage you to build and run the demo app that you can find in the [examples](#examples), together with one of the provided server implementations and to check [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/).</em>
 
 ### HTTP Multipart Upload
 This is the most common way to upload files on a server. It's the same kind of request that browsers do when you use the `<form>` tag with one or more files. Here's a minimal example:
