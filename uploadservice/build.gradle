@@ -109,6 +109,7 @@ task javadoc(type: Javadoc) {
         charSet = 'UTF-8'
         links("http://docs.oracle.com/javase/7/docs/api/");
         linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+        setMemberLevel(JavadocMemberLevel.PUBLIC)
     }
 }
 
