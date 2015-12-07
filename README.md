@@ -29,7 +29,7 @@ dependencies {
 }
 ```
 
-and do a project sync. To start using the library, you have to initialize it. I suggest you to do that in your Application subclass:
+and do a project sync. If you're upgrading to 1.6 from previous releases, [read this migration notes](https://github.com/alexbbb/android-upload-service/releases/tag/1.6). To start using the library, you have to initialize it. I suggest you to do that in your Application subclass:
 ```java
 public class Initializer extends Application {
 
