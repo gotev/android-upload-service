@@ -222,6 +222,7 @@ Contributions are welcome and encouraged! Just fork the project and then send a 
 
 ## Before asking for help...
 Let's face it, doing network programming is not easy as there are many things that can go wrong, but if upload doesn't work out of the box, consider the following things before posting a new issue:
+* Check [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/) for full class and methods docs
 * Is the server URL correct?
 * Is the server URL reachable from your device? Check if there are firewalls or other kind of restrictions between your device and the server.
 * Are you sure that the server side is working properly?
