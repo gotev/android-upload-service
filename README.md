@@ -162,6 +162,8 @@ public class YourActivity extends Activity {
 
 If you want to monitor upload status in all of your activities, just implement the BroadcastReceiver in your base activity class from which all of your activities inherits and you're done.
 
+To monitor upload status inside a `Service`, you have to call `uploadReceiver.register(this);` inside the service's `onCreate` method, and `uploadReceiver.unregister(this);` inside service's `onDestroy` method.
+
 ### Stop current upload
 Call this method from anywhere you want to stop the currently active upload task.
 ```java
