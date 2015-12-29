@@ -19,9 +19,14 @@
     </section>
 
     <section class="main-content">
-      <p><a href="http://android-arsenal.com/details/1/2161"><img src="https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat" alt="Android Arsenal"></a> <a href="https://bintray.com/alexbbb/maven/android-upload-service/_latestVersion"> <img src="https://api.bintray.com/packages/alexbbb/maven/android-upload-service/images/download.svg" alt="Download"> </a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=alexgotev%40gmail%2ecom&amp;lc=US&amp;item_name=Android%20Upload%20Service&amp;item_number=AndroidUploadService&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate"></a></p>
+      <h1>
+<a id="android-upload-service" class="anchor" href="#android-upload-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android Upload Service</h1>
+
+<p><a href="http://android-arsenal.com/details/1/2161"><img src="https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat" alt="Android Arsenal"></a> <a href="https://bintray.com/alexbbb/maven/android-upload-service/_latestVersion"> <img src="https://api.bintray.com/packages/alexbbb/maven/android-upload-service/images/download.svg" alt="Download"> </a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=alexgotev%40gmail%2ecom&amp;lc=US&amp;item_name=Android%20Upload%20Service&amp;item_number=AndroidUploadService&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate"></a></p>
 
 <p><img src="http://alexbbb.github.io/android-upload-service/upload.gif" alt="Upload Notification"></p>
+
+<p>Easily upload files in the background with automatic Android Notification Center progress indication.</p>
 
 <h2>
 <a id="purpose" class="anchor" href="#purpose" aria-hidden="true"><span class="octicon octicon-link"></span></a>Purpose</h2>
@@ -51,7 +56,7 @@
 }
 </code></pre>
 
-<p>and do a project sync. To start using the library, you have to initialize it. I suggest you to do that in your Application subclass:</p>
+<p>and do a project sync. If you're upgrading to 1.6 from previous releases, <a href="https://github.com/alexbbb/android-upload-service/releases/tag/1.6">read this migration notes</a>. To start using the library, you have to initialize it. I suggest you to do that in your Application subclass:</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Initializer</span> <span class="pl-k">extends</span> <span class="pl-e">Application</span> {
 
@@ -184,6 +189,8 @@
 
 <p>If you want to monitor upload status in all of your activities, just implement the BroadcastReceiver in your base activity class from which all of your activities inherits and you're done.</p>
 
+<p>To monitor upload status inside a <code>Service</code>, you have to call <code>uploadReceiver.register(this);</code> inside the service's <code>onCreate</code> method, and <code>uploadReceiver.unregister(this);</code> inside service's <code>onDestroy</code> method.</p>
+
 <h3>
 <a id="stop-current-upload" class="anchor" href="#stop-current-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stop current upload</h3>
 
@@ -277,6 +284,7 @@ Binary:         http://YOUR_LOCAL_IP:3000/upload/binary
 <p>Let's face it, doing network programming is not easy as there are many things that can go wrong, but if upload doesn't work out of the box, consider the following things before posting a new issue:</p>
 
 <ul>
+<li>Check <a href="http://alexbbb.github.io/android-upload-service/javadoc/">JavaDocs</a> for full class and methods docs</li>
 <li>Is the server URL correct?</li>
 <li>Is the server URL reachable from your device? Check if there are firewalls or other kind of restrictions between your device and the server.</li>
 <li>Are you sure that the server side is working properly?</li>
