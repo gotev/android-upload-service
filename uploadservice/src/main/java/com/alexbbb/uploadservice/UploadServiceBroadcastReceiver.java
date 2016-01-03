@@ -28,6 +28,10 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
                 final String uploadId = intent.getStringExtra(UploadService.UPLOAD_ID);
 
                 switch (status) {
+                    case UploadService.STATUS_CANCELLED:
+                        onCancelled(uploadId);
+                        break;
+
                     case UploadService.STATUS_ERROR:
                         final Exception exception = (Exception) intent
                                 .getSerializableExtra(UploadService.ERROR_EXCEPTION);
@@ -120,5 +124,13 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
      */
     public void onCompleted(final String uploadId, final int serverResponseCode,
                             final String serverResponseMessage) {
+    }
+
+    /**
+     * Called when the upload is cancelled. Override this method to add your own logic.
+     *
+     * @param uploadId unique ID of the upload request
+     */
+    public void onCancelled(final String uploadId) {
     }
 }

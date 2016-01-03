@@ -62,6 +62,7 @@ public class UploadService extends Service {
     public static final int STATUS_IN_PROGRESS = 1;
     public static final int STATUS_COMPLETED = 2;
     public static final int STATUS_ERROR = 3;
+    public static final int STATUS_CANCELLED = 4;
     public static final String PROGRESS = "progress";
     public static final String PROGRESS_UPLOADED_BYTES = "progressUploadedBytes";
     public static final String PROGRESS_TOTAL_BYTES = "progressTotalBytes";
@@ -255,6 +256,18 @@ public class UploadService extends Service {
         uploadTasksMap.remove(uploadId);
     }
 
+    synchronized void broadcastCancelled(final String uploadId) {
+        updateNotificationCancelled(uploadId);
+
+        final Intent intent = new Intent(getActionBroadcast());
+        intent.setAction(getActionBroadcast());
+        intent.putExtra(UPLOAD_ID, uploadId);
+        intent.putExtra(STATUS, STATUS_CANCELLED);
+        sendBroadcast(intent);
+
+        uploadTasksMap.remove(uploadId);
+    }
+
     private void createNotification(final String uploadId) {
         HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
         if (uploadTask == null) return;
@@ -442,6 +455,41 @@ public class UploadService extends Service {
                 takeoverForegroundNotification = true;
             }
         }
+    }
+
+    private void updateNotificationCancelled(final String uploadId) {
+        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
+        if (uploadTask == null) return;
+
+        UploadNotificationConfig notificationConfig = uploadTask.getNotificationConfig();
+        if (notificationConfig == null) return;
+
+        if (shouldTakeoverForegroundNotification()) {
+            int oldNotificationId = uploadTask.getNotificationId();
+
+            takeoverForegroundNotification = false;
+            uploadTask.setNotificationId(0);
+
+            if (tempNotificationToDisplay != null) {
+                notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + oldNotificationId, tempNotificationToDisplay.build());
+
+                tempNotificationToDisplay = null;
+            } else {
+                notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID + oldNotificationId);
+            }
+        }
+
+        if (uploadTask.getNotificationId() != 0) {
+            notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID + uploadTask.getNotificationId());
+        } else {
+            if (getRemainingTasks() <= 1) {
+                notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID);
+            } else {
+                takeoverForegroundNotification = true;
+            }
+        }
+
+        uploadThreadPool.remove(uploadTask);
     }
 
     private void setRingtone(final String uploadId, NotificationCompat.Builder notification) {

@@ -95,7 +95,9 @@ abstract class HttpUploadTask implements Runnable {
 
                 break;
             } catch (Exception exc) {
-                if (attempts > maxRetries || !shouldContinue) {
+                if (!shouldContinue) {
+                    broadcastCancelled();
+                } else if (attempts > maxRetries) {
                     broadcastError(exc);
                 } else {
                     Log.w(getClass().getName(), "Error in uploadId " + uploadId + " on attempt " + attempts
@@ -113,7 +115,15 @@ abstract class HttpUploadTask implements Runnable {
     }
 
     public void cancel() {
+        cancel(true);
+    }
+
+    public void cancel(boolean immediate) {
         this.shouldContinue = false;
+
+        if (immediate) {
+            broadcastCancelled();
+        }
     }
 
     protected void broadcastProgress(long uploadedBytes, long totalBytes) {
@@ -126,6 +136,10 @@ abstract class HttpUploadTask implements Runnable {
 
     private void broadcastCompleted(final int responseCode, final String responseMessage) {
         this.service.broadcastCompleted(uploadId, responseCode, responseMessage);
+    }
+
+    private void broadcastCancelled() {
+        this.service.broadcastCancelled(uploadId);
     }
 
     @SuppressLint("NewApi")
