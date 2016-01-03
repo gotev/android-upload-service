@@ -20,7 +20,7 @@ import java.util.ArrayList;
  *
  * @author cankov
  */
-abstract class HttpUploadTask {
+abstract class HttpUploadTask implements Runnable {
 
     private static final int BUFFER_SIZE = 4096;
 
@@ -32,6 +32,10 @@ abstract class HttpUploadTask {
     protected final String customUserAgent;
     protected final int maxRetries;
     protected final ArrayList<NameValue> headers;
+
+    private int notificationId;
+    private UploadNotificationConfig notificationConfig;
+    private long lastProgressNotificationTime;
 
     protected HttpURLConnection connection = null;
     protected OutputStream requestStream = null;
@@ -53,6 +57,31 @@ abstract class HttpUploadTask {
         this.headers = intent.getParcelableArrayListExtra(UploadService.PARAM_REQUEST_HEADERS);
     }
 
+    public int getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(int notificationId) {
+        this.notificationId = notificationId;
+    }
+
+    public UploadNotificationConfig getNotificationConfig() {
+        return notificationConfig;
+    }
+
+    public void setNotificationConfig(UploadNotificationConfig notificationConfig) {
+        this.notificationConfig = notificationConfig;
+    }
+
+    public long getLastProgressNotificationTime() {
+        return lastProgressNotificationTime;
+    }
+
+    public void setLastProgressNotificationTime(long lastProgressNotificationTime) {
+        this.lastProgressNotificationTime = lastProgressNotificationTime;
+    }
+
+    @Override
     public void run() {
         int attempts = 0;
 
