@@ -99,6 +99,17 @@ public class MainActivity extends AppCompatActivity {
             container.removeView(uploadProgressHolders.get(uploadId).itemView);
             uploadProgressHolders.remove(uploadId);
         }
+
+        @Override
+        public void onCancelled(String uploadId) {
+            Log.i(TAG, "Upload with ID " + uploadId + " is cancelled");
+
+            if (uploadProgressHolders.get(uploadId) == null)
+                return;
+
+            container.removeView(uploadProgressHolders.get(uploadId).itemView);
+            uploadProgressHolders.remove(uploadId);
+        }
     };
 
     @Override
