@@ -227,7 +227,7 @@ Let's face it, doing network programming is not easy as there are many things th
 * Check [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/) for full class and methods docs
 * Is the server URL correct?
 * Is the server URL reachable from your device? Check if there are firewalls or other kind of restrictions between your device and the server.
-* Are you sure that the server side is working properly?
+* Are you sure that the server side is working properly? For example, if you use PHP in your server side, and you get an EPIPE exception, check if the content size you are trying to upload exceeds the values of `upload_max_filesize` or `post_max_size` set in your `php.ini`
 * Have you properly set up the request with all the headers, parameters and files that the server expects?
 * Have you tried to make an upload using the demo app and one of the provided server implementations? I use the node.js version which provides good feedback and supports both HTTP Multipart and binary uploads.
 
