@@ -1,1 +1,3 @@
 include ':app'
+include ':uploadservice'
+project(':uploadservice').projectDir = file('../../uploadservice')
