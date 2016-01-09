@@ -50,7 +50,7 @@ and now you're ready to rock!
 
 <em>I strongly encourage you to build and run the demo app that you can find in the [examples](#examples), together with one of the provided server implementations and to check [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/).</em>
 
-### HTTP Multipart Upload
+### [HTTP Multipart Upload](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/MultipartUploadRequest.html)
 This is the most common way to upload files on a server. It's the same kind of request that browsers do when you use the `<form>` tag with one or more files. Here's a minimal example:
 
 ```java
@@ -73,7 +73,7 @@ public void uploadMultipart(final Context context) {
 }
 ```
 
-### Binary Upload
+### [Binary Upload](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/BinaryUploadRequest.html)
 The binary upload uses a single file as the raw body of the upload request.
 
 ``` java
@@ -96,7 +96,7 @@ public void uploadBinary(final Context context) {
 ```
 
 ### Monitoring upload status
-To listen for the status of the upload service, use the provided `UploadServiceBroadcastReceiver`. Override its methods to add your own business logic. Example on how to use it in an activity:
+To listen for the status of the upload service, use the provided [UploadServiceBroadcastReceiver](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/UploadServiceBroadcastReceiver.html). Override its methods to add your own business logic. Example on how to use it in an activity:
 
 ```java
 public class YourActivity extends Activity {
