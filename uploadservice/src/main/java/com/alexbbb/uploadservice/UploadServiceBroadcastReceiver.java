@@ -60,7 +60,10 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
 
     /**
      * Register this upload receiver.
-     * It's recommended to register the receiver in Activity's onResume method.
+     * If you use this receiver in an {@link android.app.Activity}, you have to call this method inside
+     * {@link android.app.Activity#onResume()}, after {@code super.onResume();}.
+     * If you use it in a {@link android.app.Service}, you have to
+     * call this method inside {@link android.app.Service#onCreate()}, after {@code super.onCreate();}.
      *
      * @param context context in which to register this receiver
      */
@@ -72,7 +75,10 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
 
     /**
      * Unregister this upload receiver.
-     * It's recommended to unregister the receiver in Activity's onPause method.
+     * If you use this receiver in an {@link android.app.Activity}, you have to call this method inside
+     * {@link android.app.Activity#onPause()}, after {@code super.onPause();}.
+     * If you use it in a {@link android.app.Service}, you have to
+     * call this method inside {@link android.app.Service#onDestroy()}.
      *
      * @param context context in which to unregister this receiver
      */
