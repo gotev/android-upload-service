@@ -17,6 +17,11 @@ import java.util.List;
  */
 public class MultipartUploadRequest extends HttpUploadRequest {
 
+    /**
+     * Static constant used to identify the task type. It must be unique between task types.
+     */
+    public static final String NAME = "multipart";
+
     private final ArrayList<MultipartUploadFile> filesToUpload;
     private final ArrayList<NameValue> parameters;
 
@@ -58,7 +63,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     @Override
     protected void initializeIntent(Intent intent) {
         super.initializeIntent(intent);
-        intent.putExtra(UploadService.PARAM_TYPE, UploadService.UPLOAD_MULTIPART);
+        intent.putExtra(UploadService.PARAM_TYPE, NAME);
         intent.putParcelableArrayListExtra(UploadService.PARAM_FILES, getFilesToUpload());
         intent.putParcelableArrayListExtra(UploadService.PARAM_REQUEST_PARAMETERS, getParameters());
     }

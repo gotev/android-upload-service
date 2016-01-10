@@ -17,7 +17,7 @@ public class UploadService extends IntentService {
     private static final String SERVICE_NAME = UploadService.class.getName();
     private static final String TAG = "UploadService";
 
-    private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
+    private static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
 
     public static String NAMESPACE = "com.alexbbb";
 
@@ -34,9 +34,6 @@ public class UploadService extends IntentService {
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
     protected static final String PARAM_CUSTOM_USER_AGENT = "customUserAgent";
     protected static final String PARAM_MAX_RETRIES = "maxRetries";
-
-    protected static final String UPLOAD_BINARY = "binary";
-    protected static final String UPLOAD_MULTIPART = "multipart";
 
     /**
      * The minimum interval between progress reports in milliseconds.
@@ -59,8 +56,8 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
     private PowerManager.WakeLock wakeLock;
-
     private static HttpUploadTask currentTask;
+    private int notificationIncrementalId = 0;
 
     protected static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
@@ -93,22 +90,24 @@ public class UploadService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-
-            if (getActionUpload().equals(action)) {
-                currentTask = getTask(intent);
-
-                if (currentTask == null) {
-                    return;
-                }
-
-                currentTask.setLastProgressNotificationTime(0)
-                           .setNotificationId(UPLOAD_NOTIFICATION_ID);
-                wakeLock.acquire();
-                currentTask.run();
-            }
+        if (intent == null || !getActionUpload().equals(intent.getAction())) {
+            return;
         }
+
+        currentTask = getTask(intent);
+
+        if (currentTask == null) {
+            return;
+        }
+
+        currentTask.setLastProgressNotificationTime(0)
+                   .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
+        // increment by 2 because the notificationIncrementalId + 1 is used internally
+        // in each HttpUploadTask. Check its sources for more info about this.
+        notificationIncrementalId+=2;
+
+        wakeLock.acquire();
+        currentTask.run();
     }
 
     /**
@@ -119,11 +118,11 @@ public class UploadService extends IntentService {
     HttpUploadTask getTask(Intent intent) {
         String type = intent.getStringExtra(PARAM_TYPE);
 
-        if (UPLOAD_MULTIPART.equals(type)) {
+        if (MultipartUploadRequest.NAME.equals(type)) {
             return new MultipartUploadTask(this, intent);
         }
 
-        if (UPLOAD_BINARY.equals(type)) {
+        if (BinaryUploadRequest.NAME.equals(type)) {
             return new BinaryUploadTask(this, intent);
         }
 
