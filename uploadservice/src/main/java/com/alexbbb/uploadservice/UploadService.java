@@ -1,12 +1,8 @@
 package com.alexbbb.uploadservice;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
 import android.content.Intent;
-import android.media.RingtoneManager;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.Builder;
 
 /**
  * Service to upload files in background using HTTP POST with notification center progress
@@ -22,7 +18,6 @@ public class UploadService extends IntentService {
     private static final String TAG = "UploadService";
 
     private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
-    private static final int UPLOAD_NOTIFICATION_ID_DONE = 1235; // Something unique
 
     public static String NAMESPACE = "com.alexbbb";
 
@@ -63,11 +58,7 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
-    private NotificationManager notificationManager;
-    private Builder notification;
     private PowerManager.WakeLock wakeLock;
-    private UploadNotificationConfig notificationConfig;
-    private long lastProgressNotificationTime;
 
     private static HttpUploadTask currentTask;
 
@@ -96,8 +87,6 @@ public class UploadService extends IntentService {
     public void onCreate() {
         super.onCreate();
 
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notification = new NotificationCompat.Builder(this);
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
     }
@@ -108,8 +97,6 @@ public class UploadService extends IntentService {
             final String action = intent.getAction();
 
             if (getActionUpload().equals(action)) {
-                notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
-
                 String type = intent.getStringExtra(PARAM_TYPE);
                 if (UPLOAD_MULTIPART.equals(type)) {
                     currentTask = new MultipartUploadTask(this, intent);
@@ -119,139 +106,19 @@ public class UploadService extends IntentService {
                     return;
                 }
 
-                lastProgressNotificationTime = 0;
+                currentTask.setLastProgressNotificationTime(0)
+                           .setNotificationId(UPLOAD_NOTIFICATION_ID);
                 wakeLock.acquire();
-
-                createNotification();
-
                 currentTask.run();
             }
         }
     }
 
-    void broadcastProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
-
-        long currentTime = System.currentTimeMillis();
-        if (currentTime < lastProgressNotificationTime + PROGRESS_REPORT_INTERVAL) {
-            return;
-        }
-
-        lastProgressNotificationTime = currentTime;
-
-        updateNotificationProgress((int)uploadedBytes, (int)totalBytes);
-
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_IN_PROGRESS);
-
-        final int percentsProgress = (int) (uploadedBytes * 100 / totalBytes);
-        intent.putExtra(PROGRESS, percentsProgress);
-
-        intent.putExtra(PROGRESS_UPLOADED_BYTES, uploadedBytes);
-        intent.putExtra(PROGRESS_TOTAL_BYTES, totalBytes);
-        sendBroadcast(intent);
-    }
-
-    void broadcastCompleted(final String uploadId, final int responseCode, final String responseMessage) {
-
-        final String filteredMessage;
-        if (responseMessage == null) {
-            filteredMessage = "";
-        } else {
-            filteredMessage = responseMessage;
-        }
-
-        if (responseCode >= 200 && responseCode <= 299)
-            updateNotificationCompleted();
-        else
-            updateNotificationError();
-
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_COMPLETED);
-        intent.putExtra(SERVER_RESPONSE_CODE, responseCode);
-        intent.putExtra(SERVER_RESPONSE_MESSAGE, filteredMessage);
-        sendBroadcast(intent);
+    /**
+     * Called by each task when it is completed (either successfully, with an error or due to
+     * user cancellation).
+     */
+    protected void taskCompleted() {
         wakeLock.release();
-    }
-
-    void broadcastError(final String uploadId, final Exception exception) {
-
-        updateNotificationError();
-
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.setAction(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_ERROR);
-        intent.putExtra(ERROR_EXCEPTION, exception);
-        sendBroadcast(intent);
-        wakeLock.release();
-    }
-
-    private void createNotification() {
-        if (notificationConfig == null) return;
-
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getInProgressMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(100, 0, true).setOngoing(true);
-
-        startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
-    }
-
-    private void updateNotificationProgress(int uploadedBytes, int totalBytes) {
-        if (notificationConfig == null) return;
-
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getInProgressMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(totalBytes, uploadedBytes, false)
-                    .setOngoing(true);
-
-        startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
-    }
-
-    private void updateNotificationCompleted() {
-        if (notificationConfig == null) return;
-
-        stopForeground(notificationConfig.isAutoClearOnSuccess());
-
-        if (!notificationConfig.isAutoClearOnSuccess()) {
-            notification.setContentTitle(notificationConfig.getTitle())
-                        .setContentText(notificationConfig.getCompletedMessage())
-                        .setContentIntent(notificationConfig.getPendingIntent(this))
-                        .setAutoCancel(notificationConfig.isClearOnAction())
-                        .setSmallIcon(notificationConfig.getIconResourceID())
-                        .setProgress(0, 0, false)
-                        .setOngoing(false);
-            setRingtone();
-            notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
-        }
-    }
-
-    private void setRingtone() {
-
-        if(notificationConfig.isRingToneEnabled()) {
-            notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION));
-            notification.setOnlyAlertOnce(false);
-        }
-
-    }
-
-    private void updateNotificationError() {
-        if (notificationConfig == null) return;
-
-        stopForeground(false);
-
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getErrorMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setAutoCancel(notificationConfig.isClearOnAction())
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(0, 0, false).setOngoing(false);
-        setRingtone();
-        notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
     }
 }
