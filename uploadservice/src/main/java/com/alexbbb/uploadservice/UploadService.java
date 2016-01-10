@@ -97,12 +97,9 @@ public class UploadService extends IntentService {
             final String action = intent.getAction();
 
             if (getActionUpload().equals(action)) {
-                String type = intent.getStringExtra(PARAM_TYPE);
-                if (UPLOAD_MULTIPART.equals(type)) {
-                    currentTask = new MultipartUploadTask(this, intent);
-                } else if (UPLOAD_BINARY.equals(type)) {
-                    currentTask = new BinaryUploadTask(this, intent);
-                } else {
+                currentTask = getTask(intent);
+
+                if (currentTask == null) {
                     return;
                 }
 
@@ -112,6 +109,25 @@ public class UploadService extends IntentService {
                 currentTask.run();
             }
         }
+    }
+
+    /**
+     * Creates a new task instance based on the requested task type in the intent.
+     * @param intent
+     * @return task instance or null if the type is not supported or invalid
+     */
+    HttpUploadTask getTask(Intent intent) {
+        String type = intent.getStringExtra(PARAM_TYPE);
+
+        if (UPLOAD_MULTIPART.equals(type)) {
+            return new MultipartUploadTask(this, intent);
+        }
+
+        if (UPLOAD_BINARY.equals(type)) {
+            return new BinaryUploadTask(this, intent);
+        }
+
+        return null;
     }
 
     /**
