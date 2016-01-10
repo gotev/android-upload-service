@@ -60,6 +60,7 @@ public class UploadService extends Service {
     public static final int STATUS_IN_PROGRESS = 1;
     public static final int STATUS_COMPLETED = 2;
     public static final int STATUS_ERROR = 3;
+    public static final int STATUS_CANCELLED = 4;
     public static final String PROGRESS = "progress";
     public static final String PROGRESS_UPLOADED_BYTES = "progressUploadedBytes";
     public static final String PROGRESS_TOTAL_BYTES = "progressTotalBytes";

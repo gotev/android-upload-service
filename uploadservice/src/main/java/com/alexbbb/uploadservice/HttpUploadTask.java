@@ -24,6 +24,7 @@ import java.util.ArrayList;
  *
  * @author cankov
  * @author alexbbb (Aleksandar Gotev)
+ * @author mabdurrahman
  */
 abstract class HttpUploadTask implements Runnable {
 
@@ -84,7 +85,9 @@ abstract class HttpUploadTask implements Runnable {
 
                 break;
             } catch (Exception exc) {
-                if (attempts > maxRetries || !shouldContinue) {
+                if (!shouldContinue) {
+                    broadcastCancelled();
+                } else if (attempts > maxRetries) {
                     broadcastError(exc);
                 } else {
                     Log.w(getClass().getName(), "Error in uploadId " + uploadId + " on attempt " + attempts
@@ -361,6 +364,15 @@ abstract class HttpUploadTask implements Runnable {
         intent.putExtra(UploadService.ERROR_EXCEPTION, exception);
         service.sendBroadcast(intent);
         service.taskCompleted(uploadId);
+    }
+
+    void broadcastCancelled() {
+        updateNotificationError();
+
+        final Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
+        intent.putExtra(UploadService.STATUS, UploadService.STATUS_CANCELLED);
+        service.sendBroadcast(intent);
     }
 
     private void setRingtone() {
