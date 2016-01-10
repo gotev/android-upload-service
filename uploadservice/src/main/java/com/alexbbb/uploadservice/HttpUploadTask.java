@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * @author cankov
  * @author alexbbb (Aleksandar Gotev)
  */
-abstract class HttpUploadTask {
+abstract class HttpUploadTask implements Runnable {
 
     private static final int BUFFER_SIZE = 4096;
 
@@ -67,6 +67,7 @@ abstract class HttpUploadTask {
         this.headers = intent.getParcelableArrayListExtra(UploadService.PARAM_REQUEST_HEADERS);
     }
 
+    @Override
     public void run() {
 
         createNotification();
@@ -267,7 +268,7 @@ abstract class HttpUploadTask {
                 .setSmallIcon(notificationConfig.getIconResourceID())
                 .setProgress(100, 0, true).setOngoing(true);
 
-        service.startForeground(notificationId, notification.build());
+        notificationManager.notify(notificationId, notification.build());
     }
 
     protected void broadcastProgress(final long uploadedBytes, final long totalBytes) {
@@ -303,7 +304,7 @@ abstract class HttpUploadTask {
                 .setProgress(totalBytes, uploadedBytes, false)
                 .setOngoing(true);
 
-        service.startForeground(notificationId, notification.build());
+        notificationManager.notify(notificationId, notification.build());
     }
 
     void broadcastCompleted(final int responseCode, final String responseMessage) {
@@ -326,13 +327,13 @@ abstract class HttpUploadTask {
         intent.putExtra(UploadService.SERVER_RESPONSE_CODE, responseCode);
         intent.putExtra(UploadService.SERVER_RESPONSE_MESSAGE, filteredMessage);
         service.sendBroadcast(intent);
-        service.taskCompleted();
+        service.taskCompleted(uploadId);
     }
 
     private void updateNotificationCompleted() {
         if (notificationConfig == null) return;
 
-        service.stopForeground(notificationConfig.isAutoClearOnSuccess());
+        notificationManager.cancel(notificationId);
 
         if (!notificationConfig.isAutoClearOnSuccess()) {
             notification.setContentTitle(notificationConfig.getTitle())
@@ -344,8 +345,8 @@ abstract class HttpUploadTask {
                     .setOngoing(false);
             setRingtone();
 
-            // this is needed because to properly show a notification after stopForeground,
-            // it needs to have a different ID, otherwise if it's the same it won't be shown
+            // this is needed because the main notification used to show progress is ongoing
+            // and a new one has to be created to allow the user to dismiss it
             notificationManager.notify(notificationId + 1, notification.build());
         }
     }
@@ -359,7 +360,7 @@ abstract class HttpUploadTask {
         intent.putExtra(UploadService.STATUS, UploadService.STATUS_ERROR);
         intent.putExtra(UploadService.ERROR_EXCEPTION, exception);
         service.sendBroadcast(intent);
-        service.taskCompleted();
+        service.taskCompleted(uploadId);
     }
 
     private void setRingtone() {
@@ -374,7 +375,7 @@ abstract class HttpUploadTask {
     private void updateNotificationError() {
         if (notificationConfig == null) return;
 
-        service.stopForeground(false);
+        notificationManager.cancel(notificationId);
 
         notification.setContentTitle(notificationConfig.getTitle())
                 .setContentText(notificationConfig.getErrorMessage())
@@ -384,8 +385,8 @@ abstract class HttpUploadTask {
                 .setProgress(0, 0, false).setOngoing(false);
         setRingtone();
 
-        // this is needed because to properly show a notification after stopForeground,
-        // it needs to have a different ID, otherwise if it's the same it won't be shown
+        // this is needed because the main notification used to show progress is ongoing
+        // and a new one has to be created to allow the user to dismiss it
         notificationManager.notify(notificationId + 1, notification.build());
     }
 }

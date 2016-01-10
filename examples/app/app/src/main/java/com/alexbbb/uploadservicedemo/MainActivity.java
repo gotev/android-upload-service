@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.cancelUploadButton)
     void onCancelUploadButtonClick() {
-        UploadService.stopCurrentUpload();
+        UploadService.stopAllUploads();
     }
 
     @OnClick(R.id.pickFile)

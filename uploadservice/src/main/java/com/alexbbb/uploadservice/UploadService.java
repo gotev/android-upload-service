@@ -1,8 +1,18 @@
 package com.alexbbb.uploadservice;
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
+import android.os.IBinder;
 import android.os.PowerManager;
+import android.util.Log;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Service to upload files in background using HTTP POST with notification center progress
@@ -11,13 +21,15 @@ import android.os.PowerManager;
  * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
+ * @author mabdurrahman
  */
-public class UploadService extends IntentService {
+public class UploadService extends Service {
 
-    private static final String SERVICE_NAME = UploadService.class.getName();
-    private static final String TAG = "UploadService";
+    private static final String TAG = UploadService.class.getSimpleName();
 
     private static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
+    public static int UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    public static int KEEP_ALIVE_TIME_IN_SECONDS = 1;
 
     public static String NAMESPACE = "com.alexbbb";
 
@@ -56,8 +68,10 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
     private PowerManager.WakeLock wakeLock;
-    private static HttpUploadTask currentTask;
     private int notificationIncrementalId = 0;
+    private static final Map<String, HttpUploadTask> uploadTasksMap = new ConcurrentHashMap<>();
+    private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
+    private ThreadPoolExecutor uploadThreadPool;
 
     protected static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
@@ -68,16 +82,31 @@ public class UploadService extends IntentService {
     }
 
     /**
-     * Stops the currently active upload task.
+     * Stops the upload task with the given uploadId.
+     * @param uploadId The unique upload id
      */
-    public static void stopCurrentUpload() {
-        if (currentTask != null) {
-            currentTask.cancel();
+    public static synchronized void stopUpload(final String uploadId) {
+        HttpUploadTask removedTask = uploadTasksMap.get(uploadId);
+        if (removedTask != null) {
+            removedTask.cancel();
         }
     }
 
-    public UploadService() {
-        super(SERVICE_NAME);
+    /**
+     * Stop all the active uploads.
+     */
+    public static synchronized void stopAllUploads() {
+        if (uploadTasksMap.isEmpty()) {
+            return;
+        }
+
+        // using iterator instead for each loop, because it's faster on Android
+        Iterator<String> iterator = uploadTasksMap.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            HttpUploadTask taskToCancel = uploadTasksMap.get(iterator.next());
+            taskToCancel.cancel();
+        }
     }
 
     @Override
@@ -86,28 +115,58 @@ public class UploadService extends IntentService {
 
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+
+        if (UPLOAD_POOL_SIZE <= 0) {
+            UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+        }
+
+        // Creates a thread pool manager
+        uploadThreadPool = new ThreadPoolExecutor(
+                UPLOAD_POOL_SIZE,       // Initial pool size
+                UPLOAD_POOL_SIZE,       // Max pool size
+                KEEP_ALIVE_TIME_IN_SECONDS,
+                TimeUnit.SECONDS,
+                uploadTasksQueue);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null || !getActionUpload().equals(intent.getAction())) {
-            return;
+            return START_STICKY;
         }
 
-        currentTask = getTask(intent);
+        HttpUploadTask currentTask = getTask(intent);
 
         if (currentTask == null) {
-            return;
+            return START_STICKY;
         }
 
         currentTask.setLastProgressNotificationTime(0)
                    .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
         // increment by 2 because the notificationIncrementalId + 1 is used internally
         // in each HttpUploadTask. Check its sources for more info about this.
-        notificationIncrementalId+=2;
+        notificationIncrementalId += 2;
 
         wakeLock.acquire();
-        currentTask.run();
+
+        uploadTasksMap.put(currentTask.uploadId, currentTask);
+        uploadThreadPool.execute(currentTask);
+
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        stopAllUploads();
+        uploadThreadPool.shutdown();
+        Log.d(TAG, "UploadService destroyed");
     }
 
     /**
@@ -132,8 +191,16 @@ public class UploadService extends IntentService {
     /**
      * Called by each task when it is completed (either successfully, with an error or due to
      * user cancellation).
+     * @param uploadId the uploadID of the finished task
      */
-    protected void taskCompleted() {
-        wakeLock.release();
+    protected synchronized void taskCompleted(String uploadId) {
+        uploadTasksMap.remove(uploadId);
+
+        // when all the upload tasks are completed, release the wake lock and shut down the service
+        if (uploadTasksMap.isEmpty()) {
+            Log.d(TAG, "All tasks finished. UploadService is about to shutdown...");
+            wakeLock.release();
+            stopSelf();
+        }
     }
 }
