@@ -330,6 +330,8 @@ abstract class HttpUploadTask implements Runnable {
         service.sendBroadcast(intent);
 
         updateNotificationError();
+
+        service.taskCompleted(uploadId);
     }
 
     private void createNotification() {
