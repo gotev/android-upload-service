@@ -1,8 +1,13 @@
 package com.alexbbb.uploadservice;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -19,6 +24,8 @@ import java.util.ArrayList;
  * Generic HTTP Upload Task.
  *
  * @author cankov
+ * @author alexbbb (Aleksandar Gotev)
+ * @author mabdurrahman
  */
 abstract class HttpUploadTask implements Runnable {
 
@@ -33,20 +40,25 @@ abstract class HttpUploadTask implements Runnable {
     protected final int maxRetries;
     protected final ArrayList<NameValue> headers;
 
-    private int notificationId;
-    private UploadNotificationConfig notificationConfig;
-    private long lastProgressNotificationTime;
-
     protected HttpURLConnection connection = null;
     protected OutputStream requestStream = null;
     protected InputStream responseStream = null;
     protected boolean shouldContinue = true;
+
+    private int notificationId;
+    private long lastProgressNotificationTime;
+    private NotificationManager notificationManager;
+    private NotificationCompat.Builder notification;
+    protected UploadNotificationConfig notificationConfig;
 
     protected long totalBodyBytes;
     protected long uploadedBodyBytes;
 
     HttpUploadTask(UploadService service, Intent intent) {
 
+        this.notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
+        this.notificationConfig = intent.getParcelableExtra(UploadService.PARAM_NOTIFICATION_CONFIG);
+        this.notification = new NotificationCompat.Builder(service);
         this.service = service;
 
         this.uploadId = intent.getStringExtra(UploadService.PARAM_ID);
@@ -57,32 +69,11 @@ abstract class HttpUploadTask implements Runnable {
         this.headers = intent.getParcelableArrayListExtra(UploadService.PARAM_REQUEST_HEADERS);
     }
 
-    public int getNotificationId() {
-        return notificationId;
-    }
-
-    public void setNotificationId(int notificationId) {
-        this.notificationId = notificationId;
-    }
-
-    public UploadNotificationConfig getNotificationConfig() {
-        return notificationConfig;
-    }
-
-    public void setNotificationConfig(UploadNotificationConfig notificationConfig) {
-        this.notificationConfig = notificationConfig;
-    }
-
-    public long getLastProgressNotificationTime() {
-        return lastProgressNotificationTime;
-    }
-
-    public void setLastProgressNotificationTime(long lastProgressNotificationTime) {
-        this.lastProgressNotificationTime = lastProgressNotificationTime;
-    }
-
     @Override
     public void run() {
+
+        createNotification();
+
         int attempts = 0;
 
         int errorDelay = 1000;
@@ -115,31 +106,17 @@ abstract class HttpUploadTask implements Runnable {
     }
 
     public void cancel() {
-        cancel(true);
-    }
-
-    public void cancel(boolean immediate) {
         this.shouldContinue = false;
-
-        if (immediate) {
-            broadcastCancelled();
-        }
     }
 
-    protected void broadcastProgress(long uploadedBytes, long totalBytes) {
-        this.service.broadcastProgress(uploadId, uploadedBytes, totalBytes);
+    public HttpUploadTask setLastProgressNotificationTime(long lastProgressNotificationTime) {
+        this.lastProgressNotificationTime = lastProgressNotificationTime;
+        return this;
     }
 
-    private void broadcastError(Exception exc) {
-        this.service.broadcastError(uploadId, exc);
-    }
-
-    private void broadcastCompleted(final int responseCode, final String responseMessage) {
-        this.service.broadcastCompleted(uploadId, responseCode, responseMessage);
-    }
-
-    private void broadcastCancelled() {
-        this.service.broadcastCancelled(uploadId);
+    public HttpUploadTask setNotificationId(int notificationId) {
+        this.notificationId = notificationId;
+        return this;
     }
 
     @SuppressLint("NewApi")
@@ -284,5 +261,160 @@ abstract class HttpUploadTask implements Runnable {
             uploadedBodyBytes += bytesRead;
             broadcastProgress(uploadedBodyBytes, totalBodyBytes);
         }
+    }
+
+    protected void broadcastProgress(final long uploadedBytes, final long totalBytes) {
+
+        long currentTime = System.currentTimeMillis();
+        if (currentTime < lastProgressNotificationTime + UploadService.PROGRESS_REPORT_INTERVAL) {
+            return;
+        }
+
+        lastProgressNotificationTime = currentTime;
+
+        final Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
+        intent.putExtra(UploadService.STATUS, UploadService.STATUS_IN_PROGRESS);
+
+        final int percentsProgress = (int) (uploadedBytes * 100 / totalBytes);
+        intent.putExtra(UploadService.PROGRESS, percentsProgress);
+
+        intent.putExtra(UploadService.PROGRESS_UPLOADED_BYTES, uploadedBytes);
+        intent.putExtra(UploadService.PROGRESS_TOTAL_BYTES, totalBytes);
+        service.sendBroadcast(intent);
+
+        updateNotificationProgress((int) uploadedBytes, (int) totalBytes);
+    }
+
+    void broadcastCompleted(final int responseCode, final String responseMessage) {
+
+        final String filteredMessage;
+        if (responseMessage == null) {
+            filteredMessage = "";
+        } else {
+            filteredMessage = responseMessage;
+        }
+
+        final Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
+        intent.putExtra(UploadService.STATUS, UploadService.STATUS_COMPLETED);
+        intent.putExtra(UploadService.SERVER_RESPONSE_CODE, responseCode);
+        intent.putExtra(UploadService.SERVER_RESPONSE_MESSAGE, filteredMessage);
+        service.sendBroadcast(intent);
+
+        if (responseCode >= 200 && responseCode <= 299)
+            updateNotificationCompleted();
+        else
+            updateNotificationError();
+
+        service.taskCompleted(uploadId);
+    }
+
+    void broadcastError(final Exception exception) {
+
+        final Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
+        intent.putExtra(UploadService.STATUS, UploadService.STATUS_ERROR);
+        intent.putExtra(UploadService.ERROR_EXCEPTION, exception);
+        service.sendBroadcast(intent);
+
+        updateNotificationError();
+
+        service.taskCompleted(uploadId);
+    }
+
+    void broadcastCancelled() {
+        final Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
+        intent.putExtra(UploadService.STATUS, UploadService.STATUS_CANCELLED);
+        service.sendBroadcast(intent);
+
+        updateNotificationError();
+    }
+
+    private void createNotification() {
+        if (notificationConfig == null) return;
+
+        notification.setContentTitle(notificationConfig.getTitle())
+                .setContentText(notificationConfig.getInProgressMessage())
+                .setContentIntent(notificationConfig.getPendingIntent(service))
+                .setSmallIcon(notificationConfig.getIconResourceID())
+                .setProgress(100, 0, true)
+                .setOngoing(true);
+
+        Notification builtNotification = notification.build();
+
+        if (service.holdForegroundNotification(uploadId, builtNotification)) {
+            notificationManager.cancel(notificationId);
+        } else {
+            notificationManager.notify(notificationId, builtNotification);
+        }
+    }
+
+    private void updateNotificationProgress(int uploadedBytes, int totalBytes) {
+        if (notificationConfig == null) return;
+
+        notification.setContentTitle(notificationConfig.getTitle())
+                .setContentText(notificationConfig.getInProgressMessage())
+                .setContentIntent(notificationConfig.getPendingIntent(service))
+                .setSmallIcon(notificationConfig.getIconResourceID())
+                .setProgress(totalBytes, uploadedBytes, false)
+                .setOngoing(true);
+
+        Notification builtNotification = notification.build();
+
+        if (service.holdForegroundNotification(uploadId, builtNotification)) {
+            notificationManager.cancel(notificationId);
+        } else {
+            notificationManager.notify(notificationId, builtNotification);
+        }
+    }
+
+    private void setRingtone() {
+
+        if(notificationConfig.isRingToneEnabled()) {
+            notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(service, RingtoneManager.TYPE_NOTIFICATION));
+            notification.setOnlyAlertOnce(false);
+        }
+
+    }
+
+    private void updateNotificationCompleted() {
+        if (notificationConfig == null) return;
+
+        notificationManager.cancel(notificationId);
+
+        if (!notificationConfig.isAutoClearOnSuccess()) {
+            notification.setContentTitle(notificationConfig.getTitle())
+                    .setContentText(notificationConfig.getCompletedMessage())
+                    .setContentIntent(notificationConfig.getPendingIntent(service))
+                    .setAutoCancel(notificationConfig.isClearOnAction())
+                    .setSmallIcon(notificationConfig.getIconResourceID())
+                    .setProgress(0, 0, false)
+                    .setOngoing(false);
+            setRingtone();
+
+            // this is needed because the main notification used to show progress is ongoing
+            // and a new one has to be created to allow the user to dismiss it
+            notificationManager.notify(notificationId + 1, notification.build());
+        }
+    }
+
+    private void updateNotificationError() {
+        if (notificationConfig == null) return;
+
+        notificationManager.cancel(notificationId);
+
+        notification.setContentTitle(notificationConfig.getTitle())
+                .setContentText(notificationConfig.getErrorMessage())
+                .setContentIntent(notificationConfig.getPendingIntent(service))
+                .setAutoCancel(notificationConfig.isClearOnAction())
+                .setSmallIcon(notificationConfig.getIconResourceID())
+                .setProgress(0, 0, false).setOngoing(false);
+        setRingtone();
+
+        // this is needed because the main notification used to show progress is ongoing
+        // and a new one has to be created to allow the user to dismiss it
+        notificationManager.notify(notificationId + 1, notification.build());
     }
 }

@@ -1,13 +1,13 @@
 package com.alexbbb.uploadservice;
 
-import android.app.NotificationManager;
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.media.RingtoneManager;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,15 +22,42 @@ import java.util.concurrent.TimeUnit;
  * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
+ * @author mabdurrahman
  */
 public class UploadService extends Service {
 
     private static final String TAG = UploadService.class.getSimpleName();
 
-    private static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
-
-    public static String NAMESPACE = "com.alexbbb";
+    // configurable values
+    /**
+     * Sets how many threads to use to handle concurrent uploads.
+     */
     public static int UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+
+    /**
+     * When the number of threads is greater than UPLOAD_POOL_SIZE, this is the maximum time that
+     * excess idle threads will wait for new tasks before terminating.
+     */
+    public static int KEEP_ALIVE_TIME_IN_SECONDS = 1;
+
+    /**
+     * If set to true, the service will go in foreground mode when doing uploads,
+     * lowering the probability of being killed by the system on low memory.
+     * This setting is used only when your uploads have a notification configuration.
+     * It's not possible to run in foreground without notifications, as per Android policy
+     * constraints, so if you set this to true, but you do upload tasks without a
+     * notification configuration, the service will simply run in background mode.
+     */
+    public static boolean EXECUTE_IN_FOREGROUND = true;
+
+    /**
+     * Sets the namespace used to broadcast events. Set this to your app namespace to avoid
+     * conflicts and unexpected behaviours.
+     */
+    public static String NAMESPACE = "com.alexbbb";
+    // end configurable values
+
+    protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
 
     private static final String ACTION_UPLOAD_SUFFIX = ".uploadservice.action.upload";
     protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
@@ -45,9 +72,6 @@ public class UploadService extends Service {
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
     protected static final String PARAM_CUSTOM_USER_AGENT = "customUserAgent";
     protected static final String PARAM_MAX_RETRIES = "maxRetries";
-
-    protected static final String UPLOAD_BINARY = "binary";
-    protected static final String UPLOAD_MULTIPART = "multipart";
 
     /**
      * The minimum interval between progress reports in milliseconds.
@@ -70,22 +94,12 @@ public class UploadService extends Service {
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
-    private static final String FOREGROUND_ACTION_SUFFIX = ".uploadservice.foreground";
-
-    private int notificationIncremental = 1;
-    private NotificationManager notificationManager;
     private PowerManager.WakeLock wakeLock;
-
-    private boolean takeoverForegroundNotification;
-    private NotificationCompat.Builder tempNotificationToDisplay;
-
-    private static final int KEEP_ALIVE_TIME = 1;
-
+    private int notificationIncrementalId = 0;
     private static final Map<String, HttpUploadTask> uploadTasksMap = new ConcurrentHashMap<>();
-
-    // A queue of Runnable(s)
-    private static final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
-    private static ThreadPoolExecutor uploadThreadPool;
+    private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
+    private static volatile String foregroundUploadId = null;
+    private ThreadPoolExecutor uploadThreadPool;
 
     protected static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
@@ -95,56 +109,50 @@ public class UploadService extends Service {
         return NAMESPACE + BROADCAST_ACTION_SUFFIX;
     }
 
-    protected static String getActionForeground() {
-        return NAMESPACE + FOREGROUND_ACTION_SUFFIX;
-    }
-
     /**
      * Stops the upload task with the given uploadId.
      * @param uploadId The unique upload id
-     * @return {@code true} if an upload task was actually stopped, Otherwise {@code false}.
      */
-    public synchronized static boolean stopUpload(final String uploadId) {
-        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
-        if (uploadTask == null) return false;
-
-        uploadTask.cancel();
-        return true;
+    public static synchronized void stopUpload(final String uploadId) {
+        HttpUploadTask removedTask = uploadTasksMap.get(uploadId);
+        if (removedTask != null) {
+            removedTask.cancel();
+        }
     }
 
     /**
-     * Stops all upload tasks.
-     * @return {@code true} if at least one upload task was actually stopped, Otherwise {@code false}.
+     * Stop all the active uploads.
      */
-    public synchronized static boolean stopAllUploads() {
-        boolean result = false;
-        for (HttpUploadTask uploadTask : uploadTasksMap.values()) {
-            uploadTask.cancel();
-            result = true;
+    public static synchronized void stopAllUploads() {
+        if (uploadTasksMap.isEmpty()) {
+            return;
         }
-        return result;
-    }
 
-    public UploadService() {
-        super();
+        // using iterator instead for each loop, because it's faster on Android
+        Iterator<String> iterator = uploadTasksMap.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            HttpUploadTask taskToCancel = uploadTasksMap.get(iterator.next());
+            taskToCancel.cancel();
+        }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
 
         if (UPLOAD_POOL_SIZE <= 0) {
             UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
         }
+
         // Creates a thread pool manager
         uploadThreadPool = new ThreadPoolExecutor(
                 UPLOAD_POOL_SIZE,       // Initial pool size
                 UPLOAD_POOL_SIZE,       // Max pool size
-                KEEP_ALIVE_TIME,
+                KEEP_ALIVE_TIME_IN_SECONDS,
                 TimeUnit.SECONDS,
                 uploadTasksQueue);
     }
@@ -155,364 +163,104 @@ public class UploadService extends Service {
     }
 
     @Override
-    public synchronized int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            final String action = intent.getAction();
-
-            if (getActionUpload().equals(action)) {
-                UploadNotificationConfig notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
-
-                HttpUploadTask newTask = null;
-
-                String type = intent.getStringExtra(PARAM_TYPE);
-                if (UPLOAD_MULTIPART.equals(type)) {
-                    newTask = new MultipartUploadTask(this, intent);
-                } else if (UPLOAD_BINARY.equals(type)) {
-                    newTask = new BinaryUploadTask(this, intent);
-                }
-
-                if (newTask != null) {
-                    if (shouldTakeoverForegroundNotification() || getRemainingTasks() == 0) {
-                        takeoverForegroundNotification = false;
-
-                        newTask.setNotificationId(0);
-                    } else {
-                        newTask.setNotificationId(notificationIncremental++);
-                    }
-                    newTask.setNotificationConfig(notificationConfig);
-
-                    uploadTasksMap.put(newTask.uploadId, newTask);
-
-                    wakeLock.acquire();
-
-                    createNotification(newTask.uploadId);
-
-                    uploadThreadPool.execute(newTask);
-                }
-            }
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null || !getActionUpload().equals(intent.getAction())) {
+            return START_STICKY;
         }
+
+        HttpUploadTask currentTask = getTask(intent);
+
+        if (currentTask == null) {
+            return START_STICKY;
+        }
+
+        // increment by 2 because the notificationIncrementalId + 1 is used internally
+        // in each HttpUploadTask. Check its sources for more info about this.
+        notificationIncrementalId += 2;
+        currentTask.setLastProgressNotificationTime(0)
+                   .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
+
+        wakeLock.acquire();
+
+        uploadTasksMap.put(currentTask.uploadId, currentTask);
+        uploadThreadPool.execute(currentTask);
+
         return START_STICKY;
     }
 
-    synchronized void broadcastProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
-        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
-        if (uploadTask == null)
-            return;
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-        long currentTime = System.currentTimeMillis();
-        if (currentTime < uploadTask.getLastProgressNotificationTime() + PROGRESS_REPORT_INTERVAL) {
-            return;
+        stopAllUploads();
+        uploadThreadPool.shutdown();
+
+        if (EXECUTE_IN_FOREGROUND) {
+            stopForeground(true);
         }
 
-        uploadTask.setLastProgressNotificationTime(currentTime);
-
-        updateNotificationProgress(uploadId, (int) uploadedBytes, (int) totalBytes);
-
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_IN_PROGRESS);
-
-        final int percentsProgress = (int) (uploadedBytes * 100 / totalBytes);
-        intent.putExtra(PROGRESS, percentsProgress);
-
-        intent.putExtra(PROGRESS_UPLOADED_BYTES, uploadedBytes);
-        intent.putExtra(PROGRESS_TOTAL_BYTES, totalBytes);
-        sendBroadcast(intent);
+        Log.d(TAG, "UploadService destroyed");
     }
 
-    synchronized void broadcastCompleted(final String uploadId, final int responseCode, final String responseMessage) {
-        final String filteredMessage;
-        if (responseMessage == null) {
-            filteredMessage = "";
-        } else {
-            filteredMessage = responseMessage;
+    /**
+     * Creates a new task instance based on the requested task type in the intent.
+     * @param intent
+     * @return task instance or null if the type is not supported or invalid
+     */
+    HttpUploadTask getTask(Intent intent) {
+        String type = intent.getStringExtra(PARAM_TYPE);
+
+        if (MultipartUploadRequest.NAME.equals(type)) {
+            return new MultipartUploadTask(this, intent);
         }
 
-        if (responseCode >= 200 && responseCode <= 299)
-            updateNotificationCompleted(uploadId);
-        else
-            updateNotificationError(uploadId);
-
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_COMPLETED);
-        intent.putExtra(SERVER_RESPONSE_CODE, responseCode);
-        intent.putExtra(SERVER_RESPONSE_MESSAGE, filteredMessage);
-        sendBroadcast(intent);
-
-        uploadTasksMap.remove(uploadId);
-    }
-
-    synchronized void broadcastError(final String uploadId, final Exception exception) {
-        updateNotificationError(uploadId);
-
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.setAction(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_ERROR);
-        intent.putExtra(ERROR_EXCEPTION, exception);
-        sendBroadcast(intent);
-
-        uploadTasksMap.remove(uploadId);
-    }
-
-    synchronized void broadcastCancelled(final String uploadId) {
-        updateNotificationCancelled(uploadId);
-
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.setAction(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_CANCELLED);
-        sendBroadcast(intent);
-
-        uploadTasksMap.remove(uploadId);
-    }
-
-    private void createNotification(final String uploadId) {
-        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
-        if (uploadTask == null) return;
-
-        UploadNotificationConfig notificationConfig = uploadTask.getNotificationConfig();
-        if (notificationConfig == null) return;
-
-        if (getRemainingTasks() == 0) {
-            startForeground(UPLOAD_NOTIFICATION_BASE_ID, new NotificationCompat.Builder(this).build());
+        if (BinaryUploadRequest.NAME.equals(type)) {
+            return new BinaryUploadTask(this, intent);
         }
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(this)
-                .setContentTitle(notificationConfig.getTitle())
-                .setContentText(notificationConfig.getInProgressMessage())
-                .setContentIntent(notificationConfig.getPendingIntent(this))
-                .setSmallIcon(notificationConfig.getIconResourceID())
-                .setProgress(100, 0, true)
-                .setOngoing(true);
-
-        notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + uploadTask.getNotificationId(), notification.build());
+        return null;
     }
 
-    private void updateNotificationProgress(final String uploadId, int uploadedBytes, int totalBytes) {
-        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
-        if (uploadTask == null) return;
+    /**
+     * Check if the task is currently the one shown in the foreground notification.
+     * @param uploadId ID of the upload
+     * @return true if the current upload task holds the foreground notification, otherwise false
+     */
+    protected synchronized boolean holdForegroundNotification(String uploadId, Notification notification) {
+        if (!EXECUTE_IN_FOREGROUND) return false;
 
-        UploadNotificationConfig notificationConfig = uploadTask.getNotificationConfig();
-        if (notificationConfig == null) return;
-
-        int oldNotificationId = -1;
-        if (shouldTakeoverForegroundNotification()) {
-            oldNotificationId = uploadTask.getNotificationId();
-
-            takeoverForegroundNotification = false;
-            uploadTask.setNotificationId(0);
+        if (foregroundUploadId == null) {
+            foregroundUploadId = uploadId;
+            Log.d(TAG, uploadId + " now holds the foreground notification");
         }
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(this)
-                .setContentTitle(notificationConfig.getTitle())
-                .setContentText(notificationConfig.getInProgressMessage())
-                .setContentIntent(notificationConfig.getPendingIntent(this))
-                .setSmallIcon(notificationConfig.getIconResourceID())
-                .setProgress(totalBytes, uploadedBytes, false)
-                .setOngoing(true);
-
-        if (oldNotificationId != -1) {
-            if (tempNotificationToDisplay != null) {
-                notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + oldNotificationId, tempNotificationToDisplay.build());
-
-                tempNotificationToDisplay = null;
-            } else {
-                notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID + oldNotificationId);
-            }
+        if (uploadId.equals(foregroundUploadId)) {
+            startForeground(UPLOAD_NOTIFICATION_BASE_ID, notification);
+            return true;
         }
-        notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + uploadTask.getNotificationId(), notification.build());
+
+        return false;
     }
 
-    private void updateNotificationCompleted(final String uploadId) {
-        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
-        if (uploadTask == null) return;
+    /**
+     * Called by each task when it is completed (either successfully, with an error or due to
+     * user cancellation).
+     * @param uploadId the uploadID of the finished task
+     */
+    protected synchronized void taskCompleted(String uploadId) {
+        HttpUploadTask task = uploadTasksMap.remove(uploadId);
 
-        UploadNotificationConfig notificationConfig = uploadTask.getNotificationConfig();
-        if (notificationConfig == null) return;
+        // un-hold foreground upload ID if it's been hold
+        if (EXECUTE_IN_FOREGROUND && task != null && task.uploadId.equals(foregroundUploadId)) {
+            Log.d(TAG, uploadId + " now un-holded the foreground notification");
+            foregroundUploadId = null;
+        }
 
-        if (getRemainingTasks() <= 1) {
-            stopForeground((uploadTask.getNotificationId() == 0 && notificationConfig.isAutoClearOnSuccess()) || shouldTakeoverForegroundNotification());
-
-            takeoverForegroundNotification = false;
-
-            if (tempNotificationToDisplay != null) {
-                notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + notificationIncremental++, tempNotificationToDisplay.build());
-
-                tempNotificationToDisplay = null;
-            }
-
+        // when all the upload tasks are completed, release the wake lock and shut down the service
+        if (uploadTasksMap.isEmpty()) {
+            Log.d(TAG, "All tasks finished. UploadService is about to shutdown...");
             wakeLock.release();
+            stopSelf();
         }
-
-        if (uploadTask.getNotificationId() != 0) {
-            if (!notificationConfig.isAutoClearOnSuccess()) {
-                NotificationCompat.Builder notification = new NotificationCompat.Builder(this)
-                        .setContentTitle(notificationConfig.getTitle())
-                        .setContentText(notificationConfig.getCompletedMessage())
-                        .setContentIntent(notificationConfig.getPendingIntent(this))
-                        .setAutoCancel(notificationConfig.isClearOnAction())
-                        .setSmallIcon(notificationConfig.getIconResourceID())
-                        .setProgress(0, 0, false)
-                        .setOngoing(false);
-                setRingtone(uploadId, notification);
-
-                notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + uploadTask.getNotificationId(), notification.build());
-            } else {
-                notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID + uploadTask.getNotificationId());
-            }
-        } else {
-            if (!notificationConfig.isAutoClearOnSuccess()) {
-                tempNotificationToDisplay = new NotificationCompat.Builder(this)
-                        .setContentTitle(notificationConfig.getTitle())
-                        .setContentText(notificationConfig.getCompletedMessage())
-                        .setContentIntent(notificationConfig.getPendingIntent(this))
-                        .setAutoCancel(notificationConfig.isClearOnAction())
-                        .setSmallIcon(notificationConfig.getIconResourceID())
-                        .setProgress(0, 0, false)
-                        .setOngoing(false);
-                setRingtone(uploadId, tempNotificationToDisplay);
-
-                if (getRemainingTasks() <= 1) {
-                    notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID);
-
-                    notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + notificationIncremental++, tempNotificationToDisplay.build());
-
-                    tempNotificationToDisplay = null;
-                }
-            }
-
-            takeoverForegroundNotification = true;
-        }
-    }
-
-    private void updateNotificationError(final String uploadId) {
-        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
-        if (uploadTask == null) return;
-
-        UploadNotificationConfig notificationConfig = uploadTask.getNotificationConfig();
-        if (notificationConfig == null) return;
-
-        if (shouldTakeoverForegroundNotification()) {
-            int oldNotificationId = uploadTask.getNotificationId();
-
-            takeoverForegroundNotification = false;
-            uploadTask.setNotificationId(0);
-
-            if (tempNotificationToDisplay != null) {
-                notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + oldNotificationId, tempNotificationToDisplay.build());
-
-                tempNotificationToDisplay = null;
-            } else {
-                notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID + oldNotificationId);
-            }
-        }
-
-        if (getRemainingTasks() <= 1) {
-            stopForeground(false);
-
-            takeoverForegroundNotification = false;
-
-            if (tempNotificationToDisplay != null) {
-                notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + notificationIncremental++, tempNotificationToDisplay.build());
-
-                tempNotificationToDisplay = null;
-            }
-
-            wakeLock.release();
-        }
-
-        if (uploadTask.getNotificationId() != 0) {
-            NotificationCompat.Builder notification = new NotificationCompat.Builder(this)
-                    .setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getErrorMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setAutoCancel(notificationConfig.isClearOnAction())
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(0, 0, false)
-                    .setOngoing(false);
-            setRingtone(uploadId, notification);
-            notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + uploadTask.getNotificationId(), notification.build());
-        } else {
-            tempNotificationToDisplay = new NotificationCompat.Builder(this)
-                    .setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getCompletedMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setAutoCancel(notificationConfig.isClearOnAction())
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(0, 0, false)
-                    .setOngoing(false);
-            setRingtone(uploadId, tempNotificationToDisplay);
-
-            if (getRemainingTasks() <= 1) {
-                notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID);
-
-                notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + notificationIncremental++, tempNotificationToDisplay.build());
-
-                tempNotificationToDisplay = null;
-            } else {
-                takeoverForegroundNotification = true;
-            }
-        }
-    }
-
-    private void updateNotificationCancelled(final String uploadId) {
-        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
-        if (uploadTask == null) return;
-
-        UploadNotificationConfig notificationConfig = uploadTask.getNotificationConfig();
-        if (notificationConfig == null) return;
-
-        if (shouldTakeoverForegroundNotification()) {
-            int oldNotificationId = uploadTask.getNotificationId();
-
-            takeoverForegroundNotification = false;
-            uploadTask.setNotificationId(0);
-
-            if (tempNotificationToDisplay != null) {
-                notificationManager.notify(UPLOAD_NOTIFICATION_BASE_ID + oldNotificationId, tempNotificationToDisplay.build());
-
-                tempNotificationToDisplay = null;
-            } else {
-                notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID + oldNotificationId);
-            }
-        }
-
-        if (uploadTask.getNotificationId() != 0) {
-            notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID + uploadTask.getNotificationId());
-        } else {
-            if (getRemainingTasks() <= 1) {
-                notificationManager.cancel(UPLOAD_NOTIFICATION_BASE_ID);
-            } else {
-                takeoverForegroundNotification = true;
-            }
-        }
-
-        uploadThreadPool.remove(uploadTask);
-    }
-
-    private void setRingtone(final String uploadId, NotificationCompat.Builder notification) {
-        HttpUploadTask uploadTask = uploadTasksMap.get(uploadId);
-        if (uploadTask == null) return;
-
-        UploadNotificationConfig notificationConfig = uploadTask.getNotificationConfig();
-        if (notificationConfig == null) return;
-
-        if(notificationConfig.isRingToneEnabled()) {
-            notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION));
-            notification.setOnlyAlertOnce(false);
-        }
-    }
-
-    private synchronized boolean shouldTakeoverForegroundNotification() {
-        return takeoverForegroundNotification;
-    }
-
-    private synchronized long getRemainingTasks() {
-        if (uploadTasksMap == null)
-            return 0;
-
-        return uploadTasksMap.size();
     }
 }

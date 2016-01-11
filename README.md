@@ -50,7 +50,7 @@ and now you're ready to rock!
 
 <em>I strongly encourage you to build and run the demo app that you can find in the [examples](#examples), together with one of the provided server implementations and to check [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/).</em>
 
-### HTTP Multipart Upload
+### [HTTP Multipart Upload](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/MultipartUploadRequest.html)
 This is the most common way to upload files on a server. It's the same kind of request that browsers do when you use the `<form>` tag with one or more files. Here's a minimal example:
 
 ```java
@@ -73,7 +73,7 @@ public void uploadMultipart(final Context context) {
 }
 ```
 
-### Binary Upload
+### [Binary Upload](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/BinaryUploadRequest.html)
 The binary upload uses a single file as the raw body of the upload request.
 
 ``` java
@@ -96,7 +96,7 @@ public void uploadBinary(final Context context) {
 ```
 
 ### Monitoring upload status
-To listen for the status of the upload service, use the provided `UploadServiceBroadcastReceiver`. Override its methods to add your own business logic. Example on how to use it in an activity:
+To listen for the status of the upload service, use the provided [UploadServiceBroadcastReceiver](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/UploadServiceBroadcastReceiver.html). Override its methods to add your own business logic. Example on how to use it in an activity:
 
 ```java
 public class YourActivity extends Activity {
@@ -227,7 +227,7 @@ Let's face it, doing network programming is not easy as there are many things th
 * Check [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/) for full class and methods docs
 * Is the server URL correct?
 * Is the server URL reachable from your device? Check if there are firewalls or other kind of restrictions between your device and the server.
-* Are you sure that the server side is working properly?
+* Are you sure that the server side is working properly? For example, if you use PHP in your server side, and you get an EPIPE exception, check if the content size you are trying to upload exceeds the values of `upload_max_filesize` or `post_max_size` set in your `php.ini`
 * Have you properly set up the request with all the headers, parameters and files that the server expects?
 * Have you tried to make an upload using the demo app and one of the provided server implementations? I use the node.js version which provides good feedback and supports both HTTP Multipart and binary uploads.
 
