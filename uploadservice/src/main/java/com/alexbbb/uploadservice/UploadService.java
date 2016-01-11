@@ -195,6 +195,11 @@ public class UploadService extends Service {
 
         stopAllUploads();
         uploadThreadPool.shutdown();
+
+        if (EXECUTE_IN_FOREGROUND) {
+            stopForeground(true);
+        }
+
         Log.d(TAG, "UploadService destroyed");
     }
 
@@ -254,9 +259,6 @@ public class UploadService extends Service {
 
         // when all the upload tasks are completed, release the wake lock and shut down the service
         if (uploadTasksMap.isEmpty()) {
-            if (EXECUTE_IN_FOREGROUND && task != null) {
-                stopForeground(true);
-            }
             Log.d(TAG, "All tasks finished. UploadService is about to shutdown...");
             wakeLock.release();
             stopSelf();
