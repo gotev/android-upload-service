@@ -1,6 +1,7 @@
 package com.alexbbb.uploadservice;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -48,7 +49,7 @@ abstract class HttpUploadTask implements Runnable {
     private long lastProgressNotificationTime;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder notification;
-    private UploadNotificationConfig notificationConfig;
+    protected UploadNotificationConfig notificationConfig;
 
     protected long totalBodyBytes;
     protected long uploadedBodyBytes;
@@ -262,18 +263,6 @@ abstract class HttpUploadTask implements Runnable {
         }
     }
 
-    private void createNotification() {
-        if (notificationConfig == null) return;
-
-        notification.setContentTitle(notificationConfig.getTitle())
-                .setContentText(notificationConfig.getInProgressMessage())
-                .setContentIntent(notificationConfig.getPendingIntent(service))
-                .setSmallIcon(notificationConfig.getIconResourceID())
-                .setProgress(100, 0, true).setOngoing(true);
-
-        notificationManager.notify(notificationId, notification.build());
-    }
-
     protected void broadcastProgress(final long uploadedBytes, final long totalBytes) {
 
         long currentTime = System.currentTimeMillis();
@@ -282,8 +271,6 @@ abstract class HttpUploadTask implements Runnable {
         }
 
         lastProgressNotificationTime = currentTime;
-
-        updateNotificationProgress((int)uploadedBytes, (int)totalBytes);
 
         final Intent intent = new Intent(UploadService.getActionBroadcast());
         intent.putExtra(UploadService.UPLOAD_ID, uploadId);
@@ -295,6 +282,73 @@ abstract class HttpUploadTask implements Runnable {
         intent.putExtra(UploadService.PROGRESS_UPLOADED_BYTES, uploadedBytes);
         intent.putExtra(UploadService.PROGRESS_TOTAL_BYTES, totalBytes);
         service.sendBroadcast(intent);
+
+        updateNotificationProgress((int) uploadedBytes, (int) totalBytes);
+    }
+
+    void broadcastCompleted(final int responseCode, final String responseMessage) {
+
+        final String filteredMessage;
+        if (responseMessage == null) {
+            filteredMessage = "";
+        } else {
+            filteredMessage = responseMessage;
+        }
+
+        final Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
+        intent.putExtra(UploadService.STATUS, UploadService.STATUS_COMPLETED);
+        intent.putExtra(UploadService.SERVER_RESPONSE_CODE, responseCode);
+        intent.putExtra(UploadService.SERVER_RESPONSE_MESSAGE, filteredMessage);
+        service.sendBroadcast(intent);
+
+        if (responseCode >= 200 && responseCode <= 299)
+            updateNotificationCompleted();
+        else
+            updateNotificationError();
+
+        service.taskCompleted(uploadId);
+    }
+
+    void broadcastError(final Exception exception) {
+
+        final Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
+        intent.putExtra(UploadService.STATUS, UploadService.STATUS_ERROR);
+        intent.putExtra(UploadService.ERROR_EXCEPTION, exception);
+        service.sendBroadcast(intent);
+
+        updateNotificationError();
+
+        service.taskCompleted(uploadId);
+    }
+
+    void broadcastCancelled() {
+        final Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
+        intent.putExtra(UploadService.STATUS, UploadService.STATUS_CANCELLED);
+        service.sendBroadcast(intent);
+
+        updateNotificationError();
+    }
+
+    private void createNotification() {
+        if (notificationConfig == null) return;
+
+        notification.setContentTitle(notificationConfig.getTitle())
+                .setContentText(notificationConfig.getInProgressMessage())
+                .setContentIntent(notificationConfig.getPendingIntent(service))
+                .setSmallIcon(notificationConfig.getIconResourceID())
+                .setProgress(100, 0, true)
+                .setOngoing(true);
+
+        Notification builtNotification = notification.build();
+
+        if (service.holdForegroundNotification(uploadId, builtNotification)) {
+            notificationManager.cancel(notificationId);
+        } else {
+            notificationManager.notify(notificationId, builtNotification);
+        }
     }
 
     private void updateNotificationProgress(int uploadedBytes, int totalBytes) {
@@ -307,30 +361,22 @@ abstract class HttpUploadTask implements Runnable {
                 .setProgress(totalBytes, uploadedBytes, false)
                 .setOngoing(true);
 
-        notificationManager.notify(notificationId, notification.build());
+        Notification builtNotification = notification.build();
+
+        if (service.holdForegroundNotification(uploadId, builtNotification)) {
+            notificationManager.cancel(notificationId);
+        } else {
+            notificationManager.notify(notificationId, builtNotification);
+        }
     }
 
-    void broadcastCompleted(final int responseCode, final String responseMessage) {
+    private void setRingtone() {
 
-        final String filteredMessage;
-        if (responseMessage == null) {
-            filteredMessage = "";
-        } else {
-            filteredMessage = responseMessage;
+        if(notificationConfig.isRingToneEnabled()) {
+            notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(service, RingtoneManager.TYPE_NOTIFICATION));
+            notification.setOnlyAlertOnce(false);
         }
 
-        if (responseCode >= 200 && responseCode <= 299)
-            updateNotificationCompleted();
-        else
-            updateNotificationError();
-
-        final Intent intent = new Intent(UploadService.getActionBroadcast());
-        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
-        intent.putExtra(UploadService.STATUS, UploadService.STATUS_COMPLETED);
-        intent.putExtra(UploadService.SERVER_RESPONSE_CODE, responseCode);
-        intent.putExtra(UploadService.SERVER_RESPONSE_MESSAGE, filteredMessage);
-        service.sendBroadcast(intent);
-        service.taskCompleted(uploadId);
     }
 
     private void updateNotificationCompleted() {
@@ -352,36 +398,6 @@ abstract class HttpUploadTask implements Runnable {
             // and a new one has to be created to allow the user to dismiss it
             notificationManager.notify(notificationId + 1, notification.build());
         }
-    }
-
-    void broadcastError(final Exception exception) {
-
-        updateNotificationError();
-
-        final Intent intent = new Intent(UploadService.getActionBroadcast());
-        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
-        intent.putExtra(UploadService.STATUS, UploadService.STATUS_ERROR);
-        intent.putExtra(UploadService.ERROR_EXCEPTION, exception);
-        service.sendBroadcast(intent);
-        service.taskCompleted(uploadId);
-    }
-
-    void broadcastCancelled() {
-        updateNotificationError();
-
-        final Intent intent = new Intent(UploadService.getActionBroadcast());
-        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
-        intent.putExtra(UploadService.STATUS, UploadService.STATUS_CANCELLED);
-        service.sendBroadcast(intent);
-    }
-
-    private void setRingtone() {
-
-        if(notificationConfig.isRingToneEnabled()) {
-            notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(service, RingtoneManager.TYPE_NOTIFICATION));
-            notification.setOnlyAlertOnce(false);
-        }
-
     }
 
     private void updateNotificationError() {

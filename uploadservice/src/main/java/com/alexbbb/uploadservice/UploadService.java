@@ -1,5 +1,6 @@
 package com.alexbbb.uploadservice;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -27,11 +28,37 @@ public class UploadService extends Service {
 
     private static final String TAG = UploadService.class.getSimpleName();
 
-    private static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
+    // configurable values
+    /**
+     * Sets how many threads to use to handle concurrent uploads.
+     */
     public static int UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+
+    /**
+     * When the number of threads is greater than UPLOAD_POOL_SIZE, this is the maximum time that
+     * excess idle threads will wait for new tasks before terminating.
+     */
     public static int KEEP_ALIVE_TIME_IN_SECONDS = 1;
 
+    /**
+     * If set to true, the service will go in foreground mode when doing uploads,
+     * lowering the probability of being killed by the system on low memory.
+     * This setting is used only when your uploads have a notification configuration.
+     * It's not possible to run in foreground without notifications, as per Android policy
+     * constraints, so if you set this to true, but you do upload tasks without a
+     * notification configuration, the service will simply run in background mode without
+     * raising any exception.
+     */
+    public static boolean EXECUTE_IN_FOREGROUND = true;
+
+    /**
+     * Sets the namespace used to broadcast events. Set this to your app namespace to avoid
+     * conflicts and unexpected behaviours.
+     */
     public static String NAMESPACE = "com.alexbbb";
+    // end configurable values
+
+    protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
 
     private static final String ACTION_UPLOAD_SUFFIX = ".uploadservice.action.upload";
     protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
@@ -72,6 +99,7 @@ public class UploadService extends Service {
     private int notificationIncrementalId = 0;
     private static final Map<String, HttpUploadTask> uploadTasksMap = new ConcurrentHashMap<>();
     private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
+    private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
 
     protected static String getActionUpload() {
@@ -147,11 +175,11 @@ public class UploadService extends Service {
             return START_STICKY;
         }
 
-        currentTask.setLastProgressNotificationTime(0)
-                   .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
         // increment by 2 because the notificationIncrementalId + 1 is used internally
         // in each HttpUploadTask. Check its sources for more info about this.
         notificationIncrementalId += 2;
+        currentTask.setLastProgressNotificationTime(0)
+                   .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
 
         wakeLock.acquire();
 
@@ -190,15 +218,45 @@ public class UploadService extends Service {
     }
 
     /**
+     * Check if the task is currently the one shown in the foreground notification.
+     * @param uploadId ID of the upload
+     * @return true if the current upload task holds the foreground notification, otherwise false
+     */
+    protected synchronized boolean holdForegroundNotification(String uploadId, Notification notification) {
+        if (!EXECUTE_IN_FOREGROUND) return false;
+
+        if (foregroundUploadId == null) {
+            foregroundUploadId = uploadId;
+            Log.d(TAG, uploadId + " now holds the foreground notification");
+        }
+
+        if (uploadId.equals(foregroundUploadId)) {
+            startForeground(UPLOAD_NOTIFICATION_BASE_ID, notification);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Called by each task when it is completed (either successfully, with an error or due to
      * user cancellation).
      * @param uploadId the uploadID of the finished task
      */
     protected synchronized void taskCompleted(String uploadId) {
-        uploadTasksMap.remove(uploadId);
+        HttpUploadTask task = uploadTasksMap.remove(uploadId);
+
+        // un-hold foreground upload ID if it's been hold
+        if (EXECUTE_IN_FOREGROUND && task != null && task.uploadId.equals(foregroundUploadId)) {
+            Log.d(TAG, uploadId + " now un-holded the foreground notification");
+            foregroundUploadId = null;
+        }
 
         // when all the upload tasks are completed, release the wake lock and shut down the service
         if (uploadTasksMap.isEmpty()) {
+            if (EXECUTE_IN_FOREGROUND && task != null) {
+                stopForeground(true);
+            }
             Log.d(TAG, "All tasks finished. UploadService is about to shutdown...");
             wakeLock.release();
             stopSelf();
