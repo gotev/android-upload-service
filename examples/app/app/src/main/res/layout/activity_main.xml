@@ -23,7 +23,6 @@
         <EditText
             android:id="@+id/serverURL"
             android:inputType="textUri"
-            android:text="http://posttestserver.com/post.php?dump&amp;dir=mabdurrahman"
             android:hint="@string/server_url_hint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
