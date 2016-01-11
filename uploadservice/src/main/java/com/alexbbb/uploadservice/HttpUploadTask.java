@@ -87,7 +87,7 @@ abstract class HttpUploadTask implements Runnable {
                 break;
             } catch (Exception exc) {
                 if (!shouldContinue) {
-                    broadcastCancelled();
+                    break;
                 } else if (attempts > maxRetries) {
                     broadcastError(exc);
                 } else {
@@ -102,6 +102,10 @@ abstract class HttpUploadTask implements Runnable {
                     }
                 }
             }
+        }
+
+        if (!shouldContinue) {
+            broadcastCancelled();
         }
     }
 
