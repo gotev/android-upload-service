@@ -46,8 +46,7 @@ public class UploadService extends Service {
      * This setting is used only when your uploads have a notification configuration.
      * It's not possible to run in foreground without notifications, as per Android policy
      * constraints, so if you set this to true, but you do upload tasks without a
-     * notification configuration, the service will simply run in background mode without
-     * raising any exception.
+     * notification configuration, the service will simply run in background mode.
      */
     public static boolean EXECUTE_IN_FOREGROUND = true;
 
