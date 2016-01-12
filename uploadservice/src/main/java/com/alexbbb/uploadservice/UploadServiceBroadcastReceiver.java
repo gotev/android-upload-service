@@ -15,6 +15,7 @@ import android.content.IntentFilter;
  * @author alexbbb (Alex Gotev)
  * @author eliasnaur
  * @author cankov
+ * @author mabdurrahman
  *
  */
 public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
@@ -48,6 +49,10 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
                         final long totalBytes = intent.getLongExtra(UploadService.PROGRESS_TOTAL_BYTES, 1);
                         onProgress(uploadId, uploadedBytes, totalBytes);
 
+                        break;
+
+                    case UploadService.STATUS_CANCELLED:
+                        onCancelled(uploadId);
                         break;
 
                     default:
@@ -126,5 +131,13 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
      */
     public void onCompleted(final String uploadId, final int serverResponseCode,
                             final String serverResponseMessage) {
+    }
+
+    /**
+     * Called when the upload is cancelled. Override this method to add your own logic.
+     *
+     * @param uploadId unique ID of the upload request
+     */
+    public void onCancelled(final String uploadId) {
     }
 }

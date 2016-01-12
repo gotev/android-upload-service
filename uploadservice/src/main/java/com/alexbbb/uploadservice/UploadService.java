@@ -1,12 +1,19 @@
 package com.alexbbb.uploadservice;
 
-import android.app.IntentService;
-import android.app.NotificationManager;
+import android.app.Notification;
+import android.app.Service;
 import android.content.Intent;
-import android.media.RingtoneManager;
+import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.Builder;
+import android.util.Log;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Service to upload files in background using HTTP POST with notification center progress
@@ -15,16 +22,42 @@ import android.support.v4.app.NotificationCompat.Builder;
  * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
+ * @author mabdurrahman
  */
-public class UploadService extends IntentService {
+public class UploadService extends Service {
 
-    private static final String SERVICE_NAME = UploadService.class.getName();
-    private static final String TAG = "UploadService";
+    private static final String TAG = UploadService.class.getSimpleName();
 
-    private static final int UPLOAD_NOTIFICATION_ID = 1234; // Something unique
-    private static final int UPLOAD_NOTIFICATION_ID_DONE = 1235; // Something unique
+    // configurable values
+    /**
+     * Sets how many threads to use to handle concurrent uploads.
+     */
+    public static int UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
 
+    /**
+     * When the number of threads is greater than UPLOAD_POOL_SIZE, this is the maximum time that
+     * excess idle threads will wait for new tasks before terminating.
+     */
+    public static int KEEP_ALIVE_TIME_IN_SECONDS = 1;
+
+    /**
+     * If set to true, the service will go in foreground mode when doing uploads,
+     * lowering the probability of being killed by the system on low memory.
+     * This setting is used only when your uploads have a notification configuration.
+     * It's not possible to run in foreground without notifications, as per Android policy
+     * constraints, so if you set this to true, but you do upload tasks without a
+     * notification configuration, the service will simply run in background mode.
+     */
+    public static boolean EXECUTE_IN_FOREGROUND = true;
+
+    /**
+     * Sets the namespace used to broadcast events. Set this to your app namespace to avoid
+     * conflicts and unexpected behaviours.
+     */
     public static String NAMESPACE = "com.alexbbb";
+    // end configurable values
+
+    protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
 
     private static final String ACTION_UPLOAD_SUFFIX = ".uploadservice.action.upload";
     protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
@@ -40,9 +73,6 @@ public class UploadService extends IntentService {
     protected static final String PARAM_CUSTOM_USER_AGENT = "customUserAgent";
     protected static final String PARAM_MAX_RETRIES = "maxRetries";
 
-    protected static final String UPLOAD_BINARY = "binary";
-    protected static final String UPLOAD_MULTIPART = "multipart";
-
     /**
      * The minimum interval between progress reports in milliseconds.
      * If the upload Tasks report more frequently, we will throttle notifications.
@@ -56,6 +86,7 @@ public class UploadService extends IntentService {
     public static final int STATUS_IN_PROGRESS = 1;
     public static final int STATUS_COMPLETED = 2;
     public static final int STATUS_ERROR = 3;
+    public static final int STATUS_CANCELLED = 4;
     public static final String PROGRESS = "progress";
     public static final String PROGRESS_UPLOADED_BYTES = "progressUploadedBytes";
     public static final String PROGRESS_TOTAL_BYTES = "progressTotalBytes";
@@ -63,13 +94,12 @@ public class UploadService extends IntentService {
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
     public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
 
-    private NotificationManager notificationManager;
-    private Builder notification;
     private PowerManager.WakeLock wakeLock;
-    private UploadNotificationConfig notificationConfig;
-    private long lastProgressNotificationTime;
-
-    private static HttpUploadTask currentTask;
+    private int notificationIncrementalId = 0;
+    private static final Map<String, HttpUploadTask> uploadTasksMap = new ConcurrentHashMap<>();
+    private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
+    private static volatile String foregroundUploadId = null;
+    private ThreadPoolExecutor uploadThreadPool;
 
     protected static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
@@ -80,178 +110,157 @@ public class UploadService extends IntentService {
     }
 
     /**
-     * Stops the currently active upload task.
+     * Stops the upload task with the given uploadId.
+     * @param uploadId The unique upload id
      */
-    public static void stopCurrentUpload() {
-        if (currentTask != null) {
-            currentTask.cancel();
+    public static synchronized void stopUpload(final String uploadId) {
+        HttpUploadTask removedTask = uploadTasksMap.get(uploadId);
+        if (removedTask != null) {
+            removedTask.cancel();
         }
     }
 
-    public UploadService() {
-        super(SERVICE_NAME);
+    /**
+     * Stop all the active uploads.
+     */
+    public static synchronized void stopAllUploads() {
+        if (uploadTasksMap.isEmpty()) {
+            return;
+        }
+
+        // using iterator instead for each loop, because it's faster on Android
+        Iterator<String> iterator = uploadTasksMap.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            HttpUploadTask taskToCancel = uploadTasksMap.get(iterator.next());
+            taskToCancel.cancel();
+        }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notification = new NotificationCompat.Builder(this);
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+
+        if (UPLOAD_POOL_SIZE <= 0) {
+            UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+        }
+
+        // Creates a thread pool manager
+        uploadThreadPool = new ThreadPoolExecutor(
+                UPLOAD_POOL_SIZE,       // Initial pool size
+                UPLOAD_POOL_SIZE,       // Max pool size
+                KEEP_ALIVE_TIME_IN_SECONDS,
+                TimeUnit.SECONDS,
+                uploadTasksQueue);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-
-            if (getActionUpload().equals(action)) {
-                notificationConfig = intent.getParcelableExtra(PARAM_NOTIFICATION_CONFIG);
-
-                String type = intent.getStringExtra(PARAM_TYPE);
-                if (UPLOAD_MULTIPART.equals(type)) {
-                    currentTask = new MultipartUploadTask(this, intent);
-                } else if (UPLOAD_BINARY.equals(type)) {
-                    currentTask = new BinaryUploadTask(this, intent);
-                } else {
-                    return;
-                }
-
-                lastProgressNotificationTime = 0;
-                wakeLock.acquire();
-
-                createNotification();
-
-                currentTask.run();
-            }
-        }
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
-    void broadcastProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
-
-        long currentTime = System.currentTimeMillis();
-        if (currentTime < lastProgressNotificationTime + PROGRESS_REPORT_INTERVAL) {
-            return;
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null || !getActionUpload().equals(intent.getAction())) {
+            return START_STICKY;
         }
 
-        lastProgressNotificationTime = currentTime;
+        HttpUploadTask currentTask = getTask(intent);
 
-        updateNotificationProgress((int)uploadedBytes, (int)totalBytes);
-
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_IN_PROGRESS);
-
-        final int percentsProgress = (int) (uploadedBytes * 100 / totalBytes);
-        intent.putExtra(PROGRESS, percentsProgress);
-
-        intent.putExtra(PROGRESS_UPLOADED_BYTES, uploadedBytes);
-        intent.putExtra(PROGRESS_TOTAL_BYTES, totalBytes);
-        sendBroadcast(intent);
-    }
-
-    void broadcastCompleted(final String uploadId, final int responseCode, final String responseMessage) {
-
-        final String filteredMessage;
-        if (responseMessage == null) {
-            filteredMessage = "";
-        } else {
-            filteredMessage = responseMessage;
+        if (currentTask == null) {
+            return START_STICKY;
         }
 
-        if (responseCode >= 200 && responseCode <= 299)
-            updateNotificationCompleted();
-        else
-            updateNotificationError();
+        // increment by 2 because the notificationIncrementalId + 1 is used internally
+        // in each HttpUploadTask. Check its sources for more info about this.
+        notificationIncrementalId += 2;
+        currentTask.setLastProgressNotificationTime(0)
+                   .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
 
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_COMPLETED);
-        intent.putExtra(SERVER_RESPONSE_CODE, responseCode);
-        intent.putExtra(SERVER_RESPONSE_MESSAGE, filteredMessage);
-        sendBroadcast(intent);
-        wakeLock.release();
+        wakeLock.acquire();
+
+        uploadTasksMap.put(currentTask.uploadId, currentTask);
+        uploadThreadPool.execute(currentTask);
+
+        return START_STICKY;
     }
 
-    void broadcastError(final String uploadId, final Exception exception) {
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-        updateNotificationError();
+        stopAllUploads();
+        uploadThreadPool.shutdown();
 
-        final Intent intent = new Intent(getActionBroadcast());
-        intent.setAction(getActionBroadcast());
-        intent.putExtra(UPLOAD_ID, uploadId);
-        intent.putExtra(STATUS, STATUS_ERROR);
-        intent.putExtra(ERROR_EXCEPTION, exception);
-        sendBroadcast(intent);
-        wakeLock.release();
-    }
-
-    private void createNotification() {
-        if (notificationConfig == null) return;
-
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getInProgressMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(100, 0, true).setOngoing(true);
-
-        startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
-    }
-
-    private void updateNotificationProgress(int uploadedBytes, int totalBytes) {
-        if (notificationConfig == null) return;
-
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getInProgressMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(totalBytes, uploadedBytes, false)
-                    .setOngoing(true);
-
-        startForeground(UPLOAD_NOTIFICATION_ID, notification.build());
-    }
-
-    private void updateNotificationCompleted() {
-        if (notificationConfig == null) return;
-
-        stopForeground(notificationConfig.isAutoClearOnSuccess());
-
-        if (!notificationConfig.isAutoClearOnSuccess()) {
-            notification.setContentTitle(notificationConfig.getTitle())
-                        .setContentText(notificationConfig.getCompletedMessage())
-                        .setContentIntent(notificationConfig.getPendingIntent(this))
-                        .setAutoCancel(notificationConfig.isClearOnAction())
-                        .setSmallIcon(notificationConfig.getIconResourceID())
-                        .setProgress(0, 0, false)
-                        .setOngoing(false);
-            setRingtone();
-            notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
-        }
-    }
-
-    private void setRingtone() {
-
-        if(notificationConfig.isRingToneEnabled()) {
-            notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION));
-            notification.setOnlyAlertOnce(false);
+        if (EXECUTE_IN_FOREGROUND) {
+            stopForeground(true);
         }
 
+        Log.d(TAG, "UploadService destroyed");
     }
 
-    private void updateNotificationError() {
-        if (notificationConfig == null) return;
+    /**
+     * Creates a new task instance based on the requested task type in the intent.
+     * @param intent
+     * @return task instance or null if the type is not supported or invalid
+     */
+    HttpUploadTask getTask(Intent intent) {
+        String type = intent.getStringExtra(PARAM_TYPE);
 
-        stopForeground(false);
+        if (MultipartUploadRequest.NAME.equals(type)) {
+            return new MultipartUploadTask(this, intent);
+        }
 
-        notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getErrorMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(this))
-                    .setAutoCancel(notificationConfig.isClearOnAction())
-                    .setSmallIcon(notificationConfig.getIconResourceID())
-                    .setProgress(0, 0, false).setOngoing(false);
-        setRingtone();
-        notificationManager.notify(UPLOAD_NOTIFICATION_ID_DONE, notification.build());
+        if (BinaryUploadRequest.NAME.equals(type)) {
+            return new BinaryUploadTask(this, intent);
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if the task is currently the one shown in the foreground notification.
+     * @param uploadId ID of the upload
+     * @return true if the current upload task holds the foreground notification, otherwise false
+     */
+    protected synchronized boolean holdForegroundNotification(String uploadId, Notification notification) {
+        if (!EXECUTE_IN_FOREGROUND) return false;
+
+        if (foregroundUploadId == null) {
+            foregroundUploadId = uploadId;
+            Log.d(TAG, uploadId + " now holds the foreground notification");
+        }
+
+        if (uploadId.equals(foregroundUploadId)) {
+            startForeground(UPLOAD_NOTIFICATION_BASE_ID, notification);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Called by each task when it is completed (either successfully, with an error or due to
+     * user cancellation).
+     * @param uploadId the uploadID of the finished task
+     */
+    protected synchronized void taskCompleted(String uploadId) {
+        HttpUploadTask task = uploadTasksMap.remove(uploadId);
+
+        // un-hold foreground upload ID if it's been hold
+        if (EXECUTE_IN_FOREGROUND && task != null && task.uploadId.equals(foregroundUploadId)) {
+            Log.d(TAG, uploadId + " now un-holded the foreground notification");
+            foregroundUploadId = null;
+        }
+
+        // when all the upload tasks are completed, release the wake lock and shut down the service
+        if (uploadTasksMap.isEmpty()) {
+            Log.d(TAG, "All tasks finished. UploadService is about to shutdown...");
+            wakeLock.release();
+            stopSelf();
+        }
     }
 }
