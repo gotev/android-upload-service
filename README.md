@@ -25,7 +25,7 @@ At the core of the library there is a `Service` which handles multiple concurren
 * [Testing upload](#testing-upload)
 * [Example app and server implementations](#examples)
 * [How to use self-signed certificates](#certificates)
-* [Upload only when a connection is available](#host-monitor)
+* [Uploading only when a connection is available](#host-monitor)
 * [Apps powered by Android Upload Service](#powered)
 * [Contribute](#contribute)
 * [Before asking for help...](#help)
@@ -43,11 +43,11 @@ then in your dependencies section add:
 
 ```
 dependencies {
-    compile 'com.alexbbb:uploadservice:1.6'
+    compile 'com.alexbbb:uploadservice:2.0'
 }
 ```
 
-and do a project sync. 
+and do a project sync.
 If you're upgrading to 2.0 from 1.6, read [2.0 migration notes](https://github.com/alexbbb/android-upload-service/releases/tag/2.0).
 If you're upgrading to 2.0 from 1.5 or older releases, [read 1.6 migration notes first](https://github.com/alexbbb/android-upload-service/releases/tag/1.6).
 
