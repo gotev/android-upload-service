@@ -7,14 +7,32 @@ Android Upload Service
 
 Easily upload files in the background with automatic Android Notification Center progress indication.
 
-## Purpose
-* upload files to a server with an HTTP `multipart/form-data` or binary request
-* handle the operation in the background, even if the device is idle
+### Purpose
+* upload files to a server with HTTP `multipart/form-data` or binary requests
+* handle uploads in the background, even if the device is idle
+* automatically retry failed uploads, with an exponential backoff
 * show status in the Android Notification Center.
 
-At the core of the library there is an `IntentService` which handles uploads in the background. It publishes broadcast intents to notify status. This way the logic is decoupled from the UI and it's much more reusable. You can do multiple uploads being sure that they will be performed sequentially, and so you don't have to deal with the nightmare of concurrency. Read further to learn how you can use it in your App.
+At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
 
-## Setup
+### Index
+* [Setup](#setup)
+* [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/) 
+* [HTTP Multipart Upload](#multipart)
+* [Binary Upload](#binary)
+* [Monitoring upload status](#monitoring-upload)
+* [Stop upload tasks](#stop-upload-tasks)
+* [Testing upload](#testing-upload)
+* [Example app and server implementations](#examples)
+* [How to use self-signed certificates](#certificates)
+* [Upload only when a connection is available](#host-monitor)
+* [Apps powered by Android Upload Service](#powered)
+* [Contribute](#contribute)
+* [Before asking for help...](#help)
+* [Do you like the project?](#donate)
+* [License](#license)
+
+### Setup <a name="setup"></a>
 Ensure that you have jcenter in your gradle build file:
 ```
 repositories {
@@ -29,14 +47,17 @@ dependencies {
 }
 ```
 
-and do a project sync. If you're upgrading to 1.6 from previous releases, [read this migration notes](https://github.com/alexbbb/android-upload-service/releases/tag/1.6). To start using the library, you have to initialize it. I suggest you to do that in your Application subclass:
+and do a project sync. 
+If you're upgrading to 2.0 from 1.6, read [2.0 migration notes](https://github.com/alexbbb/android-upload-service/releases/tag/2.0).
+If you're upgrading to 2.0 from 1.5 or older releases, [read 1.6 migration notes first](https://github.com/alexbbb/android-upload-service/releases/tag/1.6).
+
+To start using the library, you have to initialize it in your Application subclass:
 ```java
 public class Initializer extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-
         // setup the broadcast action namespace string which will
         // be used to notify upload status.
         // Gradle automatically generates proper variable as below.
@@ -46,11 +67,11 @@ public class Initializer extends Application {
     }
 }
 ```
-and now you're ready to rock!
+and now you're ready to rock! Read further to discover how to do upload requests.
 
 <em>I strongly encourage you to build and run the demo app that you can find in the [examples](#examples), together with one of the provided server implementations and to check [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/).</em>
 
-### [HTTP Multipart Upload](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/MultipartUploadRequest.html)
+### HTTP Multipart Upload <a name="multipart"></a>
 This is the most common way to upload files on a server. It's the same kind of request that browsers do when you use the `<form>` tag with one or more files. Here's a minimal example:
 
 ```java
@@ -62,8 +83,6 @@ public void uploadMultipart(final Context context) {
     try {
         new MultipartUploadRequest(context, uploadID, serverUrlString)
             .addFileToUpload("/absolute/path/to/your/file", "your-param-name")
-            .addHeader("your-custom-header-name", "your-custom-value")
-            .addParameter("your-param-name", "your-param-value")
             .setNotificationConfig(new UploadNotificationConfig())
             .setMaxRetries(2)
             .startUpload();
@@ -72,9 +91,11 @@ public void uploadMultipart(final Context context) {
     }
 }
 ```
+To discover all the available options, check [MultipartUploadRequest JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/MultipartUploadRequest.html)
 
-### [Binary Upload](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/BinaryUploadRequest.html)
+### Binary Upload <a name="binary"></a>
 The binary upload uses a single file as the raw body of the upload request.
+Here's a minimal example:
 
 ``` java
 public void uploadBinary(final Context context) {
@@ -84,7 +105,6 @@ public void uploadBinary(final Context context) {
 
     try {
         new BinaryUploadRequest(context, uploadID, serverUrlString)
-            .addHeader("your-custom-header-name", "your-custom-value")
             .setFileToUpload("/absolute/path/to/your/file")
             .setNotificationConfig(new UploadNotificationConfig())
             .setMaxRetries(2)
@@ -94,9 +114,21 @@ public void uploadBinary(final Context context) {
     }
 }
 ```
+To discover all the available options, check [BinaryUploadRequest JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/BinaryUploadRequest.html)
 
-### Monitoring upload status
-To listen for the status of the upload service, use the provided [UploadServiceBroadcastReceiver](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/UploadServiceBroadcastReceiver.html). Override its methods to add your own business logic. Example on how to use it in an activity:
+### Monitoring upload status <a name="monitoring-upload"></a>
+To listen for the status of the upload tasks, use the provided [UploadServiceBroadcastReceiver](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/UploadServiceBroadcastReceiver.html) in one of the following ways:
+* use it inside a `Service` or `Activity` (check `register` and `unregister` methods JavaDoc for detailed instructions)
+* create a new class (e.g. MyReceiver) which extends `UploadServiceBroadcastReceiver` and then register it as a broadcast receiver in your manifest, with the intent filter `com.yourcompany.yourapp.uploadservice.broadcast.status`. Change `com.yourcompany.yourapp` with whatever you have set as `UploadService.NAMESPACE` in the initial setup.
+```xml
+<receiver android:name="MyReceiver">
+    <intent-filter>
+        <action android:name="com.yourcompany.yourapp.uploadservice.broadcast.status" />
+    </intent-filter>
+</receiver>
+```
+
+Override its methods to add your own business logic. Example on how to use it in an activity:
 
 ```java
 public class YourActivity extends Activity {
@@ -143,6 +175,12 @@ public class YourActivity extends Activity {
             //from serverResponseMessage string using a library
             //such as org.json (embedded in Android) or Google's gson
         }
+
+        @Override
+        public void onCancelled(String uploadId) {
+            Log.i(TAG, "Upload with ID " + uploadId
+                       + " has been cancelled by the user");
+        }
     };
 
     @Override
@@ -160,34 +198,22 @@ public class YourActivity extends Activity {
 }
 ```
 
-If you want to monitor upload status in all of your activities, just implement the BroadcastReceiver in your base activity class from which all of your activities inherits and you're done.
+If you want to monitor upload status in all of your activities, just implement the [UploadServiceBroadcastReceiver](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/UploadServiceBroadcastReceiver.html) in your base activity class from which all of your activities inherits and you're done.
 
-To monitor upload status inside a `Service`, you have to call `uploadReceiver.register(this);` inside the service's `onCreate` method, and `uploadReceiver.unregister(this);` inside service's `onDestroy` method.
-
-### Stop current upload
-Call this method from anywhere you want to stop the currently active upload task.
+### Stop upload tasks <a name="stop-upload-tasks"></a>
+Call this method from anywhere you want to stop all the active upload tasks.
 ```java
-UploadService.stopCurrentUpload();
+UploadService.stopAllUploads();
 ```
-After that the upload task is cancelled, you will receive a `java.net.ProtocolException` in your broadcast receiver's `onError` method and the notification will display the error message that you have set.
+After that each upload task is stopped, your [broadcast receiver's](http://alexbbb.github.io/android-upload-service/javadoc/com/alexbbb/uploadservice/UploadServiceBroadcastReceiver.html) `onCancelled(final String uploadId)` method will be called.
 
-### Using HTTPS connection with self-signed certificates
-For security reasons, the library doesn't accept self-signed certificates by default when using HTTPS connections, but you can enable them by calling:
+You can stop a particular upload with `UploadService.stopUpload(uploadId);`
 
-```java
-AllCertificatesAndHostsTruster.apply();
-```
-
-before starting the upload service.
-
-### Upload only when a connection is available
-If you want to start uploads or retry them based on the remote server's reachability status, [Android Host Monitor](https://github.com/alexbbb/android-host-monitor) may be useful to you in combination with this library.
-
-### Testing upload
+### Testing upload <a name="testing-upload"></a>
 You have the following choices:
-* Use your own server which handles HTTP/Multipart uploads
+* Use your own server (which handles one or more of the supported upload types)
 * Use one of the server implementations provided in the examples (read below)
-* Use the excellent http://www.posttestserver.com/ (bear in mind that the data you post there is public!) for HTTP Multipart
+* Use the excellent http://www.posttestserver.com/ (bear in mind that the data you post there is public!) for HTTP Multipart requests
 
 ### Examples <a name="examples"></a>
 In the <b>examples</b> folder you will find:
@@ -208,21 +234,33 @@ In the <b>examples</b> folder you will find:
     ```
   * <b>PHP (HTTP Multipart only)</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like [XAMPP (supports Windows, OS X and Linux)](https://www.apachefriends.org/download.html).
 
-## Apps powered by Android Upload Service
+### How to use self-signed certificates <a name="certificates"></a>
+For security reasons, the library doesn't accept self-signed certificates by default when using HTTPS connections, but you can enable them by calling:
+
+```java
+AllCertificatesAndHostsTruster.apply();
+```
+
+before starting the upload service.
+
+### Uploading only when a connection is available <a name="host-monitor"></a>
+If you want to start uploads or retry them based on the remote server's reachability status, [Android Host Monitor](https://github.com/alexbbb/android-host-monitor) may be useful to you in combination with this library.
+
+### Apps powered by Android Upload Service <a name="powered"></a>
 To be included in the following list, simply create an issue and provide the app name and a link.
 
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
 - [DotShare](http://dot-share.com/index-en.html)
 - [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
 
-## Contribute
+### Contribute <a name="contribute"></a>
 * Do you have a new feature in mind?
 * Do you know how to improve existing docs or code?
 * Have you found a bug?
 
 Contributions are welcome and encouraged! Just fork the project and then send a pull request. Be ready to discuss your code and design decisions :)
 
-## Before asking for help...
+### Before asking for help... <a name="help"></a>
 Let's face it, doing network programming is not easy as there are many things that can go wrong, but if upload doesn't work out of the box, consider the following things before posting a new issue:
 * Check [JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/) for full class and methods docs
 * Is the server URL correct?
@@ -240,12 +278,12 @@ If you've checked all the above and still something goes wrong...it's time to cr
 
 Please make use of Markdown styling when you post code or console output.
 
-## Do you like the project?
+### Do you like the project? <a name="donate"></a>
 Put a star, spread the word and if you want to offer me a free beer, [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
-## License
+### License <a name="license"></a>
 
-    Copyright (C) 2013-2015 Aleksandar Gotev
+    Copyright (C) 2013-2016 Aleksandar Gotev
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -258,4 +296,3 @@ Put a star, spread the word and if you want to offer me a free beer, [![Donate](
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
