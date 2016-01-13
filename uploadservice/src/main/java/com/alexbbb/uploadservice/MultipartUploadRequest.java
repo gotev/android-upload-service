@@ -30,8 +30,8 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      *
      * @param context application context
      * @param uploadId unique ID to assign to this upload request.<br>
-     *                 It can be whatever string you want. For simplicity you can
-     *                 generate an UUID with {@code UUID.randomUUID().toString()}.<br>
+     *                 It can be whatever string you want. If you set it to null or an
+     *                 empty string, an UUID will be automatically generated.<br>
      *                 It's advised to keep a reference to it in your code, so when you receive
      *                 status updates in {@link UploadServiceBroadcastReceiver}, you know to
      *                 which upload they refer to.
@@ -42,6 +42,18 @@ public class MultipartUploadRequest extends HttpUploadRequest {
         super(context, uploadId, serverUrl);
         filesToUpload = new ArrayList<>();
         parameters = new ArrayList<>();
+    }
+
+    /**
+     * Creates a new multipart upload request and automatically generates an upload id, that will
+     * be returned when you call {@link HttpUploadRequest#startUpload()}.
+     *
+     * @param context application context
+     * @param serverUrl URL of the server side script that will handle the multipart form upload.
+     *                  E.g.: http://www.yourcompany.com/your/script
+     */
+    public MultipartUploadRequest(final Context context, final String serverUrl) {
+        this(context, null, serverUrl);
     }
 
     /**

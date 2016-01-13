@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -165,10 +164,9 @@ public class MainActivity extends AppCompatActivity {
 
         for (String fileToUploadPath : filesToUploadArray) {
             try {
-                final String uploadID = UUID.randomUUID().toString();
                 final String filename = getFilename(fileToUploadPath);
 
-                new MultipartUploadRequest(this, uploadID, serverUrlString)
+                String uploadID = new MultipartUploadRequest(this, serverUrlString)
                         .addFileToUpload(fileToUploadPath, paramNameString)
                         .setNotificationConfig(getNotificationConfig(filename))
                         .setCustomUserAgent(USER_AGENT)
@@ -202,10 +200,9 @@ public class MainActivity extends AppCompatActivity {
 
         for (String fileToUploadPath : filesToUploadArray) {
             try {
-                final String uploadID = UUID.randomUUID().toString();
                 final String filename = getFilename(fileToUploadPath);
 
-                new BinaryUploadRequest(this, uploadID, serverUrlString)
+                String uploadID = new BinaryUploadRequest(this, serverUrlString)
                         .addHeader("file-name", new File(fileToUploadPath).getName())
                         .setFileToUpload(fileToUploadPath)
                         .setNotificationConfig(getNotificationConfig(filename))

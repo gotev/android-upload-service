@@ -6,6 +6,7 @@ import android.content.Intent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Represents a generic HTTP upload request.
@@ -30,13 +31,20 @@ abstract class HttpUploadRequest {
      * Creates a new multipart upload request.
      *
      * @param context application context
-     * @param uploadId unique ID to assign to this upload request.
-     *                 It's used in the broadcast receiver when receiving updates.
+     * @param uploadId unique ID to assign to this upload request. If is null or empty, a random
+     *                 UUID will be automatically generated. It's used in the broadcast receiver
+     *                 when receiving updates.
      * @param serverUrl URL of the server side script that handles the multipart form upload
      */
     public HttpUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         this.context = context;
-        this.uploadId = uploadId;
+
+        if (uploadId == null || uploadId.isEmpty()) {
+            this.uploadId = UUID.randomUUID().toString();
+        } else {
+            this.uploadId = uploadId;
+        }
+
         notificationConfig = null;
         url = serverUrl;
         headers = new ArrayList<>();
@@ -45,16 +53,17 @@ abstract class HttpUploadRequest {
 
     /**
      * Start the background file upload service.
-     *
+     * @return the uploadId string
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid
      */
-    public void startUpload() throws IllegalArgumentException, MalformedURLException {
+    public String startUpload() throws IllegalArgumentException, MalformedURLException {
         this.validate();
         final Intent intent = new Intent(this.getContext(), UploadService.class);
         this.initializeIntent(intent);
         intent.setAction(UploadService.getActionUpload());
         getContext().startService(intent);
+        return uploadId;
     }
 
     /**

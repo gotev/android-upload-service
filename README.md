@@ -77,12 +77,9 @@ This is the most common way to upload files on a server. It's the same kind of r
 
 ```java
 public void uploadMultipart(final Context context) {
-
-    final String uploadID = UUID.randomUUID().toString();
-    final String serverUrlString = "http://www.yoursite.com/yourscript";
-
     try {
-        new MultipartUploadRequest(context, uploadID, serverUrlString)
+        String uploadId =
+          new MultipartUploadRequest(context, "http://upload.server.com/path")
             .addFileToUpload("/absolute/path/to/your/file", "your-param-name")
             .setNotificationConfig(new UploadNotificationConfig())
             .setMaxRetries(2)
@@ -100,12 +97,9 @@ Here's a minimal example:
 
 ``` java
 public void uploadBinary(final Context context) {
-
-    final String uploadID = UUID.randomUUID().toString();
-    final String serverUrlString = "http://www.yoursite.com/yourscript";
-
     try {
-        new BinaryUploadRequest(context, uploadID, serverUrlString)
+        String uploadId =
+          new BinaryUploadRequest(context, "http://upload.server.com/path")
             .setFileToUpload("/absolute/path/to/your/file")
             .setNotificationConfig(new UploadNotificationConfig())
             .setMaxRetries(2)

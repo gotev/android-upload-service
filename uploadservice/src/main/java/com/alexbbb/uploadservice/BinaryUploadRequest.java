@@ -21,15 +21,32 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     private BinaryUploadFile file = null;
 
     /**
-     * Creates a file upload.
+     * Creates a binary file upload request.
      *
      * @param context application context
-     * @param uploadId unique ID to assign to this upload request.
-     *                 It's used in the broadcast receiver when receiving updates.
-     * @param serverUrl URL of the server side script that handles the multipart form upload
+     * @param uploadId unique ID to assign to this upload request.<br>
+     *                 It can be whatever string you want. If you set it to null or an
+     *                 empty string, an UUID will be automatically generated.<br>
+     *                 It's advised to keep a reference to it in your code, so when you receive
+     *                 status updates in {@link UploadServiceBroadcastReceiver}, you know to
+     *                 which upload they refer to.
+     * @param serverUrl URL of the server side script that will handle the multipart form upload.
+     *                  E.g.: http://www.yourcompany.com/your/script
      */
     public BinaryUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         super(context, uploadId, serverUrl);
+    }
+
+    /**
+     * Creates a new binaryupload request and automatically generates an upload id, that will
+     * be returned when you call {@link HttpUploadRequest#startUpload()}.
+     *
+     * @param context application context
+     * @param serverUrl URL of the server side script that will handle the multipart form upload.
+     *                  E.g.: http://www.yourcompany.com/your/script
+     */
+    public BinaryUploadRequest(final Context context, final String serverUrl) {
+        this(context, null, serverUrl);
     }
 
     /**
