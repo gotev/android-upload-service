@@ -91,6 +91,25 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     /**
+     * Adds a file to this upload request, without setting the content type, which will be
+     * automatically detected from the file extension. If you want to
+     * manually set the content type, use {@link #addFileToUpload(String, String, String, String)}.
+     * @param path Absolute path to the file that you want to upload
+     * @param parameterName Name of the form parameter that will contain file's data
+     * @param fileName File name seen by the server side script. If null, the original file name
+     *                 will be used
+     * @return {@link MultipartUploadRequest}
+     * @throws FileNotFoundException if the file does not exist at the specified path
+     * @throws IllegalArgumentException if one or more parameters are not valid
+     */
+    public MultipartUploadRequest addFileToUpload(final String path, final String parameterName,
+                                                  final String fileName)
+            throws FileNotFoundException, IllegalArgumentException {
+        filesToUpload.add(new MultipartUploadFile(path, parameterName, fileName, null));
+        return this;
+    }
+
+    /**
      * Adds a file to this upload request, without setting file name and content type.
      * The original file name will be used instead. If you want to manually set the file name seen
      * by the server side script and the content type, use
