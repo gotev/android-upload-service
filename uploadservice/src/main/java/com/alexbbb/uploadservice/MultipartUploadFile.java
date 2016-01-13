@@ -58,7 +58,7 @@ class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
                .append(paramName).append("\"; filename=\"")
                .append(fileName).append("\"").append(NEW_LINE);
 
-        if (contentType == null) {
+        if (contentType == null || contentType.isEmpty()) {
             contentType = autoDetectMimeType();
         }
 
@@ -68,7 +68,14 @@ class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
     }
 
     private String autoDetectMimeType() {
-        String extension = MimeTypeMap.getFileExtensionFromUrl(this.file.getAbsolutePath());
+        String extension = null;
+
+        String absolutePath = this.file.getAbsolutePath();
+        int index = absolutePath.lastIndexOf(".") + 1;
+
+        if (index >= 0 && index <= absolutePath.length()) {
+            extension = absolutePath.substring(index);
+        }
 
         if (extension == null || extension.isEmpty()) {
             return ContentType.APPLICATION_OCTET_STREAM;

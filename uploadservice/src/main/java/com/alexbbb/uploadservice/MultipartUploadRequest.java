@@ -76,8 +76,9 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * @param fileName File name seen by the server side script. If null, the original file name
      *                 will be used
      * @param contentType Content type of the file. You can use constants defined in
-     *                    {@link ContentType} class. Set this to null to try to
-     *                    automatically detect the mime type.
+     *                    {@link ContentType} class. Set this to null or empty string to try to
+     *                    automatically detect the mime type from the file. If the mime type can't
+     *                    be detected, {@code application/octet-stream} will be used by default
      * @throws FileNotFoundException if the file does not exist at the specified path
      * @throws IllegalArgumentException if one or more parameters are not valid
      * @return {@link MultipartUploadRequest}
