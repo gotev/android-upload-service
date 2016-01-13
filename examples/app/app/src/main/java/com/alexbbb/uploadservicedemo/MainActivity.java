@@ -90,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onCompleted(String uploadId, int serverResponseCode, String serverResponseMessage) {
+        public void onCompleted(String uploadId, int serverResponseCode, byte[] serverResponseBody) {
             Log.i(TAG, "Upload with ID " + uploadId + " is completed: " + serverResponseCode + ", "
-                       + serverResponseMessage);
+                       + new String(serverResponseBody));
 
             if (uploadProgressHolders.get(uploadId) == null)
                 return;

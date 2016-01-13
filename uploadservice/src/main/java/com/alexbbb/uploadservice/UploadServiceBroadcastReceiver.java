@@ -37,8 +37,8 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
 
                     case UploadService.STATUS_COMPLETED:
                         final int responseCode = intent.getIntExtra(UploadService.SERVER_RESPONSE_CODE, 0);
-                        final String responseMsg = intent.getStringExtra(UploadService.SERVER_RESPONSE_MESSAGE);
-                        onCompleted(uploadId, responseCode, responseMsg);
+                        final byte[] responseBody = intent.getByteArrayExtra(UploadService.SERVER_RESPONSE_BODY);
+                        onCompleted(uploadId, responseCode, responseBody);
                         break;
 
                     case UploadService.STATUS_IN_PROGRESS:
@@ -124,13 +124,14 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
      *
      * @param uploadId unique ID of the upload request
      * @param serverResponseCode status code returned by the server
-     * @param serverResponseMessage string containing the response received from the server.
-     *                              If your server responds with a JSON, you can parse it from
-     *                              this string using a library such as org.json
-     *                              (embedded in Android) or google's gson
+     * @param serverResponseBody byte array containing the response body received from the server.
+     *                           If your server responds with a string, you can get it with
+     *                           {@code new String(serverResponseBody)}. If the string is a
+     *                           JSON, you can parse it using a library such as org.json
+     *                           (embedded in Android) or google's gson
      */
     public void onCompleted(final String uploadId, final int serverResponseCode,
-                            final String serverResponseMessage) {
+                            final byte[] serverResponseBody) {
     }
 
     /**

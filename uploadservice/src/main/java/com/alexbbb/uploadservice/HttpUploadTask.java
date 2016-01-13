@@ -10,11 +10,10 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -167,9 +166,8 @@ abstract class HttpUploadTask implements Runnable {
             } else { // getErrorStream if the response code is not 2xx
                 responseStream = connection.getErrorStream();
             }
-            final String serverResponseMessage = getResponseBodyAsString(responseStream);
 
-            broadcastCompleted(serverResponseCode, serverResponseMessage);
+            broadcastCompleted(serverResponseCode, getResponseBodyAsByteArray(responseStream));
 
         } finally {
             closeOutputStream();
@@ -243,25 +241,19 @@ abstract class HttpUploadTask implements Runnable {
         }
     }
 
-    private String getResponseBodyAsString(final InputStream inputStream) {
-        StringBuilder outString = new StringBuilder();
+    private byte[] getResponseBodyAsByteArray(final InputStream inputStream) {
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 
-        BufferedReader reader = null;
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int bytesRead;
+
         try {
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                outString.append(line).append("\n");
+            while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) > 0) {
+                byteStream.write(buffer, 0, bytesRead);
             }
-        } catch (Exception exc) {
-            try {
-                if (reader != null)
-                    reader.close();
-            } catch (Exception ignored) {
-            }
-        }
+        } catch (Exception ignored) {}
 
-        return outString.toString();
+        return byteStream.toByteArray();
     }
 
     protected void writeStream(InputStream stream) throws IOException {
@@ -298,14 +290,7 @@ abstract class HttpUploadTask implements Runnable {
         updateNotificationProgress((int) uploadedBytes, (int) totalBytes);
     }
 
-    void broadcastCompleted(final int responseCode, final String responseMessage) {
-
-        final String filteredMessage;
-        if (responseMessage == null) {
-            filteredMessage = "";
-        } else {
-            filteredMessage = responseMessage;
-        }
+    void broadcastCompleted(final int responseCode, final byte[] serverResponseBody) {
 
         boolean successfulUpload = ((responseCode / 100) == 2);
 
@@ -317,7 +302,7 @@ abstract class HttpUploadTask implements Runnable {
         intent.putExtra(UploadService.UPLOAD_ID, uploadId);
         intent.putExtra(UploadService.STATUS, UploadService.STATUS_COMPLETED);
         intent.putExtra(UploadService.SERVER_RESPONSE_CODE, responseCode);
-        intent.putExtra(UploadService.SERVER_RESPONSE_MESSAGE, filteredMessage);
+        intent.putExtra(UploadService.SERVER_RESPONSE_BODY, serverResponseBody);
         service.sendBroadcast(intent);
 
         if (successfulUpload)

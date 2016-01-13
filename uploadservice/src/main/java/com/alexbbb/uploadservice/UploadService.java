@@ -93,7 +93,7 @@ public class UploadService extends Service {
     public static final String PROGRESS_TOTAL_BYTES = "progressTotalBytes";
     public static final String ERROR_EXCEPTION = "errorException";
     public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
-    public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
+    public static final String SERVER_RESPONSE_BODY = "serverResponseBody";
 
     private PowerManager.WakeLock wakeLock;
     private int notificationIncrementalId = 0;
