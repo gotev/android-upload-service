@@ -52,7 +52,7 @@ and do a project sync.
 If you're upgrading to 2.0 from 1.6, read [2.0 migration notes](https://github.com/alexbbb/android-upload-service/releases/tag/2.0).
 If you're upgrading to 2.0 from 1.5 or older releases, [read 1.6 migration notes first](https://github.com/alexbbb/android-upload-service/releases/tag/1.6).
 
-To start using the library, you have to initialize it in your Application subclass:
+To start using the library, you have to initialize it in your [Application subclass](http://developer.android.com/reference/android/app/Application.html):
 ```java
 public class Initializer extends Application {
 
