@@ -167,13 +167,14 @@ public class YourActivity extends Activity {
         @Override
         public void onCompleted(String uploadId,
                                 int serverResponseCode,
-                                String serverResponseMessage) {
+                                byte[] serverResponseBody) {
             Log.i(TAG, "Upload with ID " + uploadId
                        + " has been completed with HTTP " + serverResponseCode
-                       + ". Response from server: " + serverResponseMessage);
+                       + ". Response from server: "
+                       + new String(serverResponseBody));
 
             //If your server responds with a JSON, you can parse it
-            //from serverResponseMessage string using a library
+            //from serverResponseBody using a library
             //such as org.json (embedded in Android) or Google's gson
         }
 
