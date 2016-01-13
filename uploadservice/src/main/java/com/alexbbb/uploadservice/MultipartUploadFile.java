@@ -2,6 +2,7 @@ package com.alexbbb.uploadservice;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.webkit.MimeTypeMap;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -58,12 +59,28 @@ class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
                .append(fileName).append("\"").append(NEW_LINE);
 
         if (contentType == null) {
-            contentType = ContentType.APPLICATION_OCTET_STREAM;
+            contentType = autoDetectMimeType();
         }
 
         builder.append("Content-Type: ").append(contentType).append(NEW_LINE).append(NEW_LINE);
 
         return builder.toString().getBytes("US-ASCII");
+    }
+
+    private String autoDetectMimeType() {
+        String extension = MimeTypeMap.getFileExtensionFromUrl(this.file.getAbsolutePath());
+
+        if (extension == null || extension.isEmpty()) {
+            return ContentType.APPLICATION_OCTET_STREAM;
+        }
+
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
+
+        if (mimeType == null) {
+            return ContentType.APPLICATION_OCTET_STREAM;
+        }
+
+        return mimeType;
     }
 
     /**
