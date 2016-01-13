@@ -79,6 +79,12 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     }
 
     @Override
+    public BinaryUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFilesAfterSuccessfulUpload) {
+        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFilesAfterSuccessfulUpload);
+        return this;
+    }
+
+    @Override
     public BinaryUploadRequest addHeader(String headerName, String headerValue) {
         super.addHeader(headerName, headerValue);
         return this;

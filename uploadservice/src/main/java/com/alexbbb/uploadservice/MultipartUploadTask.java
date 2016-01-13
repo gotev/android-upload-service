@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Implements an HTTP Multipart upload task.
@@ -135,6 +136,17 @@ class MultipartUploadTask extends HttpUploadTask {
 
             final InputStream stream = file.getStream();
             writeStream(stream);
+        }
+    }
+
+    @Override
+    protected void onSuccessfulUpload() {
+        if (autoDeleteFilesAfterSuccessfulUpload) {
+            Iterator<MultipartUploadFile> iterator = files.iterator();
+
+            while (iterator.hasNext()) {
+                deleteFile(this.getClass().getSimpleName(), iterator.next().file);
+            }
         }
     }
 }

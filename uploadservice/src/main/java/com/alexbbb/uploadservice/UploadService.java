@@ -72,6 +72,7 @@ public class UploadService extends Service {
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
     protected static final String PARAM_CUSTOM_USER_AGENT = "customUserAgent";
     protected static final String PARAM_MAX_RETRIES = "maxRetries";
+    protected static final String PARAM_AUTO_DELETE_FILES = "autoDeleteFiles";
 
     /**
      * The minimum interval between progress reports in milliseconds.

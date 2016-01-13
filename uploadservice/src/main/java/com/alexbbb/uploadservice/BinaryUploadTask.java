@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
  * Task to upload a binary file.
  *
  * @author cankov
+ * @author alexbbb
  */
 class BinaryUploadTask extends HttpUploadTask {
 
@@ -27,5 +28,12 @@ class BinaryUploadTask extends HttpUploadTask {
     @Override
     protected void writeBody() throws IOException {
         writeStream(file.getStream());
+    }
+
+    @Override
+    protected void onSuccessfulUpload() {
+        if (autoDeleteFilesAfterSuccessfulUpload) {
+            deleteFile(this.getClass().getSimpleName(), this.file.file);
+        }
     }
 }

@@ -82,6 +82,13 @@
             android:layout_gravity="center_horizontal"
             android:checked="true" />
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_delete_uploaded_files"
+            android:id="@+id/autoDeleteUploadedFiles"
+            android:layout_gravity="center_horizontal" />
+
         <Button
             android:id="@+id/multipartUploadButton"
             android:layout_width="wrap_content"

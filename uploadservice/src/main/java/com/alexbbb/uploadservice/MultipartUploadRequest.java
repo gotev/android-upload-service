@@ -153,6 +153,12 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     @Override
+    public MultipartUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFilesAfterSuccessfulUpload) {
+        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFilesAfterSuccessfulUpload);
+        return this;
+    }
+
+    @Override
     public MultipartUploadRequest addHeader(String headerName, String headerValue) {
         super.addHeader(headerName, headerValue);
         return this;

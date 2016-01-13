@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.filesToUpload) EditText filesToUpload;
     @Bind(R.id.parameterName) EditText parameterName;
     @Bind(R.id.displayNotification) CheckBox displayNotification;
+    @Bind(R.id.autoDeleteUploadedFiles) CheckBox autoDeleteUploadedFiles;
 
     private Map<String, UploadProgressViewHolder> uploadProgressHolders = new HashMap<>();
 
@@ -171,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
                         .addFileToUpload(fileToUploadPath, paramNameString)
                         .setNotificationConfig(getNotificationConfig(filename))
                         .setCustomUserAgent(USER_AGENT)
+                        .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
                         .setMaxRetries(2)
                         .startUpload();
 
@@ -208,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
                         .setFileToUpload(fileToUploadPath)
                         .setNotificationConfig(getNotificationConfig(filename))
                         .setCustomUserAgent(USER_AGENT)
+                        .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
                         .setMaxRetries(2)
                         .startUpload();
 

@@ -11,6 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +39,7 @@ abstract class HttpUploadTask implements Runnable {
     protected final String method;
     protected final String customUserAgent;
     protected final int maxRetries;
+    protected final boolean autoDeleteFilesAfterSuccessfulUpload;
     protected final ArrayList<NameValue> headers;
 
     protected HttpURLConnection connection = null;
@@ -66,6 +68,7 @@ abstract class HttpUploadTask implements Runnable {
         this.method = intent.getStringExtra(UploadService.PARAM_METHOD);
         this.customUserAgent = intent.getStringExtra(UploadService.PARAM_CUSTOM_USER_AGENT);
         this.maxRetries = intent.getIntExtra(UploadService.PARAM_MAX_RETRIES, 0);
+        this.autoDeleteFilesAfterSuccessfulUpload = intent.getBooleanExtra(UploadService.PARAM_AUTO_DELETE_FILES, false);
         this.headers = intent.getParcelableArrayListExtra(UploadService.PARAM_REQUEST_HEADERS);
     }
 
@@ -187,17 +190,22 @@ abstract class HttpUploadTask implements Runnable {
     }
 
     /**
-     * Implement in derived classes to provide the expected upload in the progress notifications.
+     * Implement in subclasses to provide the expected upload in the progress notifications.
      * @return The expected size of the http request body.
      * @throws UnsupportedEncodingException
      */
     protected abstract long getBodyLength() throws UnsupportedEncodingException;
 
     /**
-     * Implement in derived classes to write the body of the http request.
+     * Implement in subclasses to write the body of the http request.
      * @throws IOException
      */
     protected abstract void writeBody() throws IOException;
+
+    /**
+     * Implement in subclasses to be able to do something when the upload is successful.
+     */
+    protected void onSuccessfulUpload() {}
 
     private void closeInputStream() {
         if (responseStream != null) {
@@ -299,6 +307,12 @@ abstract class HttpUploadTask implements Runnable {
             filteredMessage = responseMessage;
         }
 
+        boolean successfulUpload = ((responseCode / 100) == 2);
+
+        if (successfulUpload) {
+            onSuccessfulUpload();
+        }
+
         final Intent intent = new Intent(UploadService.getActionBroadcast());
         intent.putExtra(UploadService.UPLOAD_ID, uploadId);
         intent.putExtra(UploadService.STATUS, UploadService.STATUS_COMPLETED);
@@ -306,7 +320,7 @@ abstract class HttpUploadTask implements Runnable {
         intent.putExtra(UploadService.SERVER_RESPONSE_MESSAGE, filteredMessage);
         service.sendBroadcast(intent);
 
-        if (responseCode >= 200 && responseCode <= 299)
+        if (successfulUpload)
             updateNotificationCompleted();
         else
             updateNotificationError();
@@ -422,5 +436,15 @@ abstract class HttpUploadTask implements Runnable {
         // this is needed because the main notification used to show progress is ongoing
         // and a new one has to be created to allow the user to dismiss it
         notificationManager.notify(notificationId + 1, notification.build());
+    }
+
+    protected void deleteFile(String errorTag, File fileToDelete) {
+        try {
+            if (!fileToDelete.delete()) {
+                Log.e(errorTag, "Unable to delete " + fileToDelete.getAbsolutePath());
+            }
+        } catch (Exception exc) {
+            Log.e(errorTag, "Error while deleting file " + fileToDelete.getAbsolutePath(), exc);
+        }
     }
 }

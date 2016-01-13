@@ -19,5 +19,6 @@
     <string name="server_url_hint">http://company.com/path/to/script</string>
     <string name="file_path_hint">/path/to/your/file.ext</string>
     <string name="display_notification">Display notification</string>
+    <string name="auto_delete_uploaded_files">Auto delete uploaded files</string>
 
 </resources>

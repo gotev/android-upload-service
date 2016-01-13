@@ -24,6 +24,7 @@ abstract class HttpUploadRequest {
     private final String uploadId;
     private final String url;
     private final ArrayList<NameValue> headers;
+    private boolean autoDeleteFilesAfterSuccessfulUpload = false;
 
     /**
      * Creates a new multipart upload request.
@@ -69,6 +70,7 @@ abstract class HttpUploadRequest {
         intent.putExtra(UploadService.PARAM_METHOD, getMethod());
         intent.putExtra(UploadService.PARAM_CUSTOM_USER_AGENT, getCustomUserAgent());
         intent.putExtra(UploadService.PARAM_MAX_RETRIES, getMaxRetries());
+        intent.putExtra(UploadService.PARAM_AUTO_DELETE_FILES, autoDeleteFilesAfterSuccessfulUpload);
         intent.putParcelableArrayListExtra(UploadService.PARAM_REQUEST_HEADERS, getHeaders());
     }
 
@@ -83,6 +85,19 @@ abstract class HttpUploadRequest {
      */
     public HttpUploadRequest setNotificationConfig(UploadNotificationConfig config) {
         notificationConfig = config;
+        return this;
+    }
+
+    /**
+     * Sets the automatic file deletion after successful upload.
+     * @param autoDeleteFilesAfterSuccessfulUpload true to auto delete files included in the
+     *                                             request when the upload is completed successfully.
+     *                                             By default this setting is set to false, and
+     *                                             nothing gets deleted.
+     * @return {@link HttpUploadRequest}
+     */
+    public HttpUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFilesAfterSuccessfulUpload) {
+        this.autoDeleteFilesAfterSuccessfulUpload = autoDeleteFilesAfterSuccessfulUpload;
         return this;
     }
 
