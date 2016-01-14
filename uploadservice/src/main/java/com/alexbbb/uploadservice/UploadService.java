@@ -166,13 +166,13 @@ public class UploadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null || !getActionUpload().equals(intent.getAction())) {
-            return START_STICKY;
+            return shutdownIfThereArentAnyActiveTasks();
         }
 
         HttpUploadTask currentTask = getTask(intent);
 
         if (currentTask == null) {
-            return START_STICKY;
+            return shutdownIfThereArentAnyActiveTasks();
         }
 
         // increment by 2 because the notificationIncrementalId + 1 is used internally
@@ -185,6 +185,15 @@ public class UploadService extends Service {
 
         uploadTasksMap.put(currentTask.uploadId, currentTask);
         uploadThreadPool.execute(currentTask);
+
+        return START_STICKY;
+    }
+
+    private int shutdownIfThereArentAnyActiveTasks() {
+        if (uploadTasksMap.isEmpty()) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
 
         return START_STICKY;
     }

@@ -28,13 +28,13 @@ abstract class HttpUploadRequest {
     private boolean autoDeleteFilesAfterSuccessfulUpload = false;
 
     /**
-     * Creates a new multipart upload request.
+     * Creates a new http upload request.
      *
      * @param context application context
      * @param uploadId unique ID to assign to this upload request. If is null or empty, a random
      *                 UUID will be automatically generated. It's used in the broadcast receiver
      *                 when receiving updates.
-     * @param serverUrl URL of the server side script that handles the multipart form upload
+     * @param serverUrl URL of the server side script that handles the request
      */
     public HttpUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         this.context = context;
