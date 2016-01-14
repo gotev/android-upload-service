@@ -21,15 +21,16 @@ class MultipartUploadTask extends HttpUploadTask {
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
 
-    private final ArrayList<MultipartUploadFile> files;
-    private final ArrayList<NameValue> parameters;
+    private ArrayList<MultipartUploadFile> files;
+    private ArrayList<NameValue> parameters;
 
     private String boundary;
     private byte[] boundaryBytes;
     private byte[] trailerBytes;
 
-    MultipartUploadTask(UploadService service, Intent intent) {
-        super(service, intent);
+    @Override
+    protected void init(UploadService service, Intent intent) {
+        super.init(service, intent);
         this.files = intent.getParcelableArrayListExtra(UploadService.PARAM_FILES);
         this.parameters = intent.getParcelableArrayListExtra(UploadService.PARAM_REQUEST_PARAMETERS);
     }

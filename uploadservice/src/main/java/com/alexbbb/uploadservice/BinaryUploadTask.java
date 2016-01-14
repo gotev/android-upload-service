@@ -13,10 +13,11 @@ import java.io.UnsupportedEncodingException;
  */
 class BinaryUploadTask extends HttpUploadTask {
 
-    private final BinaryUploadFile file;
+    private BinaryUploadFile file;
 
-    BinaryUploadTask(UploadService service, Intent intent) {
-        super(service, intent);
+    @Override
+    protected void init(UploadService service, Intent intent) {
+        super.init(service, intent);
         this.file = intent.getParcelableExtra(UploadService.PARAM_FILE);
     }
 

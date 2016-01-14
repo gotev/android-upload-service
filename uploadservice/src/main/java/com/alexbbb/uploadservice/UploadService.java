@@ -66,7 +66,7 @@ public class UploadService extends Service {
     protected static final String PARAM_METHOD = "method";
     protected static final String PARAM_FILES = "files";
     protected static final String PARAM_FILE = "file";
-    protected static final String PARAM_TYPE = "uploadType";
+    protected static final String PARAM_TASK_CLASS = "taskClass";
 
     protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
     protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
@@ -204,22 +204,32 @@ public class UploadService extends Service {
     }
 
     /**
-     * Creates a new task instance based on the requested task type in the intent.
+     * Creates a new task instance based on the requested task class in the intent.
      * @param intent
-     * @return task instance or null if the type is not supported or invalid
+     * @return task instance or null if the task class is not supported or invalid
      */
     HttpUploadTask getTask(Intent intent) {
-        String type = intent.getStringExtra(PARAM_TYPE);
+        String taskClass = intent.getStringExtra(PARAM_TASK_CLASS);
 
-        if (MultipartUploadRequest.NAME.equals(type)) {
-            return new MultipartUploadTask(this, intent);
+        if (taskClass == null) {
+            return null;
         }
 
-        if (BinaryUploadRequest.NAME.equals(type)) {
-            return new BinaryUploadTask(this, intent);
-        }
+        HttpUploadTask uploadTask = null;
 
-        return null;
+        try {
+            Class<?> task = Class.forName(taskClass);
+
+            if (HttpUploadTask.class.isAssignableFrom(task)) {
+                uploadTask = HttpUploadTask.class.cast(task.newInstance());
+                uploadTask.init(this, intent);
+            } else {
+                Log.e(TAG, taskClass + " does not extend HttpUploadTask!");
+            }
+
+        } catch (Exception ignored) { }
+
+        return uploadTask;
     }
 
     /**

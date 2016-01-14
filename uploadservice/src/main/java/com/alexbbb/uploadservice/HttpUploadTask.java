@@ -33,13 +33,13 @@ abstract class HttpUploadTask implements Runnable {
 
     protected UploadService service;
 
-    protected final String uploadId;
-    protected final String url;
-    protected final String method;
-    protected final String customUserAgent;
-    protected final int maxRetries;
-    protected final boolean autoDeleteFilesAfterSuccessfulUpload;
-    protected final ArrayList<NameValue> headers;
+    protected String uploadId;
+    protected String url;
+    protected String method;
+    protected String customUserAgent;
+    protected int maxRetries;
+    protected boolean autoDeleteFilesAfterSuccessfulUpload;
+    protected ArrayList<NameValue> headers;
 
     protected HttpURLConnection connection = null;
     protected OutputStream requestStream = null;
@@ -55,8 +55,7 @@ abstract class HttpUploadTask implements Runnable {
     protected long totalBodyBytes;
     protected long uploadedBodyBytes;
 
-    HttpUploadTask(UploadService service, Intent intent) {
-
+    protected void init(UploadService service, Intent intent) {
         this.notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
         this.notificationConfig = intent.getParcelableExtra(UploadService.PARAM_NOTIFICATION_CONFIG);
         this.notification = new NotificationCompat.Builder(service);

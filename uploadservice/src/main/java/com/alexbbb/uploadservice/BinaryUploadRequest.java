@@ -10,13 +10,9 @@ import java.net.MalformedURLException;
  * Binary file upload request.
  *
  * @author cankov
+ * @author alexbbb
  */
 public class BinaryUploadRequest extends HttpUploadRequest {
-
-    /**
-     * Static constant used to identify the task type. It must be unique between task types.
-     */
-    public static final String NAME = "binary";
 
     private BinaryUploadFile file = null;
 
@@ -73,7 +69,6 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     @Override
     protected void initializeIntent(Intent intent) {
         super.initializeIntent(intent);
-        intent.putExtra(UploadService.PARAM_TYPE, NAME);
         intent.putExtra(UploadService.PARAM_FILE, getFile());
     }
 
@@ -123,6 +118,11 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     public BinaryUploadRequest setMaxRetries(int maxRetries) {
         super.setMaxRetries(maxRetries);
         return this;
+    }
+
+    @Override
+    protected Class getTaskClass() {
+        return BinaryUploadTask.class;
     }
 
     /**

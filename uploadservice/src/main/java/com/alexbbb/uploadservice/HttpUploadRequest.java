@@ -81,6 +81,12 @@ abstract class HttpUploadRequest {
         intent.putExtra(UploadService.PARAM_MAX_RETRIES, getMaxRetries());
         intent.putExtra(UploadService.PARAM_AUTO_DELETE_FILES, autoDeleteFilesAfterSuccessfulUpload);
         intent.putParcelableArrayListExtra(UploadService.PARAM_REQUEST_HEADERS, getHeaders());
+
+        Class taskClass = getTaskClass();
+        if (taskClass == null)
+            throw new RuntimeException("The request must specify a task class!");
+
+        intent.putExtra(UploadService.PARAM_TASK_CLASS, taskClass.getName());
     }
 
     /**
@@ -244,4 +250,11 @@ abstract class HttpUploadRequest {
 
         return this;
     }
+
+    /**
+     * Implement in subclasses to specify the class which will handle the the upload task.
+     * The class must be a subclass of {@link HttpUploadTask}.
+     * @return class
+     */
+    protected abstract Class getTaskClass();
 }
