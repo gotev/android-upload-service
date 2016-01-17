@@ -74,40 +74,72 @@
             android:layout_height="wrap_content"
             android:ems="10" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/options"
+            android:id="@+id/optionsTextView" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fixed_length_streaming_mode"
+            android:id="@+id/fixedLengthStreamingMode"
+            android:layout_gravity="start"
+            android:checked="true" />
+
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/display_notification"
             android:id="@+id/displayNotification"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="start"
             android:checked="true" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_clear_on_success"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:id="@+id/autoClearOnSuccess" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/auto_delete_uploaded_files"
             android:id="@+id/autoDeleteUploadedFiles"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="start" />
 
-        <Button
-            android:id="@+id/multipartUploadButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/multipart_upload" />
+            android:layout_gravity="center_horizontal">
 
-        <Button
-            android:id="@+id/binaryUploadButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/binary_upload" />
+            <Button
+                android:id="@+id/multipartUploadButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:text="@string/multipart_upload" />
+
+            <Button
+                android:id="@+id/binaryUploadButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:text="@string/binary_upload" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/cancelAllUploadsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:text="@string/cancel_all_uploads" />
 
     </LinearLayout>

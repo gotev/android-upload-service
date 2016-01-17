@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.parameterName) EditText parameterName;
     @Bind(R.id.displayNotification) CheckBox displayNotification;
     @Bind(R.id.autoDeleteUploadedFiles) CheckBox autoDeleteUploadedFiles;
+    @Bind(R.id.autoClearOnSuccess) CheckBox autoClearOnSuccess;
+    @Bind(R.id.fixedLengthStreamingMode) CheckBox fixedLengthStreamingMode;
 
     private Map<String, UploadProgressViewHolder> uploadProgressHolders = new HashMap<>();
 
@@ -148,10 +150,18 @@ public class MainActivity extends AppCompatActivity {
             .setInProgressMessage(getString(R.string.uploading))
             .setCompletedMessage(getString(R.string.upload_success))
             .setErrorMessage(getString(R.string.upload_error))
-            .setAutoClearOnSuccess(false)
+            .setAutoClearOnSuccess(autoClearOnSuccess.isChecked())
             .setClickIntent(new Intent(this, MainActivity.class))
             .setClearOnAction(true)
             .setRingToneEnabled(true);
+    }
+
+    private void addUploadToList(String uploadID, String filename) {
+        View uploadProgressView = getLayoutInflater().inflate(R.layout.view_upload_progress, null);
+        UploadProgressViewHolder viewHolder = new UploadProgressViewHolder(uploadProgressView, filename);
+        viewHolder.uploadId = uploadID;
+        container.addView(viewHolder.itemView, 0);
+        uploadProgressHolders.put(uploadID, viewHolder);
     }
 
     @OnClick(R.id.multipartUploadButton)
@@ -171,14 +181,11 @@ public class MainActivity extends AppCompatActivity {
                         .setNotificationConfig(getNotificationConfig(filename))
                         .setCustomUserAgent(USER_AGENT)
                         .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
+                        .setUsesFixedLengthStreamingMode(fixedLengthStreamingMode.isChecked())
                         .setMaxRetries(2)
                         .startUpload();
 
-                View uploadProgressView = getLayoutInflater().inflate(R.layout.view_upload_progress, null);
-                UploadProgressViewHolder viewHolder = new UploadProgressViewHolder(uploadProgressView, filename);
-                viewHolder.uploadId = uploadID;
-                container.addView(viewHolder.itemView, 0);
-                uploadProgressHolders.put(uploadID, viewHolder);
+                addUploadToList(uploadID,filename);
 
                 // these are the different exceptions that may be thrown
             } catch (FileNotFoundException exc) {
@@ -208,14 +215,11 @@ public class MainActivity extends AppCompatActivity {
                         .setNotificationConfig(getNotificationConfig(filename))
                         .setCustomUserAgent(USER_AGENT)
                         .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
+                        .setUsesFixedLengthStreamingMode(fixedLengthStreamingMode.isChecked())
                         .setMaxRetries(2)
                         .startUpload();
 
-                View uploadProgressView = getLayoutInflater().inflate(R.layout.view_upload_progress, null);
-                UploadProgressViewHolder viewHolder = new UploadProgressViewHolder(uploadProgressView, filename);
-                viewHolder.uploadId = uploadID;
-                container.addView(viewHolder.itemView, 0);
-                uploadProgressHolders.put(uploadID, viewHolder);
+                addUploadToList(uploadID, filename);
 
                 // these are the different exceptions that may be thrown
             } catch (FileNotFoundException exc) {
@@ -267,7 +271,8 @@ public class MainActivity extends AppCompatActivity {
                             resultUris.add(clip.getItemAt(i).getUri());
                         }
                     }
-                    // For Ice Cream Sandwich
+
+                // For Ice Cream Sandwich
                 } else {
                     ArrayList<String> paths = data.getStringArrayListExtra(FilePickerActivity.EXTRA_PATHS);
 
