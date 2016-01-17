@@ -7,7 +7,8 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
- * Binary file upload request.
+ * Binary file upload request. The binary upload uses a single file as the raw body of the
+ * upload request.
  *
  * @author cankov
  * @author alexbbb (Aleksandar Gotev)

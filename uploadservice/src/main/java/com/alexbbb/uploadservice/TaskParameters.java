@@ -19,7 +19,7 @@ public final class TaskParameters implements Parcelable {
     private String method = "POST";
     private String customUserAgent;
     private int maxRetries = 0;
-    private boolean usesFixedLengthStreamingMode = false;
+    private boolean usesFixedLengthStreamingMode = true;
     private boolean autoDeleteSuccessfullyUploadedFiles = false;
     private UploadNotificationConfig notificationConfig;
     private ArrayList<NameValue> requestHeaders = new ArrayList<>();

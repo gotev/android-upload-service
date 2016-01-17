@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 /**
- * Broadcast receiver from which to inherit when creating a receiver for
- * {@link UploadService}.
+ * Broadcast receiver to sublass to create a receiver for
+ * {@link UploadService} events.
  *
  * It provides the boilerplate code to properly handle broadcast messages coming from the
  * upload service and dispatch them to the proper handler method.
@@ -51,9 +51,9 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Register this upload receiver.
+     * Register this upload receiver.<br>
      * If you use this receiver in an {@link android.app.Activity}, you have to call this method inside
-     * {@link android.app.Activity#onResume()}, after {@code super.onResume();}.
+     * {@link android.app.Activity#onResume()}, after {@code super.onResume();}.<br>
      * If you use it in a {@link android.app.Service}, you have to
      * call this method inside {@link android.app.Service#onCreate()}, after {@code super.onCreate();}.
      *
@@ -66,9 +66,9 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Unregister this upload receiver.
+     * Unregister this upload receiver.<br>
      * If you use this receiver in an {@link android.app.Activity}, you have to call this method inside
-     * {@link android.app.Activity#onPause()}, after {@code super.onPause();}.
+     * {@link android.app.Activity#onPause()}, after {@code super.onPause();}.<br>
      * If you use it in a {@link android.app.Service}, you have to
      * call this method inside {@link android.app.Service#onDestroy()}.
      *

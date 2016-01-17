@@ -21,7 +21,8 @@ import java.net.URL;
 import java.util.Iterator;
 
 /**
- * Generic HTTP Upload Task.
+ * Generic HTTP Upload Task.<br>
+ * Subclass to create your custom upload task.
  *
  * @author cankov
  * @author alexbbb (Aleksandar Gotev)
@@ -31,22 +32,63 @@ public abstract class HttpUploadTask implements Runnable {
 
     private static final int BUFFER_SIZE = 4096;
 
+    /**
+     * Reference to the upload service instance.
+     */
     protected UploadService service;
+
+    /**
+     * Contains all the parameters set in {@link HttpUploadRequest}.
+     */
     protected TaskParameters params = null;
 
+    /**
+     * HttpUrlConnection used to perform the upload task.
+     */
     protected HttpURLConnection connection = null;
+
+    /**
+     * Server output stream got from HttpUrlConnection. Used to send data to the server.
+     */
     protected OutputStream requestStream = null;
+
+    /**
+     * Server input stream got from HttpUrlConnection. Used to get server response.
+     */
     protected InputStream responseStream = null;
+
+    /**
+     * Flag indicating if the operation should continue or is cancelled. You should never
+     * explicitly set this value in your subclasses, as it's written by the Upload Service
+     * when you call {@link UploadService#stopUpload(String)}.
+     */
     protected boolean shouldContinue = true;
+
+    /**
+     * Counter of how many bytes have been successfully transferred to the server.
+     */
+    protected long uploadedBodyBytes;
+
+    /**
+     * Total bytes to send in the request body. This value is set by the value returned from
+     * {@link HttpUploadTask#getBodyLength()} method.
+     */
+    protected long totalBodyBytes;
 
     private int notificationId;
     private long lastProgressNotificationTime;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder notification;
 
-    protected long totalBodyBytes;
-    protected long uploadedBodyBytes;
-
+    /**
+     * Initializes the {@link HttpUploadTask}.<br>
+     * Override this method in subclasses to perform custom task initialization and to get the
+     * custom parameters set in {@link HttpUploadRequest#initializeIntent(Intent)} method.
+     *
+     * @param service Upload Service instance
+     * @param intent intent sent to the service to start the upload
+     * @throws IOException if an I/O exception occurs while initializing
+     */
     protected void init(UploadService service, Intent intent) throws IOException {
         this.notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
         this.notification = new NotificationCompat.Builder(service);
@@ -96,6 +138,16 @@ public abstract class HttpUploadTask implements Runnable {
         }
     }
 
+    /**
+     * Implementation of the upload logic.<br>
+     * If you want to take advantage of the automations which Android Upload Service provides,
+     * do not override or change the implementation of this method in your subclasses. If you do,
+     * you have full control on how the upload is done, so for example you can use your custom
+     * http stack, but you have to manually setup the request to the server with everything you
+     * set in your {@link HttpUploadRequest} subclass and to get the response from the server.
+     *
+     * @throws Exception if an error occurs
+     */
     @SuppressLint("NewApi")
     protected void upload() throws Exception {
 
@@ -139,6 +191,11 @@ public abstract class HttpUploadTask implements Runnable {
         }
     }
 
+    /**
+     * Creates a new {@link HttpURLConnection} with the custom request method and streaming mode
+     * set in {@link HttpUploadRequest}.
+     * @throws IOException if an error occurs
+     */
     protected final HttpURLConnection getHttpURLConnection() throws IOException {
         final HttpURLConnection conn = (HttpURLConnection) new URL(params.getUrl()).openConnection();
 
@@ -236,12 +293,12 @@ public abstract class HttpUploadTask implements Runnable {
         this.shouldContinue = false;
     }
 
-    public final HttpUploadTask setLastProgressNotificationTime(long lastProgressNotificationTime) {
+    protected final HttpUploadTask setLastProgressNotificationTime(long lastProgressNotificationTime) {
         this.lastProgressNotificationTime = lastProgressNotificationTime;
         return this;
     }
 
-    public final HttpUploadTask setNotificationId(int notificationId) {
+    protected final HttpUploadTask setNotificationId(int notificationId) {
         this.notificationId = notificationId;
         return this;
     }
@@ -285,7 +342,7 @@ public abstract class HttpUploadTask implements Runnable {
             return;
         }
 
-        lastProgressNotificationTime = currentTime;
+        setLastProgressNotificationTime(currentTime);
 
         BroadcastData data = new BroadcastData()
                 .setId(params.getId())

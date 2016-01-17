@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Represents a generic HTTP upload request.
+ * Represents a generic HTTP upload request.<br>
+ * Subclass to create your own custom upload request.
  *
  * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
@@ -57,7 +58,8 @@ public abstract class HttpUploadRequest {
     }
 
     /**
-     * Write any upload request data to the intent used to start the upload service.
+     * Write any upload request data to the intent used to start the upload service.<br>
+     * Override this method in subclasses to add your own custom parameters to the upload task.
      *
      * @param intent the intent used to start the upload service
      */

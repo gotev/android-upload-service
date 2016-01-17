@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 
 /**
- * Task to upload a binary file.
+ * Implements a binary file upload task.
  *
  * @author cankov
  * @author alexbbb (Aleksandar Gotev)
