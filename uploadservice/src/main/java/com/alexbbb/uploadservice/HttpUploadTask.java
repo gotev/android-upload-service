@@ -18,7 +18,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Generic HTTP Upload Task.
@@ -27,19 +27,12 @@ import java.util.ArrayList;
  * @author alexbbb (Aleksandar Gotev)
  * @author mabdurrahman
  */
-abstract class HttpUploadTask implements Runnable {
+public abstract class HttpUploadTask implements Runnable {
 
     private static final int BUFFER_SIZE = 4096;
 
     protected UploadService service;
-
-    protected String uploadId;
-    protected String url;
-    protected String method;
-    protected String customUserAgent;
-    protected int maxRetries;
-    protected boolean autoDeleteFilesAfterSuccessfulUpload;
-    protected ArrayList<NameValue> headers;
+    protected TaskParameters params = null;
 
     protected HttpURLConnection connection = null;
     protected OutputStream requestStream = null;
@@ -50,28 +43,19 @@ abstract class HttpUploadTask implements Runnable {
     private long lastProgressNotificationTime;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder notification;
-    protected UploadNotificationConfig notificationConfig;
 
     protected long totalBodyBytes;
     protected long uploadedBodyBytes;
 
-    protected void init(UploadService service, Intent intent) {
+    protected void init(UploadService service, Intent intent) throws IOException {
         this.notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
-        this.notificationConfig = intent.getParcelableExtra(UploadService.PARAM_NOTIFICATION_CONFIG);
         this.notification = new NotificationCompat.Builder(service);
         this.service = service;
-
-        this.uploadId = intent.getStringExtra(UploadService.PARAM_ID);
-        this.url = intent.getStringExtra(UploadService.PARAM_URL);
-        this.method = intent.getStringExtra(UploadService.PARAM_METHOD);
-        this.customUserAgent = intent.getStringExtra(UploadService.PARAM_CUSTOM_USER_AGENT);
-        this.maxRetries = intent.getIntExtra(UploadService.PARAM_MAX_RETRIES, 0);
-        this.autoDeleteFilesAfterSuccessfulUpload = intent.getBooleanExtra(UploadService.PARAM_AUTO_DELETE_FILES, false);
-        this.headers = intent.getParcelableArrayListExtra(UploadService.PARAM_REQUEST_HEADERS);
+        this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS);
     }
 
     @Override
-    public void run() {
+    public final void run() {
 
         createNotification();
 
@@ -80,21 +64,23 @@ abstract class HttpUploadTask implements Runnable {
         int errorDelay = 1000;
         int maxErrorDelay = 10 * 60 * 1000;
 
-        while (attempts <= maxRetries && shouldContinue) {
+        while (attempts <= params.getMaxRetries() && shouldContinue) {
             attempts++;
-            try {
-                this.upload();
 
+            try {
+                upload();
                 break;
+
             } catch (Exception exc) {
                 if (!shouldContinue) {
                     break;
-                } else if (attempts > maxRetries) {
+                } else if (attempts > params.getMaxRetries()) {
                     broadcastError(exc);
                 } else {
-                    Log.w(getClass().getName(), "Error in uploadId " + uploadId + " on attempt " + attempts
+                    Log.w(getClass().getName(), "Error in uploadId " + params.getId()
+                                    + " on attempt " + attempts
                                     + ". Waiting " + errorDelay / 1000 + "s before next attempt",
-                            exc);
+                                    exc);
                     SystemClock.sleep(errorDelay);
 
                     errorDelay *= 10;
@@ -110,53 +96,23 @@ abstract class HttpUploadTask implements Runnable {
         }
     }
 
-    public void cancel() {
-        this.shouldContinue = false;
-    }
-
-    public HttpUploadTask setLastProgressNotificationTime(long lastProgressNotificationTime) {
-        this.lastProgressNotificationTime = lastProgressNotificationTime;
-        return this;
-    }
-
-    public HttpUploadTask setNotificationId(int notificationId) {
-        this.notificationId = notificationId;
-        return this;
-    }
-
     @SuppressLint("NewApi")
-    protected void upload() throws IOException {
+    protected void upload() throws Exception {
 
         try {
             totalBodyBytes = getBodyLength();
 
-            if (android.os.Build.VERSION.SDK_INT < 19 && totalBodyBytes > Integer.MAX_VALUE)
-                throw new IOException("You need Android API version 19 or newer to "
-                        + "upload more than 2GB in a single request using "
-                        + "fixed size content length. Try switching to "
-                        + "chunked mode instead, but make sure your server side supports it!");
-
             connection = getHttpURLConnection();
 
-            if (customUserAgent != null && !customUserAgent.equals("")) {
-                headers.add(new NameValue("User-Agent", customUserAgent));
+            if (params.isCustomUserAgentDefined()) {
+                params.addRequestHeader("User-Agent", params.getCustomUserAgent());
             }
 
             setRequestHeaders();
 
-            if (android.os.Build.VERSION.SDK_INT >= 19) {
-                connection.setFixedLengthStreamingMode(totalBodyBytes);
-            } else {
-                connection.setFixedLengthStreamingMode((int) totalBodyBytes);
-            }
-
             requestStream = connection.getOutputStream();
 
-            try {
-                writeBody();
-            } finally {
-                closeInputStream();
-            }
+            writeBody();
 
             final int serverResponseCode = connection.getResponseCode();
 
@@ -166,7 +122,15 @@ abstract class HttpUploadTask implements Runnable {
                 responseStream = connection.getErrorStream();
             }
 
-            broadcastCompleted(serverResponseCode, getResponseBodyAsByteArray(responseStream));
+            // Broadcast completion only if the user has not cancelled the operation.
+            // It may happen that when the body is not completely written and the client
+            // closes the connection, no exception is thrown here, and the server responds
+            // with an HTTP status code. Without this, what happened was that completion was
+            // broadcasted and then the cancellation. That behaviour was not desirable as the
+            // library user couldn't execute code on user cancellation.
+            if (shouldContinue) {
+                broadcastCompleted(serverResponseCode, getResponseBodyAsByteArray(responseStream));
+            }
 
         } finally {
             closeOutputStream();
@@ -175,16 +139,44 @@ abstract class HttpUploadTask implements Runnable {
         }
     }
 
-    protected HttpURLConnection getHttpURLConnection() throws IOException {
-        final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+    protected final HttpURLConnection getHttpURLConnection() throws IOException {
+        final HttpURLConnection conn = (HttpURLConnection) new URL(params.getUrl()).openConnection();
 
         conn.setDoInput(true);
         conn.setDoOutput(true);
         conn.setUseCaches(false);
-        conn.setRequestMethod(method);
+        conn.setInstanceFollowRedirects(true);
+        conn.setRequestMethod(params.getMethod());
+
+        if (params.isUsesFixedLengthStreamingMode()) {
+            if (android.os.Build.VERSION.SDK_INT >= 19) {
+                conn.setFixedLengthStreamingMode(totalBodyBytes);
+
+            } else {
+                if (totalBodyBytes > Integer.MAX_VALUE)
+                    throw new RuntimeException("You need Android API version 19 or newer to "
+                            + "upload more than 2GB in a single request using "
+                            + "fixed size content length. Try switching to "
+                            + "chunked mode instead, but make sure your server side supports it!");
+
+                conn.setFixedLengthStreamingMode((int) totalBodyBytes);
+            }
+        } else {
+            conn.setChunkedStreamingMode(0);
+        }
+
+        setupHttpUrlConnection(conn);
 
         return conn;
     }
+
+    /**
+     * Implement in subclasses to be able to perform additional setup to the underlying
+     * {@link HttpURLConnection}.
+     * @param connection connection to configure
+     * @throws IOException if some IO errors occurs
+     */
+    protected abstract void setupHttpUrlConnection(HttpURLConnection connection) throws IOException;
 
     /**
      * Implement in subclasses to provide the expected upload in the progress notifications.
@@ -233,11 +225,25 @@ abstract class HttpUploadTask implements Runnable {
     }
 
     private void setRequestHeaders() {
-        if (!headers.isEmpty()) {
-            for (final NameValue param : headers) {
+        if (!params.getRequestHeaders().isEmpty()) {
+            for (final NameValue param : params.getRequestHeaders()) {
                 connection.setRequestProperty(param.getName(), param.getValue());
             }
         }
+    }
+
+    public final void cancel() {
+        this.shouldContinue = false;
+    }
+
+    public final HttpUploadTask setLastProgressNotificationTime(long lastProgressNotificationTime) {
+        this.lastProgressNotificationTime = lastProgressNotificationTime;
+        return this;
+    }
+
+    public final HttpUploadTask setNotificationId(int notificationId) {
+        this.notificationId = notificationId;
+        return this;
     }
 
     private byte[] getResponseBodyAsByteArray(final InputStream inputStream) {
@@ -255,7 +261,7 @@ abstract class HttpUploadTask implements Runnable {
         return byteStream.toByteArray();
     }
 
-    protected void writeStream(InputStream stream) throws IOException {
+    protected final void writeStream(InputStream stream) throws IOException {
         byte[] buffer = new byte[BUFFER_SIZE];
         int bytesRead;
 
@@ -266,7 +272,13 @@ abstract class HttpUploadTask implements Runnable {
         }
     }
 
-    protected void broadcastProgress(final long uploadedBytes, final long totalBytes) {
+    /**
+     * Broadcasts a progress update.
+     *
+     * @param uploadedBytes
+     * @param totalBytes
+     */
+    protected final void broadcastProgress(final long uploadedBytes, final long totalBytes) {
 
         long currentTime = System.currentTimeMillis();
         if (currentTime < lastProgressNotificationTime + UploadService.PROGRESS_REPORT_INTERVAL) {
@@ -275,80 +287,129 @@ abstract class HttpUploadTask implements Runnable {
 
         lastProgressNotificationTime = currentTime;
 
-        final Intent intent = new Intent(UploadService.getActionBroadcast());
-        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
-        intent.putExtra(UploadService.STATUS, UploadService.STATUS_IN_PROGRESS);
+        BroadcastData data = new BroadcastData()
+                .setId(params.getId())
+                .setStatus(BroadcastData.Status.IN_PROGRESS)
+                .setUploadedBytes(uploadedBytes)
+                .setTotalBytes(totalBytes);
 
-        final int percentsProgress = (int) (uploadedBytes * 100 / totalBytes);
-        intent.putExtra(UploadService.PROGRESS, percentsProgress);
-
-        intent.putExtra(UploadService.PROGRESS_UPLOADED_BYTES, uploadedBytes);
-        intent.putExtra(UploadService.PROGRESS_TOTAL_BYTES, totalBytes);
-        service.sendBroadcast(intent);
+        service.sendBroadcast(data.getIntent());
 
         updateNotificationProgress((int) uploadedBytes, (int) totalBytes);
     }
 
-    void broadcastCompleted(final int responseCode, final byte[] serverResponseBody) {
+    /**
+     * Broadcasts a completion update. Call this when the task has completed the upload request and
+     * has received the response from the server.
+     *
+     * @param responseCode HTTP response code got from the server
+     * @param serverResponseBody bytes read from server's response body
+     */
+    protected final void broadcastCompleted(final int responseCode, final byte[] serverResponseBody) {
 
         boolean successfulUpload = ((responseCode / 100) == 2);
 
         if (successfulUpload) {
+            if (params.isAutoDeleteSuccessfullyUploadedFiles() && !params.getFiles().isEmpty()) {
+                Iterator<UploadFile> iterator = params.getFiles().iterator();
+
+                while (iterator.hasNext()) {
+                    deleteFile(iterator.next().file);
+                }
+            }
+
             onSuccessfulUpload();
         }
 
-        final Intent intent = new Intent(UploadService.getActionBroadcast());
-        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
-        intent.putExtra(UploadService.STATUS, UploadService.STATUS_COMPLETED);
-        intent.putExtra(UploadService.SERVER_RESPONSE_CODE, responseCode);
-        intent.putExtra(UploadService.SERVER_RESPONSE_BODY, serverResponseBody);
-        service.sendBroadcast(intent);
+        BroadcastData data = new BroadcastData()
+                .setId(params.getId())
+                .setStatus(BroadcastData.Status.COMPLETED)
+                .setResponseCode(responseCode)
+                .setResponseBody(serverResponseBody);
+
+        service.sendBroadcast(data.getIntent());
 
         if (successfulUpload)
             updateNotificationCompleted();
         else
             updateNotificationError();
 
-        service.taskCompleted(uploadId);
+        service.taskCompleted(params.getId());
     }
 
-    void broadcastError(final Exception exception) {
+    /**
+     * Broadcast a cancelled status. Call this when the value of {@code shouldContinue} is false,
+     * after that you have done the needed actions to properly cancel the request.
+     */
+    protected final void broadcastCancelled() {
 
-        final Intent intent = new Intent(UploadService.getActionBroadcast());
-        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
-        intent.putExtra(UploadService.STATUS, UploadService.STATUS_ERROR);
-        intent.putExtra(UploadService.ERROR_EXCEPTION, exception);
-        service.sendBroadcast(intent);
+        BroadcastData data = new BroadcastData()
+                .setId(params.getId())
+                .setStatus(BroadcastData.Status.CANCELLED);
+
+        service.sendBroadcast(data.getIntent());
 
         updateNotificationError();
 
-        service.taskCompleted(uploadId);
+        service.taskCompleted(params.getId());
     }
 
-    void broadcastCancelled() {
-        final Intent intent = new Intent(UploadService.getActionBroadcast());
-        intent.putExtra(UploadService.UPLOAD_ID, uploadId);
-        intent.putExtra(UploadService.STATUS, UploadService.STATUS_CANCELLED);
-        service.sendBroadcast(intent);
+    /**
+     * Tries to delete a file from the device. If it fails, the error will be printed in the LogCat
+     * log.
+     *
+     * @param fileToDelete file to delete
+     * @return true if the file has been deleted, otherwise false.
+     */
+    protected final boolean deleteFile(File fileToDelete) {
+        boolean deleted = false;
+
+        try {
+            deleted = fileToDelete.delete();
+
+            if (!deleted) {
+                Log.e(this.getClass().getSimpleName(), "Unable to delete: " + fileToDelete.getAbsolutePath());
+            }
+
+        } catch (Exception exc) {
+            Log.e(this.getClass().getSimpleName(), "Error while deleting: " + fileToDelete.getAbsolutePath(), exc);
+        }
+
+        return deleted;
+    }
+
+    /**
+     * Broadcasts an error.
+     *
+     * @param exception exception to broadcast
+     */
+    private void broadcastError(final Exception exception) {
+
+        BroadcastData data = new BroadcastData()
+                .setId(params.getId())
+                .setStatus(BroadcastData.Status.ERROR)
+                .setException(exception);
+
+        service.sendBroadcast(data.getIntent());
 
         updateNotificationError();
 
-        service.taskCompleted(uploadId);
+        service.taskCompleted(params.getId());
     }
 
     private void createNotification() {
-        if (notificationConfig == null) return;
+        if (params.getNotificationConfig() == null) return;
 
-        notification.setContentTitle(notificationConfig.getTitle())
-                .setContentText(notificationConfig.getInProgressMessage())
-                .setContentIntent(notificationConfig.getPendingIntent(service))
-                .setSmallIcon(notificationConfig.getIconResourceID())
+        notification.setContentTitle(params.getNotificationConfig().getTitle())
+                .setContentText(params.getNotificationConfig().getInProgressMessage())
+                .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
+                .setSmallIcon(params.getNotificationConfig().getIconResourceID())
                 .setProgress(100, 0, true)
                 .setOngoing(true);
 
         Notification builtNotification = notification.build();
 
-        if (service.holdForegroundNotification(uploadId, builtNotification)) {
+        if (service.holdForegroundNotification(params.getId(), builtNotification)) {
             notificationManager.cancel(notificationId);
         } else {
             notificationManager.notify(notificationId, builtNotification);
@@ -356,18 +417,18 @@ abstract class HttpUploadTask implements Runnable {
     }
 
     private void updateNotificationProgress(int uploadedBytes, int totalBytes) {
-        if (notificationConfig == null) return;
+        if (params.getNotificationConfig() == null) return;
 
-        notification.setContentTitle(notificationConfig.getTitle())
-                .setContentText(notificationConfig.getInProgressMessage())
-                .setContentIntent(notificationConfig.getPendingIntent(service))
-                .setSmallIcon(notificationConfig.getIconResourceID())
+        notification.setContentTitle(params.getNotificationConfig().getTitle())
+                .setContentText(params.getNotificationConfig().getInProgressMessage())
+                .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
+                .setSmallIcon(params.getNotificationConfig().getIconResourceID())
                 .setProgress(totalBytes, uploadedBytes, false)
                 .setOngoing(true);
 
         Notification builtNotification = notification.build();
 
-        if (service.holdForegroundNotification(uploadId, builtNotification)) {
+        if (service.holdForegroundNotification(params.getId(), builtNotification)) {
             notificationManager.cancel(notificationId);
         } else {
             notificationManager.notify(notificationId, builtNotification);
@@ -376,7 +437,7 @@ abstract class HttpUploadTask implements Runnable {
 
     private void setRingtone() {
 
-        if(notificationConfig.isRingToneEnabled()) {
+        if(params.getNotificationConfig().isRingToneEnabled()) {
             notification.setSound(RingtoneManager.getActualDefaultRingtoneUri(service, RingtoneManager.TYPE_NOTIFICATION));
             notification.setOnlyAlertOnce(false);
         }
@@ -384,16 +445,16 @@ abstract class HttpUploadTask implements Runnable {
     }
 
     private void updateNotificationCompleted() {
-        if (notificationConfig == null) return;
+        if (params.getNotificationConfig() == null) return;
 
         notificationManager.cancel(notificationId);
 
-        if (!notificationConfig.isAutoClearOnSuccess()) {
-            notification.setContentTitle(notificationConfig.getTitle())
-                    .setContentText(notificationConfig.getCompletedMessage())
-                    .setContentIntent(notificationConfig.getPendingIntent(service))
-                    .setAutoCancel(notificationConfig.isClearOnAction())
-                    .setSmallIcon(notificationConfig.getIconResourceID())
+        if (!params.getNotificationConfig().isAutoClearOnSuccess()) {
+            notification.setContentTitle(params.getNotificationConfig().getTitle())
+                    .setContentText(params.getNotificationConfig().getCompletedMessage())
+                    .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
+                    .setAutoCancel(params.getNotificationConfig().isClearOnAction())
+                    .setSmallIcon(params.getNotificationConfig().getIconResourceID())
                     .setProgress(0, 0, false)
                     .setOngoing(false);
             setRingtone();
@@ -405,30 +466,20 @@ abstract class HttpUploadTask implements Runnable {
     }
 
     private void updateNotificationError() {
-        if (notificationConfig == null) return;
+        if (params.getNotificationConfig() == null) return;
 
         notificationManager.cancel(notificationId);
 
-        notification.setContentTitle(notificationConfig.getTitle())
-                .setContentText(notificationConfig.getErrorMessage())
-                .setContentIntent(notificationConfig.getPendingIntent(service))
-                .setAutoCancel(notificationConfig.isClearOnAction())
-                .setSmallIcon(notificationConfig.getIconResourceID())
+        notification.setContentTitle(params.getNotificationConfig().getTitle())
+                .setContentText(params.getNotificationConfig().getErrorMessage())
+                .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
+                .setAutoCancel(params.getNotificationConfig().isClearOnAction())
+                .setSmallIcon(params.getNotificationConfig().getIconResourceID())
                 .setProgress(0, 0, false).setOngoing(false);
         setRingtone();
 
         // this is needed because the main notification used to show progress is ongoing
         // and a new one has to be created to allow the user to dismiss it
         notificationManager.notify(notificationId + 1, notification.build());
-    }
-
-    protected void deleteFile(String errorTag, File fileToDelete) {
-        try {
-            if (!fileToDelete.delete()) {
-                Log.e(errorTag, "Unable to delete " + fileToDelete.getAbsolutePath());
-            }
-        } catch (Exception exc) {
-            Log.e(errorTag, "Error while deleting file " + fileToDelete.getAbsolutePath(), exc);
-        }
     }
 }

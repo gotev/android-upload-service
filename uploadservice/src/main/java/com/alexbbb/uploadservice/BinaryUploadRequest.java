@@ -1,20 +1,18 @@
 package com.alexbbb.uploadservice;
 
 import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
+import java.util.List;
 
 /**
  * Binary file upload request.
  *
  * @author cankov
- * @author alexbbb
+ * @author alexbbb (Aleksandar Gotev)
  */
 public class BinaryUploadRequest extends HttpUploadRequest {
-
-    private BinaryUploadFile file = null;
 
     /**
      * Creates a binary file upload request.
@@ -45,31 +43,9 @@ public class BinaryUploadRequest extends HttpUploadRequest {
         this(context, null, serverUrl);
     }
 
-    /**
-     * Validates the upload request and throws exceptions if one or more parameters are not
-     * properly set.
-     *
-     * @throws IllegalArgumentException if request protocol or URL are not correctly set o
-     * if no file is set
-     * @throws MalformedURLException if the provided server URL is not valid
-     */
     @Override
-    protected void validate() throws IllegalArgumentException, MalformedURLException {
-        super.validate();
-        if (file == null) {
-            throw new IllegalArgumentException("You have to set a file to upload");
-        }
-    }
-
-    /**
-     * Write any upload request data to the intent used to start the upload service.
-     *
-     * @param intent the intent used to start the upload service
-     */
-    @Override
-    protected void initializeIntent(Intent intent) {
-        super.initializeIntent(intent);
-        intent.putExtra(UploadService.PARAM_FILE, getFile());
+    protected Class getTaskClass() {
+        return BinaryUploadTask.class;
     }
 
     /**
@@ -80,7 +56,8 @@ public class BinaryUploadRequest extends HttpUploadRequest {
      * @return {@link BinaryUploadRequest}
      */
     public BinaryUploadRequest setFileToUpload(String path) throws FileNotFoundException {
-        file = new BinaryUploadFile(path);
+        params.getFiles().clear();
+        params.addFile(new UploadFile(path));
         return this;
     }
 
@@ -91,8 +68,8 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     }
 
     @Override
-    public BinaryUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFilesAfterSuccessfulUpload) {
-        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFilesAfterSuccessfulUpload);
+    public BinaryUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
+        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFiles);
         return this;
     }
 
@@ -121,16 +98,30 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     }
 
     @Override
-    protected Class getTaskClass() {
-        return BinaryUploadTask.class;
+    public BinaryUploadRequest setUsesFixedLengthStreamingMode(boolean fixedLength) {
+        super.setUsesFixedLengthStreamingMode(fixedLength);
+        return this;
     }
 
-    /**
-     * Gets the file used as raw body of the upload request.
-     *
-     * @return The absolute path of the file that will be used for the upload
-     */
-    protected BinaryUploadFile getFile() {
-        return file;
+    @Override
+    public HttpUploadRequest addParameter(String paramName, String paramValue) {
+        logDoesNotSupportParameters();
+        return this;
+    }
+
+    @Override
+    public HttpUploadRequest addArrayParameter(String paramName, String... array) {
+        logDoesNotSupportParameters();
+        return this;
+    }
+
+    @Override
+    public HttpUploadRequest addArrayParameter(String paramName, List<String> list) {
+        logDoesNotSupportParameters();
+        return this;
+    }
+
+    private void logDoesNotSupportParameters() {
+        Log.e(this.getClass().getSimpleName(), "This upload method does not support adding parameters");
     }
 }

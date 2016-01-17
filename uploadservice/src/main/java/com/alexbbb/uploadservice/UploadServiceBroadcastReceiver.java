@@ -12,7 +12,7 @@ import android.content.IntentFilter;
  * It provides the boilerplate code to properly handle broadcast messages coming from the
  * upload service and dispatch them to the proper handler method.
  *
- * @author alexbbb (Alex Gotev)
+ * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
  * @author mabdurrahman
@@ -22,45 +22,32 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (intent == null || !UploadService.getActionBroadcast().equals(intent.getAction()))
+            return;
 
-        if (intent != null) {
-            if (UploadService.getActionBroadcast().equals(intent.getAction())) {
-                final int status = intent.getIntExtra(UploadService.STATUS, 0);
-                final String uploadId = intent.getStringExtra(UploadService.UPLOAD_ID);
+        BroadcastData data = intent.getParcelableExtra(UploadService.PARAM_BROADCAST_DATA);
 
-                switch (status) {
-                    case UploadService.STATUS_ERROR:
-                        final Exception exception = (Exception) intent
-                                .getSerializableExtra(UploadService.ERROR_EXCEPTION);
-                        onError(uploadId, exception);
-                        break;
+        switch (data.getStatus()) {
+            case ERROR:
+                onError(data.getId(), data.getException());
+                break;
 
-                    case UploadService.STATUS_COMPLETED:
-                        final int responseCode = intent.getIntExtra(UploadService.SERVER_RESPONSE_CODE, 0);
-                        final byte[] responseBody = intent.getByteArrayExtra(UploadService.SERVER_RESPONSE_BODY);
-                        onCompleted(uploadId, responseCode, responseBody);
-                        break;
+            case COMPLETED:
+                onCompleted(data.getId(), data.getResponseCode(), data.getResponseBody());
+                break;
 
-                    case UploadService.STATUS_IN_PROGRESS:
-                        final int progress = intent.getIntExtra(UploadService.PROGRESS, 0);
-                        onProgress(uploadId, progress);
+            case IN_PROGRESS:
+                onProgress(data.getId(), data.getProgressPercent());
+                onProgress(data.getId(), data.getUploadedBytes(), data.getTotalBytes());
+                break;
 
-                        final long uploadedBytes = intent.getLongExtra(UploadService.PROGRESS_UPLOADED_BYTES, 0);
-                        final long totalBytes = intent.getLongExtra(UploadService.PROGRESS_TOTAL_BYTES, 1);
-                        onProgress(uploadId, uploadedBytes, totalBytes);
+            case CANCELLED:
+                onCancelled(data.getId());
+                break;
 
-                        break;
-
-                    case UploadService.STATUS_CANCELLED:
-                        onCancelled(uploadId);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
+            default:
+                break;
         }
-
     }
 
     /**

@@ -1,40 +1,30 @@
 package com.alexbbb.uploadservice;
 
-import android.content.Intent;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 
 /**
  * Task to upload a binary file.
  *
  * @author cankov
- * @author alexbbb
+ * @author alexbbb (Aleksandar Gotev)
  */
-class BinaryUploadTask extends HttpUploadTask {
-
-    private BinaryUploadFile file;
+public class BinaryUploadTask extends HttpUploadTask {
 
     @Override
-    protected void init(UploadService service, Intent intent) {
-        super.init(service, intent);
-        this.file = intent.getParcelableExtra(UploadService.PARAM_FILE);
+    protected void setupHttpUrlConnection(HttpURLConnection connection) throws IOException {
+        // nothing additional to setup for this request type
     }
 
     @Override
     protected long getBodyLength() throws UnsupportedEncodingException {
-        return file.length();
+        return params.getFiles().get(0).length();
     }
 
     @Override
     protected void writeBody() throws IOException {
-        writeStream(file.getStream());
+        writeStream(params.getFiles().get(0).getStream());
     }
 
-    @Override
-    protected void onSuccessfulUpload() {
-        if (autoDeleteFilesAfterSuccessfulUpload) {
-            deleteFile(this.getClass().getSimpleName(), this.file.file);
-        }
-    }
 }

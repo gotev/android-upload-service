@@ -8,10 +8,10 @@ import java.io.UnsupportedEncodingException;
 /**
  * Represents a request parameter.
  *
- * @author alexbbb (Alex Gotev)
+ * @author alexbbb (Aleksandar Gotev)
  *
  */
-class NameValue implements Parcelable {
+public final class NameValue implements Parcelable {
 
     private static final String NEW_LINE = "\r\n";
 
@@ -31,7 +31,7 @@ class NameValue implements Parcelable {
         return value;
     }
 
-    public byte[] getBytes() throws UnsupportedEncodingException {
+    public byte[] getMultipartBytes() throws UnsupportedEncodingException {
         return ("Content-Disposition: form-data; name=\"" + name + "\""
                 + NEW_LINE + NEW_LINE + value).getBytes("UTF-8");
     }

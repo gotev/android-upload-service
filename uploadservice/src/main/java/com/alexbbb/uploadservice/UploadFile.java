@@ -4,45 +4,51 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
- * An HTTP Multipart file to upload.
+ * Represents a file to upload.
  *
- * @author alexbbb (Alex Gotev)
- * @author eliasnaur
- *
+ * @author cankov
+ * @author alexbbb (Aleksandar Gotev)
  */
-class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
+public class UploadFile implements Parcelable {
 
     private static final String NEW_LINE = "\r\n";
+    private static final String UNUSED = "unused";
 
+    protected final File file;
     protected final String paramName;
     protected final String fileName;
     protected String contentType;
 
-    /**
-     * Create a new {@link MultipartUploadFile} object.
-     *
-     * @param path absolute path to the file
-     * @param parameterName parameter name to use in the multipart form
-     * @param contentType content type of the file to send
-     * @throws FileNotFoundException if the specified file is not found
-     * @throws IllegalArgumentException if one or more arguments passed are not valid
-     */
-    public MultipartUploadFile(final String path, final String parameterName,
-                               final String fileName, final String contentType)
-        throws FileNotFoundException, IllegalArgumentException {
+    UploadFile(final String path, final String parameterName,
+               final String fileName, final String contentType)
+            throws FileNotFoundException, IllegalArgumentException {
 
-        super(path);
+        if (path == null || "".equals(path)) {
+            throw new IllegalArgumentException("Please specify a file path! Passed path value is: " + path);
+        }
+
+        File file = new File(path);
+        if (!file.exists()) throw new FileNotFoundException("Could not find file at path: " + path);
+        this.file = file;
 
         if (parameterName == null || "".equals(parameterName)) {
             throw new IllegalArgumentException("Please specify parameterName value for file: " + path);
         }
 
         this.paramName = parameterName;
-        this.contentType = contentType;
+
+        if (contentType == null || contentType.isEmpty()) {
+            this.contentType = autoDetectMimeType();
+        } else {
+            this.contentType = contentType;
+        }
 
         if (fileName == null || "".equals(fileName)) {
             this.fileName = this.file.getName();
@@ -51,16 +57,24 @@ class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
         }
     }
 
+    UploadFile(final String path) throws FileNotFoundException {
+        this(path, UNUSED, UNUSED, UNUSED);
+    }
+
+    public long length() {
+        return file.length();
+    }
+
+    public final InputStream getStream() throws FileNotFoundException {
+        return new FileInputStream(file);
+    }
+
     public byte[] getMultipartHeader() throws UnsupportedEncodingException {
         StringBuilder builder = new StringBuilder();
 
         builder.append("Content-Disposition: form-data; name=\"")
-               .append(paramName).append("\"; filename=\"")
-               .append(fileName).append("\"").append(NEW_LINE);
-
-        if (contentType == null || contentType.isEmpty()) {
-            contentType = autoDetectMimeType();
-        }
+                .append(paramName).append("\"; filename=\"")
+                .append(fileName).append("\"").append(NEW_LINE);
 
         builder.append("Content-Type: ").append(contentType).append(NEW_LINE).append(NEW_LINE);
 
@@ -103,18 +117,26 @@ class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
         return boundaryBytesLength + getMultipartHeader().length + file.length();
     }
 
+    @Override
+    public void writeToParcel(Parcel parcel, int arg1) {
+        parcel.writeString(file.getAbsolutePath());
+        parcel.writeString(paramName);
+        parcel.writeString(fileName);
+        parcel.writeString(contentType);
+    }
+
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
-    public static final Parcelable.Creator<MultipartUploadFile> CREATOR =
-            new Parcelable.Creator<MultipartUploadFile>() {
+    public static final Parcelable.Creator<UploadFile> CREATOR =
+            new Parcelable.Creator<UploadFile>() {
         @Override
-        public MultipartUploadFile createFromParcel(final Parcel in) {
-            return new MultipartUploadFile(in);
+        public UploadFile createFromParcel(final Parcel in) {
+            return new UploadFile(in);
         }
 
         @Override
-        public MultipartUploadFile[] newArray(final int size) {
-            return new MultipartUploadFile[size];
+        public UploadFile[] newArray(final int size) {
+            return new UploadFile[size];
         }
     };
 
@@ -123,18 +145,10 @@ class MultipartUploadFile extends BinaryUploadFile implements Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int arg1) {
-        super.writeToParcel(parcel, arg1);
-        parcel.writeString(paramName);
-        parcel.writeString(contentType);
-        parcel.writeString(fileName);
-    }
-
-    private MultipartUploadFile(Parcel in) {
-        super(in);
+    protected UploadFile(Parcel in) {
+        file = new File(in.readString());
         paramName = in.readString();
-        contentType = in.readString();
         fileName = in.readString();
+        contentType = in.readString();
     }
 }

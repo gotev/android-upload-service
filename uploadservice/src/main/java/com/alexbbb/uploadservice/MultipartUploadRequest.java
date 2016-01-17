@@ -1,24 +1,19 @@
 package com.alexbbb.uploadservice;
 
 import android.content.Context;
-import android.content.Intent;
 
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * HTTP/Multipart upload request.
  *
- * @author alexbbb (Alex Gotev)
+ * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
  *
  */
 public class MultipartUploadRequest extends HttpUploadRequest {
-
-    private final ArrayList<MultipartUploadFile> filesToUpload;
-    private final ArrayList<NameValue> parameters;
 
     /**
      * Creates a new multipart upload request.
@@ -35,8 +30,6 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      */
     public MultipartUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         super(context, uploadId, serverUrl);
-        filesToUpload = new ArrayList<>();
-        parameters = new ArrayList<>();
     }
 
     /**
@@ -51,27 +44,17 @@ public class MultipartUploadRequest extends HttpUploadRequest {
         this(context, null, serverUrl);
     }
 
-    /**
-     * Validates the upload request and throws exceptions if one or more parameters
-     * are not properly set.
-     *
-     * @throws IllegalArgumentException if request protocol or URL are not correctly set or if no files are added
-     * @throws MalformedURLException if the provided server URL is not valid
-     */
+    @Override
+    protected Class getTaskClass() {
+        return MultipartUploadTask.class;
+    }
+
     @Override
     protected void validate() throws IllegalArgumentException, MalformedURLException {
         super.validate();
 
-        if (filesToUpload.isEmpty()) {
+        if (params.getFiles().isEmpty())
             throw new IllegalArgumentException("You have to add at least one file to upload");
-        }
-    }
-
-    @Override
-    protected void initializeIntent(Intent intent) {
-        super.initializeIntent(intent);
-        intent.putParcelableArrayListExtra(UploadService.PARAM_FILES, getFilesToUpload());
-        intent.putParcelableArrayListExtra(UploadService.PARAM_REQUEST_PARAMETERS, getParameters());
     }
 
     /**
@@ -92,7 +75,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     public MultipartUploadRequest addFileToUpload(final String path, final String parameterName,
                                                   final String fileName, final String contentType)
             throws FileNotFoundException, IllegalArgumentException {
-        filesToUpload.add(new MultipartUploadFile(path, parameterName, fileName, contentType));
+        params.addFile(new UploadFile(path, parameterName, fileName, contentType));
         return this;
     }
 
@@ -111,8 +94,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     public MultipartUploadRequest addFileToUpload(final String path, final String parameterName,
                                                   final String fileName)
             throws FileNotFoundException, IllegalArgumentException {
-        filesToUpload.add(new MultipartUploadFile(path, parameterName, fileName, null));
-        return this;
+        return addFileToUpload(path, parameterName, fileName, null);
     }
 
     /**
@@ -132,46 +114,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
         return addFileToUpload(path, parameterName, null, null);
     }
 
-    /**
-     * Adds a parameter to this upload request.
-     *
-     * @param paramName parameter name
-     * @param paramValue parameter value
-     * @return {@link MultipartUploadRequest}
-     */
-    public MultipartUploadRequest addParameter(final String paramName, final String paramValue) {
-        parameters.add(new NameValue(paramName, paramValue));
-        return this;
-    }
-
-    /**
-     * Adds a parameter with multiple values to this upload request.
-     *
-     * @param paramName parameter name
-     * @param array values
-     * @return {@link MultipartUploadRequest}
-     */
-    public MultipartUploadRequest addArrayParameter(final String paramName, final String... array) {
-        for (String value : array) {
-            parameters.add(new NameValue(paramName, value));
-        }
-        return this;
-    }
-
-    /**
-     * Adds a parameter with multiple values to this upload request.
-     *
-     * @param paramName parameter name
-     * @param list values
-     * @return {@link MultipartUploadRequest}
-     */
-    public MultipartUploadRequest addArrayParameter(final String paramName, final List<String> list) {
-        for (String value : list) {
-            parameters.add(new NameValue(paramName, value));
-        }
-        return this;
-    }
-
+    // override all the supported builder methods by calling the super method and returning this
     @Override
     public MultipartUploadRequest setNotificationConfig(UploadNotificationConfig config) {
         super.setNotificationConfig(config);
@@ -179,14 +122,32 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     @Override
-    public MultipartUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFilesAfterSuccessfulUpload) {
-        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFilesAfterSuccessfulUpload);
+    public MultipartUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
+        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFiles);
         return this;
     }
 
     @Override
     public MultipartUploadRequest addHeader(String headerName, String headerValue) {
         super.addHeader(headerName, headerValue);
+        return this;
+    }
+
+    @Override
+    public MultipartUploadRequest addParameter(String paramName, String paramValue) {
+        super.addParameter(paramName, paramValue);
+        return this;
+    }
+
+    @Override
+    public MultipartUploadRequest addArrayParameter(String paramName, String... array) {
+        super.addArrayParameter(paramName, array);
+        return this;
+    }
+
+    @Override
+    public MultipartUploadRequest addArrayParameter(String paramName, List<String> list) {
+        super.addArrayParameter(paramName, list);
         return this;
     }
 
@@ -209,21 +170,8 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     @Override
-    protected Class getTaskClass() {
-        return MultipartUploadTask.class;
-    }
-
-    /**
-     * @return Gets the list of the parameters.
-     */
-    protected ArrayList<NameValue> getParameters() {
-        return parameters;
-    }
-
-    /**
-     * @return Gets the list of the files that has to be uploaded.
-     */
-    protected ArrayList<MultipartUploadFile> getFilesToUpload() {
-        return filesToUpload;
+    public MultipartUploadRequest setUsesFixedLengthStreamingMode(boolean fixedLength) {
+        super.setUsesFixedLengthStreamingMode(fixedLength);
+        return this;
     }
 }
