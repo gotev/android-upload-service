@@ -47,7 +47,9 @@ properties.load(project.rootProject.file('local.properties').newDataInputStream(
 install {
     repositories.mavenInstaller {
         pom.project {
-            packaging 'jar'
+            name projectName
+            description projectDesc
+            packaging 'aar'
             groupId projectGroup
             version version
             url siteUrl
