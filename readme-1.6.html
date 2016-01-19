@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Android Upload Service by alexbbb</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Android Upload Service</h1>
+      <h2 class="project-tagline">Easily upload files in the background with automatic Android Notification Center progress indication.</h2>
+      <a href="https://github.com/alexbbb/android-upload-service" class="btn">View on GitHub</a>
+      <a href="https://github.com/alexbbb/android-upload-service/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/alexbbb/android-upload-service/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p><a href="http://android-arsenal.com/details/1/2161"><img src="https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat" alt="Android Arsenal"></a> <a href="https://bintray.com/alexbbb/maven/android-upload-service/_latestVersion"> <img src="https://api.bintray.com/packages/alexbbb/maven/android-upload-service/images/download.svg" alt="Download"> </a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=alexgotev%40gmail%2ecom&amp;lc=US&amp;item_name=Android%20Upload%20Service&amp;item_number=AndroidUploadService&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate"></a></p>
+
+<p><img src="http://alexbbb.github.io/android-upload-service/upload.gif" alt="Upload Notification"></p>
+
+<p>Easily upload files in the background with automatic Android Notification Center progress indication.</p>
+
+<h2>
+<a id="purpose" class="anchor" href="#purpose" aria-hidden="true"><span class="octicon octicon-link"></span></a>Purpose</h2>
+
+<ul>
+<li>upload files to a server with an HTTP <code>multipart/form-data</code> or binary request</li>
+<li>handle the operation in the background, even if the device is idle</li>
+<li>show status in the Android Notification Center.</li>
+</ul>
+
+<p>At the core of the library there is an <code>IntentService</code> which handles uploads in the background. It publishes broadcast intents to notify status. This way the logic is decoupled from the UI and it's much more reusable. You can do multiple uploads being sure that they will be performed sequentially, and so you don't have to deal with the nightmare of concurrency. Read further to learn how you can use it in your App.</p>
+
+<h2>
+<a id="setup" class="anchor" href="#setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup</h2>
+
+<p>Ensure that you have jcenter in your gradle build file:</p>
+
+<pre><code>repositories {
+    jcenter()
+}
+</code></pre>
+
+<p>then in your dependencies section add:</p>
+
+<pre><code>dependencies {
+    compile 'com.alexbbb:uploadservice:1.6'
+}
+</code></pre>
+
+<p>and do a project sync. If you're upgrading to 1.6 from previous releases, <a href="https://github.com/alexbbb/android-upload-service/releases/tag/1.6">read this migration notes</a>. To start using the library, you have to initialize it. I suggest you to do that in your Application subclass:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Initializer</span> <span class="pl-k">extends</span> <span class="pl-e">Application</span> {
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCreate</span>() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onCreate();
+
+        <span class="pl-c">// setup the broadcast action namespace string which will</span>
+        <span class="pl-c">// be used to notify upload status.</span>
+        <span class="pl-c">// Gradle automatically generates proper variable as below.</span>
+        <span class="pl-smi">UploadService</span><span class="pl-c1"><span class="pl-k">.</span>NAMESPACE</span> <span class="pl-k">=</span> <span class="pl-smi">BuildConfig</span><span class="pl-c1"><span class="pl-k">.</span>APPLICATION_ID</span>;
+        <span class="pl-c">// Or, you can define it manually.</span>
+        <span class="pl-smi">UploadService</span><span class="pl-c1"><span class="pl-k">.</span>NAMESPACE</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>com.yourcompany.yourapp<span class="pl-pds">"</span></span>;
+    }
+}</pre></div>
+
+<p>and now you're ready to rock!</p>
+
+<p><em>I strongly encourage you to build and run the demo app that you can find in the <a href="#examples">examples</a>, together with one of the provided server implementations and to check <a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/">JavaDocs</a>.</em></p>
+
+<h3>
+<a id="http-multipart-upload" class="anchor" href="#http-multipart-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/com/alexbbb/uploadservice/MultipartUploadRequest.html">HTTP Multipart Upload</a>
+</h3>
+
+<p>This is the most common way to upload files on a server. It's the same kind of request that browsers do when you use the <code>&lt;form&gt;</code> tag with one or more files. Here's a minimal example:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">void</span> uploadMultipart(<span class="pl-k">final</span> <span class="pl-smi">Context</span> context) {
+
+    <span class="pl-k">final</span> <span class="pl-smi">String</span> uploadID <span class="pl-k">=</span> <span class="pl-c1">UUID</span><span class="pl-k">.</span>randomUUID()<span class="pl-k">.</span>toString();
+    <span class="pl-k">final</span> <span class="pl-smi">String</span> serverUrlString <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>http://www.yoursite.com/yourscript<span class="pl-pds">"</span></span>;
+
+    <span class="pl-k">try</span> {
+        <span class="pl-k">new</span> <span class="pl-smi">MultipartUploadRequest</span>(context, uploadID, serverUrlString)
+            .addFileToUpload(<span class="pl-s"><span class="pl-pds">"</span>/absolute/path/to/your/file<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>your-param-name<span class="pl-pds">"</span></span>)
+            .addHeader(<span class="pl-s"><span class="pl-pds">"</span>your-custom-header-name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>your-custom-value<span class="pl-pds">"</span></span>)
+            .addParameter(<span class="pl-s"><span class="pl-pds">"</span>your-param-name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>your-param-value<span class="pl-pds">"</span></span>)
+            .setNotificationConfig(<span class="pl-k">new</span> <span class="pl-smi">UploadNotificationConfig</span>())
+            .setMaxRetries(<span class="pl-c1">2</span>)
+            .startUpload();
+    } <span class="pl-k">catch</span> (<span class="pl-smi">Exception</span> exc) {
+        <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-s"><span class="pl-pds">"</span>AndroidUploadService<span class="pl-pds">"</span></span>, exc<span class="pl-k">.</span>getMessage(), exc);
+    }
+}</pre></div>
+
+<h3>
+<a id="binary-upload" class="anchor" href="#binary-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/com/alexbbb/uploadservice/BinaryUploadRequest.html">Binary Upload</a>
+</h3>
+
+<p>The binary upload uses a single file as the raw body of the upload request.</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">void</span> uploadBinary(<span class="pl-k">final</span> <span class="pl-smi">Context</span> context) {
+
+    <span class="pl-k">final</span> <span class="pl-smi">String</span> uploadID <span class="pl-k">=</span> <span class="pl-c1">UUID</span><span class="pl-k">.</span>randomUUID()<span class="pl-k">.</span>toString();
+    <span class="pl-k">final</span> <span class="pl-smi">String</span> serverUrlString <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>http://www.yoursite.com/yourscript<span class="pl-pds">"</span></span>;
+
+    <span class="pl-k">try</span> {
+        <span class="pl-k">new</span> <span class="pl-smi">BinaryUploadRequest</span>(context, uploadID, serverUrlString)
+            .addHeader(<span class="pl-s"><span class="pl-pds">"</span>your-custom-header-name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>your-custom-value<span class="pl-pds">"</span></span>)
+            .setFileToUpload(<span class="pl-s"><span class="pl-pds">"</span>/absolute/path/to/your/file<span class="pl-pds">"</span></span>)
+            .setNotificationConfig(<span class="pl-k">new</span> <span class="pl-smi">UploadNotificationConfig</span>())
+            .setMaxRetries(<span class="pl-c1">2</span>)
+            .startUpload();
+    } <span class="pl-k">catch</span> (<span class="pl-smi">Exception</span> exc) {
+        <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-s"><span class="pl-pds">"</span>AndroidUploadService<span class="pl-pds">"</span></span>, exc<span class="pl-k">.</span>getMessage(), exc);
+    }
+}</pre></div>
+
+<h3>
+<a id="monitoring-upload-status" class="anchor" href="#monitoring-upload-status" aria-hidden="true"><span class="octicon octicon-link"></span></a>Monitoring upload status</h3>
+
+<p>To listen for the status of the upload service, use the provided <a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/com/alexbbb/uploadservice/UploadServiceBroadcastReceiver.html">UploadServiceBroadcastReceiver</a>. Override its methods to add your own business logic. Example on how to use it in an activity:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">YourActivity</span> <span class="pl-k">extends</span> <span class="pl-e">Activity</span> {
+
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> <span class="pl-c1">TAG</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>AndroidUploadService<span class="pl-pds">"</span></span>;
+
+    <span class="pl-k">private</span> <span class="pl-k">final</span> <span class="pl-smi">UploadServiceBroadcastReceiver</span> uploadReceiver <span class="pl-k">=</span>
+    <span class="pl-k">new</span> <span class="pl-smi">UploadServiceBroadcastReceiver</span>() {
+
+        <span class="pl-c">// you can override this progress method if you want to get</span>
+        <span class="pl-c">// the completion progress in percent (0 to 100)</span>
+        <span class="pl-c">// or if you need to know exactly how many bytes have been transferred</span>
+        <span class="pl-c">// override the method below this one</span>
+        <span class="pl-k">@Override</span>
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onProgress</span>(<span class="pl-smi">String</span> <span class="pl-v">uploadId</span>, <span class="pl-k">int</span> <span class="pl-v">progress</span>) {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>The progress of the upload with ID <span class="pl-pds">"</span></span>
+                       <span class="pl-k">+</span> uploadId <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span> is: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> progress);
+        }
+
+        <span class="pl-k">@Override</span>
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onProgress</span>(<span class="pl-k">final</span> <span class="pl-smi">String</span> <span class="pl-v">uploadId</span>,
+                               <span class="pl-k">final</span> <span class="pl-k">long</span> <span class="pl-v">uploadedBytes</span>,
+                               <span class="pl-k">final</span> <span class="pl-k">long</span> <span class="pl-v">totalBytes</span>) {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>Upload with ID <span class="pl-pds">"</span></span> <span class="pl-k">+</span> uploadId <span class="pl-k">+</span>
+                       <span class="pl-s"><span class="pl-pds">"</span> uploaded bytes: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> uploadedBytes
+                       <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span>, total: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> totalBytes);
+        }
+
+        <span class="pl-k">@Override</span>
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onError</span>(<span class="pl-smi">String</span> <span class="pl-v">uploadId</span>, <span class="pl-smi">Exception</span> <span class="pl-v">exception</span>) {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>Error in upload with ID: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> uploadId <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span>. <span class="pl-pds">"</span></span>
+                       <span class="pl-k">+</span> exception<span class="pl-k">.</span>getLocalizedMessage(), exception);
+        }
+
+        <span class="pl-k">@Override</span>
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCompleted</span>(<span class="pl-smi">String</span> <span class="pl-v">uploadId</span>,
+                                <span class="pl-k">int</span> <span class="pl-v">serverResponseCode</span>,
+                                <span class="pl-smi">String</span> <span class="pl-v">serverResponseMessage</span>) {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>Upload with ID <span class="pl-pds">"</span></span> <span class="pl-k">+</span> uploadId
+                       <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span> has been completed with HTTP <span class="pl-pds">"</span></span> <span class="pl-k">+</span> serverResponseCode
+                       <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span>. Response from server: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> serverResponseMessage);
+
+            <span class="pl-c">//If your server responds with a JSON, you can parse it</span>
+            <span class="pl-c">//from serverResponseMessage string using a library</span>
+            <span class="pl-c">//such as org.json (embedded in Android) or Google's gson</span>
+        }
+    };
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> <span class="pl-en">onResume</span>() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onResume();
+        uploadReceiver<span class="pl-k">.</span>register(<span class="pl-v">this</span>);
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> <span class="pl-en">onPause</span>() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onPause();
+        uploadReceiver<span class="pl-k">.</span>unregister(<span class="pl-v">this</span>);
+    }
+
+}</pre></div>
+
+<p>If you want to monitor upload status in all of your activities, just implement the BroadcastReceiver in your base activity class from which all of your activities inherits and you're done.</p>
+
+<p>To monitor upload status inside a <code>Service</code>, you have to call <code>uploadReceiver.register(this);</code> inside the service's <code>onCreate</code> method, and <code>uploadReceiver.unregister(this);</code> inside service's <code>onDestroy</code> method.</p>
+
+<h3>
+<a id="stop-current-upload" class="anchor" href="#stop-current-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stop current upload</h3>
+
+<p>Call this method from anywhere you want to stop the currently active upload task.</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">UploadService</span><span class="pl-k">.</span>stopCurrentUpload();</pre></div>
+
+<p>After that the upload task is cancelled, you will receive a <code>java.net.ProtocolException</code> in your broadcast receiver's <code>onError</code> method and the notification will display the error message that you have set.</p>
+
+<h3>
+<a id="using-https-connection-with-self-signed-certificates" class="anchor" href="#using-https-connection-with-self-signed-certificates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using HTTPS connection with self-signed certificates</h3>
+
+<p>For security reasons, the library doesn't accept self-signed certificates by default when using HTTPS connections, but you can enable them by calling:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">AllCertificatesAndHostsTruster</span><span class="pl-k">.</span>apply();</pre></div>
+
+<p>before starting the upload service.</p>
+
+<h3>
+<a id="upload-only-when-a-connection-is-available" class="anchor" href="#upload-only-when-a-connection-is-available" aria-hidden="true"><span class="octicon octicon-link"></span></a>Upload only when a connection is available</h3>
+
+<p>If you want to start uploads or retry them based on the remote server's reachability status, <a href="https://github.com/alexbbb/android-host-monitor">Android Host Monitor</a> may be useful to you in combination with this library.</p>
+
+<h3>
+<a id="testing-upload" class="anchor" href="#testing-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing upload</h3>
+
+<p>You have the following choices:</p>
+
+<ul>
+<li>Use your own server which handles HTTP/Multipart uploads</li>
+<li>Use one of the server implementations provided in the examples (read below)</li>
+<li>Use the excellent <a href="http://www.posttestserver.com/">http://www.posttestserver.com/</a> (bear in mind that the data you post there is public!) for HTTP Multipart</li>
+</ul>
+
+<h3>
+<a id="examples-" class="anchor" href="#examples-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples <a name="examples"></a>
+</h3>
+
+<p>In the <b>examples</b> folder you will find:</p>
+
+<ul>
+<li><p>A simple Android application that uses this library</p></li>
+<li>
+<p>Demo servers which handle upload in:</p>
+
+<ul>
+<li>
+<p><b>node.js (HTTP Multipart and Binary)</b>. You need to have node.js and npm installed. <a href="https://github.com/joyent/node/wiki/installing-node.js-via-package-manager">Refer to this guide</a>. To run the server, open a terminal, navigate to <code>examples/server-nodejs</code> folder and simply execute:</p>
+
+<pre><code>npm install (only the first time)
+npm start
+</code></pre>
+
+<p>The following endpoints will be available for upload testing:</p>
+
+<pre><code>HTTP/Multipart: http://YOUR_LOCAL_IP:3000/upload/multipart
+Binary:         http://YOUR_LOCAL_IP:3000/upload/binary
+</code></pre>
+</li>
+<li>
+<b>PHP (HTTP Multipart only)</b>. You need a running web server (e.g. Apache + PHP) in which to put the script. To get up and running in minutes you can use a solution like <a href="https://www.apachefriends.org/download.html">XAMPP (supports Windows, OS X and Linux)</a>.</li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="apps-powered-by-android-upload-service" class="anchor" href="#apps-powered-by-android-upload-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Apps powered by Android Upload Service</h2>
+
+<p>To be included in the following list, simply create an issue and provide the app name and a link.</p>
+
+<ul>
+<li><a href="https://play.google.com/store/apps/details?id=com.voismart.softphone">VoiSmart IP Communicator</a></li>
+<li><a href="http://dot-share.com/index-en.html">DotShare</a></li>
+<li><a href="https://www.npmjs.com/package/nativescript-background-http">NativeScript Background HTTP</a></li>
+</ul>
+
+<h2>
+<a id="contribute" class="anchor" href="#contribute" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contribute</h2>
+
+<ul>
+<li>Do you have a new feature in mind?</li>
+<li>Do you know how to improve existing docs or code?</li>
+<li>Have you found a bug?</li>
+</ul>
+
+<p>Contributions are welcome and encouraged! Just fork the project and then send a pull request. Be ready to discuss your code and design decisions :)</p>
+
+<h2>
+<a id="before-asking-for-help" class="anchor" href="#before-asking-for-help" aria-hidden="true"><span class="octicon octicon-link"></span></a>Before asking for help...</h2>
+
+<p>Let's face it, doing network programming is not easy as there are many things that can go wrong, but if upload doesn't work out of the box, consider the following things before posting a new issue:</p>
+
+<ul>
+<li>Check <a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/">JavaDocs</a> for full class and methods docs</li>
+<li>Is the server URL correct?</li>
+<li>Is the server URL reachable from your device? Check if there are firewalls or other kind of restrictions between your device and the server.</li>
+<li>Are you sure that the server side is working properly? For example, if you use PHP in your server side, and you get an EPIPE exception, check if the content size you are trying to upload exceeds the values of <code>upload_max_filesize</code> or <code>post_max_size</code> set in your <code>php.ini</code>
+</li>
+<li>Have you properly set up the request with all the headers, parameters and files that the server expects?</li>
+<li>Have you tried to make an upload using the demo app and one of the provided server implementations? I use the node.js version which provides good feedback and supports both HTTP Multipart and binary uploads.</li>
+</ul>
+
+<p>If you've checked all the above and still something goes wrong...it's time to create a new issue! Be sure to include the following info:</p>
+
+<ul>
+<li>Android API version</li>
+<li>Device vendor and model</li>
+<li>Code used to generate the request. Replace sensible data values.</li>
+<li>LogCat output</li>
+<li>Server output</li>
+</ul>
+
+<p>Please make use of Markdown styling when you post code or console output.</p>
+
+<h2>
+<a id="do-you-like-the-project" class="anchor" href="#do-you-like-the-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Do you like the project?</h2>
+
+<p>Put a star, spread the word and if you want to offer me a free beer, <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=alexgotev%40gmail%2ecom&amp;lc=US&amp;item_name=Android%20Upload%20Service&amp;item_number=AndroidUploadService&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate"></a></p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<pre><code>Copyright (C) 2013-2015 Aleksandar Gotev
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/alexbbb/android-upload-service">Android Upload Service</a> is maintained by <a href="https://github.com/alexbbb">alexbbb</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
