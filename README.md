@@ -31,10 +31,9 @@ dependencies {
 }
 ```
 
-and do a project sync. If you're upgrading to 2.0 from 1.6, read [2.0 migration notes](https://github.com/alexbbb/android-upload-service/releases/tag/2.0).
-If you're upgrading to 2.0 from 1.5 or older releases, [read 1.6 migration notes first](https://github.com/alexbbb/android-upload-service/releases/tag/1.6).
+and do a project sync. [Read this page](https://github.com/alexbbb/android-upload-service/wiki/Setup) if you're upgrading from a previous release and for setup troubleshooting.
 
-[Check the wiki](https://github.com/alexbbb/android-upload-service/wiki) for full setup instructions and examples to get up and running fast. If something isn't covered there, search in the [issues](https://github.com/alexbbb/android-upload-service/issues). Your question could already have been answered in the past. There are also [some checks you can do yourself to resolve common setup mistakes](#help).
+[Check the wiki](https://github.com/alexbbb/android-upload-service/wiki) for full setup instructions and examples to get up and running fast. If something isn't covered there, search in the [issues](https://github.com/alexbbb/android-upload-service/issues). Your question could already have been answered in the past. There are also [some checks you can do yourself to resolve common setup mistakes](https://github.com/alexbbb/android-upload-service/wiki/Resolve%20common%20setup%20issues).
 
 ### Apps powered by Android Upload Service <a name="powered"></a>
 To be included in the following list, simply create an issue and provide the app name and a link.
@@ -49,25 +48,6 @@ To be included in the following list, simply create an issue and provide the app
 * Have you found a bug?
 
 Contributions are welcome and encouraged! Just fork the project and then send a pull request. Be ready to discuss your code and design decisions :)
-
-### Before asking for help... <a name="help"></a>
-Let's face it, doing network programming is not easy as there are many things that can go wrong, but if upload doesn't work out of the box, consider the following things before posting a new issue:
-* [Check the wiki](https://github.com/alexbbb/android-upload-service/wiki), in which you can find how to setup everything and make it work
-* [Check JavaDocs](http://alexbbb.github.io/android-upload-service/javadoc/) for full class and methods docs
-* Is the server URL correct?
-* Is the server URL reachable from your device? Check if there are firewalls or other kind of restrictions between your device and the server.
-* Are you sure that the server side is working properly? For example, if you use PHP in your server side, and you get an EPIPE exception, check if the content size you are trying to upload exceeds the values of `upload_max_filesize` or `post_max_size` set in your `php.ini`
-* Have you properly set up the request with all the headers, parameters and files that the server expects?
-* Have you tried to make an upload using the demo app and one of the provided server implementations? I use the node.js version which provides good feedback and supports both HTTP Multipart and binary uploads.
-
-If you've checked all the above and still something goes wrong...it's time to create a new issue! Be sure to include the following info:
-* Android API version
-* Device vendor and model
-* Code used to generate the request. Replace sensible data values.
-* LogCat output
-* Server output
-
-Please make use of Markdown styling when you post code or console output.
 
 ### Do you like the project? <a name="donate"></a>
 Put a star, spread the word and if you want to offer me a free beer, [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
