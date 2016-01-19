@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -60,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.filesToUpload) EditText filesToUpload;
     @Bind(R.id.parameterName) EditText parameterName;
     @Bind(R.id.displayNotification) CheckBox displayNotification;
+    @Bind(R.id.autoDeleteUploadedFiles) CheckBox autoDeleteUploadedFiles;
+    @Bind(R.id.autoClearOnSuccess) CheckBox autoClearOnSuccess;
+    @Bind(R.id.fixedLengthStreamingMode) CheckBox fixedLengthStreamingMode;
 
     private Map<String, UploadProgressViewHolder> uploadProgressHolders = new HashMap<>();
 
@@ -89,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onCompleted(String uploadId, int serverResponseCode, String serverResponseMessage) {
+        public void onCompleted(String uploadId, int serverResponseCode, byte[] serverResponseBody) {
             Log.i(TAG, "Upload with ID " + uploadId + " is completed: " + serverResponseCode + ", "
-                       + serverResponseMessage);
+                       + new String(serverResponseBody));
 
             if (uploadProgressHolders.get(uploadId) == null)
                 return;
@@ -148,10 +150,18 @@ public class MainActivity extends AppCompatActivity {
             .setInProgressMessage(getString(R.string.uploading))
             .setCompletedMessage(getString(R.string.upload_success))
             .setErrorMessage(getString(R.string.upload_error))
-            .setAutoClearOnSuccess(false)
+            .setAutoClearOnSuccess(autoClearOnSuccess.isChecked())
             .setClickIntent(new Intent(this, MainActivity.class))
             .setClearOnAction(true)
             .setRingToneEnabled(true);
+    }
+
+    private void addUploadToList(String uploadID, String filename) {
+        View uploadProgressView = getLayoutInflater().inflate(R.layout.view_upload_progress, null);
+        UploadProgressViewHolder viewHolder = new UploadProgressViewHolder(uploadProgressView, filename);
+        viewHolder.uploadId = uploadID;
+        container.addView(viewHolder.itemView, 0);
+        uploadProgressHolders.put(uploadID, viewHolder);
     }
 
     @OnClick(R.id.multipartUploadButton)
@@ -164,21 +174,18 @@ public class MainActivity extends AppCompatActivity {
 
         for (String fileToUploadPath : filesToUploadArray) {
             try {
-                final String uploadID = UUID.randomUUID().toString();
                 final String filename = getFilename(fileToUploadPath);
 
-                new MultipartUploadRequest(this, uploadID, serverUrlString)
+                String uploadID = new MultipartUploadRequest(this, serverUrlString)
                         .addFileToUpload(fileToUploadPath, paramNameString)
                         .setNotificationConfig(getNotificationConfig(filename))
                         .setCustomUserAgent(USER_AGENT)
+                        .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
+                        .setUsesFixedLengthStreamingMode(fixedLengthStreamingMode.isChecked())
                         .setMaxRetries(2)
                         .startUpload();
 
-                View uploadProgressView = getLayoutInflater().inflate(R.layout.view_upload_progress, null);
-                UploadProgressViewHolder viewHolder = new UploadProgressViewHolder(uploadProgressView, filename);
-                viewHolder.uploadId = uploadID;
-                container.addView(viewHolder.itemView, 0);
-                uploadProgressHolders.put(uploadID, viewHolder);
+                addUploadToList(uploadID,filename);
 
                 // these are the different exceptions that may be thrown
             } catch (FileNotFoundException exc) {
@@ -200,22 +207,19 @@ public class MainActivity extends AppCompatActivity {
 
         for (String fileToUploadPath : filesToUploadArray) {
             try {
-                final String uploadID = UUID.randomUUID().toString();
                 final String filename = getFilename(fileToUploadPath);
 
-                new BinaryUploadRequest(this, uploadID, serverUrlString)
+                String uploadID = new BinaryUploadRequest(this, serverUrlString)
                         .addHeader("file-name", new File(fileToUploadPath).getName())
                         .setFileToUpload(fileToUploadPath)
                         .setNotificationConfig(getNotificationConfig(filename))
                         .setCustomUserAgent(USER_AGENT)
+                        .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
+                        .setUsesFixedLengthStreamingMode(fixedLengthStreamingMode.isChecked())
                         .setMaxRetries(2)
                         .startUpload();
 
-                View uploadProgressView = getLayoutInflater().inflate(R.layout.view_upload_progress, null);
-                UploadProgressViewHolder viewHolder = new UploadProgressViewHolder(uploadProgressView, filename);
-                viewHolder.uploadId = uploadID;
-                container.addView(viewHolder.itemView, 0);
-                uploadProgressHolders.put(uploadID, viewHolder);
+                addUploadToList(uploadID, filename);
 
                 // these are the different exceptions that may be thrown
             } catch (FileNotFoundException exc) {
@@ -267,7 +271,8 @@ public class MainActivity extends AppCompatActivity {
                             resultUris.add(clip.getItemAt(i).getUri());
                         }
                     }
-                    // For Ice Cream Sandwich
+
+                // For Ice Cream Sandwich
                 } else {
                     ArrayList<String> paths = data.getStringArrayListExtra(FilePickerActivity.EXTRA_PATHS);
 

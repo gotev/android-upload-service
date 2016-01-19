@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @author cankov
  * @author mabdurrahman
  */
-public class UploadService extends Service {
+public final class UploadService extends Service {
 
     private static final String TAG = UploadService.class.getSimpleName();
 
@@ -59,20 +59,6 @@ public class UploadService extends Service {
 
     protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
 
-    private static final String ACTION_UPLOAD_SUFFIX = ".uploadservice.action.upload";
-    protected static final String PARAM_NOTIFICATION_CONFIG = "notificationConfig";
-    protected static final String PARAM_ID = "id";
-    protected static final String PARAM_URL = "url";
-    protected static final String PARAM_METHOD = "method";
-    protected static final String PARAM_FILES = "files";
-    protected static final String PARAM_FILE = "file";
-    protected static final String PARAM_TYPE = "uploadType";
-
-    protected static final String PARAM_REQUEST_HEADERS = "requestHeaders";
-    protected static final String PARAM_REQUEST_PARAMETERS = "requestParameters";
-    protected static final String PARAM_CUSTOM_USER_AGENT = "customUserAgent";
-    protected static final String PARAM_MAX_RETRIES = "maxRetries";
-
     /**
      * The minimum interval between progress reports in milliseconds.
      * If the upload Tasks report more frequently, we will throttle notifications.
@@ -80,20 +66,16 @@ public class UploadService extends Service {
      */
     protected static final long PROGRESS_REPORT_INTERVAL = 166;
 
-    private static final String BROADCAST_ACTION_SUFFIX = ".uploadservice.broadcast.status";
-    public static final String UPLOAD_ID = "id";
-    public static final String STATUS = "status";
-    public static final int STATUS_IN_PROGRESS = 1;
-    public static final int STATUS_COMPLETED = 2;
-    public static final int STATUS_ERROR = 3;
-    public static final int STATUS_CANCELLED = 4;
-    public static final String PROGRESS = "progress";
-    public static final String PROGRESS_UPLOADED_BYTES = "progressUploadedBytes";
-    public static final String PROGRESS_TOTAL_BYTES = "progressTotalBytes";
-    public static final String ERROR_EXCEPTION = "errorException";
-    public static final String SERVER_RESPONSE_CODE = "serverResponseCode";
-    public static final String SERVER_RESPONSE_MESSAGE = "serverResponseMessage";
+    // constants used in the intent which starts this service
+    private static final String ACTION_UPLOAD_SUFFIX = ".uploadservice.action.upload";
+    protected static final String PARAM_TASK_PARAMETERS = "taskParameters";
+    protected static final String PARAM_TASK_CLASS = "taskClass";
 
+    // constants used in broadcast intents
+    private static final String BROADCAST_ACTION_SUFFIX = ".uploadservice.broadcast.status";
+    protected static final String PARAM_BROADCAST_DATA = "broadcastData";
+
+    // internal variables
     private PowerManager.WakeLock wakeLock;
     private int notificationIncrementalId = 0;
     private static final Map<String, HttpUploadTask> uploadTasksMap = new ConcurrentHashMap<>();
@@ -165,13 +147,13 @@ public class UploadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null || !getActionUpload().equals(intent.getAction())) {
-            return START_STICKY;
+            return shutdownIfThereArentAnyActiveTasks();
         }
 
         HttpUploadTask currentTask = getTask(intent);
 
         if (currentTask == null) {
-            return START_STICKY;
+            return shutdownIfThereArentAnyActiveTasks();
         }
 
         // increment by 2 because the notificationIncrementalId + 1 is used internally
@@ -182,8 +164,17 @@ public class UploadService extends Service {
 
         wakeLock.acquire();
 
-        uploadTasksMap.put(currentTask.uploadId, currentTask);
+        uploadTasksMap.put(currentTask.params.getId(), currentTask);
         uploadThreadPool.execute(currentTask);
+
+        return START_STICKY;
+    }
+
+    private int shutdownIfThereArentAnyActiveTasks() {
+        if (uploadTasksMap.isEmpty()) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
 
         return START_STICKY;
     }
@@ -203,22 +194,34 @@ public class UploadService extends Service {
     }
 
     /**
-     * Creates a new task instance based on the requested task type in the intent.
+     * Creates a new task instance based on the requested task class in the intent.
      * @param intent
-     * @return task instance or null if the type is not supported or invalid
+     * @return task instance or null if the task class is not supported or invalid
      */
     HttpUploadTask getTask(Intent intent) {
-        String type = intent.getStringExtra(PARAM_TYPE);
+        String taskClass = intent.getStringExtra(PARAM_TASK_CLASS);
 
-        if (MultipartUploadRequest.NAME.equals(type)) {
-            return new MultipartUploadTask(this, intent);
+        if (taskClass == null) {
+            return null;
         }
 
-        if (BinaryUploadRequest.NAME.equals(type)) {
-            return new BinaryUploadTask(this, intent);
+        HttpUploadTask uploadTask = null;
+
+        try {
+            Class<?> task = Class.forName(taskClass);
+
+            if (HttpUploadTask.class.isAssignableFrom(task)) {
+                uploadTask = HttpUploadTask.class.cast(task.newInstance());
+                uploadTask.init(this, intent);
+            } else {
+                Log.e(TAG, taskClass + " does not extend HttpUploadTask!");
+            }
+
+        } catch (Exception exc) {
+            Log.e(TAG, "Error while instantiating new task", exc);
         }
 
-        return null;
+        return uploadTask;
     }
 
     /**
@@ -251,7 +254,7 @@ public class UploadService extends Service {
         HttpUploadTask task = uploadTasksMap.remove(uploadId);
 
         // un-hold foreground upload ID if it's been hold
-        if (EXECUTE_IN_FOREGROUND && task != null && task.uploadId.equals(foregroundUploadId)) {
+        if (EXECUTE_IN_FOREGROUND && task != null && task.params.getId().equals(foregroundUploadId)) {
             Log.d(TAG, uploadId + " now un-holded the foreground notification");
             foregroundUploadId = null;
         }

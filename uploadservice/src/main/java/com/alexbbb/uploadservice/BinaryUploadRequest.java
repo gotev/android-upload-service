@@ -1,63 +1,52 @@
 package com.alexbbb.uploadservice;
 
 import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
+import java.util.List;
 
 /**
- * Binary file upload request.
+ * Binary file upload request. The binary upload uses a single file as the raw body of the
+ * upload request.
  *
  * @author cankov
+ * @author alexbbb (Aleksandar Gotev)
  */
 public class BinaryUploadRequest extends HttpUploadRequest {
 
     /**
-     * Static constant used to identify the task type. It must be unique between task types.
-     */
-    public static final String NAME = "binary";
-
-    private BinaryUploadFile file = null;
-
-    /**
-     * Creates a file upload.
+     * Creates a binary file upload request.
      *
      * @param context application context
-     * @param uploadId unique ID to assign to this upload request.
-     *                 It's used in the broadcast receiver when receiving updates.
-     * @param serverUrl URL of the server side script that handles the multipart form upload
+     * @param uploadId unique ID to assign to this upload request.<br>
+     *                 It can be whatever string you want, as long as it's unique.
+     *                 If you set it to null or an empty string, an UUID will be automatically
+     *                 generated.<br> It's advised to keep a reference to it in your code,
+     *                 so when you receive status updates in {@link UploadServiceBroadcastReceiver},
+     *                 you know to which upload they refer to.
+     * @param serverUrl URL of the server side script that will handle the multipart form upload.
+     *                  E.g.: http://www.yourcompany.com/your/script
      */
     public BinaryUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         super(context, uploadId, serverUrl);
     }
 
     /**
-     * Validates the upload request and throws exceptions if one or more parameters are not
-     * properly set.
+     * Creates a new binaryupload request and automatically generates an upload id, that will
+     * be returned when you call {@link HttpUploadRequest#startUpload()}.
      *
-     * @throws IllegalArgumentException if request protocol or URL are not correctly set o
-     * if no file is set
-     * @throws MalformedURLException if the provided server URL is not valid
+     * @param context application context
+     * @param serverUrl URL of the server side script that will handle the multipart form upload.
+     *                  E.g.: http://www.yourcompany.com/your/script
      */
-    @Override
-    protected void validate() throws IllegalArgumentException, MalformedURLException {
-        super.validate();
-        if (file == null) {
-            throw new IllegalArgumentException("You have to set a file to upload");
-        }
+    public BinaryUploadRequest(final Context context, final String serverUrl) {
+        this(context, null, serverUrl);
     }
 
-    /**
-     * Write any upload request data to the intent used to start the upload service.
-     *
-     * @param intent the intent used to start the upload service
-     */
     @Override
-    protected void initializeIntent(Intent intent) {
-        super.initializeIntent(intent);
-        intent.putExtra(UploadService.PARAM_TYPE, NAME);
-        intent.putExtra(UploadService.PARAM_FILE, getFile());
+    protected Class getTaskClass() {
+        return BinaryUploadTask.class;
     }
 
     /**
@@ -68,13 +57,20 @@ public class BinaryUploadRequest extends HttpUploadRequest {
      * @return {@link BinaryUploadRequest}
      */
     public BinaryUploadRequest setFileToUpload(String path) throws FileNotFoundException {
-        file = new BinaryUploadFile(path);
+        params.getFiles().clear();
+        params.addFile(new UploadFile(path));
         return this;
     }
 
     @Override
     public BinaryUploadRequest setNotificationConfig(UploadNotificationConfig config) {
         super.setNotificationConfig(config);
+        return this;
+    }
+
+    @Override
+    public BinaryUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
+        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFiles);
         return this;
     }
 
@@ -102,12 +98,31 @@ public class BinaryUploadRequest extends HttpUploadRequest {
         return this;
     }
 
-    /**
-     * Gets the file used as raw body of the upload request.
-     *
-     * @return The absolute path of the file that will be used for the upload
-     */
-    protected BinaryUploadFile getFile() {
-        return file;
+    @Override
+    public BinaryUploadRequest setUsesFixedLengthStreamingMode(boolean fixedLength) {
+        super.setUsesFixedLengthStreamingMode(fixedLength);
+        return this;
+    }
+
+    @Override
+    public HttpUploadRequest addParameter(String paramName, String paramValue) {
+        logDoesNotSupportParameters();
+        return this;
+    }
+
+    @Override
+    public HttpUploadRequest addArrayParameter(String paramName, String... array) {
+        logDoesNotSupportParameters();
+        return this;
+    }
+
+    @Override
+    public HttpUploadRequest addArrayParameter(String paramName, List<String> list) {
+        logDoesNotSupportParameters();
+        return this;
+    }
+
+    private void logDoesNotSupportParameters() {
+        Log.e(this.getClass().getSimpleName(), "This upload method does not support adding parameters");
     }
 }

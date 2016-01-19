@@ -77,14 +77,15 @@ var multerFiles = multer({
     onFileUploadStart: function (file) {
         console.log("Started file upload\n  parameter name: " +
                     file.fieldname + "\n  file name: " +
-                    file.originalname + "\n");
+                    file.originalname + "\n  mime type: " + file.mimetype);
     },
 
     onFileUploadComplete: function (file) {
         var fullPath = path.resolve(UPLOAD_PATH, file.originalname);
         console.log("Completed file upload\n  parameter name: " +
                     file.fieldname + "\n  file name: " +
-                    file.originalname + "\n  in: " + fullPath);
+                    file.originalname + "\n  mime type: " + file.mimetype +
+                    "\n  in: " + fullPath);
         fileUploadCompleted = true;
     }
 });

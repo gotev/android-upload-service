@@ -5,71 +5,72 @@ import android.content.Intent;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
- * Represents a generic HTTP upload request.
+ * Represents a generic HTTP upload request.<br>
+ * Subclass to create your own custom upload request.
  *
- * @author alexbbb (Alex Gotev)
+ * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
  */
-abstract class HttpUploadRequest {
+public abstract class HttpUploadRequest {
 
-    private UploadNotificationConfig notificationConfig;
-    private String method = "POST";
     private final Context context;
-    private String customUserAgent;
-    private int maxRetries;
-    private final String uploadId;
-    private final String url;
-    private final ArrayList<NameValue> headers;
+    protected final TaskParameters params = new TaskParameters();
 
     /**
-     * Creates a new multipart upload request.
+     * Creates a new http upload request.
      *
      * @param context application context
-     * @param uploadId unique ID to assign to this upload request.
-     *                 It's used in the broadcast receiver when receiving updates.
-     * @param serverUrl URL of the server side script that handles the multipart form upload
+     * @param uploadId unique ID to assign to this upload request. If is null or empty, a random
+     *                 UUID will be automatically generated. It's used in the broadcast receiver
+     *                 when receiving updates.
+     * @param serverUrl URL of the server side script that handles the request
      */
     public HttpUploadRequest(final Context context, final String uploadId, final String serverUrl) {
         this.context = context;
-        this.uploadId = uploadId;
-        notificationConfig = null;
-        url = serverUrl;
-        headers = new ArrayList<>();
-        maxRetries = 0;
+
+        if (uploadId == null || uploadId.isEmpty()) {
+            params.setId(UUID.randomUUID().toString());
+        } else {
+            params.setId(uploadId);
+        }
+
+        params.setUrl(serverUrl);
     }
 
     /**
      * Start the background file upload service.
-     *
+     * @return the uploadId string
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid
      */
-    public void startUpload() throws IllegalArgumentException, MalformedURLException {
+    public final String startUpload() throws IllegalArgumentException, MalformedURLException {
         this.validate();
         final Intent intent = new Intent(this.getContext(), UploadService.class);
         this.initializeIntent(intent);
         intent.setAction(UploadService.getActionUpload());
         getContext().startService(intent);
+        return params.getId();
     }
 
     /**
-     * Write any upload request data to the intent used to start the upload service.
+     * Write any upload request data to the intent used to start the upload service.<br>
+     * Override this method in subclasses to add your own custom parameters to the upload task.
      *
      * @param intent the intent used to start the upload service
      */
     protected void initializeIntent(Intent intent) {
-        intent.setAction(UploadService.getActionUpload());
-        intent.putExtra(UploadService.PARAM_NOTIFICATION_CONFIG, getNotificationConfig());
-        intent.putExtra(UploadService.PARAM_ID, getUploadId());
-        intent.putExtra(UploadService.PARAM_URL, getServerUrl());
-        intent.putExtra(UploadService.PARAM_METHOD, getMethod());
-        intent.putExtra(UploadService.PARAM_CUSTOM_USER_AGENT, getCustomUserAgent());
-        intent.putExtra(UploadService.PARAM_MAX_RETRIES, getMaxRetries());
-        intent.putParcelableArrayListExtra(UploadService.PARAM_REQUEST_HEADERS, getHeaders());
+        intent.putExtra(UploadService.PARAM_TASK_PARAMETERS, params);
+
+        Class taskClass = getTaskClass();
+        if (taskClass == null)
+            throw new RuntimeException("The request must specify a task class!");
+
+        intent.putExtra(UploadService.PARAM_TASK_CLASS, taskClass.getName());
     }
 
     /**
@@ -82,7 +83,19 @@ abstract class HttpUploadRequest {
      * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setNotificationConfig(UploadNotificationConfig config) {
-        notificationConfig = config;
+        params.setNotificationConfig(config);
+        return this;
+    }
+
+    /**
+     * Sets the automatic file deletion after successful upload.
+     * @param autoDeleteFiles true to auto delete files included in the
+     *                        request when the upload is completed successfully.
+     *                        By default this setting is set to false, and nothing gets deleted.
+     * @return {@link HttpUploadRequest}
+     */
+    public HttpUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
+        params.setAutoDeleteSuccessfullyUploadedFiles(autoDeleteFiles);
         return this;
     }
 
@@ -94,16 +107,16 @@ abstract class HttpUploadRequest {
      * @throws MalformedURLException if the provided server URL is not valid
      */
     protected void validate() throws IllegalArgumentException, MalformedURLException {
-        if (url == null || "".equals(url)) {
-            throw new IllegalArgumentException("Request URL cannot be either null or empty");
+        if (params.getUrl() == null || "".equals(params.getUrl())) {
+            throw new IllegalArgumentException("Request URL cannot be null or empty");
         }
 
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        if (!params.getUrl().startsWith("http://") && !params.getUrl().startsWith("https://")) {
             throw new IllegalArgumentException("Specify either http:// or https:// as protocol");
         }
 
         // Check if the URL is valid
-        new URL(url);
+        new URL(params.getUrl());
     }
 
     /**
@@ -114,7 +127,47 @@ abstract class HttpUploadRequest {
      * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest addHeader(final String headerName, final String headerValue) {
-        headers.add(new NameValue(headerName, headerValue));
+        params.addRequestHeader(headerName, headerValue);
+        return this;
+    }
+
+    /**
+     * Adds a parameter to this upload request.
+     *
+     * @param paramName parameter name
+     * @param paramValue parameter value
+     * @return {@link HttpUploadRequest}
+     */
+    public HttpUploadRequest addParameter(final String paramName, final String paramValue) {
+        params.addRequestParameter(paramName, paramValue);
+        return this;
+    }
+
+    /**
+     * Adds a parameter with multiple values to this upload request.
+     *
+     * @param paramName parameter name
+     * @param array values
+     * @return {@link HttpUploadRequest}
+     */
+    public HttpUploadRequest addArrayParameter(final String paramName, final String... array) {
+        for (String value : array) {
+            params.addRequestParameter(paramName, value);
+        }
+        return this;
+    }
+
+    /**
+     * Adds a parameter with multiple values to this upload request.
+     *
+     * @param paramName parameter name
+     * @param list values
+     * @return {@link HttpUploadRequest}
+     */
+    public HttpUploadRequest addArrayParameter(final String paramName, final List<String> list) {
+        for (String value : list) {
+            params.addRequestParameter(paramName, value);
+        }
         return this;
     }
 
@@ -125,63 +178,8 @@ abstract class HttpUploadRequest {
      * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setMethod(final String method) {
-        if (method != null && method.length() > 0)
-            this.method = method;
-
+        params.setMethod(method);
         return this;
-    }
-
-    /**
-     * Gets the HTTP method to use.
-     *
-     * @return HTTP method
-     */
-    protected String getMethod() {
-        return method;
-    }
-
-    /**
-     * @return Gets the upload ID of this request.
-     */
-    protected String getUploadId() {
-        return uploadId;
-    }
-
-    /**
-     * @return Gets the URL of the server side script that will handle the multipart form upload.
-     */
-    protected String getServerUrl() {
-        return url;
-    }
-
-    /**
-     * @return Gets the list of the headers.
-     */
-    protected ArrayList<NameValue> getHeaders() {
-        return headers;
-    }
-
-    /**
-     * @return Gets the upload notification configuration.
-     */
-    protected UploadNotificationConfig getNotificationConfig() {
-        return notificationConfig;
-    }
-
-    /**
-     * @return Gets the application context.
-     */
-    protected Context getContext() {
-        return context;
-    }
-
-    /**
-     * Gets the custom user agent defined for this upload request.
-     *
-     * @return string representing the user agent or null if it's not defined
-     */
-    protected final String getCustomUserAgent() {
-        return customUserAgent;
     }
 
     /**
@@ -193,16 +191,15 @@ abstract class HttpUploadRequest {
      * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setCustomUserAgent(String customUserAgent) {
-        this.customUserAgent = customUserAgent;
+        params.setCustomUserAgent(customUserAgent);
         return this;
     }
 
     /**
-     * @return Get the maximum number of retries that the library will do if an error occurs,
-     * before returning an error.
+     * @return Gets the application context.
      */
-    protected final int getMaxRetries() {
-        return maxRetries;
+    protected final Context getContext() {
+        return context;
     }
 
     /**
@@ -213,11 +210,28 @@ abstract class HttpUploadRequest {
      * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setMaxRetries(int maxRetries) {
-        if (maxRetries < 0)
-            this.maxRetries = 0;
-        else
-            this.maxRetries = maxRetries;
-
+        params.setMaxRetries(maxRetries);
         return this;
     }
+
+    /**
+     * Sets if this upload request is using fixed length streaming mode.
+     * If it uses fixed length streaming mode, then the value returned by
+     * {@link HttpUploadTask#getBodyLength()} will be automatically used to properly set the
+     * underlying {@link java.net.HttpURLConnection}, otherwise chunked streaming mode will be used.
+     * @param fixedLength true to use fixed length streaming mode (this is the default setting) or
+     *                    false to use chunked streaming mode.
+     * @return {@link HttpUploadRequest}
+     */
+    public HttpUploadRequest setUsesFixedLengthStreamingMode(boolean fixedLength) {
+        params.setUsesFixedLengthStreamingMode(fixedLength);
+        return this;
+    }
+
+    /**
+     * Implement in subclasses to specify the class which will handle the the upload task.
+     * The class must be a subclass of {@link HttpUploadTask}.
+     * @return class
+     */
+    protected abstract Class getTaskClass();
 }

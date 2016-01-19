@@ -9,9 +9,9 @@ import android.os.Parcelable;
 /**
  * Contains the configuration of the upload notification.
  *
- * @author alexbbb (Alex Gotev)
+ * @author alexbbb (Aleksandar Gotev)
  */
-public class UploadNotificationConfig implements Parcelable {
+public final class UploadNotificationConfig implements Parcelable {
 
     private int iconResourceID;
     private String title;

@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 /**
- * Broadcast receiver from which to inherit when creating a receiver for
- * {@link UploadService}.
+ * Broadcast receiver to sublass to create a receiver for
+ * {@link UploadService} events.
  *
  * It provides the boilerplate code to properly handle broadcast messages coming from the
  * upload service and dispatch them to the proper handler method.
  *
- * @author alexbbb (Alex Gotev)
+ * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
  * @author mabdurrahman
@@ -22,51 +22,38 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (intent == null || !UploadService.getActionBroadcast().equals(intent.getAction()))
+            return;
 
-        if (intent != null) {
-            if (UploadService.getActionBroadcast().equals(intent.getAction())) {
-                final int status = intent.getIntExtra(UploadService.STATUS, 0);
-                final String uploadId = intent.getStringExtra(UploadService.UPLOAD_ID);
+        BroadcastData data = intent.getParcelableExtra(UploadService.PARAM_BROADCAST_DATA);
 
-                switch (status) {
-                    case UploadService.STATUS_ERROR:
-                        final Exception exception = (Exception) intent
-                                .getSerializableExtra(UploadService.ERROR_EXCEPTION);
-                        onError(uploadId, exception);
-                        break;
+        switch (data.getStatus()) {
+            case ERROR:
+                onError(data.getId(), data.getException());
+                break;
 
-                    case UploadService.STATUS_COMPLETED:
-                        final int responseCode = intent.getIntExtra(UploadService.SERVER_RESPONSE_CODE, 0);
-                        final String responseMsg = intent.getStringExtra(UploadService.SERVER_RESPONSE_MESSAGE);
-                        onCompleted(uploadId, responseCode, responseMsg);
-                        break;
+            case COMPLETED:
+                onCompleted(data.getId(), data.getResponseCode(), data.getResponseBody());
+                break;
 
-                    case UploadService.STATUS_IN_PROGRESS:
-                        final int progress = intent.getIntExtra(UploadService.PROGRESS, 0);
-                        onProgress(uploadId, progress);
+            case IN_PROGRESS:
+                onProgress(data.getId(), data.getProgressPercent());
+                onProgress(data.getId(), data.getUploadedBytes(), data.getTotalBytes());
+                break;
 
-                        final long uploadedBytes = intent.getLongExtra(UploadService.PROGRESS_UPLOADED_BYTES, 0);
-                        final long totalBytes = intent.getLongExtra(UploadService.PROGRESS_TOTAL_BYTES, 1);
-                        onProgress(uploadId, uploadedBytes, totalBytes);
+            case CANCELLED:
+                onCancelled(data.getId());
+                break;
 
-                        break;
-
-                    case UploadService.STATUS_CANCELLED:
-                        onCancelled(uploadId);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
+            default:
+                break;
         }
-
     }
 
     /**
-     * Register this upload receiver.
+     * Register this upload receiver.<br>
      * If you use this receiver in an {@link android.app.Activity}, you have to call this method inside
-     * {@link android.app.Activity#onResume()}, after {@code super.onResume();}.
+     * {@link android.app.Activity#onResume()}, after {@code super.onResume();}.<br>
      * If you use it in a {@link android.app.Service}, you have to
      * call this method inside {@link android.app.Service#onCreate()}, after {@code super.onCreate();}.
      *
@@ -79,9 +66,9 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Unregister this upload receiver.
+     * Unregister this upload receiver.<br>
      * If you use this receiver in an {@link android.app.Activity}, you have to call this method inside
-     * {@link android.app.Activity#onPause()}, after {@code super.onPause();}.
+     * {@link android.app.Activity#onPause()}, after {@code super.onPause();}.<br>
      * If you use it in a {@link android.app.Service}, you have to
      * call this method inside {@link android.app.Service#onDestroy()}.
      *
@@ -124,13 +111,14 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
      *
      * @param uploadId unique ID of the upload request
      * @param serverResponseCode status code returned by the server
-     * @param serverResponseMessage string containing the response received from the server.
-     *                              If your server responds with a JSON, you can parse it from
-     *                              this string using a library such as org.json
-     *                              (embedded in Android) or google's gson
+     * @param serverResponseBody byte array containing the response body received from the server.
+     *                           If your server responds with a string, you can get it with
+     *                           {@code new String(serverResponseBody)}. If the string is a
+     *                           JSON, you can parse it using a library such as org.json
+     *                           (embedded in Android) or google's gson
      */
     public void onCompleted(final String uploadId, final int serverResponseCode,
-                            final String serverResponseMessage) {
+                            final byte[] serverResponseBody) {
     }
 
     /**

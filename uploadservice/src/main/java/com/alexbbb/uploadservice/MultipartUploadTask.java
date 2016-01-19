@@ -6,54 +6,57 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 
 /**
  * Implements an HTTP Multipart upload task.
  *
- * @author alexbbb (Alex Gotev)
+ * @author alexbbb (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
  */
-class MultipartUploadTask extends HttpUploadTask {
+public class MultipartUploadTask extends HttpUploadTask {
 
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
-
-    private final ArrayList<MultipartUploadFile> files;
-    private final ArrayList<NameValue> parameters;
 
     private String boundary;
     private byte[] boundaryBytes;
     private byte[] trailerBytes;
 
-    MultipartUploadTask(UploadService service, Intent intent) {
-        super(service, intent);
-        this.files = intent.getParcelableArrayListExtra(UploadService.PARAM_FILES);
-        this.parameters = intent.getParcelableArrayListExtra(UploadService.PARAM_REQUEST_PARAMETERS);
-    }
-
     @Override
-    protected void upload() throws IOException {
+    protected void init(UploadService service, Intent intent) throws IOException {
+        super.init(service, intent);
         boundary = getBoundary();
         boundaryBytes = getBoundaryBytes();
         trailerBytes = getTrailerBytes();
-        super.upload();
     }
 
     @Override
-    protected HttpURLConnection getHttpURLConnection() throws IOException {
-        final HttpURLConnection conn = super.getHttpURLConnection();
-
-        if (files.size() <= 1) {
-            conn.setRequestProperty("Connection", "close");
+    protected void setupHttpUrlConnection(HttpURLConnection connection) throws IOException {
+        if (params.getFiles().size() <= 1) {
+            connection.setRequestProperty("Connection", "close");
         } else {
-            conn.setRequestProperty("Connection", "Keep-Alive");
+            connection.setRequestProperty("Connection", "Keep-Alive");
         }
-        conn.setRequestProperty("ENCTYPE", "multipart/form-data");
-        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
-        return conn;
+        connection.setRequestProperty("ENCTYPE", "multipart/form-data");
+        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+    }
+
+    @Override
+    protected long getBodyLength() throws UnsupportedEncodingException {
+        // get the content length of the entire HTTP/Multipart request body
+        long parameterBytes = getRequestParametersLength();
+        final long totalFileBytes = getFilesLength();
+
+        return (parameterBytes + totalFileBytes + trailerBytes.length);
+    }
+
+    @Override
+    protected void writeBody() throws IOException {
+        writeRequestParameters();
+        writeFiles();
+        requestStream.write(trailerBytes, 0, trailerBytes.length);
     }
 
     private String getBoundary() {
@@ -68,19 +71,10 @@ class MultipartUploadTask extends HttpUploadTask {
         return (NEW_LINE + TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes("US-ASCII");
     }
 
-    @Override
-    protected long getBodyLength() throws UnsupportedEncodingException {
-        // get the content length of the entire HTTP/Multipart request body
-        long parameterBytes = getRequestParametersLength();
-        final long totalFileBytes = getFilesLength();
-
-        return (parameterBytes + totalFileBytes + trailerBytes.length);
-    }
-
     private long getFilesLength() throws UnsupportedEncodingException {
         long total = 0;
 
-        for (MultipartUploadFile file : files) {
+        for (UploadFile file : params.getFiles()) {
             total += file.getTotalMultipartBytes(boundaryBytes.length);
         }
 
@@ -90,29 +84,22 @@ class MultipartUploadTask extends HttpUploadTask {
     private long getRequestParametersLength() throws UnsupportedEncodingException {
         long parametersBytes = 0;
 
-        if (!parameters.isEmpty()) {
-            for (final NameValue parameter : parameters) {
+        if (!params.getRequestParameters().isEmpty()) {
+            for (final NameValue parameter : params.getRequestParameters()) {
                 // the bytes needed for every parameter are the sum of the boundary bytes
-                // and the bytes occupied by the parameter. Check setRequestParameters method
-                parametersBytes += boundaryBytes.length + parameter.getBytes().length;
+                // and the bytes occupied by the parameter
+                parametersBytes += boundaryBytes.length + parameter.getMultipartBytes().length;
             }
         }
 
         return parametersBytes;
     }
 
-    @Override
-    protected void writeBody() throws IOException {
-        writeRequestParameters();
-        writeFiles();
-        requestStream.write(trailerBytes, 0, trailerBytes.length);
-    }
-
     private void writeRequestParameters() throws IOException {
-        if (!parameters.isEmpty()) {
-            for (final NameValue parameter : parameters) {
+        if (!params.getRequestParameters().isEmpty()) {
+            for (final NameValue parameter : params.getRequestParameters()) {
                 requestStream.write(boundaryBytes, 0, boundaryBytes.length);
-                byte[] formItemBytes = parameter.getBytes();
+                byte[] formItemBytes = parameter.getMultipartBytes();
                 requestStream.write(formItemBytes, 0, formItemBytes.length);
 
                 uploadedBodyBytes += boundaryBytes.length + formItemBytes.length;
@@ -122,9 +109,9 @@ class MultipartUploadTask extends HttpUploadTask {
     }
 
     private void writeFiles() throws IOException {
-        for (MultipartUploadFile file : files) {
+        for (UploadFile file : params.getFiles()) {
             if (!shouldContinue)
-                continue;
+                break;
 
             requestStream.write(boundaryBytes, 0, boundaryBytes.length);
             byte[] headerBytes = file.getMultipartHeader();
@@ -137,4 +124,5 @@ class MultipartUploadTask extends HttpUploadTask {
             writeStream(stream);
         }
     }
+
 }
