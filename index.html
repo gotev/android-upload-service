@@ -23,6 +23,8 @@
 
 <p><img src="http://alexbbb.github.io/android-upload-service/upload.gif" alt="Upload Notification"></p>
 
+<p>Easily upload files in the background with automatic Android Notification Center progress indication.</p>
+
 <h2>
 <a id="purpose" class="anchor" href="#purpose" aria-hidden="true"><span class="octicon octicon-link"></span></a>Purpose</h2>
 
@@ -70,10 +72,11 @@
 
 <p>and now you're ready to rock!</p>
 
-<p><em>I strongly encourage you to build and run the demo app that you can find in the <a href="#examples">examples</a>, together with one of the provided server implementations and to check <a href="http://alexbbb.github.io/android-upload-service/javadoc/">JavaDocs</a>.</em></p>
+<p><em>I strongly encourage you to build and run the demo app that you can find in the <a href="#examples">examples</a>, together with one of the provided server implementations and to check <a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/">JavaDocs</a>.</em></p>
 
 <h3>
-<a id="http-multipart-upload" class="anchor" href="#http-multipart-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a>HTTP Multipart Upload</h3>
+<a id="http-multipart-upload" class="anchor" href="#http-multipart-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/com/alexbbb/uploadservice/MultipartUploadRequest.html">HTTP Multipart Upload</a>
+</h3>
 
 <p>This is the most common way to upload files on a server. It's the same kind of request that browsers do when you use the <code>&lt;form&gt;</code> tag with one or more files. Here's a minimal example:</p>
 
@@ -96,7 +99,8 @@
 }</pre></div>
 
 <h3>
-<a id="binary-upload" class="anchor" href="#binary-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a>Binary Upload</h3>
+<a id="binary-upload" class="anchor" href="#binary-upload" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/com/alexbbb/uploadservice/BinaryUploadRequest.html">Binary Upload</a>
+</h3>
 
 <p>The binary upload uses a single file as the raw body of the upload request.</p>
 
@@ -120,7 +124,7 @@
 <h3>
 <a id="monitoring-upload-status" class="anchor" href="#monitoring-upload-status" aria-hidden="true"><span class="octicon octicon-link"></span></a>Monitoring upload status</h3>
 
-<p>To listen for the status of the upload service, use the provided <code>UploadServiceBroadcastReceiver</code>. Override its methods to add your own business logic. Example on how to use it in an activity:</p>
+<p>To listen for the status of the upload service, use the provided <a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/com/alexbbb/uploadservice/UploadServiceBroadcastReceiver.html">UploadServiceBroadcastReceiver</a>. Override its methods to add your own business logic. Example on how to use it in an activity:</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">YourActivity</span> <span class="pl-k">extends</span> <span class="pl-e">Activity</span> {
 
@@ -279,10 +283,11 @@ Binary:         http://YOUR_LOCAL_IP:3000/upload/binary
 <p>Let's face it, doing network programming is not easy as there are many things that can go wrong, but if upload doesn't work out of the box, consider the following things before posting a new issue:</p>
 
 <ul>
-<li>Check <a href="http://alexbbb.github.io/android-upload-service/javadoc/">JavaDocs</a> for full class and methods docs</li>
+<li>Check <a href="http://alexbbb.github.io/android-upload-service/javadoc-1.6/">JavaDocs</a> for full class and methods docs</li>
 <li>Is the server URL correct?</li>
 <li>Is the server URL reachable from your device? Check if there are firewalls or other kind of restrictions between your device and the server.</li>
-<li>Are you sure that the server side is working properly?</li>
+<li>Are you sure that the server side is working properly? For example, if you use PHP in your server side, and you get an EPIPE exception, check if the content size you are trying to upload exceeds the values of <code>upload_max_filesize</code> or <code>post_max_size</code> set in your <code>php.ini</code>
+</li>
 <li>Have you properly set up the request with all the headers, parameters and files that the server expects?</li>
 <li>Have you tried to make an upload using the demo app and one of the provided server implementations? I use the node.js version which provides good feedback and supports both HTTP Multipart and binary uploads.</li>
 </ul>
