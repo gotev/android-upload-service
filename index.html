@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Android Upload Service by alexbbb</title>
+    <title>Android Upload Service by gotev</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -13,20 +13,20 @@
     <section class="page-header">
       <h1 class="project-name">Android Upload Service</h1>
       <h2 class="project-tagline">Easily upload files in the background with automatic Android Notification Center progress indication.</h2>
-      <a href="https://github.com/alexbbb/android-upload-service" class="btn">View on GitHub</a>
-      <a href="https://github.com/alexbbb/android-upload-service/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/alexbbb/android-upload-service/tarball/master" class="btn">Download .tar.gz</a>
+      <a href="https://github.com/gotev/android-upload-service" class="btn">View on GitHub</a>
+      <a href="https://github.com/gotev/android-upload-service/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/gotev/android-upload-service/tarball/master" class="btn">Download .tar.gz</a>
     </section>
 
     <section class="main-content">
       <p><a href="http://android-arsenal.com/details/1/2161"><img src="https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat" alt="Android Arsenal"></a> <a href="https://bintray.com/alexbbb/maven/android-upload-service/_latestVersion"> <img src="https://api.bintray.com/packages/alexbbb/maven/android-upload-service/images/download.svg" alt="Download"> </a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=alexgotev%40gmail%2ecom&amp;lc=US&amp;item_name=Android%20Upload%20Service&amp;item_number=AndroidUploadService&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate"></a></p>
 
-<p><img src="http://alexbbb.github.io/android-upload-service/upload.gif" alt="Upload Notification"></p>
+<p><img src="http://gotev.github.io/android-upload-service/upload.gif" alt="Upload Notification"></p>
 
 <p>Easily upload files in the background with automatic Android Notification Center progress indication.</p>
 
 <h3>
-<a id="purpose" class="anchor" href="#purpose" aria-hidden="true"><span class="octicon octicon-link"></span></a>Purpose</h3>
+<a id="purpose" class="anchor" href="#purpose" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Purpose</h3>
 
 <ul>
 <li>upload files to a server with HTTP <code>multipart/form-data</code> or binary requests</li>
@@ -39,8 +39,10 @@
 <p>At the core of the library there is a <code>Service</code> which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.</p>
 
 <h3>
-<a id="setup-" class="anchor" href="#setup-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup <a name="setup"></a>
+<a id="setup-" class="anchor" href="#setup-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup <a name="setup"></a>
 </h3>
+
+<p>Maven Central? <a href="https://github.com/gotev/android-upload-service/issues/84">Read here and vote!</a></p>
 
 <p>Ensure that you have jcenter in your gradle build file:</p>
 
@@ -61,7 +63,7 @@
 <p><a href="https://github.com/alexbbb/android-upload-service/wiki">Check the wiki</a> for full setup instructions and examples to get up and running fast. If something isn't covered there, search in the <a href="https://github.com/alexbbb/android-upload-service/issues">issues</a>. Your question could already have been answered in the past. There are also <a href="https://github.com/alexbbb/android-upload-service/wiki/Resolve%20common%20setup%20issues">some checks you can do yourself to resolve common setup mistakes</a>.</p>
 
 <h3>
-<a id="apps-powered-by-android-upload-service-" class="anchor" href="#apps-powered-by-android-upload-service-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Apps powered by Android Upload Service <a name="powered"></a>
+<a id="apps-powered-by-android-upload-service-" class="anchor" href="#apps-powered-by-android-upload-service-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Apps powered by Android Upload Service <a name="powered"></a>
 </h3>
 
 <p>To be included in the following list, simply create an issue and provide the app name and a link.</p>
@@ -73,7 +75,7 @@
 </ul>
 
 <h3>
-<a id="contribute-" class="anchor" href="#contribute-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contribute <a name="contribute"></a>
+<a id="contribute-" class="anchor" href="#contribute-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contribute <a name="contribute"></a>
 </h3>
 
 <ul>
@@ -85,13 +87,13 @@
 <p>Contributions are welcome and encouraged! Just fork the project and then send a pull request. Be ready to discuss your code and design decisions :)</p>
 
 <h3>
-<a id="do-you-like-the-project-" class="anchor" href="#do-you-like-the-project-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Do you like the project? <a name="donate"></a>
+<a id="do-you-like-the-project-" class="anchor" href="#do-you-like-the-project-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Do you like the project? <a name="donate"></a>
 </h3>
 
 <p>Put a star, spread the word and if you want to offer me a free beer, <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=alexgotev%40gmail%2ecom&amp;lc=US&amp;item_name=Android%20Upload%20Service&amp;item_number=AndroidUploadService&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate"></a></p>
 
 <h3>
-<a id="license-" class="anchor" href="#license-" aria-hidden="true"><span class="octicon octicon-link"></span></a>License <a name="license"></a>
+<a id="license-" class="anchor" href="#license-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License <a name="license"></a>
 </h3>
 
 <pre><code>Copyright (C) 2013-2016 Aleksandar Gotev
@@ -110,7 +112,7 @@ limitations under the License.
 </code></pre>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/alexbbb/android-upload-service">Android Upload Service</a> is maintained by <a href="https://github.com/alexbbb">alexbbb</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/gotev/android-upload-service">Android Upload Service</a> is maintained by <a href="https://github.com/gotev">gotev</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
