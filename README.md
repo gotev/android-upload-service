@@ -33,9 +33,9 @@ dependencies {
 }
 ```
 
-and do a project sync. [Read this page](https://github.com/alexbbb/android-upload-service/wiki/Setup) if you're upgrading from a previous release and for setup troubleshooting.
+and do a project sync. [Read this page](https://github.com/gotev/android-upload-service/wiki/Setup) if you're upgrading from a previous release and for setup troubleshooting.
 
-[Check the wiki](https://github.com/alexbbb/android-upload-service/wiki) for full setup instructions and examples to get up and running fast. If something isn't covered there, search in the [issues](https://github.com/alexbbb/android-upload-service/issues). Your question could already have been answered in the past. There are also [some checks you can do yourself to resolve common setup mistakes](https://github.com/alexbbb/android-upload-service/wiki/Resolve%20common%20setup%20issues).
+[Check the wiki](https://github.com/gotev/android-upload-service/wiki) for full setup instructions and examples to get up and running fast. If something isn't covered there, search in the [issues](https://github.com/gotev/android-upload-service/issues). Your question could already have been answered in the past. There are also [some checks you can do yourself to resolve common setup mistakes](https://github.com/gotev/android-upload-service/wiki/Resolve%20common%20setup%20issues).
 
 ### Apps powered by Android Upload Service <a name="powered"></a>
 To be included in the following list, simply create an issue and provide the app name and a link.
