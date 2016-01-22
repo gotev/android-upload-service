@@ -25,6 +25,7 @@ public class UploadFile implements Parcelable {
     protected final String paramName;
     protected final String fileName;
     protected String contentType;
+    protected String headerCharset="US-ASCII";
 
     /**
      * Creates a new UploadFile.
@@ -65,6 +66,26 @@ public class UploadFile implements Parcelable {
         } else {
             this.fileName = fileName;
         }
+
+    }
+
+    /**
+     * Creates a new UploadFile.
+     *
+     * @param path absolute path to the file
+     * @param parameterName parameter name of this file in the request
+     * @param fileName file name of this file
+     * @param contentType content type of this file. Set this to null to auto detect.
+     * @throws FileNotFoundException if the file can't be found at the specified path
+     * @throws IllegalArgumentException if you passed invalid argument values
+     */
+    UploadFile(final String path, final String parameterName,
+               final String fileName, final String contentType,final String headerCharset)
+            throws FileNotFoundException, IllegalArgumentException {
+        this(path,parameterName,fileName,contentType);
+        if(headerCharset!=null&&!headerCharset.isEmpty()&&!headerCharset.equalsIgnoreCase(UNUSED)){
+            this.headerCharset=headerCharset;
+        }
     }
 
     /**
@@ -75,7 +96,7 @@ public class UploadFile implements Parcelable {
      * @throws FileNotFoundException if the file can't be found at the specified path
      */
     UploadFile(final String path) throws FileNotFoundException {
-        this(path, UNUSED, UNUSED, UNUSED);
+        this(path, UNUSED, UNUSED, UNUSED,UNUSED);
     }
 
     /**
@@ -110,7 +131,7 @@ public class UploadFile implements Parcelable {
 
         builder.append("Content-Type: ").append(contentType).append(NEW_LINE).append(NEW_LINE);
 
-        return builder.toString().getBytes("US-ASCII");
+        return builder.toString().getBytes(headerCharset);
     }
 
     /**
@@ -155,6 +176,7 @@ public class UploadFile implements Parcelable {
         parcel.writeString(paramName);
         parcel.writeString(fileName);
         parcel.writeString(contentType);
+        parcel.writeString(headerCharset);
     }
 
     // This is used to regenerate the object.
@@ -182,5 +204,6 @@ public class UploadFile implements Parcelable {
         paramName = in.readString();
         fileName = in.readString();
         contentType = in.readString();
+        headerCharset=in.readString();
     }
 }
