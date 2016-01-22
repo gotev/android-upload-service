@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,7 @@ import java.util.UUID;
  * Represents a generic HTTP upload request.<br>
  * Subclass to create your own custom upload request.
  *
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
  */

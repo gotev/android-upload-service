@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.app.Notification;
 import android.app.Service;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * Service to upload files in background using HTTP POST with notification center progress
  * display.
  *
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
  * @author mabdurrahman
@@ -54,7 +54,7 @@ public final class UploadService extends Service {
      * Sets the namespace used to broadcast events. Set this to your app namespace to avoid
      * conflicts and unexpected behaviours.
      */
-    public static String NAMESPACE = "com.alexbbb";
+    public static String NAMESPACE = "net.gotev";
     // end configurable values
 
     protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique

@@ -1,11 +1,12 @@
-package com.alexbbb.uploadservicedemo;
+package net.gotev.uploadservicedemo;
 
 import android.app.Application;
 
-import com.alexbbb.uploadservice.UploadService;
+import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.demo.BuildConfig;
 
 /**
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
 public class App extends Application {
 
@@ -15,6 +16,6 @@ public class App extends Application {
 
         // Set your application namespace to avoid conflicts with other apps
         // using this library
-        UploadService.NAMESPACE = "com.alexbbb.demoapp";
+        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
     }
 }

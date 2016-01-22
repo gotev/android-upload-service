@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.content.Context;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * It's the same kind of request that browsers do when you use the &lt;form&gt; tag
  * with one or more files.
  *
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  * @author eliasnaur
  *
  */

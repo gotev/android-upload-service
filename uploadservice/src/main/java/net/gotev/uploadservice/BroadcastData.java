@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.content.Intent;
 import android.os.Parcel;
@@ -8,7 +8,7 @@ import android.os.Parcelable;
  * Class which contains all the data passed in broadcast intents to notify task progress, errors,
  * completion or cancellation.
  *
- * @author Aleksandar Gotev
+ * @author gotev (Aleksandar Gotev)
  */
 class BroadcastData implements Parcelable {
 

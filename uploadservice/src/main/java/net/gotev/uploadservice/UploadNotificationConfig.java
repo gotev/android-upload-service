@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.os.Parcelable;
 /**
  * Contains the configuration of the upload notification.
  *
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
 public final class UploadNotificationConfig implements Parcelable {
 

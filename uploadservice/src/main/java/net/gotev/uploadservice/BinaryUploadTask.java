@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -8,7 +8,7 @@ import java.net.HttpURLConnection;
  * Implements a binary file upload task.
  *
  * @author cankov
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
 public class BinaryUploadTask extends HttpUploadTask {
 
