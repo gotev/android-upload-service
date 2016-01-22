@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.content.Context;
 import android.util.Log;
@@ -11,7 +11,7 @@ import java.util.List;
  * upload request.
  *
  * @author cankov
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
 public class BinaryUploadRequest extends HttpUploadRequest {
 

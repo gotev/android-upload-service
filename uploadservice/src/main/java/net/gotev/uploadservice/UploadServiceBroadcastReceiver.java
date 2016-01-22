@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.content.IntentFilter;
  * It provides the boilerplate code to properly handle broadcast messages coming from the
  * upload service and dispatch them to the proper handler method.
  *
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
  * @author mabdurrahman

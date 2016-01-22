@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservicedemo;
+package net.gotev.uploadservicedemo;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -18,14 +18,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alexbbb.uploadservice.BinaryUploadRequest;
-import com.alexbbb.uploadservice.MultipartUploadRequest;
-import com.alexbbb.uploadservice.UploadNotificationConfig;
-import com.alexbbb.uploadservice.UploadService;
-import com.alexbbb.uploadservice.UploadServiceBroadcastReceiver;
-import com.alexbbb.uploadservice.demo.BuildConfig;
-import com.alexbbb.uploadservice.demo.R;
 import com.nononsenseapps.filepicker.FilePickerActivity;
+
+import net.gotev.uploadservice.BinaryUploadRequest;
+import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
+import net.gotev.uploadservice.demo.BuildConfig;
+import net.gotev.uploadservice.demo.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,7 +43,8 @@ import butterknife.OnClick;
 /**
  * Activity that demonstrates how to use Android Upload Service.
  *
- * @author Alex Gotev
+ * @author gotev (Aleksandar Gotev)
+ * @author mabdurrahman
  *
  */
 public class MainActivity extends AppCompatActivity {
