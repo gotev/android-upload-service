@@ -81,6 +81,13 @@ public class MultipartUploadRequest extends HttpUploadRequest {
         return this;
     }
 
+    public MultipartUploadRequest addFileToUpload(final String path, final String parameterName,
+                                                  final String fileName, final String contentType,final String headerCharset)
+            throws FileNotFoundException, IllegalArgumentException {
+        params.addFile(new UploadFile(path, parameterName, fileName, contentType,headerCharset));
+        return this;
+    }
+
     /**
      * Adds a file to this upload request, without setting the content type, which will be
      * automatically detected from the file extension. If you want to
