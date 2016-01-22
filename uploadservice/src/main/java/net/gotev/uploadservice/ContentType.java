@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 /**
  * Static class containing string constants for the most common
@@ -10,7 +10,7 @@ package com.alexbbb.uploadservice;
  * https://www.iana.org/assignments/media-types
  *
  *
- * @author alexbbb (Alex Gotev)
+ * @author gotev (Aleksandar Gotev)
  *
  */
 public final class ContentType {

@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -25,7 +25,7 @@ import java.util.Iterator;
  * Subclass to create your custom upload task.
  *
  * @author cankov
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  * @author mabdurrahman
  */
 public abstract class HttpUploadTask implements Runnable {

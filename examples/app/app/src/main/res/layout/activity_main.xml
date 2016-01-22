@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context="com.alexbbb.uploadservice.demo.MainActivity">
+    tools:context="net.gotev.uploadservice.demo.MainActivity">
 
     <LinearLayout
         android:id="@+id/container"
