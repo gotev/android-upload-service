@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.util.Log;
 
@@ -18,7 +18,7 @@ import javax.net.ssl.X509TrustManager;
  * Useful when you want to use HTTPS but you have self-signed certificates.
  * Use at your own risk and only for development.
  *
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  */
 public class AllCertificatesAndHostsTruster implements TrustManager, X509TrustManager {
 

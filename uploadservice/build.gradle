@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-def siteUrl = 'https://github.com/alexbbb/android-upload-service'
-def gitUrl = 'https://github.com/alexbbb/android-upload-service.git'
+def siteUrl = 'https://github.com/gotev/android-upload-service'
+def gitUrl = 'https://github.com/gotev/android-upload-service.git'
 def projectName = "android-upload-service"
 def projectDesc = "Easily upload files in the background with automatic Android Notification Center progress indication."
-def projectGroup = "com.alexbbb"
+def projectGroup = "net.gotev"
 group = projectGroup
 version = "2.0"
 
@@ -36,7 +36,7 @@ dependencies {
 // add the following information to the file: local.properties situated in the parent directory of
 // where this file is:
 //
-// bintray.user=alexbbb
+// bintray.user=gotev
 // bintray.apikey=api key got from the bintray profile
 //
 // be sure to add local.properties to the .gitignore!
@@ -61,8 +61,8 @@ install {
             }
             developers {
                 developer {
-                    id 'alexbbb'
-                    name 'Alex Gotev'
+                    id 'gotev'
+                    name 'Aleksandar Gotev'
                 }
             }
             scm {

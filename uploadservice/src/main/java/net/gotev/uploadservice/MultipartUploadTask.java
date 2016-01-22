@@ -1,4 +1,4 @@
-package com.alexbbb.uploadservice;
+package net.gotev.uploadservice;
 
 import android.content.Intent;
 
@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 /**
  * Implements an HTTP Multipart upload task.
  *
- * @author alexbbb (Aleksandar Gotev)
+ * @author gotev (Aleksandar Gotev)
  * @author eliasnaur
  * @author cankov
  */
