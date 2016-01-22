@@ -19,7 +19,7 @@
     </section>
 
     <section class="main-content">
-      <p><a href="http://android-arsenal.com/details/1/2161"><img src="https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat" alt="Android Arsenal"></a> <a href="https://bintray.com/alexbbb/maven/android-upload-service/_latestVersion"> <img src="https://api.bintray.com/packages/alexbbb/maven/android-upload-service/images/download.svg" alt="Download"> </a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=alexgotev%40gmail%2ecom&amp;lc=US&amp;item_name=Android%20Upload%20Service&amp;item_number=AndroidUploadService&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate"></a></p>
+      <p><a href="http://android-arsenal.com/details/1/2161"><img src="https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat" alt="Android Arsenal"></a> <a href="https://bintray.com/gotev/maven/android-upload-service/_latestVersion"> <img src="https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg" alt="Download"> </a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=alexgotev%40gmail%2ecom&amp;lc=US&amp;item_name=Android%20Upload%20Service&amp;item_number=AndroidUploadService&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate"></a></p>
 
 <p><img src="http://gotev.github.io/android-upload-service/upload.gif" alt="Upload Notification"></p>
 
@@ -42,19 +42,22 @@
 <a id="setup-" class="anchor" href="#setup-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup <a name="setup"></a>
 </h3>
 
-<p>Maven Central? <a href="https://github.com/gotev/android-upload-service/issues/84">Read here and vote!</a></p>
+<h4>
+<a id="maven" class="anchor" href="#maven" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Maven</h4>
 
-<p>Ensure that you have jcenter in your gradle build file:</p>
-
-<pre><code>repositories {
-    jcenter()
-}
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;net.gotev&lt;/groupId&gt;
+  &lt;artifactId&gt;uploadservice&lt;/artifactId&gt;
+  &lt;version&gt;2.0&lt;/version&gt;
+  &lt;type&gt;aar&lt;/type&gt;
+&lt;/dependency&gt;
 </code></pre>
 
-<p>then in your dependencies section add:</p>
+<h4>
+<a id="gradle" class="anchor" href="#gradle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Gradle</h4>
 
 <pre><code>dependencies {
-    compile 'com.alexbbb:uploadservice:2.0'
+    compile 'net.gotev:uploadservice:2.0'
 }
 </code></pre>
 
