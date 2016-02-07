@@ -83,6 +83,14 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/use_utf8_charset"
+            android:id="@+id/useUtf8"
+            android:layout_gravity="start"
+            android:checked="true" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/fixed_length_streaming_mode"
             android:id="@+id/fixedLengthStreamingMode"
             android:layout_gravity="start"
