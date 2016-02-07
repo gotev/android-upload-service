@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.autoDeleteUploadedFiles) CheckBox autoDeleteUploadedFiles;
     @Bind(R.id.autoClearOnSuccess) CheckBox autoClearOnSuccess;
     @Bind(R.id.fixedLengthStreamingMode) CheckBox fixedLengthStreamingMode;
+    @Bind(R.id.useUtf8) CheckBox useUtf8;
 
     private Map<String, UploadProgressViewHolder> uploadProgressHolders = new HashMap<>();
 
@@ -178,14 +179,19 @@ public class MainActivity extends AppCompatActivity {
             try {
                 final String filename = getFilename(fileToUploadPath);
 
-                String uploadID = new MultipartUploadRequest(this, serverUrlString)
+                MultipartUploadRequest req = new MultipartUploadRequest(this, serverUrlString)
                         .addFileToUpload(fileToUploadPath, paramNameString)
                         .setNotificationConfig(getNotificationConfig(filename))
                         .setCustomUserAgent(USER_AGENT)
                         .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
                         .setUsesFixedLengthStreamingMode(fixedLengthStreamingMode.isChecked())
-                        .setMaxRetries(2)
-                        .startUpload();
+                        .setMaxRetries(2);
+
+                if (useUtf8.isChecked()) {
+                    req.setUtf8Charset();
+                }
+
+                String uploadID = req.startUpload();
 
                 addUploadToList(uploadID,filename);
 
