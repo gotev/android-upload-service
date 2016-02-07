@@ -23,5 +23,6 @@
     <string name="options">Options</string>
     <string name="auto_clear_on_success">Auto clear on success</string>
     <string name="fixed_length_streaming_mode">Fixed length streaming mode</string>
+    <string name="use_utf8_charset">Use UTF-8 charset (un-check to use US-ASCII)</string>
 
 </resources>
