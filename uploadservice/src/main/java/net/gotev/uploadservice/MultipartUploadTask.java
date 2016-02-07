@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
 
 /**
  * Implements an HTTP Multipart upload task.
@@ -16,12 +17,17 @@ import java.net.HttpURLConnection;
  */
 public class MultipartUploadTask extends HttpUploadTask {
 
+    protected static final String PARAM_UTF8_CHARSET = "multipartUtf8Charset";
+
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
 
     private String boundary;
     private byte[] boundaryBytes;
     private byte[] trailerBytes;
+    private boolean isUtf8Charset;
+
+    private final Charset US_ASCII = Charset.forName("US-ASCII");
 
     @Override
     protected void init(UploadService service, Intent intent) throws IOException {
@@ -29,6 +35,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         boundary = getBoundary();
         boundaryBytes = getBoundaryBytes();
         trailerBytes = getTrailerBytes();
+        isUtf8Charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false);
     }
 
     @Override
@@ -39,7 +46,6 @@ public class MultipartUploadTask extends HttpUploadTask {
             connection.setRequestProperty("Connection", "Keep-Alive");
         }
 
-        connection.setRequestProperty("ENCTYPE", "multipart/form-data");
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
     }
 
@@ -60,22 +66,22 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     private String getBoundary() {
-        return "---------------------------" + System.currentTimeMillis();
+        return "-------AndroidUploadService" + System.currentTimeMillis();
     }
 
     private byte[] getBoundaryBytes() throws UnsupportedEncodingException {
-        return (NEW_LINE + TWO_HYPHENS + boundary + NEW_LINE).getBytes("US-ASCII");
+        return (NEW_LINE + TWO_HYPHENS + boundary + NEW_LINE).getBytes(US_ASCII);
     }
 
     private byte[] getTrailerBytes() throws UnsupportedEncodingException {
-        return (NEW_LINE + TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes("US-ASCII");
+        return (NEW_LINE + TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes(US_ASCII);
     }
 
     private long getFilesLength() throws UnsupportedEncodingException {
         long total = 0;
 
         for (UploadFile file : params.getFiles()) {
-            total += file.getTotalMultipartBytes(boundaryBytes.length);
+            total += file.getTotalMultipartBytes(boundaryBytes.length, isUtf8Charset);
         }
 
         return total;
@@ -88,7 +94,8 @@ public class MultipartUploadTask extends HttpUploadTask {
             for (final NameValue parameter : params.getRequestParameters()) {
                 // the bytes needed for every parameter are the sum of the boundary bytes
                 // and the bytes occupied by the parameter
-                parametersBytes += boundaryBytes.length + parameter.getMultipartBytes().length;
+                parametersBytes += boundaryBytes.length
+                                + parameter.getMultipartBytes(isUtf8Charset).length;
             }
         }
 
@@ -99,7 +106,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         if (!params.getRequestParameters().isEmpty()) {
             for (final NameValue parameter : params.getRequestParameters()) {
                 requestStream.write(boundaryBytes, 0, boundaryBytes.length);
-                byte[] formItemBytes = parameter.getMultipartBytes();
+                byte[] formItemBytes = parameter.getMultipartBytes(isUtf8Charset);
                 requestStream.write(formItemBytes, 0, formItemBytes.length);
 
                 uploadedBodyBytes += boundaryBytes.length + formItemBytes.length;
@@ -114,7 +121,7 @@ public class MultipartUploadTask extends HttpUploadTask {
                 break;
 
             requestStream.write(boundaryBytes, 0, boundaryBytes.length);
-            byte[] headerBytes = file.getMultipartHeader();
+            byte[] headerBytes = file.getMultipartHeader(isUtf8Charset);
             requestStream.write(headerBytes, 0, headerBytes.length);
 
             uploadedBodyBytes += boundaryBytes.length + headerBytes.length;

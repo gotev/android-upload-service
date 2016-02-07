@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * Represents a file to upload.
@@ -25,6 +26,9 @@ public class UploadFile implements Parcelable {
     protected final String paramName;
     protected final String fileName;
     protected String contentType;
+
+    private final Charset US_ASCII = Charset.forName("US-ASCII");
+    private final Charset UTF8 = Charset.forName("UTF-8");
 
     /**
      * Creates a new UploadFile.
@@ -98,10 +102,11 @@ public class UploadFile implements Parcelable {
 
     /**
      * Gets the HTTP/Multipart header for this file.
+     * @param isUtf8 true to get the multipart header in UTF-8 charset, false to use US-ASCII
      * @return multipart header bytes
-     * @throws UnsupportedEncodingException if the device does not support US-ASCII encoding
+     * @throws UnsupportedEncodingException if the device does not support the selected encoding
      */
-    public byte[] getMultipartHeader() throws UnsupportedEncodingException {
+    public byte[] getMultipartHeader(boolean isUtf8) throws UnsupportedEncodingException {
         StringBuilder builder = new StringBuilder();
 
         builder.append("Content-Disposition: form-data; name=\"")
@@ -110,7 +115,7 @@ public class UploadFile implements Parcelable {
 
         builder.append("Content-Type: ").append(contentType).append(NEW_LINE).append(NEW_LINE);
 
-        return builder.toString().getBytes("US-ASCII");
+        return builder.toString().getBytes(isUtf8 ? UTF8 : US_ASCII);
     }
 
     /**
@@ -119,11 +124,13 @@ public class UploadFile implements Parcelable {
      * and some bytes needed for the multipart headers
      *
      * @param boundaryBytesLength length in bytes of the multipart boundary
+     * @param isUtf8 true to get the multipart header in UTF-8 charset, false to use US-ASCII
      * @return total number of bytes needed by this file in the HTTP/Multipart request
-     * @throws UnsupportedEncodingException if the device does not support US-ASCII encoding
+     * @throws UnsupportedEncodingException if the device does not support the selected encoding
      */
-    public long getTotalMultipartBytes(long boundaryBytesLength) throws UnsupportedEncodingException {
-        return boundaryBytesLength + getMultipartHeader().length + file.length();
+    public long getTotalMultipartBytes(long boundaryBytesLength, boolean isUtf8)
+            throws UnsupportedEncodingException {
+        return boundaryBytesLength + getMultipartHeader(isUtf8).length + file.length();
     }
 
     private String autoDetectMimeType() {

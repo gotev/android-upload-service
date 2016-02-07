@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * Represents a request parameter.
@@ -18,6 +19,9 @@ public final class NameValue implements Parcelable {
     private final String name;
     private final String value;
 
+    private final Charset US_ASCII = Charset.forName("US-ASCII");
+    private final Charset UTF8 = Charset.forName("UTF-8");
+
     public NameValue(final String name, final String value) {
         this.name = name;
         this.value = value;
@@ -31,9 +35,9 @@ public final class NameValue implements Parcelable {
         return value;
     }
 
-    public byte[] getMultipartBytes() throws UnsupportedEncodingException {
+    public byte[] getMultipartBytes(boolean isUtf8) throws UnsupportedEncodingException {
         return ("Content-Disposition: form-data; name=\"" + name + "\""
-                + NEW_LINE + NEW_LINE + value).getBytes("UTF-8");
+                + NEW_LINE + NEW_LINE + value).getBytes(isUtf8 ? UTF8 : US_ASCII);
     }
 
     @Override
