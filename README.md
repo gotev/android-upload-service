@@ -40,6 +40,9 @@ and do a project sync. [Read this page](https://github.com/gotev/android-upload-
 
 [Check the wiki](https://github.com/gotev/android-upload-service/wiki) for full setup instructions and examples to get up and running fast. If something isn't covered there, search in the [issues](https://github.com/gotev/android-upload-service/issues). Your question could already have been answered in the past. There are also [some checks you can do yourself to resolve common setup mistakes](https://github.com/gotev/android-upload-service/wiki/Resolve%20common%20setup%20issues).
 
+<a name="new-issues"></a>
+> When you post a new issue regarding a possible bug in the library, make sure to add as many details as possible to be able to reproduce the error you encountered. Thank you :)
+
 ### Apps powered by Android Upload Service <a name="powered"></a>
 To be included in the following list, simply create an issue and provide the app name and a link.
 
