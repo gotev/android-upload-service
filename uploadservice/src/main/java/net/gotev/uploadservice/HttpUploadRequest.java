@@ -2,6 +2,7 @@ package net.gotev.uploadservice;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Base64;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -128,6 +129,18 @@ public abstract class HttpUploadRequest {
      */
     public HttpUploadRequest addHeader(final String headerName, final String headerValue) {
         params.addRequestHeader(headerName, headerValue);
+        return this;
+    }
+
+    /**
+     * Sets the HTTP Basic Authentication header.
+     * @param username HTTP Basic Auth username
+     * @param password HTTP Basic Auth password
+     * @return {@link HttpUploadRequest}
+     */
+    public HttpUploadRequest setBasicAuth(final String username, final String password) {
+        String auth = Base64.encodeToString((username + ":" + password).getBytes(), Base64.DEFAULT);
+        params.addRequestHeader("Authorization", "Basic " + auth);
         return this;
     }
 
