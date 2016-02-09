@@ -32,7 +32,7 @@ At the core of the library there is a `Service` which handles multiple concurren
 
 ```
 dependencies {
-    compile 'net.gotev:uploadservice:2.0'
+    compile 'net.gotev:uploadservice:2.0@aar'
 }
 ```
 
