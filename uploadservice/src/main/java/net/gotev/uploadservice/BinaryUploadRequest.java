@@ -81,6 +81,12 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     }
 
     @Override
+    public BinaryUploadRequest setBasicAuth(final String username, final String password) {
+        super.setBasicAuth(username, password);
+        return this;
+    }
+
+    @Override
     public BinaryUploadRequest setMethod(String method) {
         super.setMethod(method);
         return this;

@@ -145,6 +145,12 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     @Override
+    public MultipartUploadRequest setBasicAuth(final String username, final String password) {
+        super.setBasicAuth(username, password);
+        return this;
+    }
+
+    @Override
     public MultipartUploadRequest addParameter(String paramName, String paramValue) {
         super.addParameter(paramName, paramValue);
         return this;
