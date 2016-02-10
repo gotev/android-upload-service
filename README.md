@@ -23,7 +23,7 @@ At the core of the library there is a `Service` which handles multiple concurren
 <dependency>
   <groupId>net.gotev</groupId>
   <artifactId>uploadservice</artifactId>
-  <version>2.0</version>
+  <version>2.0.1</version>
   <type>aar</type>
 </dependency>
 ```
@@ -32,7 +32,7 @@ At the core of the library there is a `Service` which handles multiple concurren
 
 ```
 dependencies {
-    compile 'net.gotev:uploadservice:2.0@aar'
+    compile 'net.gotev:uploadservice:2.0.1@aar'
 }
 ```
 
