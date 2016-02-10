@@ -195,7 +195,7 @@ public final class UploadService extends Service {
 
     /**
      * Creates a new task instance based on the requested task class in the intent.
-     * @param intent
+     * @param intent intent passed to the service
      * @return task instance or null if the task class is not supported or invalid
      */
     HttpUploadTask getTask(Intent intent) {

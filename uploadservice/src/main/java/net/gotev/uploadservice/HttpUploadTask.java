@@ -332,8 +332,8 @@ public abstract class HttpUploadTask implements Runnable {
     /**
      * Broadcasts a progress update.
      *
-     * @param uploadedBytes
-     * @param totalBytes
+     * @param uploadedBytes number of bytes which has been uploaded to the server
+     * @param totalBytes total bytes of the request
      */
     protected final void broadcastProgress(final long uploadedBytes, final long totalBytes) {
 
