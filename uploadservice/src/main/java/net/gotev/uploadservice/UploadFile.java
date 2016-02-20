@@ -19,6 +19,8 @@ import java.nio.charset.Charset;
  */
 public class UploadFile implements Parcelable {
 
+    private static final String LOG_TAG = UploadFile.class.getSimpleName();
+
     private static final String NEW_LINE = "\r\n";
     private static final String UNUSED = "UNUSED";
 
@@ -60,14 +62,20 @@ public class UploadFile implements Parcelable {
 
         if (contentType == null || contentType.isEmpty()) {
             this.contentType = autoDetectMimeType();
+            Logger.debug(LOG_TAG, "Detected MIME type for " + file.getAbsolutePath()
+                         + " is: " + contentType);
         } else {
             this.contentType = contentType;
+            Logger.debug(LOG_TAG, "Content Type set for " + file.getAbsolutePath()
+                         + " is: " + contentType);
         }
 
         if (fileName == null || "".equals(fileName)) {
             this.fileName = this.file.getName();
+            Logger.debug(LOG_TAG, "Using original file name: " + fileName);
         } else {
             this.fileName = fileName;
+            Logger.debug(LOG_TAG, "Using custom file name: " + fileName);
         }
     }
 

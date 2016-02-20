@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,6 +28,8 @@ import java.util.Iterator;
  * @author mabdurrahman
  */
 public abstract class HttpUploadTask implements Runnable {
+
+    private static final String LOG_TAG = HttpUploadTask.class.getSimpleName();
 
     private static final int BUFFER_SIZE = 4096;
 
@@ -119,10 +120,10 @@ public abstract class HttpUploadTask implements Runnable {
                 } else if (attempts > params.getMaxRetries()) {
                     broadcastError(exc);
                 } else {
-                    Log.w(getClass().getName(), "Error in uploadId " + params.getId()
+                    Logger.info(LOG_TAG, "Error in uploadId " + params.getId()
                                     + " on attempt " + attempts
-                                    + ". Waiting " + errorDelay / 1000 + "s before next attempt",
-                                    exc);
+                                    + ". Waiting " + errorDelay / 1000 + "s before next attempt. "
+                                    + exc.getMessage());
                     SystemClock.sleep(errorDelay);
 
                     errorDelay *= 10;
@@ -151,6 +152,8 @@ public abstract class HttpUploadTask implements Runnable {
     @SuppressLint("NewApi")
     protected void upload() throws Exception {
 
+        Logger.debug(LOG_TAG, "Starting upload task with ID " + params.getId());
+
         try {
             totalBodyBytes = getBodyLength();
 
@@ -167,6 +170,8 @@ public abstract class HttpUploadTask implements Runnable {
             writeBody();
 
             final int serverResponseCode = connection.getResponseCode();
+            Logger.debug(LOG_TAG, "Server responded with HTTP " + serverResponseCode
+                            + " to upload with ID: " + params.getId());
 
             if (serverResponseCode / 100 == 2) {
                 responseStream = connection.getInputStream();
@@ -344,6 +349,9 @@ public abstract class HttpUploadTask implements Runnable {
 
         setLastProgressNotificationTime(currentTime);
 
+        Logger.debug(LOG_TAG, "Broadcasting upload progress for " + params.getId()
+                    + " Uploaded bytes: " + uploadedBytes + " out of " + totalBytes);
+
         BroadcastData data = new BroadcastData()
                 .setId(params.getId())
                 .setStatus(BroadcastData.Status.IN_PROGRESS)
@@ -378,6 +386,8 @@ public abstract class HttpUploadTask implements Runnable {
             onSuccessfulUpload();
         }
 
+        Logger.debug(LOG_TAG, "Broadcasting upload completed for " + params.getId());
+
         BroadcastData data = new BroadcastData()
                 .setId(params.getId())
                 .setStatus(BroadcastData.Status.COMPLETED)
@@ -399,6 +409,9 @@ public abstract class HttpUploadTask implements Runnable {
      * after that you have done the needed actions to properly cancel the request.
      */
     protected final void broadcastCancelled() {
+
+        Logger.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: "
+                + params.getId());
 
         BroadcastData data = new BroadcastData()
                 .setId(params.getId())
@@ -425,11 +438,17 @@ public abstract class HttpUploadTask implements Runnable {
             deleted = fileToDelete.delete();
 
             if (!deleted) {
-                Log.e(this.getClass().getSimpleName(), "Unable to delete: " + fileToDelete.getAbsolutePath());
+                Logger.error(LOG_TAG, "Unable to delete: "
+                        + fileToDelete.getAbsolutePath());
+            } else {
+                Logger.info(LOG_TAG, "Successfully deleted: "
+                        + fileToDelete.getAbsolutePath());
             }
 
         } catch (Exception exc) {
-            Log.e(this.getClass().getSimpleName(), "Error while deleting: " + fileToDelete.getAbsolutePath(), exc);
+            Logger.error(LOG_TAG,
+                    "Error while deleting: " + fileToDelete.getAbsolutePath() +
+                    " Check if you granted: android.permission.WRITE_EXTERNAL_STORAGE", exc);
         }
 
         return deleted;
@@ -441,6 +460,9 @@ public abstract class HttpUploadTask implements Runnable {
      * @param exception exception to broadcast
      */
     private void broadcastError(final Exception exception) {
+
+        Logger.info(LOG_TAG, "Broadcasting error for upload with ID: "
+                + params.getId() + ". " + exception.getMessage());
 
         BroadcastData data = new BroadcastData()
                 .setId(params.getId())
