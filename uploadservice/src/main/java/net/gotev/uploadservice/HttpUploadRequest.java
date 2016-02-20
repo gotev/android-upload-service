@@ -19,6 +19,8 @@ import java.util.UUID;
  */
 public abstract class HttpUploadRequest {
 
+    private static final String LOG_TAG = HttpUploadRequest.class.getSimpleName();
+
     private final Context context;
     protected final TaskParameters params = new TaskParameters();
 
@@ -32,15 +34,22 @@ public abstract class HttpUploadRequest {
      * @param serverUrl URL of the server side script that handles the request
      */
     public HttpUploadRequest(final Context context, final String uploadId, final String serverUrl) {
+        if (context == null)
+            throw new IllegalArgumentException("Context MUST not be null!");
+
         this.context = context;
 
         if (uploadId == null || uploadId.isEmpty()) {
+            Logger.debug(LOG_TAG, "null or empty upload ID. Generating it");
             params.setId(UUID.randomUUID().toString());
         } else {
+            Logger.debug(LOG_TAG, "setting provided upload ID");
             params.setId(uploadId);
         }
 
         params.setUrl(serverUrl);
+        Logger.debug(LOG_TAG, "Created new upload request to "
+                     + params.getUrl() + " with ID: " + params.getId());
     }
 
     /**

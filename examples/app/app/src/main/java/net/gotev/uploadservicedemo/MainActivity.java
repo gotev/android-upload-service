@@ -25,8 +25,6 @@ import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
-import net.gotev.uploadservice.demo.BuildConfig;
-import net.gotev.uploadservice.demo.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;

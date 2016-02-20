@@ -5,7 +5,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.util.Log;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -150,6 +149,11 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
+        Logger.info(TAG, String.format("Starting service with namespace: %s, " +
+                "upload pool size: %d, %ds idle thread keep alive time. Foreground execution is %s",
+                NAMESPACE, UPLOAD_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECONDS,
+                (EXECUTE_IN_FOREGROUND ? "enabled" : "disabled")));
+
         HttpUploadTask currentTask = getTask(intent);
 
         if (currentTask == null) {
@@ -187,10 +191,11 @@ public final class UploadService extends Service {
         uploadThreadPool.shutdown();
 
         if (EXECUTE_IN_FOREGROUND) {
+            Logger.debug(TAG, "Stopping foreground execution");
             stopForeground(true);
         }
 
-        Log.d(TAG, "UploadService destroyed");
+        Logger.debug(TAG, "UploadService destroyed");
     }
 
     /**
@@ -214,11 +219,13 @@ public final class UploadService extends Service {
                 uploadTask = HttpUploadTask.class.cast(task.newInstance());
                 uploadTask.init(this, intent);
             } else {
-                Log.e(TAG, taskClass + " does not extend HttpUploadTask!");
+                Logger.error(TAG, taskClass + " does not extend HttpUploadTask!");
             }
 
+            Logger.debug(TAG, "Successfully created new task with class: " + taskClass);
+
         } catch (Exception exc) {
-            Log.e(TAG, "Error while instantiating new task", exc);
+            Logger.error(TAG, "Error while instantiating new task", exc);
         }
 
         return uploadTask;
@@ -234,7 +241,7 @@ public final class UploadService extends Service {
 
         if (foregroundUploadId == null) {
             foregroundUploadId = uploadId;
-            Log.d(TAG, uploadId + " now holds the foreground notification");
+            Logger.debug(TAG, uploadId + " now holds the foreground notification");
         }
 
         if (uploadId.equals(foregroundUploadId)) {
@@ -255,13 +262,13 @@ public final class UploadService extends Service {
 
         // un-hold foreground upload ID if it's been hold
         if (EXECUTE_IN_FOREGROUND && task != null && task.params.getId().equals(foregroundUploadId)) {
-            Log.d(TAG, uploadId + " now un-holded the foreground notification");
+            Logger.debug(TAG, uploadId + " now un-holded the foreground notification");
             foregroundUploadId = null;
         }
 
         // when all the upload tasks are completed, release the wake lock and shut down the service
         if (uploadTasksMap.isEmpty()) {
-            Log.d(TAG, "All tasks finished. UploadService is about to shutdown...");
+            Logger.debug(TAG, "All tasks finished. UploadService is about to shutdown...");
             wakeLock.release();
             stopSelf();
         }
