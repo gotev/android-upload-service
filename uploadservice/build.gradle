@@ -42,7 +42,9 @@ dependencies {
 // be sure to add local.properties to the .gitignore!
 
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+if (project.rootProject.file("local.properties").exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
 
 install {
     repositories.mavenInstaller {
