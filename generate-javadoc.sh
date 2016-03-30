@@ -1,5 +1,5 @@
 #!/bin/bash -e
-./gradlew clean javadoc
+./gradlew :uploadservice:clean :uploadservice:javadoc
 rm -rf ../javadoc
 mv uploadservice/build/docs/javadoc/ ../
 git checkout gh-pages

@@ -1,1 +1,2 @@
 include ':uploadservice'
+include ':uploadservice-okhttp'
