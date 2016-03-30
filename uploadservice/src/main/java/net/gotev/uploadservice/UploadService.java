@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
 
+import net.gotev.uploadservice.http.HttpStack;
+import net.gotev.uploadservice.http.impl.HurlStack;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -54,6 +57,12 @@ public final class UploadService extends Service {
      * conflicts and unexpected behaviours.
      */
     public static String NAMESPACE = "net.gotev";
+
+    /**
+     * Sets the Http Stack to use to perform upload requests.
+     * By default {@link HurlStack} implementation is used.
+     */
+    public static HttpStack HTTP_STACK = new HurlStack();
     // end configurable values
 
     protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique

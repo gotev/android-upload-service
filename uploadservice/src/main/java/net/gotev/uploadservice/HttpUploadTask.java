@@ -9,14 +9,12 @@ import android.media.RingtoneManager;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 
-import java.io.ByteArrayOutputStream;
+import net.gotev.uploadservice.http.HttpConnection;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Iterator;
 
 /**
@@ -46,17 +44,7 @@ public abstract class HttpUploadTask implements Runnable {
     /**
      * HttpUrlConnection used to perform the upload task.
      */
-    protected HttpURLConnection connection = null;
-
-    /**
-     * Server output stream got from HttpUrlConnection. Used to send data to the server.
-     */
-    protected OutputStream requestStream = null;
-
-    /**
-     * Server input stream got from HttpUrlConnection. Used to get server response.
-     */
-    protected InputStream responseStream = null;
+    private HttpConnection connection;
 
     /**
      * Flag indicating if the operation should continue or is cancelled. You should never
@@ -157,27 +145,20 @@ public abstract class HttpUploadTask implements Runnable {
         try {
             totalBodyBytes = getBodyLength();
 
-            connection = getHttpURLConnection();
-
             if (params.isCustomUserAgentDefined()) {
                 params.addRequestHeader("User-Agent", params.getCustomUserAgent());
             }
 
-            setRequestHeaders();
+            connection = UploadService.HTTP_STACK.createNewConnection(params.getMethod(), params.getUrl());
 
-            requestStream = connection.getOutputStream();
+            connection.setHeaders(params.getRequestHeaders(),
+                                  params.isUsesFixedLengthStreamingMode(), getBodyLength());
 
-            writeBody();
+            writeBody(connection);
 
-            final int serverResponseCode = connection.getResponseCode();
+            final int serverResponseCode = connection.getServerResponseCode();
             Logger.debug(LOG_TAG, "Server responded with HTTP " + serverResponseCode
                             + " to upload with ID: " + params.getId());
-
-            if (serverResponseCode / 100 == 2) {
-                responseStream = connection.getInputStream();
-            } else { // getErrorStream if the response code is not 2xx
-                responseStream = connection.getErrorStream();
-            }
 
             // Broadcast completion only if the user has not cancelled the operation.
             // It may happen that when the body is not completely written and the client
@@ -186,59 +167,13 @@ public abstract class HttpUploadTask implements Runnable {
             // broadcasted and then the cancellation. That behaviour was not desirable as the
             // library user couldn't execute code on user cancellation.
             if (shouldContinue) {
-                broadcastCompleted(serverResponseCode, getResponseBodyAsByteArray(responseStream));
+                broadcastCompleted(serverResponseCode, connection.getServerResponseBody());
             }
 
         } finally {
-            closeOutputStream();
-            closeInputStream();
-            closeConnection();
+            connection.close();
         }
     }
-
-    /**
-     * Creates a new {@link HttpURLConnection} with the custom request method and streaming mode
-     * set in {@link HttpUploadRequest}.
-     * @throws IOException if an error occurs
-     */
-    protected final HttpURLConnection getHttpURLConnection() throws IOException {
-        final HttpURLConnection conn = (HttpURLConnection) new URL(params.getUrl()).openConnection();
-
-        conn.setDoInput(true);
-        conn.setDoOutput(true);
-        conn.setUseCaches(false);
-        conn.setInstanceFollowRedirects(true);
-        conn.setRequestMethod(params.getMethod());
-
-        if (params.isUsesFixedLengthStreamingMode()) {
-            if (android.os.Build.VERSION.SDK_INT >= 19) {
-                conn.setFixedLengthStreamingMode(totalBodyBytes);
-
-            } else {
-                if (totalBodyBytes > Integer.MAX_VALUE)
-                    throw new RuntimeException("You need Android API version 19 or newer to "
-                            + "upload more than 2GB in a single request using "
-                            + "fixed size content length. Try switching to "
-                            + "chunked mode instead, but make sure your server side supports it!");
-
-                conn.setFixedLengthStreamingMode((int) totalBodyBytes);
-            }
-        } else {
-            conn.setChunkedStreamingMode(0);
-        }
-
-        setupHttpUrlConnection(conn);
-
-        return conn;
-    }
-
-    /**
-     * Implement in subclasses to be able to perform additional setup to the underlying
-     * {@link HttpURLConnection}.
-     * @param connection connection to configure
-     * @throws IOException if some IO errors occurs
-     */
-    protected abstract void setupHttpUrlConnection(HttpURLConnection connection) throws IOException;
 
     /**
      * Implement in subclasses to provide the expected upload in the progress notifications.
@@ -249,50 +184,15 @@ public abstract class HttpUploadTask implements Runnable {
 
     /**
      * Implement in subclasses to write the body of the http request.
+     * @param connection connection on which to write the body
      * @throws IOException
      */
-    protected abstract void writeBody() throws IOException;
+    protected abstract void writeBody(HttpConnection connection) throws IOException;
 
     /**
      * Implement in subclasses to be able to do something when the upload is successful.
      */
     protected void onSuccessfulUpload() {}
-
-    private void closeInputStream() {
-        if (responseStream != null) {
-            try {
-                responseStream.close();
-            } catch (Exception ignored) {
-            }
-        }
-    }
-
-    private void closeOutputStream() {
-        if (requestStream != null) {
-            try {
-                requestStream.flush();
-                requestStream.close();
-            } catch (Exception ignored) {
-            }
-        }
-    }
-
-    private void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.disconnect();
-            } catch (Exception ignored) {
-            }
-        }
-    }
-
-    private void setRequestHeaders() {
-        if (!params.getRequestHeaders().isEmpty()) {
-            for (final NameValue param : params.getRequestHeaders()) {
-                connection.setRequestProperty(param.getName(), param.getValue());
-            }
-        }
-    }
 
     public final void cancel() {
         this.shouldContinue = false;
@@ -308,27 +208,12 @@ public abstract class HttpUploadTask implements Runnable {
         return this;
     }
 
-    private byte[] getResponseBodyAsByteArray(final InputStream inputStream) {
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int bytesRead;
-
-        try {
-            while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) > 0) {
-                byteStream.write(buffer, 0, bytesRead);
-            }
-        } catch (Exception ignored) {}
-
-        return byteStream.toByteArray();
-    }
-
     protected final void writeStream(InputStream stream) throws IOException {
         byte[] buffer = new byte[BUFFER_SIZE];
         int bytesRead;
 
         while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0 && shouldContinue) {
-            requestStream.write(buffer, 0, bytesRead);
+            connection.writeBody(buffer, bytesRead);
             uploadedBodyBytes += bytesRead;
             broadcastProgress(uploadedBodyBytes, totalBodyBytes);
         }
