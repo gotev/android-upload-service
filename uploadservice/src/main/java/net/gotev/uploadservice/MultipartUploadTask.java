@@ -2,10 +2,11 @@ package net.gotev.uploadservice;
 
 import android.content.Intent;
 
+import net.gotev.uploadservice.http.HttpConnection;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 
 /**
@@ -36,17 +37,14 @@ public class MultipartUploadTask extends HttpUploadTask {
         boundaryBytes = getBoundaryBytes();
         trailerBytes = getTrailerBytes();
         isUtf8Charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false);
-    }
 
-    @Override
-    protected void setupHttpUrlConnection(HttpURLConnection connection) throws IOException {
         if (params.getFiles().size() <= 1) {
-            connection.setRequestProperty("Connection", "close");
+            params.addRequestHeader("Connection", "close");
         } else {
-            connection.setRequestProperty("Connection", "Keep-Alive");
+            params.addRequestHeader("Connection", "Keep-Alive");
         }
 
-        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+        params.addRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
     }
 
     @Override
@@ -59,10 +57,10 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     @Override
-    protected void writeBody() throws IOException {
-        writeRequestParameters();
-        writeFiles();
-        requestStream.write(trailerBytes, 0, trailerBytes.length);
+    protected void writeBody(HttpConnection connection) throws IOException {
+        writeRequestParameters(connection);
+        writeFiles(connection);
+        connection.writeBody(trailerBytes);
     }
 
     private String getBoundary() {
@@ -102,12 +100,12 @@ public class MultipartUploadTask extends HttpUploadTask {
         return parametersBytes;
     }
 
-    private void writeRequestParameters() throws IOException {
+    private void writeRequestParameters(HttpConnection connection) throws IOException {
         if (!params.getRequestParameters().isEmpty()) {
             for (final NameValue parameter : params.getRequestParameters()) {
-                requestStream.write(boundaryBytes, 0, boundaryBytes.length);
+                connection.writeBody(boundaryBytes);
                 byte[] formItemBytes = parameter.getMultipartBytes(isUtf8Charset);
-                requestStream.write(formItemBytes, 0, formItemBytes.length);
+                connection.writeBody(formItemBytes);
 
                 uploadedBodyBytes += boundaryBytes.length + formItemBytes.length;
                 broadcastProgress(uploadedBodyBytes, totalBodyBytes);
@@ -115,14 +113,14 @@ public class MultipartUploadTask extends HttpUploadTask {
         }
     }
 
-    private void writeFiles() throws IOException {
+    private void writeFiles(HttpConnection connection) throws IOException {
         for (UploadFile file : params.getFiles()) {
             if (!shouldContinue)
                 break;
 
-            requestStream.write(boundaryBytes, 0, boundaryBytes.length);
+            connection.writeBody(boundaryBytes);
             byte[] headerBytes = file.getMultipartHeader(isUtf8Charset);
-            requestStream.write(headerBytes, 0, headerBytes.length);
+            connection.writeBody(headerBytes);
 
             uploadedBodyBytes += boundaryBytes.length + headerBytes.length;
             broadcastProgress(uploadedBodyBytes, totalBodyBytes);
