@@ -12,7 +12,9 @@ Easily upload files in the background with automatic Android Notification Center
 * handle uploads in the background, even if the device is idle
 * automatically retry failed uploads, with an exponential backoff
 * possibility to automatically delete successfully uploaded files from the device
-* show status in the Android Notification Center.
+* show status in the Android Notification Center (with support for [stacking notifications](http://developer.android.com/training/wearables/notifications/stacks.html)).
+* be able use custom HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported
+* be able to set library log level and to provide custom logger implementation
 
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
 
