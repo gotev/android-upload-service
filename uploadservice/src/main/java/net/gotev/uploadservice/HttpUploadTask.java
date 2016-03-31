@@ -368,6 +368,7 @@ public abstract class HttpUploadTask implements Runnable {
                 .setContentText(params.getNotificationConfig().getInProgressMessage())
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                .setGroup(UploadService.NAMESPACE)
                 .setProgress(100, 0, true)
                 .setOngoing(true);
 
@@ -387,6 +388,7 @@ public abstract class HttpUploadTask implements Runnable {
                 .setContentText(params.getNotificationConfig().getInProgressMessage())
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                .setGroup(UploadService.NAMESPACE)
                 .setProgress(totalBytes, uploadedBytes, false)
                 .setOngoing(true);
 
@@ -419,6 +421,7 @@ public abstract class HttpUploadTask implements Runnable {
                     .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                     .setAutoCancel(params.getNotificationConfig().isClearOnAction())
                     .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                    .setGroup(UploadService.NAMESPACE)
                     .setProgress(0, 0, false)
                     .setOngoing(false);
             setRingtone();
@@ -439,6 +442,7 @@ public abstract class HttpUploadTask implements Runnable {
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setAutoCancel(params.getNotificationConfig().isClearOnAction())
                 .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                .setGroup(UploadService.NAMESPACE)
                 .setProgress(0, 0, false).setOngoing(false);
         setRingtone();
 
