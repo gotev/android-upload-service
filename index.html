@@ -23,6 +23,8 @@
 
 <p><img src="http://gotev.github.io/android-upload-service/upload.gif" alt="Upload Notification"></p>
 
+<p>Easily upload files in the background with automatic Android Notification Center progress indication.</p>
+
 <h2>
 <a id="purpose" class="anchor" href="#purpose" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Purpose</h2>
 
@@ -31,7 +33,9 @@
 <li>handle uploads in the background, even if the device is idle</li>
 <li>automatically retry failed uploads, with an exponential backoff</li>
 <li>possibility to automatically delete successfully uploaded files from the device</li>
-<li>show status in the Android Notification Center.</li>
+<li>show status in the Android Notification Center (with support for <a href="http://developer.android.com/training/wearables/notifications/stacks.html">stacking notifications</a>).</li>
+<li>be able use custom HTTP stack. Currently <code>HttpURLConnection</code> (the default) and <code>OkHttp</code> are supported</li>
+<li>be able to set library log level and to provide custom logger implementation</li>
 </ul>
 
 <p>At the core of the library there is a <code>Service</code> which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.</p>
