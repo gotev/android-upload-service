@@ -44,7 +44,8 @@ function getEndpoints(ipAddress) {
     return "HTTP/Multipart:              http://" + ipAddress + ":" + SERVER_PORT + "/upload/multipart\n" +
            "HTTP/Multipart (Basic Auth): http://" + ipAddress + ":" + SERVER_PORT + "/upload/multipart-ba\n" +
            "Binary:                      http://" + ipAddress + ":" + SERVER_PORT + "/upload/binary\n" +
-           "Binary (Basic Auth):         http://" + ipAddress + ":" + SERVER_PORT + "/upload/binary-ba\n";
+           "Binary (Basic Auth):         http://" + ipAddress + ":" + SERVER_PORT + "/upload/binary-ba\n" +
+           "401 Forbidden:               http://" + ipAddress + ":" + SERVER_PORT + "/upload/forbidden\n"
 }
 
 function printAvailableEndpoints() {
@@ -147,6 +148,15 @@ app.post('/upload/multipart-ba', useBasicAuth, multipartReqInterceptor, multerFi
 // handle binary uploads
 app.post('/upload/binary', binaryUploadHandler);
 app.post('/upload/binary-ba', useBasicAuth,binaryUploadHandler);
+
+// endpoint which returns always 401 and a JSON response in the body
+app.post('/upload/forbidden', function(req, res) {
+    res.status(401);
+    res.json({
+        success: false,
+        message: "this endpoint always returns 401! It's for testing only"
+    });
+});
 
 var server = app.listen(SERVER_PORT, function() {
     console.log("Web server started. Listening on all interfaces on port " +
