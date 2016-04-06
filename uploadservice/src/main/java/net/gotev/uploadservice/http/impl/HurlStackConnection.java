@@ -120,6 +120,11 @@ public class HurlStackConnection implements HttpConnection {
     }
 
     @Override
+    public String getServerResponseHeaderValue(String headerKey) throws IOException {
+        return mConnection.getHeaderField(headerKey);
+    }
+
+    @Override
     public void close() {
         Logger.debug(getClass().getSimpleName(), "closing connection");
 

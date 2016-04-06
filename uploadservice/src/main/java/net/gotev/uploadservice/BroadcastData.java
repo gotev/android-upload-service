@@ -26,6 +26,7 @@ class BroadcastData implements Parcelable {
     private long totalBytes;
     private int responseCode;
     private byte[] responseBody = new byte[0];
+    private String redirectLocation;
 
     public BroadcastData() {
 
@@ -60,6 +61,7 @@ class BroadcastData implements Parcelable {
         parcel.writeLong(uploadedBytes);
         parcel.writeLong(totalBytes);
         parcel.writeInt(responseCode);
+        parcel.writeString(redirectLocation);
 
         parcel.writeInt(responseBody.length);
         parcel.writeByteArray(responseBody);
@@ -72,6 +74,7 @@ class BroadcastData implements Parcelable {
         uploadedBytes = in.readLong();
         totalBytes = in.readLong();
         responseCode = in.readInt();
+        redirectLocation = in.readString();
 
         responseBody = new byte[in.readInt()];
         in.readByteArray(responseBody);
@@ -146,6 +149,15 @@ class BroadcastData implements Parcelable {
 
     public BroadcastData setResponseBody(byte[] responseBody) {
         this.responseBody = responseBody;
+        return this;
+    }
+
+    public String getRedirectLocation() {
+        return redirectLocation;
+    }
+
+    public BroadcastData setRedirectLocation(String redirectLocation) {
+        this.redirectLocation = redirectLocation;
         return this;
     }
 }

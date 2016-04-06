@@ -160,6 +160,8 @@ public abstract class HttpUploadTask implements Runnable {
             Logger.debug(LOG_TAG, "Server responded with HTTP " + serverResponseCode
                             + " to upload with ID: " + params.getId());
 
+            String redirectLocation = connection.getServerResponseHeaderValue("Location");
+
             // Broadcast completion only if the user has not cancelled the operation.
             // It may happen that when the body is not completely written and the client
             // closes the connection, no exception is thrown here, and the server responds
@@ -167,7 +169,8 @@ public abstract class HttpUploadTask implements Runnable {
             // broadcasted and then the cancellation. That behaviour was not desirable as the
             // library user couldn't execute code on user cancellation.
             if (shouldContinue) {
-                broadcastCompleted(serverResponseCode, connection.getServerResponseBody());
+                broadcastCompleted(serverResponseCode,
+                                    connection.getServerResponseBody(), redirectLocation);
             }
 
         } finally {
@@ -255,7 +258,8 @@ public abstract class HttpUploadTask implements Runnable {
      * @param responseCode HTTP response code got from the server
      * @param serverResponseBody bytes read from server's response body
      */
-    protected final void broadcastCompleted(final int responseCode, final byte[] serverResponseBody) {
+    protected final void broadcastCompleted(final int responseCode, final byte[] serverResponseBody,
+                                            final String redirectLocation) {
 
         boolean successfulUpload = ((responseCode / 100) == 2);
 
@@ -277,7 +281,8 @@ public abstract class HttpUploadTask implements Runnable {
                 .setId(params.getId())
                 .setStatus(BroadcastData.Status.COMPLETED)
                 .setResponseCode(responseCode)
-                .setResponseBody(serverResponseBody);
+                .setResponseBody(serverResponseBody)
+                .setRedirectLocation(redirectLocation);
 
         service.sendBroadcast(data.getIntent());
 

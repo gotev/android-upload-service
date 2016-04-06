@@ -34,6 +34,8 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
 
             case COMPLETED:
                 onCompleted(data.getId(), data.getResponseCode(), data.getResponseBody());
+                onCompleted(data.getId(), data.getResponseCode(),
+                        data.getResponseBody(), data.getRedirectLocation());
                 break;
 
             case IN_PROGRESS:
@@ -119,6 +121,23 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
      */
     public void onCompleted(final String uploadId, final int serverResponseCode,
                             final byte[] serverResponseBody) {
+    }
+
+    /**
+     * Called when the upload is completed successfully. Override this method to add your own logic.
+     *
+     * @param uploadId unique ID of the upload request
+     * @param serverResponseCode status code returned by the server
+     * @param serverResponseBody byte array containing the response body received from the server.
+     *                           If your server responds with a string, you can get it with
+     *                           {@code new String(serverResponseBody)}. If the string is a
+     *                           JSON, you can parse it using a library such as org.json
+     *                           (embedded in Android) or google's gson
+     * @param redirectLocation Location URL (in response header) sent back from the server in case
+     *                         a redirect is needed (HTTP status codes 3xx). Null if not applicable.
+     */
+    public void onCompleted(final String uploadId, final int serverResponseCode,
+                            final byte[] serverResponseBody, final String redirectLocation) {
     }
 
     /**
