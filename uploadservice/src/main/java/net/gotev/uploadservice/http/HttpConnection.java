@@ -57,6 +57,13 @@ public interface HttpConnection {
     byte[] getServerResponseBody() throws IOException;
 
     /**
+     * Gets a server response header value.
+     * @return response header value
+     * @throws IOException if an error occurs while getting the server header value
+     */
+    String getServerResponseHeaderValue(String headerKey) throws IOException;
+
+    /**
      * Closes the connection and frees all the allocated resources.
      */
     void close();
