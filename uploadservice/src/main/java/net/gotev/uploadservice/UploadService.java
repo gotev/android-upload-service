@@ -10,6 +10,7 @@ import net.gotev.uploadservice.http.HttpStack;
 import net.gotev.uploadservice.http.impl.HurlStack;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,10 +60,15 @@ public final class UploadService extends Service {
     public static String NAMESPACE = "net.gotev";
 
     /**
-     * Sets the Http Stack to use to perform upload requests.
+     * Sets the HTTP Stack to use to perform HTTP based upload requests.
      * By default {@link HurlStack} implementation is used.
      */
     public static HttpStack HTTP_STACK = new HurlStack();
+
+    /**
+     * Buffer size in bytes used for data transfer by the upload tasks.
+     */
+    public static int BUFFER_SIZE = 4096;
     // end configurable values
 
     protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
@@ -86,7 +92,7 @@ public final class UploadService extends Service {
     // internal variables
     private PowerManager.WakeLock wakeLock;
     private int notificationIncrementalId = 0;
-    private static final Map<String, HttpUploadTask> uploadTasksMap = new ConcurrentHashMap<>();
+    private static final Map<String, UploadTask> uploadTasksMap = new ConcurrentHashMap<>();
     private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
     private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
@@ -104,7 +110,7 @@ public final class UploadService extends Service {
      * @param uploadId The unique upload id
      */
     public static synchronized void stopUpload(final String uploadId) {
-        HttpUploadTask removedTask = uploadTasksMap.get(uploadId);
+        UploadTask removedTask = uploadTasksMap.get(uploadId);
         if (removedTask != null) {
             removedTask.cancel();
         }
@@ -122,7 +128,7 @@ public final class UploadService extends Service {
         Iterator<String> iterator = uploadTasksMap.keySet().iterator();
 
         while (iterator.hasNext()) {
-            HttpUploadTask taskToCancel = uploadTasksMap.get(iterator.next());
+            UploadTask taskToCancel = uploadTasksMap.get(iterator.next());
             taskToCancel.cancel();
         }
     }
@@ -158,19 +164,19 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
-        Logger.info(TAG, String.format("Starting service with namespace: %s, " +
+        Logger.info(TAG, String.format(Locale.getDefault(), "Starting service with namespace: %s, " +
                 "upload pool size: %d, %ds idle thread keep alive time. Foreground execution is %s",
                 NAMESPACE, UPLOAD_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECONDS,
                 (EXECUTE_IN_FOREGROUND ? "enabled" : "disabled")));
 
-        HttpUploadTask currentTask = getTask(intent);
+        UploadTask currentTask = getTask(intent);
 
         if (currentTask == null) {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
         // increment by 2 because the notificationIncrementalId + 1 is used internally
-        // in each HttpUploadTask. Check its sources for more info about this.
+        // in each UploadTask. Check its sources for more info about this.
         notificationIncrementalId += 2;
         currentTask.setLastProgressNotificationTime(0)
                    .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
@@ -212,23 +218,23 @@ public final class UploadService extends Service {
      * @param intent intent passed to the service
      * @return task instance or null if the task class is not supported or invalid
      */
-    HttpUploadTask getTask(Intent intent) {
+    UploadTask getTask(Intent intent) {
         String taskClass = intent.getStringExtra(PARAM_TASK_CLASS);
 
         if (taskClass == null) {
             return null;
         }
 
-        HttpUploadTask uploadTask = null;
+        UploadTask uploadTask = null;
 
         try {
             Class<?> task = Class.forName(taskClass);
 
-            if (HttpUploadTask.class.isAssignableFrom(task)) {
-                uploadTask = HttpUploadTask.class.cast(task.newInstance());
+            if (UploadTask.class.isAssignableFrom(task)) {
+                uploadTask = UploadTask.class.cast(task.newInstance());
                 uploadTask.init(this, intent);
             } else {
-                Logger.error(TAG, taskClass + " does not extend HttpUploadTask!");
+                Logger.error(TAG, taskClass + " does not extend UploadTask!");
             }
 
             Logger.debug(TAG, "Successfully created new task with class: " + taskClass);
@@ -267,7 +273,7 @@ public final class UploadService extends Service {
      * @param uploadId the uploadID of the finished task
      */
     protected synchronized void taskCompleted(String uploadId) {
-        HttpUploadTask task = uploadTasksMap.remove(uploadId);
+        UploadTask task = uploadTasksMap.remove(uploadId);
 
         // un-hold foreground upload ID if it's been hold
         if (EXECUTE_IN_FOREGROUND && task != null && task.params.getId().equals(foregroundUploadId)) {

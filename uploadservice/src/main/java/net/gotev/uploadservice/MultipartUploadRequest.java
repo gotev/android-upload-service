@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -39,7 +38,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
 
     /**
      * Creates a new multipart upload request and automatically generates an upload id, that will
-     * be returned when you call {@link HttpUploadRequest#startUpload()}.
+     * be returned when you call {@link UploadRequest#startUpload()}.
      *
      * @param context application context
      * @param serverUrl URL of the server side script that will handle the multipart form upload.
@@ -58,14 +57,6 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     @Override
     protected Class getTaskClass() {
         return MultipartUploadTask.class;
-    }
-
-    @Override
-    protected void validate() throws IllegalArgumentException, MalformedURLException {
-        super.validate();
-
-        if (params.getFiles().isEmpty())
-            throw new IllegalArgumentException("You have to add at least one file to upload");
     }
 
     /**
