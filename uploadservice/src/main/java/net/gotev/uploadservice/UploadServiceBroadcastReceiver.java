@@ -6,8 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 /**
- * Broadcast receiver to sublass to create a receiver for
- * {@link UploadService} events.
+ * Broadcast receiver to subclass to create a receiver for {@link UploadService} events.
  *
  * It provides the boilerplate code to properly handle broadcast messages coming from the
  * upload service and dispatch them to the proper handler method.

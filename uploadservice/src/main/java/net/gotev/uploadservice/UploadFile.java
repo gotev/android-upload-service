@@ -26,7 +26,7 @@ public class UploadFile implements Parcelable {
 
     protected final File file;
     protected final String paramName;
-    protected final String fileName;
+    protected final String remoteFileName;
     protected String contentType;
 
     private final Charset US_ASCII = Charset.forName("US-ASCII");
@@ -37,17 +37,17 @@ public class UploadFile implements Parcelable {
      *
      * @param path absolute path to the file
      * @param parameterName parameter name of this file in the request
-     * @param fileName file name of this file
+     * @param remoteFileName remote file name for this file (this is the name or path seen by the server)
      * @param contentType content type of this file. Set this to null to auto detect.
      * @throws FileNotFoundException if the file can't be found at the specified path
      * @throws IllegalArgumentException if you passed invalid argument values
      */
-    UploadFile(final String path, final String parameterName,
-               final String fileName, final String contentType)
+    public UploadFile(final String path, final String parameterName,
+                      final String remoteFileName, final String contentType)
             throws FileNotFoundException, IllegalArgumentException {
 
         if (path == null || "".equals(path)) {
-            throw new IllegalArgumentException("Please specify a file path! Passed path value is: " + path);
+            throw new IllegalArgumentException("Please specify a file path!");
         }
 
         File file = new File(path);
@@ -70,13 +70,25 @@ public class UploadFile implements Parcelable {
                          + " is: " + contentType);
         }
 
-        if (fileName == null || "".equals(fileName)) {
-            this.fileName = this.file.getName();
-            Logger.debug(LOG_TAG, "Using original file name: " + fileName);
+        if (remoteFileName == null || "".equals(remoteFileName)) {
+            this.remoteFileName = this.file.getName();
+            Logger.debug(LOG_TAG, "Using original file name: " + remoteFileName);
         } else {
-            this.fileName = fileName;
-            Logger.debug(LOG_TAG, "Using custom file name: " + fileName);
+            this.remoteFileName = remoteFileName;
+            Logger.debug(LOG_TAG, "Using custom file name: " + remoteFileName);
         }
+    }
+
+    /**
+     * Creates a new UploadFile by specifying the full absolute path to it and the remote path.
+     * All the other values are set to {@code UNUSED}.
+     * Use this constructor when you don't need to set parameter name and content type.
+     * @param path absolute path to the file
+     * @param remotePath remote path for the file
+     * @throws FileNotFoundException if the file can't be found at the specified path
+     */
+    public UploadFile(final String path, final String remotePath) throws FileNotFoundException {
+        this(path, UNUSED, remotePath, UNUSED);
     }
 
     /**
@@ -86,7 +98,7 @@ public class UploadFile implements Parcelable {
      * @param path absolute path to the file
      * @throws FileNotFoundException if the file can't be found at the specified path
      */
-    UploadFile(final String path) throws FileNotFoundException {
+    public UploadFile(final String path) throws FileNotFoundException {
         this(path, UNUSED, UNUSED, UNUSED);
     }
 
@@ -109,6 +121,14 @@ public class UploadFile implements Parcelable {
     }
 
     /**
+     * Returns the absolute path to the file
+     * @return absolute file path
+     */
+    public final String getAbsolutePath() {
+        return file.getAbsolutePath();
+    }
+
+    /**
      * Gets the HTTP/Multipart header for this file.
      * @param isUtf8 true to get the multipart header in UTF-8 charset, false to use US-ASCII
      * @return multipart header bytes
@@ -119,7 +139,7 @@ public class UploadFile implements Parcelable {
 
         builder.append("Content-Disposition: form-data; name=\"")
                 .append(paramName).append("\"; filename=\"")
-                .append(fileName).append("\"").append(NEW_LINE);
+                .append(remoteFileName).append("\"").append(NEW_LINE);
 
         builder.append("Content-Type: ").append(contentType).append(NEW_LINE).append(NEW_LINE);
 
@@ -139,6 +159,14 @@ public class UploadFile implements Parcelable {
     public long getTotalMultipartBytes(long boundaryBytesLength, boolean isUtf8)
             throws UnsupportedEncodingException {
         return boundaryBytesLength + getMultipartHeader(isUtf8).length + file.length();
+    }
+
+    /**
+     * Returns the remote file name or path
+     * @return path
+     */
+    public String getRemoteFileName() {
+        return remoteFileName;
     }
 
     private String autoDetectMimeType() {
@@ -168,7 +196,7 @@ public class UploadFile implements Parcelable {
     public void writeToParcel(Parcel parcel, int arg1) {
         parcel.writeString(file.getAbsolutePath());
         parcel.writeString(paramName);
-        parcel.writeString(fileName);
+        parcel.writeString(remoteFileName);
         parcel.writeString(contentType);
     }
 
@@ -195,7 +223,7 @@ public class UploadFile implements Parcelable {
     protected UploadFile(Parcel in) {
         file = new File(in.readString());
         paramName = in.readString();
-        fileName = in.readString();
+        remoteFileName = in.readString();
         contentType = in.readString();
     }
 }

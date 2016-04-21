@@ -39,12 +39,12 @@ public class MultipartUploadTask extends HttpUploadTask {
         isUtf8Charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false);
 
         if (params.getFiles().size() <= 1) {
-            params.addRequestHeader("Connection", "close");
+            httpParams.addRequestHeader("Connection", "close");
         } else {
-            params.addRequestHeader("Connection", "Keep-Alive");
+            httpParams.addRequestHeader("Connection", "Keep-Alive");
         }
 
-        params.addRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+        httpParams.addRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
     }
 
     @Override
@@ -88,8 +88,8 @@ public class MultipartUploadTask extends HttpUploadTask {
     private long getRequestParametersLength() throws UnsupportedEncodingException {
         long parametersBytes = 0;
 
-        if (!params.getRequestParameters().isEmpty()) {
-            for (final NameValue parameter : params.getRequestParameters()) {
+        if (!httpParams.getRequestParameters().isEmpty()) {
+            for (final NameValue parameter : httpParams.getRequestParameters()) {
                 // the bytes needed for every parameter are the sum of the boundary bytes
                 // and the bytes occupied by the parameter
                 parametersBytes += boundaryBytes.length
@@ -101,14 +101,14 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     private void writeRequestParameters(HttpConnection connection) throws IOException {
-        if (!params.getRequestParameters().isEmpty()) {
-            for (final NameValue parameter : params.getRequestParameters()) {
+        if (!httpParams.getRequestParameters().isEmpty()) {
+            for (final NameValue parameter : httpParams.getRequestParameters()) {
                 connection.writeBody(boundaryBytes);
                 byte[] formItemBytes = parameter.getMultipartBytes(isUtf8Charset);
                 connection.writeBody(formItemBytes);
 
-                uploadedBodyBytes += boundaryBytes.length + formItemBytes.length;
-                broadcastProgress(uploadedBodyBytes, totalBodyBytes);
+                uploadedBytes += boundaryBytes.length + formItemBytes.length;
+                broadcastProgress(uploadedBytes, totalBytes);
             }
         }
     }
@@ -122,8 +122,8 @@ public class MultipartUploadTask extends HttpUploadTask {
             byte[] headerBytes = file.getMultipartHeader(isUtf8Charset);
             connection.writeBody(headerBytes);
 
-            uploadedBodyBytes += boundaryBytes.length + headerBytes.length;
-            broadcastProgress(uploadedBodyBytes, totalBodyBytes);
+            uploadedBytes += boundaryBytes.length + headerBytes.length;
+            broadcastProgress(uploadedBytes, totalBytes);
 
             final InputStream stream = file.getStream();
             writeStream(stream);
