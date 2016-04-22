@@ -123,7 +123,7 @@ public abstract class UploadTask implements Runnable {
     @Override
     public final void run() {
 
-        createNotification();
+        createNotification(new UploadInfo(params.getId()));
 
         attempts = 0;
 
@@ -212,7 +212,7 @@ public abstract class UploadTask implements Runnable {
 
         service.sendBroadcast(data.getIntent());
 
-        updateNotificationProgress((int) uploadedBytes, (int) totalBytes);
+        updateNotificationProgress(uploadInfo);
     }
 
     /**
@@ -258,9 +258,9 @@ public abstract class UploadTask implements Runnable {
         service.sendBroadcast(data.getIntent());
 
         if (successfulUpload)
-            updateNotificationCompleted();
+            updateNotificationCompleted(uploadInfo);
         else
-            updateNotificationError();
+            updateNotificationError(uploadInfo);
 
         service.taskCompleted(params.getId());
     }
@@ -285,7 +285,7 @@ public abstract class UploadTask implements Runnable {
 
         service.sendBroadcast(data.getIntent());
 
-        updateNotificationError();
+        updateNotificationError(uploadInfo);
 
         service.taskCompleted(params.getId());
     }
@@ -324,7 +324,7 @@ public abstract class UploadTask implements Runnable {
 
         service.sendBroadcast(data.getIntent());
 
-        updateNotificationError();
+        updateNotificationError(uploadInfo);
 
         service.taskCompleted(params.getId());
     }
@@ -332,12 +332,13 @@ public abstract class UploadTask implements Runnable {
     /**
      * If the upload task is initialized with a notification configuration, this handles its
      * creation.
+     * @param uploadInfo upload information and statistics
      */
-    private void createNotification() {
+    private void createNotification(UploadInfo uploadInfo) {
         if (params.getNotificationConfig() == null) return;
 
-        notification.setContentTitle(params.getNotificationConfig().getTitle())
-                .setContentText(params.getNotificationConfig().getInProgressMessage())
+        notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
+                .setContentText(replacePlaceholders(params.getNotificationConfig().getInProgressMessage(), uploadInfo))
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setSmallIcon(params.getNotificationConfig().getIconResourceID())
                 .setGroup(UploadService.NAMESPACE)
@@ -356,18 +357,17 @@ public abstract class UploadTask implements Runnable {
     /**
      * Informs the {@link UploadService} that the task has made some progress. You should call this
      * method from your task whenever you have successfully transferred some bytes to the server.
-     * @param uploadedBytes total bytes uploaded so far
-     * @param totalBytes total bytes to upload
+     * @param uploadInfo upload information and statistics
      */
-    private void updateNotificationProgress(int uploadedBytes, int totalBytes) {
+    private void updateNotificationProgress(UploadInfo uploadInfo) {
         if (params.getNotificationConfig() == null) return;
 
-        notification.setContentTitle(params.getNotificationConfig().getTitle())
-                .setContentText(params.getNotificationConfig().getInProgressMessage())
+        notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
+                .setContentText(replacePlaceholders(params.getNotificationConfig().getInProgressMessage(), uploadInfo))
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setSmallIcon(params.getNotificationConfig().getIconResourceID())
                 .setGroup(UploadService.NAMESPACE)
-                .setProgress(totalBytes, uploadedBytes, false)
+                .setProgress((int)uploadInfo.getTotalBytes(), (int)uploadInfo.getUploadedBytes(), false)
                 .setOngoing(true);
 
         Notification builtNotification = notification.build();
@@ -388,14 +388,14 @@ public abstract class UploadTask implements Runnable {
 
     }
 
-    private void updateNotificationCompleted() {
+    private void updateNotificationCompleted(UploadInfo uploadInfo) {
         if (params.getNotificationConfig() == null) return;
 
         notificationManager.cancel(notificationId);
 
         if (!params.getNotificationConfig().isAutoClearOnSuccess()) {
-            notification.setContentTitle(params.getNotificationConfig().getTitle())
-                    .setContentText(params.getNotificationConfig().getCompletedMessage())
+            notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
+                    .setContentText(replacePlaceholders(params.getNotificationConfig().getCompletedMessage(), uploadInfo))
                     .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                     .setAutoCancel(params.getNotificationConfig().isClearOnAction())
                     .setSmallIcon(params.getNotificationConfig().getIconResourceID())
@@ -410,13 +410,13 @@ public abstract class UploadTask implements Runnable {
         }
     }
 
-    private void updateNotificationError() {
+    private void updateNotificationError(UploadInfo uploadInfo) {
         if (params.getNotificationConfig() == null) return;
 
         notificationManager.cancel(notificationId);
 
-        notification.setContentTitle(params.getNotificationConfig().getTitle())
-                .setContentText(params.getNotificationConfig().getErrorMessage())
+        notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
+                .setContentText(replacePlaceholders(params.getNotificationConfig().getErrorMessage(), uploadInfo))
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setAutoCancel(params.getNotificationConfig().isClearOnAction())
                 .setSmallIcon(params.getNotificationConfig().getIconResourceID())
@@ -457,6 +457,15 @@ public abstract class UploadTask implements Runnable {
         }
 
         return deleted;
+    }
+
+    private String replacePlaceholders(String string, UploadInfo uploadInfo) {
+        String tmp;
+        tmp = string.replace(Placeholders.ELAPSED_TIME, uploadInfo.getElapsedTimeString());
+        tmp = tmp.replace(Placeholders.PROGRESS, uploadInfo.getProgressPercent() + "%");
+        tmp = tmp.replace(Placeholders.UPLOAD_RATE, uploadInfo.getUploadRateString());
+
+        return tmp;
     }
 
     public final void cancel() {

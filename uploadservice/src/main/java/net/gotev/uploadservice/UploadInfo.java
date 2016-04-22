@@ -21,6 +21,15 @@ public class UploadInfo implements Parcelable {
     private int numberOfRetries;
     private ArrayList<String> successfullyUploadedFiles = new ArrayList<>();
 
+    public UploadInfo(String uploadId) {
+        this.uploadId = uploadId;
+        startTime = 0;
+        currentTime = 0;
+        uploadedBytes = 0;
+        totalBytes = 0;
+        numberOfRetries = 0;
+    }
+
     public UploadInfo(String uploadId, long startTime, long uploadedBytes, long totalBytes,
                       int numberOfRetries, List<String> uploadedFiles) {
         this.uploadId = uploadId;
@@ -100,11 +109,57 @@ public class UploadInfo implements Parcelable {
     }
 
     /**
+     * Gets the elapsed time as a string, expressed in seconds if the value is < 60, or expressed
+     * in minutes:seconds if the value is >= 60.
+     * @return string representation of the elapsed time
+     */
+    public String getElapsedTimeString() {
+        int elapsedSeconds = (int) (getElapsedTime() / 1000);
+
+        if (elapsedSeconds == 0)
+            return "0s";
+
+        int minutes = elapsedSeconds / 60;
+        elapsedSeconds -= (60 * minutes);
+
+        if (minutes == 0) {
+            return elapsedSeconds + "s";
+        }
+
+        return minutes + "m " + elapsedSeconds + "s";
+    }
+
+    /**
      * Gets the average upload rate in Kbit/s.
      * @return upload rate
      */
     public double getUploadRate() {
-        return (double) uploadedBytes / 1024 * 8 / (getElapsedTime() / 1000);
+        long elapsedTime = getElapsedTime();
+
+        // wait at least a second to stabilize the upload rate a little bit
+        if (elapsedTime < 1000)
+            return 0;
+
+        return (double) uploadedBytes / 1024 * 8 / (elapsedTime / 1000);
+    }
+
+    /**
+     * Returns a string representation of the upload rate, expressed in the most convenient unit of
+     * measurement (Mbit/s if the value is >= 1024, B/s if the value is < 1, otherwise Kbit/s)
+     * @return string representation of the upload rate (e.g. 234 Kbit/s)
+     */
+    public String getUploadRateString() {
+        double uploadRate = getUploadRate();
+
+        if (uploadRate < 1) {
+            return (int) (uploadRate * 1000) + " bit/s";
+
+        } else if (uploadRate >= 1024) {
+            return (int) (uploadRate / 1024) + " Mbit/s";
+
+        }
+
+        return (int) uploadRate + " Kbit/s";
     }
 
     /**
@@ -136,6 +191,9 @@ public class UploadInfo implements Parcelable {
      * @return integer value
      */
     public int getProgressPercent() {
+        if (totalBytes == 0)
+            return 0;
+
         return (int) (uploadedBytes * 100 / totalBytes);
     }
 
