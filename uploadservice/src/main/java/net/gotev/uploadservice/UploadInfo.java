@@ -109,8 +109,8 @@ public class UploadInfo implements Parcelable {
     }
 
     /**
-     * Gets the elapsed time as a string, expressed in seconds if the value is < 60, or expressed
-     * in minutes:seconds if the value is >= 60.
+     * Gets the elapsed time as a string, expressed in seconds if the value is {@code < 60},
+     * or expressed in minutes:seconds if the value is {@code >=} 60.
      * @return string representation of the elapsed time
      */
     public String getElapsedTimeString() {
@@ -145,7 +145,7 @@ public class UploadInfo implements Parcelable {
 
     /**
      * Returns a string representation of the upload rate, expressed in the most convenient unit of
-     * measurement (Mbit/s if the value is >= 1024, B/s if the value is < 1, otherwise Kbit/s)
+     * measurement (Mbit/s if the value is {@code >=} 1024, B/s if the value is {@code < 1}, otherwise Kbit/s)
      * @return string representation of the upload rate (e.g. 234 Kbit/s)
      */
     public String getUploadRateString() {
@@ -164,7 +164,7 @@ public class UploadInfo implements Parcelable {
 
     /**
      * Gets the list of the successfully uploaded files.
-     * @return {@link ArrayList<String>}
+     * @return list of strings
      */
     public ArrayList<String> getSuccessfullyUploadedFiles() {
         return successfullyUploadedFiles;
