@@ -11,7 +11,10 @@ import android.support.v4.app.NotificationCompat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Base class to subclass when creating upload tasks. It contains the logic common to all the tasks,
@@ -43,6 +46,11 @@ public abstract class UploadTask implements Runnable {
     protected UploadTaskParameters params = null;
 
     /**
+     * Contains the absolute local path of the successfully uploaded files.
+     */
+    private List<String> successfullyUploadedFiles = new ArrayList<>();
+
+    /**
      * Flag indicating if the operation should continue or is cancelled. You should never
      * explicitly set this value in your subclasses, as it's written by the Upload Service
      * when you call {@link UploadService#stopUpload(String)}. If this value is false, you should
@@ -72,6 +80,16 @@ public abstract class UploadTask implements Runnable {
     protected long uploadedBytes;
 
     /**
+     * Start timestamp of this upload task.
+     */
+    private final long startTime;
+
+    /**
+     * Counter of the upload attempts that has been made;
+     */
+    private int attempts;
+
+    /**
      * Implementation of the upload logic.
      * @throws Exception if an error occurs
      */
@@ -81,6 +99,10 @@ public abstract class UploadTask implements Runnable {
      * Implement in subclasses to be able to do something when the upload is successful.
      */
     protected void onSuccessfulUpload() {}
+
+    public UploadTask() {
+        startTime = new Date().getTime();
+    }
 
     /**
      * Initializes the {@link UploadTask}.<br>
@@ -103,7 +125,7 @@ public abstract class UploadTask implements Runnable {
 
         createNotification();
 
-        int attempts = 0;
+        attempts = 0;
 
         int errorDelay = 1000;
         int maxErrorDelay = 10 * 60 * 1000;
@@ -179,13 +201,14 @@ public abstract class UploadTask implements Runnable {
         setLastProgressNotificationTime(currentTime);
 
         Logger.debug(LOG_TAG, "Broadcasting upload progress for " + params.getId()
-                + " Uploaded bytes: " + uploadedBytes + " out of " + totalBytes);
+                              + ": " + uploadedBytes + " bytes of " + totalBytes);
+
+        UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
+                                               (attempts - 1), successfullyUploadedFiles);
 
         BroadcastData data = new BroadcastData()
-                .setId(params.getId())
                 .setStatus(BroadcastData.Status.IN_PROGRESS)
-                .setUploadedBytes(uploadedBytes)
-                .setTotalBytes(totalBytes);
+                .setUploadInfo(uploadInfo);
 
         service.sendBroadcast(data.getIntent());
 
@@ -223,9 +246,12 @@ public abstract class UploadTask implements Runnable {
 
         Logger.debug(LOG_TAG, "Broadcasting upload completed for " + params.getId());
 
+        UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
+                                               (attempts - 1), successfullyUploadedFiles);
+
         BroadcastData data = new BroadcastData()
-                .setId(params.getId())
                 .setStatus(BroadcastData.Status.COMPLETED)
+                .setUploadInfo(uploadInfo)
                 .setResponseCode(responseCode)
                 .setResponseBody(serverResponseBody);
 
@@ -250,15 +276,28 @@ public abstract class UploadTask implements Runnable {
 
         Logger.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: " + params.getId());
 
+        UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
+                                               (attempts - 1), successfullyUploadedFiles);
+
         BroadcastData data = new BroadcastData()
-                .setId(params.getId())
-                .setStatus(BroadcastData.Status.CANCELLED);
+                .setStatus(BroadcastData.Status.CANCELLED)
+                .setUploadInfo(uploadInfo);
 
         service.sendBroadcast(data.getIntent());
 
         updateNotificationError();
 
         service.taskCompleted(params.getId());
+    }
+
+    /**
+     * Add a file to the list of the successfully uploaded files.
+     * @param absolutePath absolute path to the file on the device
+     */
+    protected void addSuccessfullyUploadedFile(String absolutePath) {
+        if (!successfullyUploadedFiles.contains(absolutePath)) {
+            successfullyUploadedFiles.add(absolutePath);
+        }
     }
 
     /**
@@ -275,9 +314,12 @@ public abstract class UploadTask implements Runnable {
         Logger.info(LOG_TAG, "Broadcasting error for upload with ID: "
                 + params.getId() + ". " + exception.getMessage());
 
+        UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
+                                               (attempts - 1), successfullyUploadedFiles);
+
         BroadcastData data = new BroadcastData()
-                .setId(params.getId())
                 .setStatus(BroadcastData.Status.ERROR)
+                .setUploadInfo(uploadInfo)
                 .setException(exception);
 
         service.sendBroadcast(data.getIntent());

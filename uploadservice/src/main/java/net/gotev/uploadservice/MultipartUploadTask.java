@@ -130,4 +130,11 @@ public class MultipartUploadTask extends HttpUploadTask {
         }
     }
 
+    @Override
+    protected void onSuccessfulUpload() {
+        for (UploadFile file : params.getFiles()) {
+            addSuccessfullyUploadedFile(file.getAbsolutePath());
+        }
+    }
+
 }

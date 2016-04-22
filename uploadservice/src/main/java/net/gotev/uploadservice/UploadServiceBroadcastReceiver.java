@@ -28,20 +28,19 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
 
         switch (data.getStatus()) {
             case ERROR:
-                onError(data.getId(), data.getException());
+                onError(data.getUploadInfo(), data.getException());
                 break;
 
             case COMPLETED:
-                onCompleted(data.getId(), data.getResponseCode(), data.getResponseBody());
+                onCompleted(data.getUploadInfo(), data.getResponseCode(), data.getResponseBody());
                 break;
 
             case IN_PROGRESS:
-                onProgress(data.getId(), data.getProgressPercent());
-                onProgress(data.getId(), data.getUploadedBytes(), data.getTotalBytes());
+                onProgress(data.getUploadInfo());
                 break;
 
             case CANCELLED:
-                onCancelled(data.getId());
+                onCancelled(data.getUploadInfo());
                 break;
 
             default:
@@ -80,35 +79,24 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
     /**
      * Called when the upload progress changes. Override this method to add your own logic.
      *
-     * @param uploadId unique ID of the upload request
-     * @param progress value from 0 to 100
+     * @param uploadInfo upload status information
      */
-    public void onProgress(final String uploadId, final int progress) {
-    }
-
-    /**
-     * Called when the upload progress changes. Override this method to add your own logic.
-     *
-     * @param uploadId unique ID of the upload request
-     * @param uploadedBytes the count of the bytes uploaded so far
-     * @param totalBytes the total expected bytes to upload
-     */
-    public void onProgress(final String uploadId, final long uploadedBytes, final long totalBytes) {
+    public void onProgress(final UploadInfo uploadInfo) {
     }
 
     /**
      * Called when an error happens during the upload. Override this method to add your own logic.
      *
-     * @param uploadId unique ID of the upload request
+     * @param uploadInfo upload status information
      * @param exception exception that caused the error
      */
-    public void onError(final String uploadId, final Exception exception) {
+    public void onError(final UploadInfo uploadInfo, final Exception exception) {
     }
 
     /**
      * Called when the upload is completed successfully. Override this method to add your own logic.
      *
-     * @param uploadId unique ID of the upload request
+     * @param uploadInfo upload status information
      * @param serverResponseCode status code returned by the server
      * @param serverResponseBody byte array containing the response body received from the server.
      *                           If your server responds with a string, you can get it with
@@ -116,15 +104,15 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
      *                           JSON, you can parse it using a library such as org.json
      *                           (embedded in Android) or google's gson
      */
-    public void onCompleted(final String uploadId, final int serverResponseCode,
-                            final byte[] serverResponseBody) {
+    public void onCompleted(final UploadInfo uploadInfo,
+                            final int serverResponseCode, final byte[] serverResponseBody) {
     }
 
     /**
      * Called when the upload is cancelled. Override this method to add your own logic.
      *
-     * @param uploadId unique ID of the upload request
+     * @param uploadInfo upload status information
      */
-    public void onCancelled(final String uploadId) {
+    public void onCancelled(final UploadInfo uploadInfo) {
     }
 }
