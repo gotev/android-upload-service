@@ -23,4 +23,8 @@ public class BinaryUploadTask extends HttpUploadTask {
         writeStream(params.getFiles().get(0).getStream());
     }
 
+    @Override
+    protected void onSuccessfulUpload() {
+        addSuccessfullyUploadedFile(params.getFiles().get(0).getAbsolutePath());
+    }
 }

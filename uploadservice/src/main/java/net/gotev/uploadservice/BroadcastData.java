@@ -19,11 +19,9 @@ class BroadcastData implements Parcelable {
         CANCELLED
     }
 
-    private String id;
     private Status status;
     private Exception exception;
-    private long uploadedBytes;
-    private long totalBytes;
+    private UploadInfo uploadInfo;
     private int responseCode;
     private byte[] responseBody = new byte[0];
 
@@ -53,12 +51,10 @@ class BroadcastData implements Parcelable {
             };
 
     @Override
-    public void writeToParcel(Parcel parcel, int arg1) {
-        parcel.writeString(id);
+    public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(status.ordinal());
         parcel.writeSerializable(exception);
-        parcel.writeLong(uploadedBytes);
-        parcel.writeLong(totalBytes);
+        parcel.writeParcelable(uploadInfo, flags);
         parcel.writeInt(responseCode);
 
         parcel.writeInt(responseBody.length);
@@ -66,11 +62,9 @@ class BroadcastData implements Parcelable {
     }
 
     private BroadcastData(Parcel in) {
-        id = in.readString();
         status = Status.values()[in.readInt()];
         exception = (Exception) in.readSerializable();
-        uploadedBytes = in.readLong();
-        totalBytes = in.readLong();
+        uploadInfo = in.readParcelable(UploadInfo.class.getClassLoader());
         responseCode = in.readInt();
 
         responseBody = new byte[in.readInt()];
@@ -80,15 +74,6 @@ class BroadcastData implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public BroadcastData setId(String id) {
-        this.id = id;
-        return this;
     }
 
     public Status getStatus() {
@@ -109,26 +94,13 @@ class BroadcastData implements Parcelable {
         return this;
     }
 
-    public long getUploadedBytes() {
-        return uploadedBytes;
+    public UploadInfo getUploadInfo() {
+        return uploadInfo;
     }
 
-    public BroadcastData setUploadedBytes(long uploadedBytes) {
-        this.uploadedBytes = uploadedBytes;
+    public BroadcastData setUploadInfo(UploadInfo uploadInfo) {
+        this.uploadInfo = uploadInfo;
         return this;
-    }
-
-    public long getTotalBytes() {
-        return totalBytes;
-    }
-
-    public BroadcastData setTotalBytes(long totalBytes) {
-        this.totalBytes = totalBytes;
-        return this;
-    }
-
-    public int getProgressPercent() {
-        return (int) (uploadedBytes * 100 / totalBytes);
     }
 
     public int getResponseCode() {
