@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -233,15 +232,13 @@ public abstract class UploadTask implements Runnable {
         boolean successfulUpload = ((responseCode / 100) == 2);
 
         if (successfulUpload) {
-            if (params.isAutoDeleteSuccessfullyUploadedFiles() && !params.getFiles().isEmpty()) {
-                Iterator<UploadFile> iterator = params.getFiles().iterator();
+            onSuccessfulUpload();
 
-                while (iterator.hasNext()) {
-                    deleteFile(iterator.next().file);
+            if (params.isAutoDeleteSuccessfullyUploadedFiles() && !successfullyUploadedFiles.isEmpty()) {
+                for (String filePath : successfullyUploadedFiles) {
+                    deleteFile(new File(filePath));
                 }
             }
-
-            onSuccessfulUpload();
         }
 
         Logger.debug(LOG_TAG, "Broadcasting upload completed for " + params.getId());
@@ -294,10 +291,21 @@ public abstract class UploadTask implements Runnable {
      * Add a file to the list of the successfully uploaded files.
      * @param absolutePath absolute path to the file on the device
      */
-    protected void addSuccessfullyUploadedFile(String absolutePath) {
+    protected final void addSuccessfullyUploadedFile(String absolutePath) {
         if (!successfullyUploadedFiles.contains(absolutePath)) {
             successfullyUploadedFiles.add(absolutePath);
         }
+    }
+
+    /**
+     * Gets the list of all the successfully uploaded files.
+     * You must not modify this list in your subclasses! You can only read its contents.
+     * If you want to add an element into it,
+     * use {@link UploadTask#addSuccessfullyUploadedFile(String)}
+     * @return list of strings
+     */
+    protected final List<String> getSuccessfullyUploadedFiles() {
+        return successfullyUploadedFiles;
     }
 
     /**
