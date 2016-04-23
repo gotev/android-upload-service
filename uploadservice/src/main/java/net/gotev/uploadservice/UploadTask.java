@@ -47,7 +47,7 @@ public abstract class UploadTask implements Runnable {
     /**
      * Contains the absolute local path of the successfully uploaded files.
      */
-    private List<String> successfullyUploadedFiles = new ArrayList<>();
+    private final List<String> successfullyUploadedFiles = new ArrayList<>();
 
     /**
      * Flag indicating if the operation should continue or is cancelled. You should never
