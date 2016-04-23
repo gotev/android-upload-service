@@ -126,8 +126,7 @@ public abstract class UploadTask implements Runnable {
 
         attempts = 0;
 
-        int errorDelay = 1000;
-        int maxErrorDelay = 10 * 60 * 1000;
+        int errorDelay = UploadService.INITIAL_RETRY_WAIT_TIME;
 
         while (attempts <= params.getMaxRetries() && shouldContinue) {
             attempts++;
@@ -148,9 +147,9 @@ public abstract class UploadTask implements Runnable {
                             + exc.getMessage());
                     SystemClock.sleep(errorDelay);
 
-                    errorDelay *= 10;
-                    if (errorDelay > maxErrorDelay) {
-                        errorDelay = maxErrorDelay;
+                    errorDelay *= UploadService.BACKOFF_MULTIPLIER;
+                    if (errorDelay > UploadService.MAX_RETRY_WAIT_TIME) {
+                        errorDelay = UploadService.MAX_RETRY_WAIT_TIME;
                     }
                 }
             }
