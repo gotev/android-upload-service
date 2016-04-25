@@ -51,7 +51,10 @@ public class UploadFile implements Parcelable {
         }
 
         File file = new File(path);
-        if (!file.exists()) throw new FileNotFoundException("Could not find file at path: " + path);
+        if (!file.exists())
+            throw new FileNotFoundException("Could not find file at path: " + path);
+        if (file.isDirectory())
+            throw new FileNotFoundException("The specified path refers to a directory: " + path);
         this.file = file;
 
         if (parameterName == null || "".equals(parameterName)) {
