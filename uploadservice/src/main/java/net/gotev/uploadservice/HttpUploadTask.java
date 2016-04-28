@@ -78,7 +78,8 @@ public abstract class HttpUploadTask extends UploadTask {
             // broadcasted and then the cancellation. That behaviour was not desirable as the
             // library user couldn't execute code on user cancellation.
             if (shouldContinue) {
-                broadcastCompleted(serverResponseCode, connection.getServerResponseBody());
+                broadcastCompleted(serverResponseCode, connection.getServerResponseBody(),
+                                   connection.getServerResponseHeaders());
             }
 
         } finally {

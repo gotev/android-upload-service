@@ -32,7 +32,7 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
                 break;
 
             case COMPLETED:
-                onCompleted(data.getUploadInfo(), data.getResponseCode(), data.getResponseBody());
+                onCompleted(data.getUploadInfo(), data.getServerResponse());
                 break;
 
             case IN_PROGRESS:
@@ -97,15 +97,9 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
      * Called when the upload is completed successfully. Override this method to add your own logic.
      *
      * @param uploadInfo upload status information
-     * @param serverResponseCode status code returned by the server
-     * @param serverResponseBody byte array containing the response body received from the server.
-     *                           If your server responds with a string, you can get it with
-     *                           {@code new String(serverResponseBody)}. If the string is a
-     *                           JSON, you can parse it using a library such as org.json
-     *                           (embedded in Android) or google's gson
+     * @param serverResponse response got from the server
      */
-    public void onCompleted(final UploadInfo uploadInfo,
-                            final int serverResponseCode, final byte[] serverResponseBody) {
+    public void onCompleted(final UploadInfo uploadInfo, final ServerResponse serverResponse) {
     }
 
     /**
