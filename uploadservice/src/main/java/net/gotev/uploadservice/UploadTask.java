@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -223,10 +224,13 @@ public abstract class UploadTask implements Runnable {
      *                     protocol, set this to {@link UploadTask#TASK_COMPLETED_SUCCESSFULLY}
      *                     to inform that the task has been completed successfully. Integer values
      *                     lower than 200 or greater that 299 indicates error response from server.
-     * @param serverResponseBody bytes read from server's response body. If your server does not
-     *                           return anything, set this to {@link UploadTask#EMPTY_RESPONSE}.
+     * @param responseBody bytes read from server's response body. If your server does not
+     *                     return anything, set this to {@link UploadTask#EMPTY_RESPONSE}.
+     * @param responseHeaders contains all the headers sent by the server. Set this to null or
+     *                        an empty map if the server has not sent any response header.
      */
-    protected final void broadcastCompleted(final int responseCode, final byte[] serverResponseBody) {
+    protected final void broadcastCompleted(final int responseCode, final byte[] responseBody,
+                                            final LinkedHashMap<String, String> responseHeaders) {
 
         boolean successfulUpload = ((responseCode / 100) == 2);
 
@@ -245,11 +249,13 @@ public abstract class UploadTask implements Runnable {
         UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
                                                (attempts - 1), successfullyUploadedFiles);
 
+        ServerResponse serverResponse = new ServerResponse(responseCode, responseBody,
+                                                           responseHeaders);
+
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.COMPLETED)
                 .setUploadInfo(uploadInfo)
-                .setResponseCode(responseCode)
-                .setResponseBody(serverResponseBody);
+                .setServerResponse(serverResponse);
 
         service.sendBroadcast(data.getIntent());
 

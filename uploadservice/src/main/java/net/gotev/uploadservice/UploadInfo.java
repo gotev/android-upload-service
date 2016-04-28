@@ -21,7 +21,7 @@ public class UploadInfo implements Parcelable {
     private int numberOfRetries;
     private ArrayList<String> successfullyUploadedFiles = new ArrayList<>();
 
-    public UploadInfo(String uploadId) {
+    protected UploadInfo(String uploadId) {
         this.uploadId = uploadId;
         startTime = 0;
         currentTime = 0;
@@ -30,7 +30,7 @@ public class UploadInfo implements Parcelable {
         numberOfRetries = 0;
     }
 
-    public UploadInfo(String uploadId, long startTime, long uploadedBytes, long totalBytes,
+    protected UploadInfo(String uploadId, long startTime, long uploadedBytes, long totalBytes,
                       int numberOfRetries, List<String> uploadedFiles) {
         this.uploadId = uploadId;
         this.startTime = startTime;

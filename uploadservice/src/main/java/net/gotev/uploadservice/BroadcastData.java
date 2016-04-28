@@ -22,8 +22,7 @@ class BroadcastData implements Parcelable {
     private Status status;
     private Exception exception;
     private UploadInfo uploadInfo;
-    private int responseCode;
-    private byte[] responseBody = new byte[0];
+    private ServerResponse serverResponse;
 
     public BroadcastData() {
 
@@ -55,20 +54,14 @@ class BroadcastData implements Parcelable {
         parcel.writeInt(status.ordinal());
         parcel.writeSerializable(exception);
         parcel.writeParcelable(uploadInfo, flags);
-        parcel.writeInt(responseCode);
-
-        parcel.writeInt(responseBody.length);
-        parcel.writeByteArray(responseBody);
+        parcel.writeParcelable(serverResponse, flags);
     }
 
     private BroadcastData(Parcel in) {
         status = Status.values()[in.readInt()];
         exception = (Exception) in.readSerializable();
         uploadInfo = in.readParcelable(UploadInfo.class.getClassLoader());
-        responseCode = in.readInt();
-
-        responseBody = new byte[in.readInt()];
-        in.readByteArray(responseBody);
+        serverResponse = in.readParcelable(ServerResponse.class.getClassLoader());
     }
 
     @Override
@@ -103,21 +96,12 @@ class BroadcastData implements Parcelable {
         return this;
     }
 
-    public int getResponseCode() {
-        return responseCode;
+    public ServerResponse getServerResponse() {
+        return serverResponse;
     }
 
-    public BroadcastData setResponseCode(int responseCode) {
-        this.responseCode = responseCode;
-        return this;
-    }
-
-    public byte[] getResponseBody() {
-        return responseBody;
-    }
-
-    public BroadcastData setResponseBody(byte[] responseBody) {
-        this.responseBody = responseBody;
+    public BroadcastData setServerResponse(ServerResponse serverResponse) {
+        this.serverResponse = serverResponse;
         return this;
     }
 }

@@ -3,6 +3,7 @@ package net.gotev.uploadservice.http;
 import net.gotev.uploadservice.NameValue;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -55,6 +56,13 @@ public interface HttpConnection {
      * @throws IOException if an error occurs while getting the server response body
      */
     byte[] getServerResponseBody() throws IOException;
+
+    /**
+     * Gets the server response headers.
+     * @return map containing all the response headers
+     * @throws IOException if an error occurs while getting the server response headers
+     */
+    LinkedHashMap<String, String> getServerResponseHeaders() throws IOException;
 
     /**
      * Closes the connection and frees all the allocated resources.

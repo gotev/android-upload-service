@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@link HttpConnection} implementation using {@link HttpURLConnection}.
@@ -117,6 +119,27 @@ public class HurlStackConnection implements HttpConnection {
         } catch (Exception ignored) {}
 
         return byteStream.toByteArray();
+    }
+
+    @Override
+    public LinkedHashMap<String, String> getServerResponseHeaders() throws IOException {
+        Map<String, List<String>> headers = mConnection.getHeaderFields();
+        if (headers == null)
+            return null;
+
+        LinkedHashMap<String, String> out = new LinkedHashMap<>(headers.size());
+
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            if (entry.getKey() != null) {
+                StringBuilder headerValue = new StringBuilder();
+                for (String value : entry.getValue()) {
+                    headerValue.append(value);
+                }
+                out.put(entry.getKey(), headerValue.toString());
+            }
+        }
+
+        return out;
     }
 
     @Override
