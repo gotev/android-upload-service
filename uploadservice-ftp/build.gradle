@@ -1,0 +1,127 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+def siteUrl = 'https://github.com/gotev/android-upload-service'
+def gitUrl = 'https://github.com/gotev/android-upload-service.git'
+def projectName = "android-upload-service-ftp"
+def projectDesc = "FTP Upload implementation for Android Upload Service."
+def projectGroup = "net.gotev"
+group = projectGroup
+version = "3.0"
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 23
+        versionCode 1
+        versionName version
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
+}
+
+dependencies {
+    compile 'commons-net:commons-net:3.4'
+    //compile 'net.gotev:uploadservice:3.+'
+    //comment the previous line and uncomment the next line for development (it uses the local lib)
+    compile project(':uploadservice')
+}
+
+Properties properties = new Properties()
+if (project.rootProject.file("local.properties").exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name projectName
+            description projectDesc
+            packaging 'aar'
+            groupId projectGroup
+            version version
+            url siteUrl
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            developers {
+                developer {
+                    id 'gotev'
+                    name 'Aleksandar Gotev'
+                }
+            }
+            scm {
+                connection gitUrl
+                developerConnection gitUrl
+                url siteUrl
+
+            }
+        }
+    }
+}
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = projectName
+        desc = projectDesc
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        issueTrackerUrl = siteUrl + "/issues/"
+        licenses = ["Apache-2.0"]
+        labels = ['android', 'upload', 'service', 'ftp', 'upload']
+        publicDownloadNumbers = true
+        publish = true
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    title = "Android Upload Service FTP upload implementation for version $project.version"
+    description "Generates Javadoc"
+    source = android.sourceSets.main.java.srcDirs
+    classpath += files(android.bootClasspath)
+    exclude '**/BuildConfig.java', '**/R.java'
+    options {
+        addStringOption('Xdoclint:none')
+        windowTitle("Android Upload Service FTP upload implementation for version $project.version")
+        locale = 'en_US'
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        links("http://docs.oracle.com/javase/7/docs/api/");
+        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+        setMemberLevel(JavadocMemberLevel.PUBLIC)
+    }
+    failOnError false
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
