@@ -1,5 +1,7 @@
 package net.gotev.uploadservice;
 
+import android.webkit.MimeTypeMap;
+
 /**
  * Static class containing string constants for the most common
  * Internet content types.
@@ -19,6 +21,38 @@ public final class ContentType {
      * Private constructor to avoid instatiation.
      */
     private ContentType() { }
+
+    /**
+     * Tries to auto-detect the content type (MIME type) of a specific file.
+     * @param absolutePath absolute path to the file
+     * @return content type (MIME type) of the file, or application/octet-stream if no content
+     * type could be determined automatically
+     */
+    public static String autoDetect(String absolutePath) {
+        String extension = null;
+
+        int index = absolutePath.lastIndexOf(".") + 1;
+
+        if (index >= 0 && index <= absolutePath.length()) {
+            extension = absolutePath.substring(index);
+        }
+
+        if (extension == null || extension.isEmpty()) {
+            return APPLICATION_OCTET_STREAM;
+        }
+
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
+
+        if (mimeType == null) {
+            // mp4 does not always get recognized automatically
+            if ("mp4".equalsIgnoreCase(extension))
+                return VIDEO_MPEG4;
+
+            return APPLICATION_OCTET_STREAM;
+        }
+
+        return mimeType;
+    }
 
     private static final String APPLICATION = "application/";
 
@@ -155,6 +189,7 @@ public final class ContentType {
     private static final String VIDEO = "video/";
 
     public static final String VIDEO_MPEG = VIDEO + "mpeg";
+    public static final String VIDEO_MPEG4 = VIDEO + "mp4";
     public static final String VIDEO_QUICKTIME = VIDEO + "quicktime";
     public static final String VIDEO_LA_ASF = VIDEO + "x-la-asf";
     public static final String VIDEO_MS_ASF = VIDEO + "x-ms-asf";
