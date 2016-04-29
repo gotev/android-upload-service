@@ -17,6 +17,7 @@ import java.util.List;
  */
 public class MultipartUploadRequest extends HttpUploadRequest {
 
+    private static final String LOG_TAG = MultipartUploadRequest.class.getName();
     private boolean isUtf8Charset = false;
 
     /**
@@ -62,7 +63,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     /**
      * Adds a file to this upload request.
      *
-     * @param path Absolute path to the file that you want to upload
+     * @param absolutePath Absolute path to the file that you want to upload
      * @param parameterName Name of the form parameter that will contain file's data
      * @param fileName File name seen by the server side script. If null, the original file name
      *                 will be used
@@ -74,10 +75,41 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * @throws IllegalArgumentException if one or more parameters are not valid
      * @return {@link MultipartUploadRequest}
      */
-    public MultipartUploadRequest addFileToUpload(final String path, final String parameterName,
-                                                  final String fileName, final String contentType)
+    public MultipartUploadRequest addFileToUpload(String absolutePath,
+                                                  String parameterName,
+                                                  String fileName, String contentType)
             throws FileNotFoundException, IllegalArgumentException {
-        params.addFile(new UploadFile(path, parameterName, fileName, contentType));
+        UploadFile file = new UploadFile(absolutePath);
+        absolutePath = file.getAbsolutePath();
+
+        if (parameterName == null || "".equals(parameterName)) {
+            throw new IllegalArgumentException("Please specify parameterName value for file: "
+                                               + absolutePath);
+        }
+
+        file.setProperty(MultipartUploadTask.PROPERTY_PARAM_NAME, parameterName);
+
+        if (contentType == null || contentType.isEmpty()) {
+            contentType = ContentType.autoDetect(absolutePath);
+            Logger.debug(LOG_TAG, "Auto-detected MIME type for " + absolutePath
+                    + " is: " + contentType);
+        } else {
+            Logger.debug(LOG_TAG, "Content Type set for " + absolutePath
+                    + " is: " + contentType);
+        }
+
+        file.setProperty(MultipartUploadTask.PROPERTY_CONTENT_TYPE, contentType);
+
+        if (fileName == null || "".equals(fileName)) {
+            fileName = file.getName();
+            Logger.debug(LOG_TAG, "Using original file name: " + fileName);
+        } else {
+            Logger.debug(LOG_TAG, "Using custom file name: " + fileName);
+        }
+
+        file.setProperty(MultipartUploadTask.PROPERTY_REMOTE_FILE_NAME, fileName);
+
+        params.addFile(file);
         return this;
     }
 

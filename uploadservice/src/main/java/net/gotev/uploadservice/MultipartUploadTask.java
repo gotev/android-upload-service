@@ -20,15 +20,21 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     protected static final String PARAM_UTF8_CHARSET = "multipartUtf8Charset";
 
+    private static final String BOUNDARY_SIGNATURE = "-------AndroidUploadService";
+    private static final Charset US_ASCII = Charset.forName("US-ASCII");
+    private static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String NEW_LINE = "\r\n";
     private static final String TWO_HYPHENS = "--";
+
+    // properties associated to each file
+    protected static final String PROPERTY_REMOTE_FILE_NAME = "httpRemoteFileName";
+    protected static final String PROPERTY_CONTENT_TYPE = "httpContentType";
+    protected static final String PROPERTY_PARAM_NAME = "httpParamName";
 
     private String boundary;
     private byte[] boundaryBytes;
     private byte[] trailerBytes;
     private boolean isUtf8Charset;
-
-    private final Charset US_ASCII = Charset.forName("US-ASCII");
 
     @Override
     protected void init(UploadService service, Intent intent) throws IOException {
@@ -49,11 +55,7 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     @Override
     protected long getBodyLength() throws UnsupportedEncodingException {
-        // get the content length of the entire HTTP/Multipart request body
-        long parameterBytes = getRequestParametersLength();
-        final long totalFileBytes = getFilesLength();
-
-        return (parameterBytes + totalFileBytes + trailerBytes.length);
+        return (getRequestParametersLength() + getFilesLength() + trailerBytes.length);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     private String getBoundary() {
-        return "-------AndroidUploadService" + System.currentTimeMillis();
+        return BOUNDARY_SIGNATURE + System.currentTimeMillis();
     }
 
     private byte[] getBoundaryBytes() throws UnsupportedEncodingException {
@@ -79,7 +81,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         long total = 0;
 
         for (UploadFile file : params.getFiles()) {
-            total += file.getTotalMultipartBytes(boundaryBytes.length, isUtf8Charset);
+            total += getTotalMultipartBytes(file, isUtf8Charset);
         }
 
         return total;
@@ -98,6 +100,22 @@ public class MultipartUploadTask extends HttpUploadTask {
         }
 
         return parametersBytes;
+    }
+
+    private byte[] getMultipartHeader(UploadFile file, boolean isUtf8)
+            throws UnsupportedEncodingException {
+        String header = "Content-Disposition: form-data; name=\"" +
+                file.getProperty(PROPERTY_PARAM_NAME) + "\"; filename=\"" +
+                file.getProperty(PROPERTY_REMOTE_FILE_NAME) + "\"" + NEW_LINE +
+                "Content-Type: " + file.getProperty(PROPERTY_CONTENT_TYPE) +
+                NEW_LINE + NEW_LINE;
+
+        return header.getBytes(isUtf8 ? UTF8 : US_ASCII);
+    }
+
+    private long getTotalMultipartBytes(UploadFile file, boolean isUtf8)
+            throws UnsupportedEncodingException {
+        return boundaryBytes.length + getMultipartHeader(file, isUtf8).length + file.length();
     }
 
     private void writeRequestParameters(HttpConnection connection) throws IOException {
@@ -119,7 +137,7 @@ public class MultipartUploadTask extends HttpUploadTask {
                 break;
 
             connection.writeBody(boundaryBytes);
-            byte[] headerBytes = file.getMultipartHeader(isUtf8Charset);
+            byte[] headerBytes = getMultipartHeader(file, isUtf8Charset);
             connection.writeBody(headerBytes);
 
             uploadedBytes += boundaryBytes.length + headerBytes.length;
