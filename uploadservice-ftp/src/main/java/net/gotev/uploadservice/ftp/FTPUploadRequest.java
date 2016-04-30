@@ -7,6 +7,7 @@ import net.gotev.uploadservice.UploadFile;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadRequest;
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
+import net.gotev.uploadservice.UploadTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,7 +22,7 @@ public class FTPUploadRequest extends UploadRequest {
     protected final FTPUploadTaskParameters ftpParams = new FTPUploadTaskParameters();
 
     @Override
-    protected Class getTaskClass() {
+    protected Class<? extends UploadTask> getTaskClass() {
         return FTPUploadTask.class;
     }
 

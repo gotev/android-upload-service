@@ -56,7 +56,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     }
 
     @Override
-    protected Class getTaskClass() {
+    protected Class<? extends UploadTask> getTaskClass() {
         return MultipartUploadTask.class;
     }
 
