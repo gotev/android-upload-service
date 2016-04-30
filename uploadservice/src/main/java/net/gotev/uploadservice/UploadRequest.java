@@ -136,5 +136,5 @@ public abstract class UploadRequest {
      * The class must be a subclass of {@link UploadTask}.
      * @return class
      */
-    protected abstract Class getTaskClass();
+    protected abstract Class<? extends UploadTask> getTaskClass();
 }

@@ -44,7 +44,7 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     }
 
     @Override
-    protected Class getTaskClass() {
+    protected Class<? extends UploadTask> getTaskClass() {
         return BinaryUploadTask.class;
     }
 
