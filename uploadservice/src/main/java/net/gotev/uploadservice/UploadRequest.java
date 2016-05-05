@@ -138,7 +138,8 @@ public abstract class UploadRequest {
 
     /**
      * Sets the delegate which will receive the events for this upload request.
-     * The events will be sent only to the delegate and not in broadcast. If you want to
+     * The events will be sent only to the delegate and not in broadcast. Delegate methods will
+     * be called on your main thread, so you can safely update your UI from them. If you want to
      * send events for this upload in broadcast, and handle them in the
      * {@link UploadServiceBroadcastReceiver}, do not set the delegate or set it to null.
      * @param delegate instance of the delegate which will receive the events
