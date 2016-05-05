@@ -205,7 +205,8 @@ public final class UploadService extends Service {
         currentTask.setLastProgressNotificationTime(0)
                    .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
 
-        wakeLock.acquire();
+        if (wakeLock != null && !wakeLock.isHeld())
+            wakeLock.acquire();
 
         uploadTasksMap.put(currentTask.params.getId(), currentTask);
         uploadThreadPool.execute(currentTask);
@@ -233,6 +234,9 @@ public final class UploadService extends Service {
             Logger.debug(TAG, "Stopping foreground execution");
             stopForeground(true);
         }
+
+        if (wakeLock != null && wakeLock.isHeld())
+            wakeLock.release();
 
         Logger.debug(TAG, "UploadService destroyed");
     }
