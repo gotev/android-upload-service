@@ -238,6 +238,9 @@ public final class UploadService extends Service {
         if (wakeLock != null && wakeLock.isHeld())
             wakeLock.release();
 
+        uploadTasksMap.clear();
+        uploadDelegates.clear();
+
         Logger.debug(TAG, "UploadService destroyed");
     }
 
