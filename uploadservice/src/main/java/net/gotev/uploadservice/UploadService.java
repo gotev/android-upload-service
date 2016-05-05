@@ -116,6 +116,7 @@ public final class UploadService extends Service {
     private PowerManager.WakeLock wakeLock;
     private int notificationIncrementalId = 0;
     private static final Map<String, UploadTask> uploadTasksMap = new ConcurrentHashMap<>();
+    private static final Map<String, UploadStatusDelegate> uploadDelegates = new ConcurrentHashMap<>();
     private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
     private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
@@ -297,6 +298,7 @@ public final class UploadService extends Service {
      */
     protected synchronized void taskCompleted(String uploadId) {
         UploadTask task = uploadTasksMap.remove(uploadId);
+        uploadDelegates.remove(uploadId);
 
         // un-hold foreground upload ID if it's been hold
         if (EXECUTE_IN_FOREGROUND && task != null && task.params.getId().equals(foregroundUploadId)) {
@@ -310,5 +312,28 @@ public final class UploadService extends Service {
             wakeLock.release();
             stopSelf();
         }
+    }
+
+    /**
+     * Sets the delegate which will receive the events for the given upload request.
+     * Those events will not be sent in broadcast, but only to the delegate.
+     * @param uploadId uploadID of the upload request
+     * @param delegate the delegate instance
+     */
+    protected static void setUploadStatusDelegate(String uploadId, UploadStatusDelegate delegate) {
+        if (delegate == null)
+            return;
+
+        uploadDelegates.put(uploadId, delegate);
+    }
+
+    /**
+     * Gets the delegate for an upload request.
+     * @param uploadId uploadID of the upload request
+     * @return {@link UploadStatusDelegate} or null if no delegate has been set for the given
+     * uploadId
+     */
+    protected static UploadStatusDelegate getUploadStatusDelegate(String uploadId) {
+        return uploadDelegates.get(uploadId);
     }
 }
