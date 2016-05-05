@@ -17,7 +17,8 @@ import android.content.IntentFilter;
  * @author mabdurrahman
  *
  */
-public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
+public class UploadServiceBroadcastReceiver extends BroadcastReceiver
+        implements UploadStatusDelegate {
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -76,37 +77,19 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver {
         context.unregisterReceiver(this);
     }
 
-    /**
-     * Called when the upload progress changes. Override this method to add your own logic.
-     *
-     * @param uploadInfo upload status information
-     */
+    @Override
     public void onProgress(final UploadInfo uploadInfo) {
     }
 
-    /**
-     * Called when an error happens during the upload. Override this method to add your own logic.
-     *
-     * @param uploadInfo upload status information
-     * @param exception exception that caused the error
-     */
+    @Override
     public void onError(final UploadInfo uploadInfo, final Exception exception) {
     }
 
-    /**
-     * Called when the upload is completed successfully. Override this method to add your own logic.
-     *
-     * @param uploadInfo upload status information
-     * @param serverResponse response got from the server
-     */
+    @Override
     public void onCompleted(final UploadInfo uploadInfo, final ServerResponse serverResponse) {
     }
 
-    /**
-     * Called when the upload is cancelled. Override this method to add your own logic.
-     *
-     * @param uploadInfo upload status information
-     */
+    @Override
     public void onCancelled(final UploadInfo uploadInfo) {
     }
 }

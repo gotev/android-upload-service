@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 
@@ -65,6 +66,7 @@ public abstract class UploadTask implements Runnable {
     private long lastProgressNotificationTime;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder notification;
+    private Handler mainThreadHandler;
 
     /**
      * Total bytes to transfer. You should initialize this value in the
@@ -117,6 +119,7 @@ public abstract class UploadTask implements Runnable {
         this.notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
         this.notification = new NotificationCompat.Builder(service);
         this.service = service;
+        this.mainThreadHandler = new Handler(service.getMainLooper());
         this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS);
     }
 
@@ -202,14 +205,25 @@ public abstract class UploadTask implements Runnable {
         Logger.debug(LOG_TAG, "Broadcasting upload progress for " + params.getId()
                               + ": " + uploadedBytes + " bytes of " + totalBytes);
 
-        UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
-                                               (attempts - 1), successfullyUploadedFiles);
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
+                                                     totalBytes, (attempts - 1),
+                                                     successfullyUploadedFiles);
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.IN_PROGRESS)
                 .setUploadInfo(uploadInfo);
 
-        service.sendBroadcast(data.getIntent());
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
+        if (delegate != null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    delegate.onProgress(uploadInfo);
+                }
+            });
+        } else {
+            service.sendBroadcast(data.getIntent());
+        }
 
         updateNotificationProgress(uploadInfo);
     }
@@ -246,18 +260,29 @@ public abstract class UploadTask implements Runnable {
 
         Logger.debug(LOG_TAG, "Broadcasting upload completed for " + params.getId());
 
-        UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
-                                               (attempts - 1), successfullyUploadedFiles);
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
+                                                     totalBytes, (attempts - 1),
+                                                     successfullyUploadedFiles);
 
-        ServerResponse serverResponse = new ServerResponse(responseCode, responseBody,
-                                                           responseHeaders);
+        final ServerResponse serverResponse = new ServerResponse(responseCode, responseBody,
+                                                                 responseHeaders);
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.COMPLETED)
                 .setUploadInfo(uploadInfo)
                 .setServerResponse(serverResponse);
 
-        service.sendBroadcast(data.getIntent());
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
+        if (delegate != null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    delegate.onCompleted(uploadInfo, serverResponse);
+                }
+            });
+        } else {
+            service.sendBroadcast(data.getIntent());
+        }
 
         if (successfulUpload)
             updateNotificationCompleted(uploadInfo);
@@ -278,14 +303,25 @@ public abstract class UploadTask implements Runnable {
 
         Logger.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: " + params.getId());
 
-        UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
-                                               (attempts - 1), successfullyUploadedFiles);
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
+                                                     totalBytes, (attempts - 1),
+                                                     successfullyUploadedFiles);
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.CANCELLED)
                 .setUploadInfo(uploadInfo);
 
-        service.sendBroadcast(data.getIntent());
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
+        if (delegate != null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    delegate.onCancelled(uploadInfo);
+                }
+            });
+        } else {
+            service.sendBroadcast(data.getIntent());
+        }
 
         updateNotificationError(uploadInfo);
 
@@ -327,15 +363,26 @@ public abstract class UploadTask implements Runnable {
         Logger.info(LOG_TAG, "Broadcasting error for upload with ID: "
                 + params.getId() + ". " + exception.getMessage());
 
-        UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes, totalBytes,
-                                               (attempts - 1), successfullyUploadedFiles);
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
+                                                     totalBytes, (attempts - 1),
+                                                     successfullyUploadedFiles);
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.ERROR)
                 .setUploadInfo(uploadInfo)
                 .setException(exception);
 
-        service.sendBroadcast(data.getIntent());
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
+        if (delegate != null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    delegate.onError(uploadInfo, exception);
+                }
+            });
+        } else {
+            service.sendBroadcast(data.getIntent());
+        }
 
         updateNotificationError(uploadInfo);
 

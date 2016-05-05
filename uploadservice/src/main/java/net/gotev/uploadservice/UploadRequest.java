@@ -17,6 +17,7 @@ public abstract class UploadRequest {
 
     protected final Context context;
     protected final UploadTaskParameters params = new UploadTaskParameters();
+    protected UploadStatusDelegate delegate;
 
     /**
      * Creates a new upload request.
@@ -54,10 +55,14 @@ public abstract class UploadRequest {
      */
     public final String startUpload() throws IllegalArgumentException, MalformedURLException {
         this.validate();
+
+        UploadService.setUploadStatusDelegate(params.getId(), delegate);
+
         final Intent intent = new Intent(context, UploadService.class);
         this.initializeIntent(intent);
         intent.setAction(UploadService.getActionUpload());
         context.startService(intent);
+
         return params.getId();
     }
 
@@ -128,6 +133,19 @@ public abstract class UploadRequest {
      */
     public UploadRequest setMaxRetries(int maxRetries) {
         params.setMaxRetries(maxRetries);
+        return this;
+    }
+
+    /**
+     * Sets the delegate which will receive the events for this upload request.
+     * The events will be sent only to the delegate and not in broadcast. If you want to
+     * send events for this upload in broadcast, and handle them in the
+     * {@link UploadServiceBroadcastReceiver}, do not set the delegate or set it to null.
+     * @param delegate instance of the delegate which will receive the events
+     * @return {@link UploadRequest}
+     */
+    public UploadRequest setDelegate(UploadStatusDelegate delegate) {
+        this.delegate = delegate;
         return this;
     }
 
