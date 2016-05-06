@@ -2,11 +2,13 @@ package net.gotev.uploadservice.okhttp;
 
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.NameValue;
+import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.http.HttpConnection;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.internal.huc.HttpURLConnectionImpl;
+import okhttp3.internal.huc.HttpsURLConnectionImpl;
 
 /**
  * {@link HttpConnection} implementation using {@link OkHttpClient}.
@@ -23,14 +26,18 @@ public class OkHttpStackConnection implements HttpConnection {
 
     private static final String LOG_TAG = OkHttpStackConnection.class.getSimpleName();
 
-    private static final int BUFFER_SIZE = 4096;
-
-    private HttpURLConnectionImpl mConnection;
+    private HttpURLConnection mConnection;
 
     public OkHttpStackConnection(OkHttpClient client, String method, String url) throws IOException {
         Logger.debug(getClass().getSimpleName(), "creating new connection");
 
-        mConnection = new HttpURLConnectionImpl(new URL(url), client);
+        URL urlObj = new URL(url);
+
+        if (urlObj.getProtocol().equals("https")) {
+            mConnection = new HttpsURLConnectionImpl(urlObj, client);
+        } else {
+            mConnection = new HttpURLConnectionImpl(urlObj, client);
+        }
 
         mConnection.setDoInput(true);
         mConnection.setDoOutput(true);
@@ -104,7 +111,7 @@ public class OkHttpStackConnection implements HttpConnection {
     private byte[] getResponseBodyAsByteArray(final InputStream inputStream) {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 
-        byte[] buffer = new byte[BUFFER_SIZE];
+        byte[] buffer = new byte[UploadService.BUFFER_SIZE];
         int bytesRead;
 
         try {

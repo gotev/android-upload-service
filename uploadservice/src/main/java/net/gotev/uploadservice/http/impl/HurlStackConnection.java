@@ -2,6 +2,7 @@ package net.gotev.uploadservice.http.impl;
 
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.NameValue;
+import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.http.HttpConnection;
 
 import java.io.ByteArrayOutputStream;
@@ -13,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+
 /**
  * {@link HttpConnection} implementation using {@link HttpURLConnection}.
  * @author gotev (Aleksandar Gotev)
@@ -21,8 +24,6 @@ public class HurlStackConnection implements HttpConnection {
 
     private static final String LOG_TAG = HurlStackConnection.class.getSimpleName();
 
-    private static final int BUFFER_SIZE = 4096;
-
     private HttpURLConnection mConnection;
 
     public HurlStackConnection(String method, String url, boolean followRedirects,
@@ -30,7 +31,13 @@ public class HurlStackConnection implements HttpConnection {
             throws IOException {
         Logger.debug(getClass().getSimpleName(), "creating new connection");
 
-        mConnection = (HttpURLConnection) new URL(url).openConnection();
+        URL urlObj = new URL(url);
+
+        if (urlObj.getProtocol().equals("https")) {
+            mConnection = (HttpsURLConnection) urlObj.openConnection();
+        } else {
+            mConnection = (HttpURLConnection) urlObj.openConnection();
+        }
 
         mConnection.setDoInput(true);
         mConnection.setDoOutput(true);
@@ -109,7 +116,7 @@ public class HurlStackConnection implements HttpConnection {
     private byte[] getResponseBodyAsByteArray(final InputStream inputStream) {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 
-        byte[] buffer = new byte[BUFFER_SIZE];
+        byte[] buffer = new byte[UploadService.BUFFER_SIZE];
         int bytesRead;
 
         try {
