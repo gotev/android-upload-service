@@ -1,7 +1,12 @@
 package net.gotev.uploadservice;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.OpenableColumns;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,8 +22,12 @@ import java.util.LinkedHashMap;
  */
 public class UploadFile implements Parcelable {
 
-    protected final File file;
+    private static final String TAG = UploadFile.class.getName();
+
+    protected final String path;
     private LinkedHashMap<String, String> properties = new LinkedHashMap<>();
+    protected final File file;
+    protected final Uri uri;
 
     /**
      * Creates a new UploadFile.
@@ -27,13 +36,21 @@ public class UploadFile implements Parcelable {
      * @throws FileNotFoundException if the file can't be found at the specified path
      * @throws IllegalArgumentException if you passed invalid argument values
      */
-    public UploadFile(final String path) throws FileNotFoundException {
+    public UploadFile(String path) throws FileNotFoundException {
+
+        this.path = sanitizePath(path);
+
+        if (isUri()) {
+            this.uri = Uri.parse(path);
+            this.file = null;
+            return;
+        }
 
         if (path == null || "".equals(path)) {
             throw new IllegalArgumentException("Please specify a file path!");
         }
 
-        File file = new File(path);
+        File file = new File(this.path);
 
         if (!file.exists())
             throw new FileNotFoundException("Could not find file at path: " + path);
@@ -41,14 +58,19 @@ public class UploadFile implements Parcelable {
             throw new FileNotFoundException("The specified path refers to a directory: " + path);
 
         this.file = file;
-
+        this.uri = null;
     }
 
     /**
      * Gets the file length in bytes.
      * @return file length
      */
-    public long length() {
+    public long length(Context context) {
+
+        if (isUri()) {
+            return getUriSize(context);
+        }
+
         return file.length();
     }
 
@@ -58,23 +80,38 @@ public class UploadFile implements Parcelable {
      * @throws FileNotFoundException if the file can't be found at the path specified in the
      * constructor
      */
-    public final InputStream getStream() throws FileNotFoundException {
+    public final InputStream getStream(Context context) throws FileNotFoundException {
+
+        if (isUri()) {
+            return context.getContentResolver().openInputStream(uri);
+        }
+
         return new FileInputStream(file);
     }
 
     /**
-     * Returns the absolute path to the file.
-     * @return absolute file path
+     * Returns the content type for the file
+     * @return content type
      */
-    public final String getAbsolutePath() {
-        return file.getAbsolutePath();
+    public final String getContentType(Context context) {
+
+        if (isUri()) {
+            return context.getContentResolver().getType(uri);
+        }
+
+        return ContentType.autoDetect(file.getAbsolutePath());
     }
 
     /**
      * Returns the name of this file.
      * @return string
      */
-    public final String getName() {
+    public final String getName(Context context) {
+
+        if (isUri()) {
+            return getUriName(context);
+        }
+
         return file.getName();
     }
 
@@ -100,14 +137,22 @@ public class UploadFile implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int arg1) {
-        parcel.writeString(file.getAbsolutePath());
+        parcel.writeString(path);
         parcel.writeSerializable(properties);
     }
 
     @SuppressWarnings("unchecked")
     private UploadFile(Parcel in) {
-        file = new File(in.readString());
-        properties = (LinkedHashMap<String, String>) in.readSerializable();
+        this.path = in.readString();
+        this.properties = (LinkedHashMap<String, String>) in.readSerializable();
+
+        if (isUri()) {
+            this.uri = Uri.parse(path);
+            this.file = null;
+        } else {
+            this.file = new File(path);
+            this.uri = null;
+        }
     }
 
     /**
@@ -144,4 +189,42 @@ public class UploadFile implements Parcelable {
 
         return val;
     }
+
+    private String sanitizePath(String path) {
+        if (path.startsWith("file://")) {
+            return path.substring("file://".length());
+        }
+        return path;
+    }
+
+    private boolean isUri() {
+        return path.startsWith("content");
+    }
+
+    private long getUriSize(Context context) {
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+        cursor.moveToFirst();
+        long size = cursor.getLong(sizeIndex);
+        cursor.close();
+        return size;
+    }
+
+    private String getUriName(Context context) {
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        if (cursor == null) {
+            return getUriNameFallback();
+        }
+        int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        cursor.moveToFirst();
+        String name = cursor.getString(nameIndex);
+        cursor.close();
+        return name;
+    }
+
+    private String getUriNameFallback() {
+        String[] components = uri.toString().split(File.separator);
+        return components[components.length - 1];
+    }
+
 }

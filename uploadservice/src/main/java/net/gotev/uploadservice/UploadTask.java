@@ -44,7 +44,7 @@ public abstract class UploadTask implements Runnable {
     /**
      * Contains all the parameters set in {@link UploadRequest}.
      */
-    protected UploadTaskParameters params = null;
+    protected UploadTaskParameters params = new UploadTaskParameters();
 
     /**
      * Contains the absolute local path of the successfully uploaded files.
@@ -102,7 +102,10 @@ public abstract class UploadTask implements Runnable {
      */
     protected void onSuccessfulUpload() {}
 
-    public UploadTask() {
+    protected Context context;
+
+    public UploadTask(Context context) {
+        this.context = context;
         startTime = new Date().getTime();
     }
 

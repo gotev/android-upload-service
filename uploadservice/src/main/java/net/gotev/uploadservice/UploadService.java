@@ -2,6 +2,7 @@ package net.gotev.uploadservice;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -9,6 +10,7 @@ import android.os.PowerManager;
 import net.gotev.uploadservice.http.HttpStack;
 import net.gotev.uploadservice.http.impl.HurlStack;
 
+import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -259,10 +261,10 @@ public final class UploadService extends Service {
         UploadTask uploadTask = null;
 
         try {
-            Class<?> task = Class.forName(taskClass);
+            Class<? extends UploadTask> task = getUploadTaskClass(taskClass);
 
             if (UploadTask.class.isAssignableFrom(task)) {
-                uploadTask = UploadTask.class.cast(task.newInstance());
+                uploadTask = instantiateUploadTask(task);
                 uploadTask.init(this, intent);
             } else {
                 Logger.error(TAG, taskClass + " does not extend UploadTask!");
@@ -275,6 +277,15 @@ public final class UploadService extends Service {
         }
 
         return uploadTask;
+    }
+
+    private <T extends UploadTask> Class<T> getUploadTaskClass(String name) throws Exception {
+        return (Class<T>) Class.forName(name);
+    }
+
+    private <T extends UploadTask> T instantiateUploadTask(Class<T> c) throws Exception {
+        Constructor<?> constructor =  c.getConstructor(Context.class);
+        return (T) constructor.newInstance(this);
     }
 
     /**

@@ -1,5 +1,6 @@
 package net.gotev.uploadservice;
 
+import android.content.Context;
 import android.content.Intent;
 
 import net.gotev.uploadservice.http.HttpConnection;
@@ -35,6 +36,10 @@ public class MultipartUploadTask extends HttpUploadTask {
     private byte[] boundaryBytes;
     private byte[] trailerBytes;
     private boolean isUtf8Charset;
+
+    public MultipartUploadTask(Context context) {
+        super(context);
+    }
 
     @Override
     protected void init(UploadService service, Intent intent) throws IOException {
@@ -115,7 +120,7 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private long getTotalMultipartBytes(UploadFile file, boolean isUtf8)
             throws UnsupportedEncodingException {
-        return boundaryBytes.length + getMultipartHeader(file, isUtf8).length + file.length();
+        return boundaryBytes.length + getMultipartHeader(file, isUtf8).length + file.length(context);
     }
 
     private void writeRequestParameters(HttpConnection connection) throws IOException {
@@ -143,7 +148,7 @@ public class MultipartUploadTask extends HttpUploadTask {
             uploadedBytes += boundaryBytes.length + headerBytes.length;
             broadcastProgress(uploadedBytes, totalBytes);
 
-            final InputStream stream = file.getStream();
+            final InputStream stream = file.getStream(context);
             writeStream(stream);
         }
     }
@@ -151,7 +156,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     @Override
     protected void onSuccessfulUpload() {
         for (UploadFile file : params.getFiles()) {
-            addSuccessfullyUploadedFile(file.getAbsolutePath());
+            addSuccessfullyUploadedFile(file.getName(context));
         }
     }
 
