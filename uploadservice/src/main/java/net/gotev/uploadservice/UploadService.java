@@ -9,7 +9,9 @@ import android.os.PowerManager;
 import net.gotev.uploadservice.http.HttpStack;
 import net.gotev.uploadservice.http.impl.HurlStack;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -138,6 +140,23 @@ public final class UploadService extends Service {
         if (removedTask != null) {
             removedTask.cancel();
         }
+    }
+
+    /**
+     * Gets the list of the currently active upload tasks.
+     * @return list of uploadIDs or an empty list if no tasks are currently running
+     */
+    public static synchronized List<String> getTaskList() {
+        List<String> tasks;
+
+        if (uploadTasksMap.isEmpty()) {
+            tasks = new ArrayList<>(1);
+        } else {
+            tasks = new ArrayList<>(uploadTasksMap.size());
+            tasks.addAll(uploadTasksMap.keySet());
+        }
+
+        return tasks;
     }
 
     /**
