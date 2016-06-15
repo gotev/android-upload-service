@@ -475,18 +475,20 @@ public abstract class UploadTask implements Runnable {
 
         notificationManager.cancel(notificationId);
 
-        notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
-                .setContentText(replacePlaceholders(params.getNotificationConfig().getErrorMessage(), uploadInfo))
-                .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
-                .setAutoCancel(params.getNotificationConfig().isClearOnAction())
-                .setSmallIcon(params.getNotificationConfig().getIconResourceID())
-                .setGroup(UploadService.NAMESPACE)
-                .setProgress(0, 0, false).setOngoing(false);
-        setRingtone();
+        if (params.getNotificationConfig().getErrorMessage() != null) {
+            notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
+                    .setContentText(replacePlaceholders(params.getNotificationConfig().getErrorMessage(), uploadInfo))
+                    .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
+                    .setAutoCancel(params.getNotificationConfig().isClearOnAction())
+                    .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                    .setGroup(UploadService.NAMESPACE)
+                    .setProgress(0, 0, false).setOngoing(false);
+            setRingtone();
 
-        // this is needed because the main notification used to show progress is ongoing
-        // and a new one has to be created to allow the user to dismiss it
-        notificationManager.notify(notificationId + 1, notification.build());
+            // this is needed because the main notification used to show progress is ongoing
+            // and a new one has to be created to allow the user to dismiss it
+            notificationManager.notify(notificationId + 1, notification.build());
+        }
     }
 
     /**

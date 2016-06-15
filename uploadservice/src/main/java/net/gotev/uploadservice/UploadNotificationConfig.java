@@ -79,7 +79,7 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
-     * Sets the message to be shown if an error occurs.
+     * Sets the message to be shown if an error occurs. Null if no error message should be displayed.
      * @param message Message to show
      * @return {@link UploadNotificationConfig}
      */
