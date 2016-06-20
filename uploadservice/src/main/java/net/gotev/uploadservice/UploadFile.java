@@ -1,12 +1,12 @@
 package net.gotev.uploadservice;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.OpenableColumns;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,7 +40,7 @@ public class UploadFile implements Parcelable {
 
         this.path = sanitizePath(path);
 
-        if (isUri()) {
+        if (isContentUri()) {
             this.uri = Uri.parse(path);
             this.file = null;
             return;
@@ -67,7 +67,7 @@ public class UploadFile implements Parcelable {
      */
     public long length(Context context) {
 
-        if (isUri()) {
+        if (isContentUri()) {
             return getUriSize(context);
         }
 
@@ -82,7 +82,7 @@ public class UploadFile implements Parcelable {
      */
     public final InputStream getStream(Context context) throws FileNotFoundException {
 
-        if (isUri()) {
+        if (isContentUri()) {
             return context.getContentResolver().openInputStream(uri);
         }
 
@@ -95,7 +95,7 @@ public class UploadFile implements Parcelable {
      */
     public final String getContentType(Context context) {
 
-        if (isUri()) {
+        if (isContentUri()) {
             return context.getContentResolver().getType(uri);
         }
 
@@ -108,7 +108,7 @@ public class UploadFile implements Parcelable {
      */
     public final String getName(Context context) {
 
-        if (isUri()) {
+        if (isContentUri()) {
             return getUriName(context);
         }
 
@@ -146,7 +146,7 @@ public class UploadFile implements Parcelable {
         this.path = in.readString();
         this.properties = (LinkedHashMap<String, String>) in.readSerializable();
 
-        if (isUri()) {
+        if (isContentUri()) {
             this.uri = Uri.parse(path);
             this.file = null;
         } else {
@@ -197,8 +197,8 @@ public class UploadFile implements Parcelable {
         return path;
     }
 
-    private boolean isUri() {
-        return path.startsWith("content");
+    private boolean isContentUri() {
+        return path.startsWith(ContentResolver.SCHEME_CONTENT);
     }
 
     private long getUriSize(Context context) {
