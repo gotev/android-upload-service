@@ -1,7 +1,5 @@
 package net.gotev.uploadservice;
 
-import android.content.Context;
-
 import net.gotev.uploadservice.http.HttpConnection;
 
 import java.io.IOException;
