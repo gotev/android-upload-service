@@ -15,22 +15,18 @@ import java.io.UnsupportedEncodingException;
  */
 public class BinaryUploadTask extends HttpUploadTask {
 
-    public BinaryUploadTask(Context context) {
-        super(context);
-    }
-
     @Override
     protected long getBodyLength() throws UnsupportedEncodingException {
-        return params.getFiles().get(0).length(context);
+        return params.getFiles().get(0).length(service);
     }
 
     @Override
     protected void writeBody(HttpConnection connection) throws IOException {
-        writeStream(params.getFiles().get(0).getStream(context));
+        writeStream(params.getFiles().get(0).getStream(service));
     }
 
     @Override
     protected void onSuccessfulUpload() {
-        addSuccessfullyUploadedFile(params.getFiles().get(0).getName(context));
+        addSuccessfullyUploadedFile(params.getFiles().get(0).getName(service));
     }
 }

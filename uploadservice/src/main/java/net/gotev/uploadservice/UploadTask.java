@@ -102,10 +102,7 @@ public abstract class UploadTask implements Runnable {
      */
     protected void onSuccessfulUpload() {}
 
-    protected Context context;
-
-    public UploadTask(Context context) {
-        this.context = context;
+    public UploadTask() {
         startTime = new Date().getTime();
     }
 

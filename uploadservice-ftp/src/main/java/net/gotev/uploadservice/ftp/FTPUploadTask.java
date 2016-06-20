@@ -1,6 +1,5 @@
 package net.gotev.uploadservice.ftp;
 
-import android.content.Context;
 import android.content.Intent;
 
 import net.gotev.uploadservice.Logger;
@@ -33,10 +32,6 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
     private FTPUploadTaskParameters ftpParams = null;
     private FTPClient ftpClient = null;
-
-    public FTPUploadTask(Context context) {
-        super(context);
-    }
 
     @Override
     protected void init(UploadService service, Intent intent) throws IOException {
@@ -105,7 +100,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
                     break;
 
                 uploadFile(baseWorkingDir, file);
-                addSuccessfullyUploadedFile(file.getName(context));
+                addSuccessfullyUploadedFile(file.getName(service));
                 iterator.remove();
             }
 
@@ -146,12 +141,12 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         totalBytes = uploadedBytes;
 
         for (UploadFile file : params.getFiles()) {
-            totalBytes += file.length(context);
+            totalBytes += file.length(service);
         }
     }
 
     private void uploadFile(String baseWorkingDir, UploadFile file) throws IOException {
-        Logger.debug(LOG_TAG, "Starting FTP upload of: " + file.getName(context)
+        Logger.debug(LOG_TAG, "Starting FTP upload of: " + file.getName(service)
                               + " to: " + file.getProperty(PARAM_REMOTE_PATH));
 
         String remoteDestination = file.getProperty(PARAM_REMOTE_PATH);
@@ -162,11 +157,11 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
         makeDirectories(remoteDestination, ftpParams.getCreatedDirectoriesPermissions());
 
-        InputStream localStream = file.getStream(context);
+        InputStream localStream = file.getStream(service);
         try {
             String remoteFileName = getRemoteFileName(file);
             if (!ftpClient.storeFile(remoteFileName, localStream)) {
-                throw new IOException("Error while uploading: " + file.getName(context)
+                throw new IOException("Error while uploading: " + file.getName(service)
                                       + " to: " + file.getProperty(PARAM_REMOTE_PATH));
             }
 
@@ -270,7 +265,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         // it means that the remote path specifies only the directory structure, so
         // get the remote file name from the local file
         if (file.getProperty(PARAM_REMOTE_PATH).endsWith("/")) {
-            return new File(file.getName(context)).getName();
+            return new File(file.getName(service)).getName();
         }
 
         // if the remote path contains /, but it's not the last character

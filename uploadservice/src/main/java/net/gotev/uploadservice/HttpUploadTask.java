@@ -1,7 +1,6 @@
 package net.gotev.uploadservice;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 
 import net.gotev.uploadservice.http.HttpConnection;
@@ -31,10 +30,6 @@ public abstract class HttpUploadTask extends UploadTask {
      * {@link HttpConnection} used to perform the upload task.
      */
     private HttpConnection connection;
-
-    public HttpUploadTask(Context context) {
-        super(context);
-    }
 
     @Override
     protected void init(UploadService service, Intent intent) throws IOException {
