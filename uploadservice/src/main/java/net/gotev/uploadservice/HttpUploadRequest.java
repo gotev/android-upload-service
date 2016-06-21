@@ -72,7 +72,7 @@ public abstract class HttpUploadRequest extends UploadRequest {
      * @return {@link HttpUploadRequest}
      */
     public HttpUploadRequest setBasicAuth(final String username, final String password) {
-        String auth = Base64.encodeToString((username + ":" + password).getBytes(), Base64.DEFAULT);
+        String auth = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
         httpParams.addRequestHeader("Authorization", "Basic " + auth);
         return this;
     }
