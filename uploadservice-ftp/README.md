@@ -36,6 +36,7 @@ public void uploadFTP(final Context context) {
     }
 }
 ```
+Refer to [FTPUploadRequest JavaDoc](http://gotev.github.io/android-upload-service/javadoc-ftp/net/gotev/uploadservice/ftp/FTPUploadRequest.html) for all the available features.
 
 ## Test FTP server
 If you don't already have an FTP server to make tests, you can use OS X's integrated FTP server if you have a Mac, or you can start a ready to use linux virtual machine based on CentOS 7 + vsftpd, by following the instructions provided below.
