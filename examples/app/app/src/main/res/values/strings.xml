@@ -2,8 +2,9 @@
 <resources>
 
     <string name="app_name">Upload Service</string>
-    <string name="multipart_upload">Multipart Upload</string>
-    <string name="binary_upload">Binary Upload</string>
+    <string name="multipart_upload">Multipart</string>
+    <string name="binary_upload">Binary</string>
+    <string name="ftp_upload">FTP</string>
     <string name="cancel_upload">Cancel upload</string>
     <string name="cancel_all_uploads">Cancel all uploads</string>
     <string name="server_script_url">Server script URL</string>
@@ -13,8 +14,8 @@
     <string name="parameter_name">File parameter name</string>
     <string name="parameter_name_hint">E.g. uploaded_file</string>
     <string name="upload_progress">Upload progress: %s</string>
-    <string name="uploading">Uploading</string>
-    <string name="upload_success">Upload completed successfully</string>
+    <string name="uploading">Uploading at [[UPLOAD_RATE]] ([[PROGRESS]])</string>
+    <string name="upload_success">Upload completed successfully in [[ELAPSED_TIME]]</string>
     <string name="upload_error">Error while uploading</string>
     <string name="server_url_hint">http://company.com/path/to/script</string>
     <string name="file_path_hint">/path/to/your/file.ext</string>

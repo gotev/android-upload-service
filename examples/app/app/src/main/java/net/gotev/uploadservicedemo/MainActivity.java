@@ -22,9 +22,13 @@ import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import net.gotev.uploadservice.BinaryUploadRequest;
 import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.UploadInfo;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadService;
-import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
+import net.gotev.uploadservice.UploadStatusDelegate;
+import net.gotev.uploadservice.ftp.FTPUploadRequest;
+import net.gotev.uploadservice.ftp.UnixPermissions;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,6 +36,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -45,7 +50,7 @@ import butterknife.OnClick;
  * @author mabdurrahman
  *
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements UploadStatusDelegate {
 
     private static final String TAG = "UploadServiceDemo";
     private static final String USER_AGENT = "UploadServiceDemo/" + BuildConfig.VERSION_NAME;
@@ -66,54 +71,11 @@ public class MainActivity extends AppCompatActivity {
 
     private Map<String, UploadProgressViewHolder> uploadProgressHolders = new HashMap<>();
 
-    private final UploadServiceBroadcastReceiver uploadReceiver =
-            new UploadServiceBroadcastReceiver() {
-
-        @Override
-        public void onProgress(String uploadId, int progress) {
-            Log.i(TAG, "The progress of the upload with ID " + uploadId + " is: " + progress);
-
-            if (uploadProgressHolders.get(uploadId) == null)
-                return;
-
-            uploadProgressHolders.get(uploadId).progressBar.setProgress(progress);
+    private void logSuccessfullyUploadedFiles(List<String> files) {
+        for (String file : files) {
+            Log.e(TAG, "Success:" + file);
         }
-
-        @Override
-        public void onError(String uploadId, Exception exception) {
-            Log.e(TAG, "Error in upload with ID: " + uploadId + ". "
-                        + exception.getLocalizedMessage(), exception);
-
-            if (uploadProgressHolders.get(uploadId) == null)
-                return;
-
-            container.removeView(uploadProgressHolders.get(uploadId).itemView);
-            uploadProgressHolders.remove(uploadId);
-        }
-
-        @Override
-        public void onCompleted(String uploadId, int serverResponseCode, byte[] serverResponseBody) {
-            Log.i(TAG, "Upload with ID " + uploadId + " is completed: " + serverResponseCode + ", "
-                       + new String(serverResponseBody));
-
-            if (uploadProgressHolders.get(uploadId) == null)
-                return;
-
-            container.removeView(uploadProgressHolders.get(uploadId).itemView);
-            uploadProgressHolders.remove(uploadId);
-        }
-
-        @Override
-        public void onCancelled(String uploadId) {
-            Log.i(TAG, "Upload with ID " + uploadId + " is cancelled");
-
-            if (uploadProgressHolders.get(uploadId) == null)
-                return;
-
-            container.removeView(uploadProgressHolders.get(uploadId).itemView);
-            uploadProgressHolders.remove(uploadId);
-        }
-    };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,18 +86,6 @@ public class MainActivity extends AppCompatActivity {
         // Uncomment this line to enable self-signed SSL certificates in HTTPS connections
         // WARNING: Do not use in production environment. Recommended for development only
         // AllCertificatesAndHostsTruster.apply();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        uploadReceiver.register(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        uploadReceiver.unregister(this);
     }
 
     private void showToast(String message) {
@@ -183,13 +133,13 @@ public class MainActivity extends AppCompatActivity {
                         .setCustomUserAgent(USER_AGENT)
                         .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
                         .setUsesFixedLengthStreamingMode(fixedLengthStreamingMode.isChecked())
-                        .setMaxRetries(2);
+                        .setMaxRetries(3);
 
                 if (useUtf8.isChecked()) {
                     req.setUtf8Charset();
                 }
 
-                String uploadID = req.startUpload();
+                String uploadID = req.setDelegate(this).startUpload();
 
                 addUploadToList(uploadID,filename);
 
@@ -215,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 final String filename = getFilename(fileToUploadPath);
 
-                String uploadID = new BinaryUploadRequest(this, serverUrlString)
+                final String uploadID = new BinaryUploadRequest(this, serverUrlString)
                         .addHeader("file-name", new File(fileToUploadPath).getName())
                         .setFileToUpload(fileToUploadPath)
                         .setNotificationConfig(getNotificationConfig(filename))
@@ -223,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked())
                         .setUsesFixedLengthStreamingMode(fixedLengthStreamingMode.isChecked())
                         .setMaxRetries(2)
+                        .setDelegate(this)
                         .startUpload();
 
                 addUploadToList(uploadID, filename);
@@ -235,6 +186,42 @@ public class MainActivity extends AppCompatActivity {
             } catch (MalformedURLException exc) {
                 showToast(exc.getMessage());
             }
+        }
+    }
+
+    @OnClick(R.id.ftpUploadButton)
+    void onUploadFTPClick() {
+        final String serverUrlString = serverUrl.getText().toString();
+
+        final String filesToUploadString = filesToUpload.getText().toString();
+        final String[] filesToUploadArray = filesToUploadString.split(",");
+
+        FTPUploadRequest request = new FTPUploadRequest(this, serverUrlString, 21)
+                .setUsernameAndPassword("ftpuser", "testpassword")
+                .setMaxRetries(4)
+                .setNotificationConfig(getNotificationConfig("File upload"))
+                .useCompressedFileTransferMode(true)
+                //.setCreatedDirectoriesPermissions(new UnixPermissions("777"))
+                .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked());
+
+        for (String fileToUploadPath : filesToUploadArray) {
+            try {
+                request.addFileToUpload(fileToUploadPath, "home/ftpuser/", new UnixPermissions("777"));
+            } catch (FileNotFoundException exc) {
+                showToast(exc.getMessage());
+            } catch (IllegalArgumentException exc) {
+                showToast("Missing some arguments. " + exc.getMessage());
+            }
+        }
+
+        try {
+            String uploadID = request.setDelegate(this).startUpload();
+            addUploadToList(uploadID, "FTP upload");
+
+        } catch (IllegalArgumentException exc) {
+            showToast("Missing some arguments. " + exc.getMessage());
+        } catch (MalformedURLException exc) {
+            showToast(exc.getMessage());
         }
     }
 
@@ -338,5 +325,63 @@ public class MainActivity extends AppCompatActivity {
 
             UploadService.stopUpload(uploadId);
         }
+    }
+
+    @Override
+    public void onProgress(UploadInfo uploadInfo) {
+        Log.i(TAG, String.format(Locale.getDefault(), "ID: %1$s (%2$d%%) at %3$.2f Kbit/s",
+                uploadInfo.getUploadId(), uploadInfo.getProgressPercent(),
+                uploadInfo.getUploadRate()));
+        logSuccessfullyUploadedFiles(uploadInfo.getSuccessfullyUploadedFiles());
+
+        if (uploadProgressHolders.get(uploadInfo.getUploadId()) == null)
+            return;
+
+        uploadProgressHolders.get(uploadInfo.getUploadId())
+                .progressBar.setProgress(uploadInfo.getProgressPercent());
+    }
+
+    @Override
+    public void onError(UploadInfo uploadInfo, Exception exception) {
+        Log.e(TAG, "Error with ID: " + uploadInfo.getUploadId() + ": "
+                + exception.getLocalizedMessage(), exception);
+        logSuccessfullyUploadedFiles(uploadInfo.getSuccessfullyUploadedFiles());
+
+        if (uploadProgressHolders.get(uploadInfo.getUploadId()) == null)
+            return;
+
+        container.removeView(uploadProgressHolders.get(uploadInfo.getUploadId()).itemView);
+        uploadProgressHolders.remove(uploadInfo.getUploadId());
+    }
+
+    @Override
+    public void onCompleted(UploadInfo uploadInfo, ServerResponse serverResponse) {
+        Log.i(TAG, String.format(Locale.getDefault(),
+                "ID %1$s: completed in %2$ds at %3$.2f Kbit/s. Response code: %4$d, body:[%5$s]",
+                uploadInfo.getUploadId(), uploadInfo.getElapsedTime() / 1000,
+                uploadInfo.getUploadRate(), serverResponse.getHttpCode(),
+                serverResponse.getBodyAsString()));
+        logSuccessfullyUploadedFiles(uploadInfo.getSuccessfullyUploadedFiles());
+        for (Map.Entry<String, String> header : serverResponse.getHeaders().entrySet()) {
+            Log.i("Header", header.getKey() + ": " + header.getValue());
+        }
+
+        if (uploadProgressHolders.get(uploadInfo.getUploadId()) == null)
+            return;
+
+        container.removeView(uploadProgressHolders.get(uploadInfo.getUploadId()).itemView);
+        uploadProgressHolders.remove(uploadInfo.getUploadId());
+    }
+
+    @Override
+    public void onCancelled(UploadInfo uploadInfo) {
+        Log.i(TAG, "Upload with ID " + uploadInfo.getUploadId() + " is cancelled");
+        logSuccessfullyUploadedFiles(uploadInfo.getSuccessfullyUploadedFiles());
+
+        if (uploadProgressHolders.get(uploadInfo.getUploadId()) == null)
+            return;
+
+        container.removeView(uploadProgressHolders.get(uploadInfo.getUploadId()).itemView);
+        uploadProgressHolders.remove(uploadInfo.getUploadId());
     }
 }
