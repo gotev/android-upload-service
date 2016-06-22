@@ -8,17 +8,19 @@ Android Upload Service
 Easily upload files in the background with automatic Android Notification Center progress indication.
 
 ## Purpose
-* upload files to a server with HTTP `multipart/form-data` or binary requests
-* handle uploads in the background, even if the device is idle
-* automatically retry failed uploads, with an exponential backoff
-* possibility to automatically delete successfully uploaded files from the device
+* have a tiny library (less than 60KB)
+* upload files to a server with FTP, HTTP `multipart/form-data` or binary requests
+* be able to easily implement other upload protocols as plugins
+* handle multiple concurrent uploads in the background, even if the device is idle
+* automatically retry failed uploads, with a configurable exponential backoff
+* possibility to automatically delete uploaded files when the upload is successful
 * show status in the Android Notification Center (with support for [stacking notifications](http://developer.android.com/training/wearables/notifications/stacks.html)).
-* be able use custom HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported
+* be able to change the underlying HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported. You can also implement your own.
 * be able to set library log level and to provide custom logger implementation
 
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
 
-## Setup <a name="setup"></a>
+## Getting started <a name="setup"></a>
 [Read this page](https://github.com/gotev/android-upload-service/wiki/Setup) for full setup instructions with Maven and Gradle.
 
 [Check the wiki](https://github.com/gotev/android-upload-service/wiki) to discover how to get started.
