@@ -8,7 +8,7 @@ def projectName = "android-upload-service-okhttp"
 def projectDesc = "OkHttp stack implementation for Android Upload Service."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "2.1"
+version = "3.0"
 
 android {
     compileSdkVersion 23
