@@ -23,30 +23,32 @@
 
 <p><img src="http://gotev.github.io/android-upload-service/upload.gif" alt="Upload Notification"></p>
 
-<p>Easily upload files in the background with automatic Android Notification Center progress indication.</p>
-
 <h2>
 <a id="purpose" class="anchor" href="#purpose" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Purpose</h2>
 
 <ul>
-<li>upload files to a server with HTTP <code>multipart/form-data</code> or binary requests</li>
-<li>handle uploads in the background, even if the device is idle</li>
-<li>automatically retry failed uploads, with an exponential backoff</li>
-<li>possibility to automatically delete successfully uploaded files from the device</li>
+<li>have a tiny library (less than 60KB)</li>
+<li>upload files to a server with FTP, HTTP <code>multipart/form-data</code> or binary requests</li>
+<li>be able to easily implement other upload protocols as plugins</li>
+<li>handle multiple concurrent uploads in the background, even if the device is idle</li>
+<li>automatically retry failed uploads, with a configurable exponential backoff</li>
+<li>possibility to automatically delete uploaded files when the upload is successful</li>
 <li>show status in the Android Notification Center (with support for <a href="http://developer.android.com/training/wearables/notifications/stacks.html">stacking notifications</a>).</li>
-<li>be able use custom HTTP stack. Currently <code>HttpURLConnection</code> (the default) and <code>OkHttp</code> are supported</li>
+<li>be able to change the underlying HTTP stack. Currently <code>HttpURLConnection</code> (the default) and <code>OkHttp</code> are supported. You can also implement your own.</li>
 <li>be able to set library log level and to provide custom logger implementation</li>
 </ul>
 
 <p>At the core of the library there is a <code>Service</code> which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.</p>
 
 <h2>
-<a id="setup-" class="anchor" href="#setup-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup <a name="setup"></a>
+<a id="getting-started-" class="anchor" href="#getting-started-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting started <a name="setup"></a>
 </h2>
 
 <p><a href="https://github.com/gotev/android-upload-service/wiki/Setup">Read this page</a> for full setup instructions with Maven and Gradle.</p>
 
 <p><a href="https://github.com/gotev/android-upload-service/wiki">Check the wiki</a> to discover how to get started.</p>
+
+<p><a href="http://gotev.github.io/android-upload-service/javadoc/">Check JavaDocs</a> for a complete reference of the library's API</p>
 
 <p>Do you need help? <a href="https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help">Read this</a></p>
 
