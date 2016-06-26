@@ -25,6 +25,8 @@ At the core of the library there is a `Service` which handles multiple concurren
 
 [Check the wiki](https://github.com/gotev/android-upload-service/wiki) to discover how to get started.
 
+[Check JavaDocs](http://gotev.github.io/android-upload-service/javadoc/) for a complete reference of the library's API
+
 Do you need help? [Read this](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help)
 
 ## Apps powered by Android Upload Service <a name="powered"></a>
