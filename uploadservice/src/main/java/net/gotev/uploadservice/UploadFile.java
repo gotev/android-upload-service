@@ -32,7 +32,7 @@ public class UploadFile implements Parcelable {
     /**
      * Creates a new UploadFile.
      *
-     * @param path absolute path to a file or a content Uri string
+     * @param path absolute path to a file or an Android content Uri string
      * @throws FileNotFoundException if the file can't be found at the specified path
      * @throws IllegalArgumentException if you passed invalid argument values
      */
@@ -188,7 +188,7 @@ public class UploadFile implements Parcelable {
     }
 
     /**
-     * Handler for java.io.File
+     * Handler for normal file paths, wraps java.io.File
      */
     private static class FileHandler implements UploadFileHandler {
 
