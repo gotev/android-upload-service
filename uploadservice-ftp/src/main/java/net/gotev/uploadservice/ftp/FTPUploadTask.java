@@ -265,7 +265,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         // it means that the remote path specifies only the directory structure, so
         // get the remote file name from the local file
         if (file.getProperty(PARAM_REMOTE_PATH).endsWith("/")) {
-            return new File(file.getName(service)).getName();
+            return file.getName(service);
         }
 
         // if the remote path contains /, but it's not the last character

@@ -80,7 +80,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
                                                   String fileName, String contentType)
             throws FileNotFoundException, IllegalArgumentException {
         UploadFile file = new UploadFile(absolutePath);
-        absolutePath = file.getName(context);
+        absolutePath = file.getPath();
 
         if (parameterName == null || "".equals(parameterName)) {
             throw new IllegalArgumentException("Please specify parameterName value for file: "
@@ -90,7 +90,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
         file.setProperty(MultipartUploadTask.PROPERTY_PARAM_NAME, parameterName);
 
         if (contentType == null || contentType.isEmpty()) {
-            contentType = ContentType.autoDetect(absolutePath);
+            contentType = file.getContentType(context);
             Logger.debug(LOG_TAG, "Auto-detected MIME type for " + absolutePath
                     + " is: " + contentType);
         } else {

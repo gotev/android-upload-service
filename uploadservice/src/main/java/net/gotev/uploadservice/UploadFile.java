@@ -88,6 +88,15 @@ public class UploadFile implements Parcelable {
         return handler.getName(context);
     }
 
+    /**
+     * Returns the string this was initialized with,
+     * either an absolute file path or Android content URI
+     * @return String
+     */
+    public final String getPath() {
+        return this.path;
+    }
+
     // This is used to regenerate the object.
     // All Parcelables must have a CREATOR that implements these two methods
     public static final Parcelable.Creator<UploadFile> CREATOR =
@@ -242,7 +251,11 @@ public class UploadFile implements Parcelable {
 
         @Override
         public String getContentType(Context context) {
-            return context.getContentResolver().getType(uri);
+            String type = context.getContentResolver().getType(uri);
+            if (type == null || type.isEmpty()) {
+                type = ContentType.APPLICATION_OCTET_STREAM;
+            }
+            return type;
         }
 
         @Override
