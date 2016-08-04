@@ -335,7 +335,9 @@ public final class UploadService extends Service {
         // when all the upload tasks are completed, release the wake lock and shut down the service
         if (uploadTasksMap.isEmpty()) {
             Logger.debug(TAG, "All tasks finished. UploadService is about to shutdown...");
-            wakeLock.release();
+            if (wakeLock != null && wakeLock.isHeld()) {
+                wakeLock.release();
+            }
             stopSelf();
         }
     }
