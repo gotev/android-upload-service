@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
 
         return new UploadNotificationConfig()
             .setIcon(R.drawable.ic_upload)
+            .setCompletedIcon(R.drawable.ic_upload_success)
+            .setErrorIcon(R.drawable.ic_upload_error)
             .setTitle(filename)
             .setInProgressMessage(getString(R.string.uploading))
             .setCompletedMessage(getString(R.string.upload_success))

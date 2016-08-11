@@ -458,7 +458,7 @@ public abstract class UploadTask implements Runnable {
                     .setContentText(replacePlaceholders(params.getNotificationConfig().getCompletedMessage(), uploadInfo))
                     .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                     .setAutoCancel(params.getNotificationConfig().isClearOnAction())
-                    .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                    .setSmallIcon(params.getNotificationConfig().getCompletedIconResourceID())
                     .setGroup(UploadService.NAMESPACE)
                     .setProgress(0, 0, false)
                     .setOngoing(false);
@@ -479,7 +479,7 @@ public abstract class UploadTask implements Runnable {
                 .setContentText(replacePlaceholders(params.getNotificationConfig().getErrorMessage(), uploadInfo))
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setAutoCancel(params.getNotificationConfig().isClearOnAction())
-                .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                .setSmallIcon(params.getNotificationConfig().getErrorIconResourceID())
                 .setGroup(UploadService.NAMESPACE)
                 .setProgress(0, 0, false).setOngoing(false);
         setRingtone();

@@ -14,6 +14,8 @@ import android.os.Parcelable;
 public final class UploadNotificationConfig implements Parcelable {
 
     private int iconResourceID;
+    private int completedIconResourceID;
+    private int errorIconResourceID;
     private String title;
     private String inProgress;
     private String completed;
@@ -38,6 +40,8 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     public UploadNotificationConfig() {
         iconResourceID = android.R.drawable.ic_menu_upload;
+        completedIconResourceID = iconResourceID;
+        errorIconResourceID = iconResourceID;
         title = "File Upload";
         inProgress = "Uploading at " + Placeholders.UPLOAD_RATE + " (" + Placeholders.PROGRESS + ")";
         completed = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
@@ -55,6 +59,28 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     public final UploadNotificationConfig setIcon(int resourceID) {
         this.iconResourceID = resourceID;
+        return this;
+    }
+
+    /**
+     * Sets the icon to show in the notification when the operation is completed successfully.
+     * By default it's the same as the icon used while the operation is in progress.
+     * @param resourceID Resource ID of the icon to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setCompletedIcon(int resourceID) {
+        completedIconResourceID = resourceID;
+        return this;
+    }
+
+    /**
+     * Sets the icon to show in the notification when an error happens.
+     * By default it's the same as the icon used while the operation is in progress.
+     * @param resourceID Resource ID of the icon to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setErrorIcon(int resourceID) {
+        errorIconResourceID = resourceID;
         return this;
     }
 
@@ -144,6 +170,14 @@ public final class UploadNotificationConfig implements Parcelable {
         return iconResourceID;
     }
 
+    final int getCompletedIconResourceID() {
+        return completedIconResourceID;
+    }
+
+    final int getErrorIconResourceID() {
+        return errorIconResourceID;
+    }
+
     final String getTitle() {
         return title;
     }
@@ -203,6 +237,8 @@ public final class UploadNotificationConfig implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int arg1) {
         parcel.writeInt(iconResourceID);
+        parcel.writeInt(completedIconResourceID);
+        parcel.writeInt(errorIconResourceID);
         parcel.writeString(title);
         parcel.writeString(inProgress);
         parcel.writeString(completed);
@@ -215,6 +251,8 @@ public final class UploadNotificationConfig implements Parcelable {
 
     private UploadNotificationConfig(Parcel in) {
         iconResourceID = in.readInt();
+        completedIconResourceID = in.readInt();
+        errorIconResourceID = in.readInt();
         title = in.readString();
         inProgress = in.readString();
         completed = in.readString();
