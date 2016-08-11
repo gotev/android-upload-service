@@ -1,0 +1,37 @@
+### Version info
+* Android Upload Service version (e.g. 3.0.2):
+* Android version and API version (e.g. 6.0.1 API 23):
+* HTTP stack (e.g. HurlStack or OkHttpStack):
+
+### What did you expect?
+
+### What happened instead?
+
+### Steps to reproduce (if applicable):
+
+### Library initialization code:
+```java
+// the code you wrote in your Application subclass here
+```
+
+### Request code:
+```java
+// the code you wrote to create the upload request
+```
+
+### LogCat output (please [set log level to DEBUG](https://github.com/gotev/android-upload-service/wiki/Recipes#logging-) first)
+```
+// your LogCat output here
+```
+
+### Server side
+Which server did you use (e.g. node.js demo server provided in the examples, php script provided in the examples, own implementation)?
+
+```
+// your server side script (if applicable)
+// do not write any passwords or personal data here.
+// If you need to show some code, replace sensible values
+```
+
+### Additional info
+Write some additional information about the error here. Upload also screenshots or other information which may help to reproduce your error or spot a possible bug. Thank you :)
