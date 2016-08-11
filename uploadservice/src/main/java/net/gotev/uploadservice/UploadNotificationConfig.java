@@ -95,7 +95,7 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
-     * Sets the message to be shown while upload is in progress.
+     * Sets the message to be shown while upload is in progress. Null if no message should be displayed.
      * @param message Message to show
      * @return {@link UploadNotificationConfig}
      */
@@ -105,7 +105,7 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
-     * Sets the message to be shown if an error occurs.
+     * Sets the message to be shown if an error occurs. Null if no message should be displayed.
      * @param message Message to show
      * @return {@link UploadNotificationConfig}
      */
@@ -115,7 +115,7 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
-     * Sets the message to be shown when the upload is completed.
+     * Sets the message to be shown when the upload is completed. Null if no message should be displayed.
      * @param message Message to show
      * @return {@link UploadNotificationConfig}
      */
