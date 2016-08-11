@@ -449,9 +449,11 @@ public abstract class UploadTask implements Runnable {
     }
 
     private void updateNotificationCompleted(UploadInfo uploadInfo) {
-        if (params.getNotificationConfig() == null || params.getNotificationConfig().getCompletedMessage() == null) return;
+        if (params.getNotificationConfig() == null) return;
 
         notificationManager.cancel(notificationId);
+
+        if (params.getNotificationConfig().getCompletedMessage() == null) return;
 
         if (!params.getNotificationConfig().isAutoClearOnSuccess()) {
             notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
