@@ -35,5 +35,10 @@ Which server did you use (e.g. node.js demo server provided in the examples, php
 // If you need to show some code, replace sensible values
 ```
 
+#### Server log (if applicable)
+```
+// your server side log here
+```
+
 ### Additional info
 Write some additional information about the error here. Upload also screenshots or other information which may help to reproduce your error or spot a possible bug. Thank you :)
