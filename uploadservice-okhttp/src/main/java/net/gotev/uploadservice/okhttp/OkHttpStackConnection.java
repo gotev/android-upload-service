@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
-import okhttp3.internal.huc.HttpURLConnectionImpl;
-import okhttp3.internal.huc.HttpsURLConnectionImpl;
+import okhttp3.internal.huc.OkHttpURLConnection;
+import okhttp3.internal.huc.OkHttpsURLConnection;
 
 /**
  * {@link HttpConnection} implementation using {@link OkHttpClient}.
@@ -34,9 +34,9 @@ public class OkHttpStackConnection implements HttpConnection {
         URL urlObj = new URL(url);
 
         if (urlObj.getProtocol().equals("https")) {
-            mConnection = new HttpsURLConnectionImpl(urlObj, client);
+            mConnection = new OkHttpsURLConnection(urlObj, client);
         } else {
-            mConnection = new HttpURLConnectionImpl(urlObj, client);
+            mConnection = new OkHttpURLConnection(urlObj, client);
         }
 
         mConnection.setDoInput(true);

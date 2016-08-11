@@ -18,7 +18,7 @@
   "author": "Aleksandar Gotev",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.12.0",
+    "express": "^4.14.0",
     "multer": "^0.1.8",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0"
