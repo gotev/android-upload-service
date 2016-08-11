@@ -395,7 +395,7 @@ public abstract class UploadTask implements Runnable {
      * @param uploadInfo upload information and statistics
      */
     private void createNotification(UploadInfo uploadInfo) {
-        if (params.getNotificationConfig() == null) return;
+        if (params.getNotificationConfig() == null || params.getNotificationConfig().getInProgressMessage() == null) return;
 
         notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
                 .setContentText(replacePlaceholders(params.getNotificationConfig().getInProgressMessage(), uploadInfo))
@@ -420,7 +420,7 @@ public abstract class UploadTask implements Runnable {
      * @param uploadInfo upload information and statistics
      */
     private void updateNotificationProgress(UploadInfo uploadInfo) {
-        if (params.getNotificationConfig() == null) return;
+        if (params.getNotificationConfig() == null || params.getNotificationConfig().getInProgressMessage() == null) return;
 
         notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
                 .setContentText(replacePlaceholders(params.getNotificationConfig().getInProgressMessage(), uploadInfo))
@@ -449,7 +449,7 @@ public abstract class UploadTask implements Runnable {
     }
 
     private void updateNotificationCompleted(UploadInfo uploadInfo) {
-        if (params.getNotificationConfig() == null) return;
+        if (params.getNotificationConfig() == null || params.getNotificationConfig().getCompletedMessage() == null) return;
 
         notificationManager.cancel(notificationId);
 
@@ -471,7 +471,7 @@ public abstract class UploadTask implements Runnable {
     }
 
     private void updateNotificationError(UploadInfo uploadInfo) {
-        if (params.getNotificationConfig() == null) return;
+        if (params.getNotificationConfig() == null || params.getNotificationConfig().getErrorMessage() == null) return;
 
         notificationManager.cancel(notificationId);
 
