@@ -1,3 +1,5 @@
+Be sure to check [Asking for help](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help) page on the Wiki before opening a new issue! Delete this text when you create a new issue.
+
 ### Version info
 * Android Upload Service version (e.g. 3.0.2):
 * Android version and API version (e.g. 6.0.1 API 23):
