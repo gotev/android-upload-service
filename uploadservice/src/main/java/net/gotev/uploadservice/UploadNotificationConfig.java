@@ -21,6 +21,7 @@ public final class UploadNotificationConfig implements Parcelable {
     private String completed;
     private String error;
     private boolean autoClearOnSuccess;
+    private boolean autoClearOnError;
     private boolean clearOnAction;
     private boolean ringToneEnabled;
     private Intent clickIntent;
@@ -47,6 +48,7 @@ public final class UploadNotificationConfig implements Parcelable {
         completed = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
         error = "Error during upload";
         autoClearOnSuccess = false;
+        autoClearOnError = false;
         clearOnAction = false;
         clickIntent = null;
         ringToneEnabled = true;
@@ -135,6 +137,16 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
+     * Sets whether or not to auto clear the notification when an error happens during upload.
+     * @param clear true to automatically clear the notification, otherwise false
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setAutoClearOnError(boolean clear) {
+        autoClearOnError = clear;
+        return this;
+    }
+
+    /**
      * Sets whether or not to clear the notification when the user taps on it.
      * @param clear true to clear the notification, otherwise false
      * @return {@link UploadNotificationConfig}
@@ -198,6 +210,10 @@ public final class UploadNotificationConfig implements Parcelable {
         return autoClearOnSuccess;
     }
 
+    final boolean isAutoClearOnError() {
+        return autoClearOnError;
+    }
+
     final boolean isClearOnAction() {
         return clearOnAction;
     }
@@ -244,6 +260,7 @@ public final class UploadNotificationConfig implements Parcelable {
         parcel.writeString(completed);
         parcel.writeString(error);
         parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
+        parcel.writeByte((byte) (autoClearOnError ? 1 : 0));
         parcel.writeByte((byte) (clearOnAction ? 1 : 0));
         parcel.writeByte((byte) (ringToneEnabled ? 1 : 0));
         parcel.writeParcelable(clickIntent, 0);
@@ -258,6 +275,7 @@ public final class UploadNotificationConfig implements Parcelable {
         completed = in.readString();
         error = in.readString();
         autoClearOnSuccess = in.readByte() == 1;
+        autoClearOnError = in.readByte() == 1;
         clearOnAction = in.readByte() == 1;
         ringToneEnabled = in.readByte() == 1;
         clickIntent = in.readParcelable(Intent.class.getClassLoader());
