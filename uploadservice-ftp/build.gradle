@@ -8,7 +8,7 @@ def projectName = "android-upload-service-ftp"
 def projectDesc = "FTP Upload implementation for Android Upload Service."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "3.0.2"
+version = "3.0.3"
 
 android {
     compileSdkVersion 23
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 3
+        versionCode 4
         versionName version
     }
     buildTypes {
