@@ -53,6 +53,8 @@ public abstract class HttpUploadTask extends UploadTask {
         Logger.debug(LOG_TAG, "Starting upload task with ID " + params.getId());
 
         try {
+            getSuccessfullyUploadedFiles().clear();
+            uploadedBytes = 0;
             totalBytes = getBodyLength();
 
             if (httpParams.isCustomUserAgentDefined()) {
