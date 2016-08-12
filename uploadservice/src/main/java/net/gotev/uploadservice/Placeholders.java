@@ -21,4 +21,17 @@ public class Placeholders {
      * Placeholder to display the integer progress percent from 0 to 100. E.g.: 75%
      */
     public static final String PROGRESS = "[[PROGRESS]]";
+
+    /**
+     * Placeholder to display the number of successfully uploaded files.
+     * Bear in mind that in case of HTTP/Multipart or Binary uploads which does not support
+     * resume, if the request gets restarted due to an error, the number of uploaded files will
+     * be reset to zero.
+     */
+    public static final String UPLOADED_FILES = "[[UPLOADED_FILES]]";
+
+    /**
+     * Placeholder to display the total number of files to upload.
+     */
+    public static final String TOTAL_FILES = "[[TOTAL_FILES]]";
 }

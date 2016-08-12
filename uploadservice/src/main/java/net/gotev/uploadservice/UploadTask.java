@@ -207,7 +207,8 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles);
+                                                     successfullyUploadedFiles,
+                                                     params.getFiles().size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.IN_PROGRESS)
@@ -262,7 +263,8 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles);
+                                                     successfullyUploadedFiles,
+                                                     params.getFiles().size());
 
         final ServerResponse serverResponse = new ServerResponse(responseCode, responseBody,
                                                                  responseHeaders);
@@ -305,7 +307,8 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles);
+                                                     successfullyUploadedFiles,
+                                                     params.getFiles().size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.CANCELLED)
@@ -365,7 +368,8 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles);
+                                                     successfullyUploadedFiles,
+                                                     params.getFiles().size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.ERROR)
@@ -530,6 +534,8 @@ public abstract class UploadTask implements Runnable {
         tmp = string.replace(Placeholders.ELAPSED_TIME, uploadInfo.getElapsedTimeString());
         tmp = tmp.replace(Placeholders.PROGRESS, uploadInfo.getProgressPercent() + "%");
         tmp = tmp.replace(Placeholders.UPLOAD_RATE, uploadInfo.getUploadRateString());
+        tmp = tmp.replace(Placeholders.UPLOADED_FILES, Integer.toString(uploadInfo.getSuccessfullyUploadedFiles().size()));
+        tmp = tmp.replace(Placeholders.TOTAL_FILES, Integer.toString(uploadInfo.getTotalFiles()));
 
         return tmp;
     }
