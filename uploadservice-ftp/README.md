@@ -7,7 +7,7 @@ This module adds FTP upload ([RFC959](https://tools.ietf.org/html/rfc959)) capab
 #### Gradle
 ```
 dependencies {
-    compile 'net.gotev:uploadservice-ftp:3.0.1'
+    compile 'net.gotev:uploadservice-ftp:3.0.3'
 }
 ```
 #### Maven
@@ -15,7 +15,7 @@ dependencies {
 <dependency>
   <groupId>net.gotev</groupId>
   <artifactId>uploadservice-ftp</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.3</version>
   <type>aar</type>
 </dependency>
 ```
