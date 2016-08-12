@@ -14,7 +14,7 @@
     <string name="parameter_name">File parameter name</string>
     <string name="parameter_name_hint">E.g. uploaded_file</string>
     <string name="upload_progress">Upload progress: %s</string>
-    <string name="uploading">Uploading at [[UPLOAD_RATE]] ([[PROGRESS]])</string>
+    <string name="uploading">Uploaded [[UPLOADED_FILES]] of [[TOTAL_FILES]] at [[UPLOAD_RATE]] - [[PROGRESS]]</string>
     <string name="upload_success">Upload completed successfully in [[ELAPSED_TIME]]</string>
     <string name="upload_error">Error while uploading</string>
     <string name="server_url_hint">http://company.com/path/to/script</string>
