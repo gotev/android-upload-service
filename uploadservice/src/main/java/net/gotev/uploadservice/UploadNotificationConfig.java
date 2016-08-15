@@ -14,11 +14,14 @@ import android.os.Parcelable;
 public final class UploadNotificationConfig implements Parcelable {
 
     private int iconResourceID;
+    private int completedIconResourceID;
+    private int errorIconResourceID;
     private String title;
     private String inProgress;
     private String completed;
     private String error;
     private boolean autoClearOnSuccess;
+    private boolean autoClearOnError;
     private boolean clearOnAction;
     private boolean ringToneEnabled;
     private Intent clickIntent;
@@ -38,11 +41,14 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     public UploadNotificationConfig() {
         iconResourceID = android.R.drawable.ic_menu_upload;
+        completedIconResourceID = iconResourceID;
+        errorIconResourceID = iconResourceID;
         title = "File Upload";
         inProgress = "Uploading at " + Placeholders.UPLOAD_RATE + " (" + Placeholders.PROGRESS + ")";
         completed = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
         error = "Error during upload";
         autoClearOnSuccess = false;
+        autoClearOnError = false;
         clearOnAction = false;
         clickIntent = null;
         ringToneEnabled = true;
@@ -59,6 +65,28 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
+     * Sets the icon to show in the notification when the operation is completed successfully.
+     * By default it's the same as the icon used while the operation is in progress.
+     * @param resourceID Resource ID of the icon to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setCompletedIcon(int resourceID) {
+        completedIconResourceID = resourceID;
+        return this;
+    }
+
+    /**
+     * Sets the icon to show in the notification when an error happens.
+     * By default it's the same as the icon used while the operation is in progress.
+     * @param resourceID Resource ID of the icon to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setErrorIcon(int resourceID) {
+        errorIconResourceID = resourceID;
+        return this;
+    }
+
+    /**
      * Sets the notification title.
      * @param title Title to show in the notification icon
      * @return {@link UploadNotificationConfig}
@@ -69,7 +97,7 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
-     * Sets the message to be shown while upload is in progress.
+     * Sets the message to be shown while upload is in progress. Null if no message should be displayed.
      * @param message Message to show
      * @return {@link UploadNotificationConfig}
      */
@@ -79,7 +107,7 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
-     * Sets the message to be shown if an error occurs.
+     * Sets the message to be shown if an error occurs. Null if no message should be displayed.
      * @param message Message to show
      * @return {@link UploadNotificationConfig}
      */
@@ -89,7 +117,7 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
-     * Sets the message to be shown when the upload is completed.
+     * Sets the message to be shown when the upload is completed. Null if no message should be displayed.
      * @param message Message to show
      * @return {@link UploadNotificationConfig}
      */
@@ -105,6 +133,16 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     public final UploadNotificationConfig setAutoClearOnSuccess(boolean clear) {
         autoClearOnSuccess = clear;
+        return this;
+    }
+
+    /**
+     * Sets whether or not to auto clear the notification when an error happens during upload.
+     * @param clear true to automatically clear the notification, otherwise false
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setAutoClearOnError(boolean clear) {
+        autoClearOnError = clear;
         return this;
     }
 
@@ -144,6 +182,14 @@ public final class UploadNotificationConfig implements Parcelable {
         return iconResourceID;
     }
 
+    final int getCompletedIconResourceID() {
+        return completedIconResourceID;
+    }
+
+    final int getErrorIconResourceID() {
+        return errorIconResourceID;
+    }
+
     final String getTitle() {
         return title;
     }
@@ -162,6 +208,10 @@ public final class UploadNotificationConfig implements Parcelable {
 
     final boolean isAutoClearOnSuccess() {
         return autoClearOnSuccess;
+    }
+
+    final boolean isAutoClearOnError() {
+        return autoClearOnError;
     }
 
     final boolean isClearOnAction() {
@@ -203,11 +253,14 @@ public final class UploadNotificationConfig implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int arg1) {
         parcel.writeInt(iconResourceID);
+        parcel.writeInt(completedIconResourceID);
+        parcel.writeInt(errorIconResourceID);
         parcel.writeString(title);
         parcel.writeString(inProgress);
         parcel.writeString(completed);
         parcel.writeString(error);
         parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
+        parcel.writeByte((byte) (autoClearOnError ? 1 : 0));
         parcel.writeByte((byte) (clearOnAction ? 1 : 0));
         parcel.writeByte((byte) (ringToneEnabled ? 1 : 0));
         parcel.writeParcelable(clickIntent, 0);
@@ -215,11 +268,14 @@ public final class UploadNotificationConfig implements Parcelable {
 
     private UploadNotificationConfig(Parcel in) {
         iconResourceID = in.readInt();
+        completedIconResourceID = in.readInt();
+        errorIconResourceID = in.readInt();
         title = in.readString();
         inProgress = in.readString();
         completed = in.readString();
         error = in.readString();
         autoClearOnSuccess = in.readByte() == 1;
+        autoClearOnError = in.readByte() == 1;
         clearOnAction = in.readByte() == 1;
         ringToneEnabled = in.readByte() == 1;
         clickIntent = in.readParcelable(Intent.class.getClassLoader());

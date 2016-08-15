@@ -19,6 +19,7 @@ public class UploadInfo implements Parcelable {
     private long uploadedBytes;
     private long totalBytes;
     private int numberOfRetries;
+    private int totalFiles;
     private ArrayList<String> successfullyUploadedFiles = new ArrayList<>();
 
     protected UploadInfo(String uploadId) {
@@ -28,16 +29,18 @@ public class UploadInfo implements Parcelable {
         uploadedBytes = 0;
         totalBytes = 0;
         numberOfRetries = 0;
+        totalFiles = 0;
     }
 
     protected UploadInfo(String uploadId, long startTime, long uploadedBytes, long totalBytes,
-                      int numberOfRetries, List<String> uploadedFiles) {
+                      int numberOfRetries, List<String> uploadedFiles, int totalFiles) {
         this.uploadId = uploadId;
         this.startTime = startTime;
         currentTime = new Date().getTime();
         this.uploadedBytes = uploadedBytes;
         this.totalBytes = totalBytes;
         this.numberOfRetries = numberOfRetries;
+        this.totalFiles = totalFiles;
 
         if (uploadedFiles != null && !uploadedFiles.isEmpty())
             successfullyUploadedFiles.addAll(uploadedFiles);
@@ -66,6 +69,7 @@ public class UploadInfo implements Parcelable {
         parcel.writeLong(uploadedBytes);
         parcel.writeLong(totalBytes);
         parcel.writeInt(numberOfRetries);
+        parcel.writeInt(totalFiles);
         parcel.writeStringList(successfullyUploadedFiles);
     }
 
@@ -76,6 +80,7 @@ public class UploadInfo implements Parcelable {
         uploadedBytes = in.readLong();
         totalBytes = in.readLong();
         numberOfRetries = in.readInt();
+        totalFiles = in.readInt();
         in.readStringList(successfullyUploadedFiles);
     }
 
@@ -204,5 +209,13 @@ public class UploadInfo implements Parcelable {
      */
     public int getNumberOfRetries() {
         return numberOfRetries;
+    }
+
+    /**
+     * Gets the total number of files added to the upload request.
+     * @return total number of files to upload
+     */
+    public int getTotalFiles() {
+        return totalFiles;
     }
 }

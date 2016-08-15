@@ -207,7 +207,8 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles);
+                                                     successfullyUploadedFiles,
+                                                     params.getFiles().size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.IN_PROGRESS)
@@ -262,7 +263,8 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles);
+                                                     successfullyUploadedFiles,
+                                                     params.getFiles().size());
 
         final ServerResponse serverResponse = new ServerResponse(responseCode, responseBody,
                                                                  responseHeaders);
@@ -305,7 +307,8 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles);
+                                                     successfullyUploadedFiles,
+                                                     params.getFiles().size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.CANCELLED)
@@ -365,7 +368,8 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles);
+                                                     successfullyUploadedFiles,
+                                                     params.getFiles().size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.ERROR)
@@ -395,7 +399,7 @@ public abstract class UploadTask implements Runnable {
      * @param uploadInfo upload information and statistics
      */
     private void createNotification(UploadInfo uploadInfo) {
-        if (params.getNotificationConfig() == null) return;
+        if (params.getNotificationConfig() == null || params.getNotificationConfig().getInProgressMessage() == null) return;
 
         notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
                 .setContentText(replacePlaceholders(params.getNotificationConfig().getInProgressMessage(), uploadInfo))
@@ -420,7 +424,7 @@ public abstract class UploadTask implements Runnable {
      * @param uploadInfo upload information and statistics
      */
     private void updateNotificationProgress(UploadInfo uploadInfo) {
-        if (params.getNotificationConfig() == null) return;
+        if (params.getNotificationConfig() == null || params.getNotificationConfig().getInProgressMessage() == null) return;
 
         notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
                 .setContentText(replacePlaceholders(params.getNotificationConfig().getInProgressMessage(), uploadInfo))
@@ -453,12 +457,14 @@ public abstract class UploadTask implements Runnable {
 
         notificationManager.cancel(notificationId);
 
+        if (params.getNotificationConfig().getCompletedMessage() == null) return;
+
         if (!params.getNotificationConfig().isAutoClearOnSuccess()) {
             notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
                     .setContentText(replacePlaceholders(params.getNotificationConfig().getCompletedMessage(), uploadInfo))
                     .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                     .setAutoCancel(params.getNotificationConfig().isClearOnAction())
-                    .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                    .setSmallIcon(params.getNotificationConfig().getCompletedIconResourceID())
                     .setGroup(UploadService.NAMESPACE)
                     .setProgress(0, 0, false)
                     .setOngoing(false);
@@ -475,18 +481,22 @@ public abstract class UploadTask implements Runnable {
 
         notificationManager.cancel(notificationId);
 
-        notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
-                .setContentText(replacePlaceholders(params.getNotificationConfig().getErrorMessage(), uploadInfo))
-                .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
-                .setAutoCancel(params.getNotificationConfig().isClearOnAction())
-                .setSmallIcon(params.getNotificationConfig().getIconResourceID())
-                .setGroup(UploadService.NAMESPACE)
-                .setProgress(0, 0, false).setOngoing(false);
-        setRingtone();
+        if (params.getNotificationConfig().getErrorMessage() == null) return;
 
-        // this is needed because the main notification used to show progress is ongoing
-        // and a new one has to be created to allow the user to dismiss it
-        notificationManager.notify(notificationId + 1, notification.build());
+        if (!params.getNotificationConfig().isAutoClearOnError()) {
+            notification.setContentTitle(replacePlaceholders(params.getNotificationConfig().getTitle(), uploadInfo))
+                    .setContentText(replacePlaceholders(params.getNotificationConfig().getErrorMessage(), uploadInfo))
+                    .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
+                    .setAutoCancel(params.getNotificationConfig().isClearOnAction())
+                    .setSmallIcon(params.getNotificationConfig().getErrorIconResourceID())
+                    .setGroup(UploadService.NAMESPACE)
+                    .setProgress(0, 0, false).setOngoing(false);
+            setRingtone();
+
+            // this is needed because the main notification used to show progress is ongoing
+            // and a new one has to be created to allow the user to dismiss it
+            notificationManager.notify(notificationId + 1, notification.build());
+        }
     }
 
     /**
@@ -524,6 +534,8 @@ public abstract class UploadTask implements Runnable {
         tmp = string.replace(Placeholders.ELAPSED_TIME, uploadInfo.getElapsedTimeString());
         tmp = tmp.replace(Placeholders.PROGRESS, uploadInfo.getProgressPercent() + "%");
         tmp = tmp.replace(Placeholders.UPLOAD_RATE, uploadInfo.getUploadRateString());
+        tmp = tmp.replace(Placeholders.UPLOADED_FILES, Integer.toString(uploadInfo.getSuccessfullyUploadedFiles().size()));
+        tmp = tmp.replace(Placeholders.TOTAL_FILES, Integer.toString(uploadInfo.getTotalFiles()));
 
         return tmp;
     }
