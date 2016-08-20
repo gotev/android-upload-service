@@ -1,8 +1,8 @@
 Be sure to check [Asking for help](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help) page on the Wiki before opening a new issue! Delete this text when you create a new issue.
 
 ### Version info
-* Android Upload Service version (e.g. 3.0.2):
-* Android version and API version (e.g. 6.0.1 API 23):
+* Android Upload Service version:
+* Android version and API version:
 * HTTP stack (e.g. HurlStack or OkHttpStack):
 
 ### What did you expect?
@@ -20,6 +20,10 @@ Be sure to check [Asking for help](https://github.com/gotev/android-upload-servi
 ```java
 // the code you wrote to create the upload request
 ```
+#### Where have you added the request code?
+- [ ] Activity
+- [ ] Service
+- [ ] Other class (add additional info about it)
 
 ### LogCat output (please [set log level to DEBUG](https://github.com/gotev/android-upload-service/wiki/Recipes#logging-) first)
 ```
