@@ -368,6 +368,12 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
             Log.i("Header", header.getKey() + ": " + header.getValue());
         }
 
+        Log.e(TAG, "Printing response body bytes");
+        byte[] ba = serverResponse.getBody();
+        for (int j = 0; j < ba.length; j++) {
+            Log.e(TAG, String.format("%02X ", ba[j]));
+        }
+
         if (uploadProgressHolders.get(uploadInfo.getUploadId()) == null)
             return;
 
