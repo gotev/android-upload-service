@@ -5,6 +5,7 @@ android:
   components:
     # Uncomment the lines below if you want to
     # use the latest revision of Android SDK Tools
+    # Fix for Android 24+: https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943
     - tools
     - tools
     - platform-tools
