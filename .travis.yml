@@ -1,11 +1,13 @@
 language: android
+jdk: oraclejdk8
 script: ./gradlew clean build
 android:
   components:
     # Uncomment the lines below if you want to
     # use the latest revision of Android SDK Tools
-    - platform-tools
     - tools
+    - tools
+    - platform-tools
 
     # The BuildTools version used by your project
     - build-tools-23.0.3
