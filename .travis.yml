@@ -8,10 +8,10 @@ android:
     - tools
 
     # The BuildTools version used by your project
-    - build-tools-23.0.2
+    - build-tools-23.0.3
 
     # The SDK version used to compile your project
-    - android-23
+    - android-24
 
     # Additional components
     - extra-google-m2repository
@@ -19,4 +19,4 @@ android:
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    # sys-img-armeabi-v7a-android-23
+    # sys-img-armeabi-v7a-android-24
