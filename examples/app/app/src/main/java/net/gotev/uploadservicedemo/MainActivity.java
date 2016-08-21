@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -56,18 +56,18 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     private static final String USER_AGENT = "UploadServiceDemo/" + BuildConfig.VERSION_NAME;
     private static final int FILE_CODE = 1;
 
-    @Bind(R.id.container) ViewGroup container;
-    @Bind(R.id.multipartUploadButton) Button multipartUploadButton;
-    @Bind(R.id.binaryUploadButton) Button binaryUploadButton;
-    @Bind(R.id.cancelAllUploadsButton) Button cancelAllUploadsButton;
-    @Bind(R.id.serverURL) EditText serverUrl;
-    @Bind(R.id.filesToUpload) EditText filesToUpload;
-    @Bind(R.id.parameterName) EditText parameterName;
-    @Bind(R.id.displayNotification) CheckBox displayNotification;
-    @Bind(R.id.autoDeleteUploadedFiles) CheckBox autoDeleteUploadedFiles;
-    @Bind(R.id.autoClearOnSuccess) CheckBox autoClearOnSuccess;
-    @Bind(R.id.fixedLengthStreamingMode) CheckBox fixedLengthStreamingMode;
-    @Bind(R.id.useUtf8) CheckBox useUtf8;
+    @BindView(R.id.container) ViewGroup container;
+    @BindView(R.id.multipartUploadButton) Button multipartUploadButton;
+    @BindView(R.id.binaryUploadButton) Button binaryUploadButton;
+    @BindView(R.id.cancelAllUploadsButton) Button cancelAllUploadsButton;
+    @BindView(R.id.serverURL) EditText serverUrl;
+    @BindView(R.id.filesToUpload) EditText filesToUpload;
+    @BindView(R.id.parameterName) EditText parameterName;
+    @BindView(R.id.displayNotification) CheckBox displayNotification;
+    @BindView(R.id.autoDeleteUploadedFiles) CheckBox autoDeleteUploadedFiles;
+    @BindView(R.id.autoClearOnSuccess) CheckBox autoClearOnSuccess;
+    @BindView(R.id.fixedLengthStreamingMode) CheckBox fixedLengthStreamingMode;
+    @BindView(R.id.useUtf8) CheckBox useUtf8;
 
     private Map<String, UploadProgressViewHolder> uploadProgressHolders = new HashMap<>();
 
@@ -305,8 +305,8 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     class UploadProgressViewHolder {
         View itemView;
 
-        @Bind(R.id.uploadTitle) TextView uploadTitle;
-        @Bind(R.id.uploadProgress) ProgressBar progressBar;
+        @BindView(R.id.uploadTitle) TextView uploadTitle;
+        @BindView(R.id.uploadProgress) ProgressBar progressBar;
 
         String uploadId;
 
