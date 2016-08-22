@@ -25,7 +25,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.jakewharton:butterknife:8.2.1'
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
-    compile 'com.nononsenseapps:filepicker:2.4.2'
+    compile 'com.nononsenseapps:filepicker:3.0.0'
     //compile 'net.gotev:uploadservice:3.0.3'
     //compile 'net.gotev:uploadservice-okhttp:3.0.3'
     //compile 'net.gotev:uploadservice-ftp:3.0.3'
