@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     @OnClick(R.id.pickFile)
     void onPickFileClick() {
         // Starts NoNonsense-FilePicker (https://github.com/spacecowboy/NoNonsense-FilePicker)
-        Intent intent = new Intent(this, FilePickerActivity.class);
+        Intent intent = new Intent(this, BackHandlingFilePickerActivity.class);
 
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, true);
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
