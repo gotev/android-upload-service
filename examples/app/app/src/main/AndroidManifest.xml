@@ -24,7 +24,7 @@
         </activity>
 
         <activity
-            android:name="com.nononsenseapps.filepicker.FilePickerActivity"
+            android:name=".BackHandlingFilePickerActivity"
             android:label="@string/select_file"
             android:theme="@style/FilePickerTheme">
             <intent-filter>
