@@ -44,7 +44,7 @@ public abstract class UploadTask implements Runnable {
     /**
      * Contains all the parameters set in {@link UploadRequest}.
      */
-    protected UploadTaskParameters params = new UploadTaskParameters();
+    protected UploadTaskParameters params = null;
 
     /**
      * Contains the absolute local path of the successfully uploaded files.
