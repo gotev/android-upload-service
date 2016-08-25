@@ -1,7 +1,13 @@
 package net.gotev.uploadservice;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.OpenableColumns;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,39 +23,43 @@ import java.util.LinkedHashMap;
  */
 public class UploadFile implements Parcelable {
 
-    protected final File file;
+    private static final String TAG = UploadFile.class.getName();
+
+    protected final String path;
     private LinkedHashMap<String, String> properties = new LinkedHashMap<>();
+    protected final UploadFileHandler handler;
 
     /**
      * Creates a new UploadFile.
      *
-     * @param path absolute path to the file
+     * @param path absolute path to a file or an Android content Uri string
      * @throws FileNotFoundException if the file can't be found at the specified path
      * @throws IllegalArgumentException if you passed invalid argument values
      */
-    public UploadFile(final String path) throws FileNotFoundException {
+    public UploadFile(String path) throws FileNotFoundException {
 
         if (path == null || "".equals(path)) {
             throw new IllegalArgumentException("Please specify a file path!");
         }
 
-        File file = new File(path);
+        this.path = standardizePath(path);
+        this.handler = getHandler();
+    }
 
-        if (!file.exists())
-            throw new FileNotFoundException("Could not find file at path: " + path);
-        if (file.isDirectory())
-            throw new FileNotFoundException("The specified path refers to a directory: " + path);
-
-        this.file = file;
-
+    private UploadFileHandler getHandler() throws FileNotFoundException {
+        if (path.startsWith(ContentResolver.SCHEME_CONTENT)) {
+            return new UriHandler(path);
+        } else {
+            return new FileHandler(path);
+        }
     }
 
     /**
      * Gets the file length in bytes.
      * @return file length
      */
-    public long length() {
-        return file.length();
+    public long length(Context context) {
+        return handler.getLength(context);
     }
 
     /**
@@ -58,24 +68,33 @@ public class UploadFile implements Parcelable {
      * @throws FileNotFoundException if the file can't be found at the path specified in the
      * constructor
      */
-    public final InputStream getStream() throws FileNotFoundException {
-        return new FileInputStream(file);
+    public final InputStream getStream(Context context) throws FileNotFoundException {
+        return handler.getInputStream(context);
     }
 
     /**
-     * Returns the absolute path to the file.
-     * @return absolute file path
+     * Returns the content type for the file
+     * @return content type
      */
-    public final String getAbsolutePath() {
-        return file.getAbsolutePath();
+    public final String getContentType(Context context) {
+        return handler.getContentType(context);
     }
 
     /**
      * Returns the name of this file.
      * @return string
      */
-    public final String getName() {
-        return file.getName();
+    public final String getName(Context context) {
+        return handler.getName(context);
+    }
+
+    /**
+     * Returns the string this was initialized with,
+     * either an absolute file path or Android content URI
+     * @return String
+     */
+    public final String getPath() {
+        return this.path;
     }
 
     // This is used to regenerate the object.
@@ -100,14 +119,23 @@ public class UploadFile implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int arg1) {
-        parcel.writeString(file.getAbsolutePath());
+        parcel.writeString(path);
         parcel.writeSerializable(properties);
     }
 
     @SuppressWarnings("unchecked")
     private UploadFile(Parcel in) {
-        file = new File(in.readString());
-        properties = (LinkedHashMap<String, String>) in.readSerializable();
+        this.path = in.readString();
+        this.properties = (LinkedHashMap<String, String>) in.readSerializable();
+
+        UploadFileHandler handler = null;
+        try {
+            handler = getHandler();
+        } catch (FileNotFoundException e) {
+            //This shouldn't happen, it would've been thrown in the main constructor
+            Log.e(TAG, "File not found when constructing from parcel", e);
+        }
+        this.handler = handler;
     }
 
     /**
@@ -144,4 +172,123 @@ public class UploadFile implements Parcelable {
 
         return val;
     }
+
+    /**
+     * Removes the prefix from file URIs so they can be used with
+     * the java.io.File constructor
+     * TODO: Check if this is actually necessary
+     */
+    private String standardizePath(String path) {
+        if (path.startsWith("file://")) {
+            return path.substring("file://".length());
+        }
+        return path;
+    }
+
+    /**
+     * Allows for different file representations to be used by abstracting several characteristics
+     * and operations
+     */
+    private interface UploadFileHandler {
+        long getLength(Context context);
+        InputStream getInputStream(Context context) throws FileNotFoundException;
+        String getContentType(Context context);
+        String getName(Context context);
+    }
+
+    /**
+     * Handler for normal file paths, wraps java.io.File
+     */
+    private static class FileHandler implements UploadFileHandler {
+
+        final File file;
+
+        FileHandler(String path) throws FileNotFoundException {
+            this.file = new File(path);
+        }
+
+        @Override
+        public long getLength(Context context) {
+            return file.length();
+        }
+
+        @Override
+        public InputStream getInputStream(Context context) throws FileNotFoundException {
+            return new FileInputStream(file);
+        }
+
+        @Override
+        public String getContentType(Context context) {
+            return ContentType.autoDetect(file.getAbsolutePath());
+        }
+
+        @Override
+        public String getName(Context context) {
+            return file.getName();
+        }
+    }
+
+    /**
+     * Handles Android content uris, wraps android.content.Uri
+     */
+    private static class UriHandler implements UploadFileHandler {
+
+        final Uri uri;
+
+        UriHandler(String path) {
+            this.uri = Uri.parse(path);
+        }
+
+        @Override
+        public long getLength(Context context) {
+            return getUriSize(context);
+        }
+
+        @Override
+        public InputStream getInputStream(Context context) throws FileNotFoundException {
+            return context.getContentResolver().openInputStream(uri);
+        }
+
+        @Override
+        public String getContentType(Context context) {
+            String type = context.getContentResolver().getType(uri);
+            if (type == null || type.isEmpty()) {
+                type = ContentType.APPLICATION_OCTET_STREAM;
+            }
+            return type;
+        }
+
+        @Override
+        public String getName(Context context) {
+            return getUriName(context);
+        }
+
+        private long getUriSize(Context context) {
+            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+            cursor.moveToFirst();
+            long size = cursor.getLong(sizeIndex);
+            cursor.close();
+            return size;
+        }
+
+        private String getUriName(Context context) {
+            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            if (cursor == null) {
+                return getUriNameFallback();
+            }
+            int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            cursor.moveToFirst();
+            String name = cursor.getString(nameIndex);
+            cursor.close();
+            return name;
+        }
+
+        private String getUriNameFallback() {
+            String[] components = uri.toString().split(File.separator);
+            return components[components.length - 1];
+        }
+
+    }
+
 }
