@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Contains the configuration of the upload notification.
  *
@@ -25,6 +28,7 @@ public final class UploadNotificationConfig implements Parcelable {
     private boolean clearOnAction;
     private boolean ringToneEnabled;
     private Intent clickIntent;
+    private List<NotificationAction> notificationActions;
 
     /**
      * Creates a new upload notification configuration with default settings:
@@ -52,6 +56,7 @@ public final class UploadNotificationConfig implements Parcelable {
         clearOnAction = false;
         clickIntent = null;
         ringToneEnabled = true;
+        notificationActions = new ArrayList<>(3);
     }
 
     /**
@@ -178,6 +183,21 @@ public final class UploadNotificationConfig implements Parcelable {
         return this;
     }
 
+    /**
+     * Add NotificationAction. Maximal number of NotificationActions that can be shown are 3.
+     * @param notificationAction {@link NotificationAction}, can't be null
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig addAction(NotificationAction notificationAction) {
+        if (notificationAction == null)
+            throw new NullPointerException("NotificationAction can't be null");
+        if (notificationActions.size() > 3) {
+            throw new IllegalStateException("Notification actions can't more than 3");
+        }
+        this.notificationActions.add(notificationAction);
+        return this;
+    }
+
     final int getIconResourceID() {
         return iconResourceID;
     }
@@ -222,6 +242,10 @@ public final class UploadNotificationConfig implements Parcelable {
         return ringToneEnabled;
     }
 
+    final List<NotificationAction> getNotificationActions() {
+        return notificationActions;
+    }
+
     final PendingIntent getPendingIntent(Context context) {
         if (clickIntent == null) {
             return PendingIntent.getBroadcast(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -234,16 +258,16 @@ public final class UploadNotificationConfig implements Parcelable {
     // All Parcelables must have a CREATOR that implements these two methods
     public static final Parcelable.Creator<UploadNotificationConfig> CREATOR =
             new Parcelable.Creator<UploadNotificationConfig>() {
-        @Override
-        public UploadNotificationConfig createFromParcel(final Parcel in) {
-            return new UploadNotificationConfig(in);
-        }
+                @Override
+                public UploadNotificationConfig createFromParcel(final Parcel in) {
+                    return new UploadNotificationConfig(in);
+                }
 
-        @Override
-        public UploadNotificationConfig[] newArray(final int size) {
-            return new UploadNotificationConfig[size];
-        }
-    };
+                @Override
+                public UploadNotificationConfig[] newArray(final int size) {
+                    return new UploadNotificationConfig[size];
+                }
+            };
 
     @Override
     public int describeContents() {
@@ -264,6 +288,7 @@ public final class UploadNotificationConfig implements Parcelable {
         parcel.writeByte((byte) (clearOnAction ? 1 : 0));
         parcel.writeByte((byte) (ringToneEnabled ? 1 : 0));
         parcel.writeParcelable(clickIntent, 0);
+        parcel.writeList(notificationActions);
     }
 
     private UploadNotificationConfig(Parcel in) {
@@ -279,5 +304,7 @@ public final class UploadNotificationConfig implements Parcelable {
         clearOnAction = in.readByte() == 1;
         ringToneEnabled = in.readByte() == 1;
         clickIntent = in.readParcelable(Intent.class.getClassLoader());
+        notificationActions = new ArrayList<>();
+        in.readList(notificationActions, NotificationAction.class.getClassLoader());
     }
 }
