@@ -7,7 +7,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 
 import net.gotev.uploadservice.http.HttpStack;
-import net.gotev.uploadservice.http.impl.HurlStack;
+import net.gotev.uploadservice.http.impl.OkHttpStack;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,9 +63,9 @@ public final class UploadService extends Service {
 
     /**
      * Sets the HTTP Stack to use to perform HTTP based upload requests.
-     * By default {@link HurlStack} implementation is used.
+     * By default {@link OkHttpStack} implementation is used.
      */
-    public static HttpStack HTTP_STACK = new HurlStack();
+    public static HttpStack HTTP_STACK = new OkHttpStack();
 
     /**
      * Buffer size in bytes used for data transfer by the upload tasks.

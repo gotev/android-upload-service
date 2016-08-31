@@ -31,6 +31,8 @@ android {
 dependencies {
     compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.android.support:support-v4:24.2.0'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.4.1'
 }
 
 // add the following information to the file: local.properties situated in the parent directory of
