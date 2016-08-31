@@ -19,7 +19,7 @@ import okhttp3.internal.huc.OkHttpURLConnection;
 import okhttp3.internal.huc.OkHttpsURLConnection;
 
 /**
- * {@link HttpConnection} implementation using {@link OkHttpClient}.
+ * {@link HttpConnection} implementation using OkHttpClient.
  * @author Aleksandar Gotev
  */
 public class OkHttpStackConnection implements HttpConnection {
