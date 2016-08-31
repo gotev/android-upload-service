@@ -31,6 +31,5 @@ dependencies {
     //compile 'net.gotev:uploadservice-ftp:3.0.3'
     //comment the previous lines and uncomment the next ones for development (it uses the local libs)
     compile project(':uploadservice')
-    compile project(':uploadservice-okhttp')
     compile project(':uploadservice-ftp')
 }
