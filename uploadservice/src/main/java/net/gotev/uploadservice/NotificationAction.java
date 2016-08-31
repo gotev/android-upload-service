@@ -1,6 +1,8 @@
 package net.gotev.uploadservice;
 
 import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -12,9 +14,9 @@ import android.os.Parcelable;
 public class NotificationAction implements Parcelable {
     private int resourceDrawable;
     private String text;
-    private PendingIntent clickIntent;
+    private Intent clickIntent;
 
-    public NotificationAction(int resourceDrawable, String text, PendingIntent clickIntent) {
+    public NotificationAction(int resourceDrawable, String text, Intent clickIntent) {
         this.resourceDrawable = resourceDrawable;
         this.text = text;
         this.clickIntent = clickIntent;
@@ -28,8 +30,12 @@ public class NotificationAction implements Parcelable {
         return text;
     }
 
-    public PendingIntent getClickIntent() {
-        return clickIntent;
+    public final PendingIntent getPendingIntent(Context context) {
+        if (clickIntent == null) {
+            return PendingIntent.getBroadcast(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+
+        return PendingIntent.getActivity(context, 1, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override

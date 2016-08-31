@@ -426,7 +426,9 @@ public abstract class UploadTask implements Runnable {
     private void addNotificationActions() {
         List<NotificationAction> notificationActions = params.getNotificationConfig().getNotificationActions();
         for (NotificationAction notificationAction : notificationActions) {
-            notification.addAction(notificationAction.getResourceDrawable(), notificationAction.getText(), notificationAction.getClickIntent());
+            notification.addAction(notificationAction.getResourceDrawable(),
+                    notificationAction.getText(),
+                    notificationAction.getPendingIntent(service));
         }
     }
 
