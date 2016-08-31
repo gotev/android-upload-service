@@ -208,7 +208,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     params.getFiles().size());
+                                                     params.getFiles().size() + successfullyUploadedFiles.size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.IN_PROGRESS)

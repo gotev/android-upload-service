@@ -153,6 +153,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         for (UploadFile file : params.getFiles()) {
             addSuccessfullyUploadedFile(file.getAbsolutePath());
         }
+        params.getFiles().clear();
     }
 
 }
