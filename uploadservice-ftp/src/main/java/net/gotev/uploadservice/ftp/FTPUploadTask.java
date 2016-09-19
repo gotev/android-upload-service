@@ -47,6 +47,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             ftpClient.setCopyStreamListener(this);
             ftpClient.setDefaultTimeout(ftpParams.getConnectTimeout());
             ftpClient.setConnectTimeout(ftpParams.getConnectTimeout());
+            ftpClient.setAutodetectUTF8(true);
 
             Logger.debug(LOG_TAG, "Connect timeout set to " + ftpParams.getConnectTimeout() + "ms");
 
