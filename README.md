@@ -33,7 +33,7 @@ Do you need help? [Read this](https://github.com/gotev/android-upload-service/wi
 To be included in the following list, simply create an issue and provide the app name and a link.
 
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
-- [DotShare](http://dot-share.com/index-en.html)
+- [Motolife](https://play.google.com/store/apps/details?id=bg.motolife.app)
 - [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
 
 ## Contributing <a name="contribute"></a>
