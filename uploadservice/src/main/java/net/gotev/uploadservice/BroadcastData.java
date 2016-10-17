@@ -70,6 +70,11 @@ class BroadcastData implements Parcelable {
     }
 
     public Status getStatus() {
+        if (status == null) {
+            Logger.error(getClass().getSimpleName(), "Status not defined! Returning " + Status.CANCELLED);
+            return Status.CANCELLED;
+        }
+
         return status;
     }
 

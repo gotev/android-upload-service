@@ -27,6 +27,11 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
 
         BroadcastData data = intent.getParcelableExtra(UploadService.PARAM_BROADCAST_DATA);
 
+        if (data == null) {
+            Logger.error(getClass().getSimpleName(), "Missing intent parameter: " + UploadService.PARAM_BROADCAST_DATA);
+            return;
+        }
+
         switch (data.getStatus()) {
             case ERROR:
                 onError(data.getUploadInfo(), data.getException());
