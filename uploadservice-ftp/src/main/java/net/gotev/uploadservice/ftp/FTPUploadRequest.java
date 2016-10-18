@@ -101,7 +101,7 @@ public class FTPUploadRequest extends UploadRequest {
 
     /**
      * Add a file to be uploaded.
-     * @param filePath absolute path to the local file on the device
+     * @param filePath path to the local file on the device
      * @param remotePath absolute path (or relative path to the default remote working directory)
      *                   of the file on the FTP server. Valid paths are for example:
      *                   {@code /path/to/myfile.txt}, {@code relative/path/} or {@code myfile.zip}.
@@ -129,7 +129,7 @@ public class FTPUploadRequest extends UploadRequest {
 
     /**
      * Add a file to be uploaded.
-     * @param filePath absolute path to the local file on the device
+     * @param filePath path to the local file on the device
      * @param remotePath absolute path (or relative path to the default remote working directory)
      *                   of the file on the FTP server. Valid paths are for example:
      *                   {@code /path/to/myfile.txt}, {@code relative/path/} or {@code myfile.zip}.
@@ -179,7 +179,7 @@ public class FTPUploadRequest extends UploadRequest {
      * they will be automatically created. You can also set with which permissions to create them
      * by using {@link FTPUploadRequest#setCreatedDirectoriesPermissions(UnixPermissions)}
      * method.
-     * @param filePath absolute path to the local file on the device
+     * @param filePath path to the local file on the device
      * @return {@link FTPUploadRequest}
      * @throws FileNotFoundException if the local file does not exist
      */

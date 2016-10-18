@@ -63,7 +63,7 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     /**
      * Adds a file to this upload request.
      *
-     * @param absolutePath Absolute path to the file that you want to upload
+     * @param filePath path to the file that you want to upload
      * @param parameterName Name of the form parameter that will contain file's data
      * @param fileName File name seen by the server side script. If null, the original file name
      *                 will be used
@@ -75,33 +75,34 @@ public class MultipartUploadRequest extends HttpUploadRequest {
      * @throws IllegalArgumentException if one or more parameters are not valid
      * @return {@link MultipartUploadRequest}
      */
-    public MultipartUploadRequest addFileToUpload(String absolutePath,
+    public MultipartUploadRequest addFileToUpload(String filePath,
                                                   String parameterName,
                                                   String fileName, String contentType)
             throws FileNotFoundException, IllegalArgumentException {
-        UploadFile file = new UploadFile(absolutePath);
-        absolutePath = file.getAbsolutePath();
+
+        UploadFile file = new UploadFile(filePath);
+        filePath = file.getPath();
 
         if (parameterName == null || "".equals(parameterName)) {
             throw new IllegalArgumentException("Please specify parameterName value for file: "
-                                               + absolutePath);
+                                               + filePath);
         }
 
         file.setProperty(MultipartUploadTask.PROPERTY_PARAM_NAME, parameterName);
 
         if (contentType == null || contentType.isEmpty()) {
-            contentType = ContentType.autoDetect(absolutePath);
-            Logger.debug(LOG_TAG, "Auto-detected MIME type for " + absolutePath
+            contentType = file.getContentType(context);
+            Logger.debug(LOG_TAG, "Auto-detected MIME type for " + filePath
                     + " is: " + contentType);
         } else {
-            Logger.debug(LOG_TAG, "Content Type set for " + absolutePath
+            Logger.debug(LOG_TAG, "Content Type set for " + filePath
                     + " is: " + contentType);
         }
 
         file.setProperty(MultipartUploadTask.PROPERTY_CONTENT_TYPE, contentType);
 
         if (fileName == null || "".equals(fileName)) {
-            fileName = file.getName();
+            fileName = file.getName(context);
             Logger.debug(LOG_TAG, "Using original file name: " + fileName);
         } else {
             Logger.debug(LOG_TAG, "Using custom file name: " + fileName);
