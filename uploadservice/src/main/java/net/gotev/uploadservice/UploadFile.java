@@ -1,10 +1,12 @@
 package net.gotev.uploadservice;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.File;
-import java.io.FileInputStream;
+import net.gotev.uploadservice.schemehandlers.SchemeHandler;
+import net.gotev.uploadservice.schemehandlers.SchemeHandlerFactory;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
@@ -17,39 +19,44 @@ import java.util.LinkedHashMap;
  */
 public class UploadFile implements Parcelable {
 
-    protected final File file;
+    protected final String path;
     private LinkedHashMap<String, String> properties = new LinkedHashMap<>();
+    protected final SchemeHandler handler;
 
     /**
      * Creates a new UploadFile.
      *
-     * @param path absolute path to the file
+     * @param path absolute path to a file or an Android content Uri string
      * @throws FileNotFoundException if the file can't be found at the specified path
      * @throws IllegalArgumentException if you passed invalid argument values
      */
-    public UploadFile(final String path) throws FileNotFoundException {
+    public UploadFile(String path) throws FileNotFoundException {
 
         if (path == null || "".equals(path)) {
             throw new IllegalArgumentException("Please specify a file path!");
         }
 
-        File file = new File(path);
+        if (path.startsWith("/"))
+            path = "file://" + path;
 
-        if (!file.exists())
-            throw new FileNotFoundException("Could not find file at path: " + path);
-        if (file.isDirectory())
-            throw new FileNotFoundException("The specified path refers to a directory: " + path);
+        if (!SchemeHandlerFactory.getInstance().isSupported(path))
+            throw new UnsupportedOperationException("Unsupported scheme: " + path);
 
-        this.file = file;
+        this.path = path;
 
+        try {
+            this.handler = SchemeHandlerFactory.getInstance().get(path);
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
     }
 
     /**
      * Gets the file length in bytes.
      * @return file length
      */
-    public long length() {
-        return file.length();
+    public long length(Context context) {
+        return handler.getLength(context);
     }
 
     /**
@@ -58,24 +65,33 @@ public class UploadFile implements Parcelable {
      * @throws FileNotFoundException if the file can't be found at the path specified in the
      * constructor
      */
-    public final InputStream getStream() throws FileNotFoundException {
-        return new FileInputStream(file);
+    public final InputStream getStream(Context context) throws FileNotFoundException {
+        return handler.getInputStream(context);
     }
 
     /**
-     * Returns the absolute path to the file.
-     * @return absolute file path
+     * Returns the content type for the file
+     * @return content type
      */
-    public final String getAbsolutePath() {
-        return file.getAbsolutePath();
+    public final String getContentType(Context context) {
+        return handler.getContentType(context);
     }
 
     /**
      * Returns the name of this file.
      * @return string
      */
-    public final String getName() {
-        return file.getName();
+    public final String getName(Context context) {
+        return handler.getName(context);
+    }
+
+    /**
+     * Returns the string this was initialized with,
+     * either an absolute file path or Android content URI
+     * @return String
+     */
+    public final String getPath() {
+        return this.path;
     }
 
     // This is used to regenerate the object.
@@ -100,14 +116,20 @@ public class UploadFile implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int arg1) {
-        parcel.writeString(file.getAbsolutePath());
+        parcel.writeString(path);
         parcel.writeSerializable(properties);
     }
 
     @SuppressWarnings("unchecked")
     private UploadFile(Parcel in) {
-        file = new File(in.readString());
-        properties = (LinkedHashMap<String, String>) in.readSerializable();
+        this.path = in.readString();
+        this.properties = (LinkedHashMap<String, String>) in.readSerializable();
+
+        try {
+            this.handler = SchemeHandlerFactory.getInstance().get(path);
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
     }
 
     /**
@@ -144,4 +166,5 @@ public class UploadFile implements Parcelable {
 
         return val;
     }
+
 }

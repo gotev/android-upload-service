@@ -51,7 +51,7 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     /**
      * Sets the file used as raw body of the upload request.
      *
-     * @param path Absolute path to the file that you want to upload
+     * @param path path to the file that you want to upload
      * @throws FileNotFoundException if the file to upload does not exist
      * @return {@link BinaryUploadRequest}
      */

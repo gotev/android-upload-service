@@ -15,17 +15,17 @@ public class BinaryUploadTask extends HttpUploadTask {
 
     @Override
     protected long getBodyLength() throws UnsupportedEncodingException {
-        return params.getFiles().get(0).length();
+        return params.getFiles().get(0).length(service);
     }
 
     @Override
     protected void writeBody(HttpConnection connection) throws IOException {
-        writeStream(params.getFiles().get(0).getStream());
+        writeStream(params.getFiles().get(0).getStream(service));
     }
 
     @Override
     protected void onSuccessfulUpload() {
-        addSuccessfullyUploadedFile(params.getFiles().get(0).getAbsolutePath());
+        addSuccessfullyUploadedFile(params.getFiles().get(0).getPath());
         params.getFiles().clear();
     }
 }
