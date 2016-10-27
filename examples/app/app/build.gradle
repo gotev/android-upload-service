@@ -3,14 +3,14 @@ apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "23.0.3"
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "net.gotev.uploadservicedemo"
         minSdkVersion 10
         targetSdkVersion 24
-        versionCode 13
-        versionName "3.0.3"
+        versionCode 14
+        versionName "3.1"
     }
     buildTypes {
         release {
