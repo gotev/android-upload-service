@@ -35,6 +35,7 @@ To be included in the following list, simply create an issue and provide the app
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
 - [Motolife](https://play.google.com/store/apps/details?id=bg.motolife.app)
 - [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
+- [MyCyberLaw](https://play.google.com/store/apps/details?id=com.mycyberlaw)
 
 ## Contributing <a name="contribute"></a>
 * Do you have a new feature in mind?
