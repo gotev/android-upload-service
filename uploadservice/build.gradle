@@ -8,16 +8,16 @@ def projectName = "android-upload-service"
 def projectDesc = "Easily upload files in the background with automatic Android Notification Center progress indication."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "3.0.3"
+version = "3.1"
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "23.0.3"
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 24
-        versionCode 18
+        versionCode 19
         versionName version
     }
     buildTypes {
@@ -31,11 +31,14 @@ android {
     }
 }
 
+def supportLibraryVersion = "24.2.1"
+def okHttpVersion = "3.4.1"
+
 dependencies {
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:support-v4:24.2.0'
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.4.1'
+    compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
+    compile "com.android.support:support-v4:${supportLibraryVersion}"
+    compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+    compile "com.squareup.okhttp3:okhttp-urlconnection:${okHttpVersion}"
 }
 
 // add the following information to the file: local.properties situated in the parent directory of
