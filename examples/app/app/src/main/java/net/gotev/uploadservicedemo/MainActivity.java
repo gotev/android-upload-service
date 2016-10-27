@@ -1,10 +1,8 @@
 package net.gotev.uploadservicedemo;
 
 import android.app.Activity;
-import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.nononsenseapps.filepicker.Utils;
 
 import net.gotev.uploadservice.BinaryUploadRequest;
 import net.gotev.uploadservice.MultipartUploadRequest;
@@ -55,6 +54,10 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     private static final String TAG = "UploadServiceDemo";
     private static final String USER_AGENT = "UploadServiceDemo/" + BuildConfig.VERSION_NAME;
     private static final int FILE_CODE = 1;
+
+    private static final String FTP_USERNAME = "ftpuser";
+    private static final String FTP_PASSWORD = "testpassword";
+    private static final String FTP_REMOTE_BASE_PATH = "home/ftpuser/";
 
     @BindView(R.id.container) ViewGroup container;
     @BindView(R.id.multipartUploadButton) Button multipartUploadButton;
@@ -193,22 +196,33 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
 
     @OnClick(R.id.ftpUploadButton)
     void onUploadFTPClick() {
-        final String serverUrlString = serverUrl.getText().toString();
+        String serverUrlString = serverUrl.getText().toString();
+
+        int ftpPort = 21;
+        if (serverUrlString.contains(":")) {
+            try {
+                String[] tmp = serverUrlString.split(":");
+                serverUrlString = tmp[0];
+                ftpPort = Integer.parseInt(tmp[1]);
+            } catch (Exception exc) {
+                Log.e(getClass().getSimpleName(), "error while getting FTP port from: " + serverUrlString, exc);
+            }
+        }
 
         final String filesToUploadString = filesToUpload.getText().toString();
         final String[] filesToUploadArray = filesToUploadString.split(",");
 
-        FTPUploadRequest request = new FTPUploadRequest(this, serverUrlString, 21)
-                .setUsernameAndPassword("ftpuser", "testpassword")
+        FTPUploadRequest request = new FTPUploadRequest(this, serverUrlString, ftpPort)
+                .setUsernameAndPassword(FTP_USERNAME, FTP_PASSWORD)
                 .setMaxRetries(4)
-                .setNotificationConfig(getNotificationConfig("File upload"))
+                .setNotificationConfig(getNotificationConfig("FTP upload"))
                 .useCompressedFileTransferMode(true)
-                //.setCreatedDirectoriesPermissions(new UnixPermissions("777"))
+                .setCreatedDirectoriesPermissions(new UnixPermissions("777"))
                 .setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteUploadedFiles.isChecked());
 
         for (String fileToUploadPath : filesToUploadArray) {
             try {
-                request.addFileToUpload(fileToUploadPath, "home/ftpuser/", new UnixPermissions("777"));
+                request.addFileToUpload(fileToUploadPath, FTP_REMOTE_BASE_PATH, new UnixPermissions("777"));
             } catch (FileNotFoundException exc) {
                 showToast(exc.getMessage());
             } catch (IllegalArgumentException exc) {
@@ -257,28 +271,19 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
             List<Uri> resultUris = new ArrayList<>();
 
             if (data.getBooleanExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false)) {
-                // For JellyBean and above
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    ClipData clip = data.getClipData();
+                ArrayList<String> paths = data.getStringArrayListExtra(FilePickerActivity.EXTRA_PATHS);
 
-                    if (clip != null) {
-                        for (int i = 0; i < clip.getItemCount(); i++) {
-                            resultUris.add(clip.getItemAt(i).getUri());
-                        }
-                    }
-
-                // For Ice Cream Sandwich
-                } else {
-                    ArrayList<String> paths = data.getStringArrayListExtra(FilePickerActivity.EXTRA_PATHS);
-
-                    if (paths != null) {
-                        for (String path: paths) {
-                            resultUris.add(Uri.parse(path));
-                        }
+                if (paths != null) {
+                    for (String path: paths) {
+                        Uri uri = Uri.parse(path);
+                        File file = Utils.getFileForUri(uri);
+                        resultUris.add(Uri.fromFile(file));
                     }
                 }
+
             } else {
-                resultUris.add(data.getData());
+                File file = Utils.getFileForUri(data.getData());
+                resultUris.add(Uri.fromFile(file));
             }
 
             StringBuilder absolutePathsConcat = new StringBuilder();
