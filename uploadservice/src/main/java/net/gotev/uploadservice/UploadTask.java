@@ -219,7 +219,7 @@ public abstract class UploadTask implements Runnable {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.onProgress(uploadInfo);
+                    delegate.onProgress(service, uploadInfo);
                 }
             });
         } else {
@@ -279,7 +279,7 @@ public abstract class UploadTask implements Runnable {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.onCompleted(uploadInfo, serverResponse);
+                    delegate.onCompleted(service, uploadInfo, serverResponse);
                 }
             });
         } else {
@@ -319,7 +319,7 @@ public abstract class UploadTask implements Runnable {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.onCancelled(uploadInfo);
+                    delegate.onCancelled(service, uploadInfo);
                 }
             });
         } else {
@@ -381,7 +381,7 @@ public abstract class UploadTask implements Runnable {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.onError(uploadInfo, exception);
+                    delegate.onError(service, uploadInfo, exception);
                 }
             });
         } else {

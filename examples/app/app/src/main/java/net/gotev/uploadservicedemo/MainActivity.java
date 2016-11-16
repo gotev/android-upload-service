@@ -1,11 +1,11 @@
 package net.gotev.uploadservicedemo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +49,7 @@ import butterknife.OnClick;
  * @author mabdurrahman
  *
  */
-public class MainActivity extends AppCompatActivity implements UploadStatusDelegate {
+public class MainActivity extends BaseActivity implements UploadStatusDelegate {
 
     private static final String TAG = "UploadServiceDemo";
     private static final String USER_AGENT = "UploadServiceDemo/" + BuildConfig.VERSION_NAME;
@@ -84,11 +84,6 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-
-        // Uncomment this line to enable self-signed SSL certificates in HTTPS connections
-        // WARNING: Do not use in production environment. Recommended for development only
-        // AllCertificatesAndHostsTruster.apply();
     }
 
     private void showToast(String message) {
@@ -335,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     }
 
     @Override
-    public void onProgress(UploadInfo uploadInfo) {
+    public void onProgress(Context context, UploadInfo uploadInfo) {
         Log.i(TAG, String.format(Locale.getDefault(), "ID: %1$s (%2$d%%) at %3$.2f Kbit/s",
                 uploadInfo.getUploadId(), uploadInfo.getProgressPercent(),
                 uploadInfo.getUploadRate()));
@@ -349,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     }
 
     @Override
-    public void onError(UploadInfo uploadInfo, Exception exception) {
+    public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
         Log.e(TAG, "Error with ID: " + uploadInfo.getUploadId() + ": "
                 + exception.getLocalizedMessage(), exception);
         logSuccessfullyUploadedFiles(uploadInfo.getSuccessfullyUploadedFiles());
@@ -362,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     }
 
     @Override
-    public void onCompleted(UploadInfo uploadInfo, ServerResponse serverResponse) {
+    public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
         Log.i(TAG, String.format(Locale.getDefault(),
                 "ID %1$s: completed in %2$ds at %3$.2f Kbit/s. Response code: %4$d, body:[%5$s]",
                 uploadInfo.getUploadId(), uploadInfo.getElapsedTime() / 1000,
@@ -387,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements UploadStatusDeleg
     }
 
     @Override
-    public void onCancelled(UploadInfo uploadInfo) {
+    public void onCancelled(Context context, UploadInfo uploadInfo) {
         Log.i(TAG, "Upload with ID " + uploadInfo.getUploadId() + " is cancelled");
         logSuccessfullyUploadedFiles(uploadInfo.getSuccessfullyUploadedFiles());
 
