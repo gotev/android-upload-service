@@ -34,19 +34,19 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
 
         switch (data.getStatus()) {
             case ERROR:
-                onError(data.getUploadInfo(), data.getException());
+                onError(context, data.getUploadInfo(), data.getException());
                 break;
 
             case COMPLETED:
-                onCompleted(data.getUploadInfo(), data.getServerResponse());
+                onCompleted(context, data.getUploadInfo(), data.getServerResponse());
                 break;
 
             case IN_PROGRESS:
-                onProgress(data.getUploadInfo());
+                onProgress(context, data.getUploadInfo());
                 break;
 
             case CANCELLED:
-                onCancelled(data.getUploadInfo());
+                onCancelled(context, data.getUploadInfo());
                 break;
 
             default:
@@ -83,18 +83,18 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
     }
 
     @Override
-    public void onProgress(final UploadInfo uploadInfo) {
+    public void onProgress(final Context context, final UploadInfo uploadInfo) {
     }
 
     @Override
-    public void onError(final UploadInfo uploadInfo, final Exception exception) {
+    public void onError(final Context context, final UploadInfo uploadInfo, final Exception exception) {
     }
 
     @Override
-    public void onCompleted(final UploadInfo uploadInfo, final ServerResponse serverResponse) {
+    public void onCompleted(final Context context, final UploadInfo uploadInfo, final ServerResponse serverResponse) {
     }
 
     @Override
-    public void onCancelled(final UploadInfo uploadInfo) {
+    public void onCancelled(final Context context, final UploadInfo uploadInfo) {
     }
 }
