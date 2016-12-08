@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="10sp"
-            android:text="@string/server_script_url" />
+            android:text="@string/server_upload_url" />
 
         <EditText
             android:id="@+id/serverURL"
