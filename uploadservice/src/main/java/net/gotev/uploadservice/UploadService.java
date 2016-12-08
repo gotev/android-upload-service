@@ -222,6 +222,12 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
+        if (uploadTasksMap.containsKey(currentTask.params.getId())) {
+            Logger.error(TAG, "Preventing upload with id: " + currentTask.params.getId()
+                    + " to be uploaded twice! Please check your code and fix it!");
+            return shutdownIfThereArentAnyActiveTasks();
+        }
+
         // increment by 2 because the notificationIncrementalId + 1 is used internally
         // in each UploadTask. Check its sources for more info about this.
         notificationIncrementalId += 2;
