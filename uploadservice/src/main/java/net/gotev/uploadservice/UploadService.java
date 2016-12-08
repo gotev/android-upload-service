@@ -182,6 +182,10 @@ public final class UploadService extends Service {
 
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        wakeLock.setReferenceCounted(false);
+
+        if (!wakeLock.isHeld())
+            wakeLock.acquire();
 
         if (UPLOAD_POOL_SIZE <= 0) {
             UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
@@ -224,9 +228,6 @@ public final class UploadService extends Service {
         currentTask.setLastProgressNotificationTime(0)
                    .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
 
-        if (wakeLock != null && !wakeLock.isHeld())
-            wakeLock.acquire();
-
         uploadTasksMap.put(currentTask.params.getId(), currentTask);
         uploadThreadPool.execute(currentTask);
 
@@ -254,7 +255,7 @@ public final class UploadService extends Service {
             stopForeground(true);
         }
 
-        if (wakeLock != null && wakeLock.isHeld())
+        if (wakeLock.isHeld())
             wakeLock.release();
 
         uploadTasksMap.clear();
@@ -335,9 +336,6 @@ public final class UploadService extends Service {
         // when all the upload tasks are completed, release the wake lock and shut down the service
         if (uploadTasksMap.isEmpty()) {
             Logger.debug(TAG, "All tasks finished. UploadService is about to shutdown...");
-            if (wakeLock != null && wakeLock.isHeld()) {
-                wakeLock.release();
-            }
             stopSelf();
         }
     }
