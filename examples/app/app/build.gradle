@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "net.gotev.uploadservicedemo"
-        minSdkVersion 10
+        minSdkVersion 16
         targetSdkVersion 24
         versionCode 14
         versionName "3.1"
@@ -21,12 +21,14 @@ android {
 }
 
 def butterKnifeVersion = "8.4.0"
+def supportVersion = "24.2.1"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:24.2.1'
     compile "com.jakewharton:butterknife:${butterKnifeVersion}"
     apt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    compile "com.android.support:appcompat-v7:${supportVersion}"
+    compile "com.android.support:design:${supportVersion}"
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
     //compile 'net.gotev:uploadservice:3.0.3'
     //compile 'net.gotev:uploadservice-okhttp:3.0.3'

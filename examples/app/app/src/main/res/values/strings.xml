@@ -7,7 +7,7 @@
     <string name="ftp_upload">FTP</string>
     <string name="cancel_upload">Cancel upload</string>
     <string name="cancel_all_uploads">Cancel all uploads</string>
-    <string name="server_script_url">Server script URL</string>
+    <string name="server_upload_url">Server upload URL</string>
     <string name="browse">Browse..</string>
     <string name="select_file">Select file to upload</string>
     <string name="files_to_upload_path">Path of the files to upload</string>
@@ -17,7 +17,7 @@
     <string name="uploading">Uploaded [[UPLOADED_FILES]] of [[TOTAL_FILES]] at [[UPLOAD_RATE]] - [[PROGRESS]]</string>
     <string name="upload_success">Upload completed successfully in [[ELAPSED_TIME]]</string>
     <string name="upload_error">Error while uploading</string>
-    <string name="server_url_hint">http://company.com/path/to/script</string>
+    <string name="server_url_hint">server.com/path/to/script</string>
     <string name="file_path_hint">/path/to/your/file.ext</string>
     <string name="display_notification">Display notification</string>
     <string name="auto_delete_uploaded_files">Auto delete uploaded files</string>
@@ -25,5 +25,18 @@
     <string name="auto_clear_on_success">Auto clear on success</string>
     <string name="fixed_length_streaming_mode">Fixed length streaming mode</string>
     <string name="use_utf8_charset">Use UTF-8 charset (un-check to use US-ASCII)</string>
+
+    <string-array name="protocols">
+        <item>http://</item>
+        <item>https://</item>
+    </string-array>
+
+    <string name="new_multipart">New multipart upload</string>
+    <string name="files_to_upload">Files to upload</string>
+    <string name="upload_parameters">Upload parameters</string>
+    <string name="title_activity_multipart_upload">New multipart upload</string>
+    <string name="no_files">No files to upload.\nTap on + to add one.</string>
+    <string name="no_parameters">No parameters.\nTap on + to add one.</string>
+    <string name="done">Done</string>
 
 </resources>

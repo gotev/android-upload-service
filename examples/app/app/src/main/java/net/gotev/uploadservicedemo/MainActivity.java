@@ -1,11 +1,8 @@
 package net.gotev.uploadservicedemo;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +12,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.nononsenseapps.filepicker.FilePickerActivity;
-import com.nononsenseapps.filepicker.Utils;
 
 import net.gotev.uploadservice.BinaryUploadRequest;
 import net.gotev.uploadservice.MultipartUploadRequest;
@@ -32,7 +26,6 @@ import net.gotev.uploadservice.ftp.UnixPermissions;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +42,7 @@ import butterknife.OnClick;
  * @author mabdurrahman
  *
  */
-public class MainActivity extends BaseActivity implements UploadStatusDelegate {
+public class MainActivity extends FilesPickerActivity implements UploadStatusDelegate {
 
     private static final String TAG = "UploadServiceDemo";
     private static final String USER_AGENT = "UploadServiceDemo/" + BuildConfig.VERSION_NAME;
@@ -243,54 +236,20 @@ public class MainActivity extends BaseActivity implements UploadStatusDelegate {
 
     @OnClick(R.id.pickFile)
     void onPickFileClick() {
-        // Starts NoNonsense-FilePicker (https://github.com/spacecowboy/NoNonsense-FilePicker)
-        Intent intent = new Intent(this, BackHandlingFilePickerActivity.class);
-
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, true);
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
-        intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-
-        // Configure initial directory by specifying a String.
-        // You could specify a String like "/storage/emulated/0/", but that can
-        // dangerous. Always use Android's API calls to get paths to the SD-card or
-        // internal memory.
-        intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
-                        Environment.getExternalStorageDirectory().getPath());
-
-        startActivityForResult(intent, FILE_CODE);
+        openFilePicker(false);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FILE_CODE && resultCode == Activity.RESULT_OK) {
-            List<Uri> resultUris = new ArrayList<>();
-
-            if (data.getBooleanExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false)) {
-                ArrayList<String> paths = data.getStringArrayListExtra(FilePickerActivity.EXTRA_PATHS);
-
-                if (paths != null) {
-                    for (String path: paths) {
-                        Uri uri = Uri.parse(path);
-                        File file = Utils.getFileForUri(uri);
-                        resultUris.add(Uri.fromFile(file));
-                    }
-                }
-
+    public void onPickedFiles(List<String> pickedFiles) {
+        StringBuilder absolutePathsConcat = new StringBuilder();
+        for (String file : pickedFiles) {
+            if (absolutePathsConcat.length() == 0) {
+                absolutePathsConcat.append(new File(file).getAbsolutePath());
             } else {
-                File file = Utils.getFileForUri(data.getData());
-                resultUris.add(Uri.fromFile(file));
+                absolutePathsConcat.append(",").append(new File(file).getAbsolutePath());
             }
-
-            StringBuilder absolutePathsConcat = new StringBuilder();
-            for (Uri uri : resultUris) {
-                if (absolutePathsConcat.length() == 0) {
-                    absolutePathsConcat.append(new File(uri.getPath()).getAbsolutePath());
-                } else {
-                    absolutePathsConcat.append(",").append(new File(uri.getPath()).getAbsolutePath());
-                }
-            }
-            filesToUpload.setText(absolutePathsConcat.toString());
         }
+        filesToUpload.setText(absolutePathsConcat.toString());
     }
 
     private String getFilename(String filepath) {
