@@ -49,7 +49,9 @@ public abstract class UploadRequest {
 
     /**
      * Start the background file upload service.
-     * @return the uploadId string
+     * @return the uploadId string. If you have passed your own uploadId in the constructor, this
+     *         method will return that same uploadId, otherwise it will return the automatically
+     *         generated uploadId
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid
      */
