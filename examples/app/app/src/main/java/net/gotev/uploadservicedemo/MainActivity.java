@@ -67,16 +67,17 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
 
     private Map<String, UploadProgressViewHolder> uploadProgressHolders = new HashMap<>();
 
-    private void logSuccessfullyUploadedFiles(List<String> files) {
-        for (String file : files) {
-            Log.e(TAG, "Success:" + file);
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+    }
+
+    private void logSuccessfullyUploadedFiles(List<String> files) {
+        for (String file : files) {
+            Log.e(TAG, "Success:" + file);
+        }
     }
 
     private void showToast(String message) {
@@ -109,12 +110,12 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
     }
 
     @OnClick(R.id.multipartUploadButton)
-    void onMultipartUploadClick() {
+    public void onMultipartUploadClick() {
         final String serverUrlString = serverUrl.getText().toString();
         final String paramNameString = parameterName.getText().toString();
 
         final String filesToUploadString = filesToUpload.getText().toString();
-        final String[] filesToUploadArray = filesToUploadString.split(",");
+        final String[] filesToUploadArray = filesToUploadString.split("\\|\\|");
 
         for (String fileToUploadPath : filesToUploadArray) {
             try {
@@ -148,7 +149,7 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
     }
 
     @OnClick(R.id.binaryUploadButton)
-    void onUploadBinaryClick() {
+    public void onUploadBinaryClick() {
         final String serverUrlString = serverUrl.getText().toString();
 
         final String filesToUploadString = filesToUpload.getText().toString();
@@ -183,7 +184,7 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
     }
 
     @OnClick(R.id.ftpUploadButton)
-    void onUploadFTPClick() {
+    public void onUploadFTPClick() {
         String serverUrlString = serverUrl.getText().toString();
 
         int ftpPort = 21;
@@ -230,12 +231,12 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
     }
 
     @OnClick(R.id.cancelAllUploadsButton)
-    void onCancelAllUploadsButtonClick() {
+    public void onCancelAllUploadsButtonClick() {
         UploadService.stopAllUploads();
     }
 
     @OnClick(R.id.pickFile)
-    void onPickFileClick() {
+    public void onPickFileClick() {
         openFilePicker(false);
     }
 
@@ -246,7 +247,7 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
             if (absolutePathsConcat.length() == 0) {
                 absolutePathsConcat.append(new File(file).getAbsolutePath());
             } else {
-                absolutePathsConcat.append(",").append(new File(file).getAbsolutePath());
+                absolutePathsConcat.append("||").append(new File(file).getAbsolutePath());
             }
         }
         filesToUpload.setText(absolutePathsConcat.toString());
@@ -280,7 +281,7 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
         }
 
         @OnClick(R.id.cancelUploadButton)
-        void onCancelUploadClick() {
+        public void onCancelUploadClick() {
             if (uploadId == null)
                 return;
 
