@@ -18,7 +18,10 @@ class FileSchemeHandler implements SchemeHandler {
     final File file;
 
     FileSchemeHandler(String path) throws FileNotFoundException {
-        this.file = new File(path.replace("file://", ""));
+        if (path.startsWith("file://")) {
+            path = path.substring("file://".length());
+        }
+        this.file = new File(path);
     }
 
     @Override
