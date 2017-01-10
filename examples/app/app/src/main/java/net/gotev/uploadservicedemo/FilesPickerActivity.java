@@ -1,9 +1,14 @@
 package net.gotev.uploadservicedemo;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.Nullable;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
@@ -18,12 +23,46 @@ import java.util.List;
 public class FilesPickerActivity extends BaseActivity {
 
     private static final int FILE_CODE = 1;
+    private static final int PERMISSIONS_REQUEST_CODE = 2;
+
+    private AndroidPermissions mPermissions;
+    private boolean mEnableMultipleSelections;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mPermissions = new AndroidPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        Log.i(getClass().getSimpleName(), "onRequestPermissionsResult");
+
+        if (mPermissions.areAllRequiredPermissionsGranted(permissions, grantResults)) {
+            startIntent();
+        } else {
+            Toast.makeText(this, "Please grant permissions to be able to select files", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public final void openFilePicker(boolean enableMultipleSelections) {
+        mEnableMultipleSelections = enableMultipleSelections;
+        if (mPermissions.checkPermissions()) {
+            startIntent();
+        } else {
+            Log.i(getClass().getSimpleName(), "Some needed permissions are missing. Requesting them.");
+            mPermissions.requestPermissions(PERMISSIONS_REQUEST_CODE);
+        }
+    }
+
+    private void startIntent() {
         // Starts NoNonsense-FilePicker (https://github.com/spacecowboy/NoNonsense-FilePicker)
         Intent intent = new Intent(this, BackHandlingFilePickerActivity.class);
 
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, enableMultipleSelections);
+        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, mEnableMultipleSelections);
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
         intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
 
