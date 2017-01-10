@@ -158,10 +158,9 @@ public abstract class UploadTask implements Runnable {
                 } else if (attempts > params.getMaxRetries()) {
                     broadcastError(exc);
                 } else {
-                    Logger.info(LOG_TAG, "Error in uploadId " + params.getId()
+                    Logger.error(LOG_TAG, "Error in uploadId " + params.getId()
                             + " on attempt " + attempts
-                            + ". Waiting " + errorDelay / 1000 + "s before next attempt. "
-                            + exc.getMessage());
+                            + ". Waiting " + errorDelay / 1000 + "s before next attempt. ", exc);
                     SystemClock.sleep(errorDelay);
 
                     errorDelay *= UploadService.BACKOFF_MULTIPLIER;
