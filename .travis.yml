@@ -14,7 +14,7 @@ android:
     - build-tools-24.0.3
 
     # The SDK version used to compile your project
-    - android-24
+    - android-25
 
     # Additional components
     - extra-google-m2repository

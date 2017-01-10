@@ -10,14 +10,16 @@ def projectGroup = "net.gotev"
 group = projectGroup
 version = "3.1"
 
+def sdkVersion = 25;
+
 android {
-    compileSdkVersion 24
+    compileSdkVersion sdkVersion
     buildToolsVersion "24.0.3"
 
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 24
-        versionCode 19
+        targetSdkVersion sdkVersion
+        versionCode 20
         versionName version
     }
     buildTypes {
@@ -31,8 +33,8 @@ android {
     }
 }
 
-def supportLibraryVersion = "24.2.1"
-def okHttpVersion = "3.4.1"
+def supportLibraryVersion = "25.1.0"
+def okHttpVersion = "3.5.0"
 
 dependencies {
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"

@@ -1,15 +1,17 @@
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
+def sdkVersion = 25;
+
 android {
-    compileSdkVersion 24
+    compileSdkVersion sdkVersion
     buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "net.gotev.uploadservicedemo"
         minSdkVersion 16
-        targetSdkVersion 24
-        versionCode 14
+        targetSdkVersion sdkVersion
+        versionCode 15
         versionName "3.1"
     }
     buildTypes {
@@ -21,12 +23,12 @@ android {
 }
 
 def butterKnifeVersion = "8.4.0"
-def supportVersion = "24.2.1"
+def supportVersion = "25.1.0"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.jakewharton:butterknife:${butterKnifeVersion}"
-    apt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
     compile "com.android.support:appcompat-v7:${supportVersion}"
     compile "com.android.support:design:${supportVersion}"
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
