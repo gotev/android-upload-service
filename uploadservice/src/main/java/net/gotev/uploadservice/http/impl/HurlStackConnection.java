@@ -49,9 +49,14 @@ public class HurlStackConnection implements HttpConnection {
     }
 
     @Override
-    public void setHeaders(List<NameValue> requestHeaders, boolean isFixedLengthStreamingMode,
-                           long totalBodyBytes) throws IOException {
+    public void setHeaders(List<NameValue> requestHeaders) throws IOException {
+        for (final NameValue param : requestHeaders) {
+            mConnection.setRequestProperty(param.getName(), param.getValue());
+        }
+    }
 
+    @Override
+    public void setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode) {
         if (isFixedLengthStreamingMode) {
             if (android.os.Build.VERSION.SDK_INT >= 19) {
                 mConnection.setFixedLengthStreamingMode(totalBodyBytes);
@@ -67,10 +72,6 @@ public class HurlStackConnection implements HttpConnection {
             }
         } else {
             mConnection.setChunkedStreamingMode(0);
-        }
-
-        for (final NameValue param : requestHeaders) {
-            mConnection.setRequestProperty(param.getName(), param.getValue());
         }
     }
 

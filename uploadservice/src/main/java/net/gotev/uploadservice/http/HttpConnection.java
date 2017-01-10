@@ -19,13 +19,17 @@ public interface HttpConnection {
     /**
      * Set request headers.
      * @param requestHeaders request headers to set
-     * @param isFixedLengthStreamingMode true if the fixed length streaming mode must be used. If
-     *                                   it's false, chunked streaming mode has to be used
-     * @param totalBodyBytes total number of bytes
      * @throws IOException if an error occurs while setting request headers
      */
-    void setHeaders(List<NameValue> requestHeaders, boolean isFixedLengthStreamingMode,
-                    long totalBodyBytes) throws IOException;
+    void setHeaders(List<NameValue> requestHeaders) throws IOException;
+
+    /**
+     * Sets the total body bytes.
+     * @param totalBodyBytes total number of bytes
+     * @param isFixedLengthStreamingMode true if the fixed length streaming mode must be used. If
+     *                                   it's false, chunked streaming mode has to be used
+     */
+    void setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode);
 
     /**
      * Write a byte array into the request body.
