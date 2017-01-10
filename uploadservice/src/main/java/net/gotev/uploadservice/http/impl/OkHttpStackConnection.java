@@ -2,6 +2,7 @@ package net.gotev.uploadservice.http.impl;
 
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.NameValue;
+import net.gotev.uploadservice.ServerResponse;
 import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.http.HttpConnection;
 
@@ -81,13 +82,7 @@ public class OkHttpStackConnection implements HttpConnection {
         mConnection.getOutputStream().write(bytes, 0, lengthToWriteFromStart);
     }
 
-    @Override
-    public int getServerResponseCode() throws IOException {
-        return mConnection.getResponseCode();
-    }
-
-    @Override
-    public byte[] getServerResponseBody() throws IOException {
+    private byte[] getServerResponseBody() throws IOException {
         InputStream stream = null;
 
         try {
@@ -125,8 +120,7 @@ public class OkHttpStackConnection implements HttpConnection {
         return byteStream.toByteArray();
     }
 
-    @Override
-    public LinkedHashMap<String, String> getServerResponseHeaders() throws IOException {
+    private LinkedHashMap<String, String> getServerResponseHeaders() throws IOException {
         Map<String, List<String>> headers = mConnection.getHeaderFields();
         if (headers == null)
             return null;
@@ -144,6 +138,12 @@ public class OkHttpStackConnection implements HttpConnection {
         }
 
         return out;
+    }
+
+    @Override
+    public ServerResponse getResponse() throws IOException {
+        return new ServerResponse(mConnection.getResponseCode(),
+                getServerResponseBody(), getServerResponseHeaders());
     }
 
     @Override

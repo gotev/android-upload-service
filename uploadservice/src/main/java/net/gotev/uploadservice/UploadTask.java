@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -247,19 +246,11 @@ public abstract class UploadTask implements Runnable {
      * Call this when the task has completed the upload request and has received the response
      * from the server.
      *
-     * @param responseCode HTTP response code got from the server. If you are implementing another
-     *                     protocol, set this to {@link UploadTask#TASK_COMPLETED_SUCCESSFULLY}
-     *                     to inform that the task has been completed successfully. Integer values
-     *                     lower than 200 or greater that 299 indicates error response from server.
-     * @param responseBody bytes read from server's response body. If your server does not
-     *                     return anything, set this to {@link UploadTask#EMPTY_RESPONSE}.
-     * @param responseHeaders contains all the headers sent by the server. Set this to null or
-     *                        an empty map if the server has not sent any response header.
+     * @param response response got from the server
      */
-    protected final void broadcastCompleted(final int responseCode, final byte[] responseBody,
-                                            final LinkedHashMap<String, String> responseHeaders) {
+    protected final void broadcastCompleted(final ServerResponse response) {
 
-        boolean successfulUpload = ((responseCode / 100) == 2);
+        boolean successfulUpload = ((response.getHttpCode() / 100) == 2);
 
         if (successfulUpload) {
             onSuccessfulUpload();
@@ -278,23 +269,20 @@ public abstract class UploadTask implements Runnable {
                                                      successfullyUploadedFiles,
                                                      params.getFiles().size());
 
-        final ServerResponse serverResponse = new ServerResponse(responseCode, responseBody,
-                                                                 responseHeaders);
-
-        BroadcastData data = new BroadcastData()
-                .setStatus(BroadcastData.Status.COMPLETED)
-                .setUploadInfo(uploadInfo)
-                .setServerResponse(serverResponse);
-
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.onCompleted(service, uploadInfo, serverResponse);
+                    delegate.onCompleted(service, uploadInfo, response);
                 }
             });
         } else {
+            BroadcastData data = new BroadcastData()
+                    .setStatus(BroadcastData.Status.COMPLETED)
+                    .setUploadInfo(uploadInfo)
+                    .setServerResponse(response);
+
             service.sendBroadcast(data.getIntent());
         }
 

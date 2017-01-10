@@ -32,11 +32,16 @@ public class ServerResponse implements Parcelable {
 
     /**
      * Creates a new server response object.
-     * @param httpCode HTTP response code
-     * @param body HTTP response body
-     * @param headers HTTP response headers
+     * @param httpCode HTTP response code got from the server. If you are implementing another
+     *                 protocol, set this to {@link UploadTask#TASK_COMPLETED_SUCCESSFULLY}
+     *                 to inform that the task has been completed successfully. Integer values
+     *                 lower than 200 or greater that 299 indicates error response from server.
+     * @param body bytes read from server's response body. If your server does not
+     *             return anything, set this to {@link UploadTask#EMPTY_RESPONSE}.
+     * @param headers contains all the headers sent by the server. Set this to null or
+     *                an empty map if the server has not sent any response header.
      */
-    protected ServerResponse(int httpCode, byte[] body, LinkedHashMap<String, String> headers) {
+    public ServerResponse(int httpCode, byte[] body, LinkedHashMap<String, String> headers) {
         this.httpCode = httpCode;
 
         if (body != null && body.length > 0)

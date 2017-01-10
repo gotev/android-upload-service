@@ -3,6 +3,7 @@ package net.gotev.uploadservice.ftp;
 import android.content.Intent;
 
 import net.gotev.uploadservice.Logger;
+import net.gotev.uploadservice.ServerResponse;
 import net.gotev.uploadservice.UploadFile;
 import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.UploadTask;
@@ -107,8 +108,8 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
             // Broadcast completion only if the user has not cancelled the operation.
             if (shouldContinue) {
-                broadcastCompleted(UploadTask.TASK_COMPLETED_SUCCESSFULLY,
-                                   UploadTask.EMPTY_RESPONSE, null);
+                broadcastCompleted(new ServerResponse(UploadTask.TASK_COMPLETED_SUCCESSFULLY,
+                                   UploadTask.EMPTY_RESPONSE, null));
             }
 
         } finally {

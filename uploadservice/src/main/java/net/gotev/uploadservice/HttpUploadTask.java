@@ -68,8 +68,8 @@ public abstract class HttpUploadTask extends UploadTask {
             connection.setTotalBodyBytes(getBodyLength(), httpParams.isUsesFixedLengthStreamingMode());
             writeBody(connection);
 
-            final int serverResponseCode = connection.getServerResponseCode();
-            Logger.debug(LOG_TAG, "Server responded with HTTP " + serverResponseCode
+            final ServerResponse response = connection.getResponse();
+            Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
                             + " to upload with ID: " + params.getId());
 
             // Broadcast completion only if the user has not cancelled the operation.
@@ -79,8 +79,7 @@ public abstract class HttpUploadTask extends UploadTask {
             // broadcasted and then the cancellation. That behaviour was not desirable as the
             // library user couldn't execute code on user cancellation.
             if (shouldContinue) {
-                broadcastCompleted(serverResponseCode, connection.getServerResponseBody(),
-                                   connection.getServerResponseHeaders());
+                broadcastCompleted(response);
             }
 
         } finally {

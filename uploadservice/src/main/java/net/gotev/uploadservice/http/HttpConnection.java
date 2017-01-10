@@ -1,9 +1,9 @@
 package net.gotev.uploadservice.http;
 
 import net.gotev.uploadservice.NameValue;
+import net.gotev.uploadservice.ServerResponse;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -48,25 +48,11 @@ public interface HttpConnection {
     void writeBody(byte[] bytes, int lengthToWriteFromStart) throws IOException;
 
     /**
-     * Gets the HTTP response code from the server.
-     * @return an integer representing the HTTP response code (e.g. 200)
-     * @throws IOException if an error occurs while getting the server response code
+     * Gets the server response.
+     * @return object containing the server response status, headers and body.
+     * @throws IOException if an error occurs while getting the server response
      */
-    int getServerResponseCode() throws IOException;
-
-    /**
-     * Gets the server response body.
-     * @return response body bytes
-     * @throws IOException if an error occurs while getting the server response body
-     */
-    byte[] getServerResponseBody() throws IOException;
-
-    /**
-     * Gets the server response headers.
-     * @return map containing all the response headers
-     * @throws IOException if an error occurs while getting the server response headers
-     */
-    LinkedHashMap<String, String> getServerResponseHeaders() throws IOException;
+    ServerResponse getResponse() throws IOException;
 
     /**
      * Closes the connection and frees all the allocated resources.
