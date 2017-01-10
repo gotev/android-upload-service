@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.nononsenseapps.filepicker.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,9 +81,15 @@ public class FilesPickerActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_CODE && resultCode == Activity.RESULT_OK) {
             if (data.getBooleanExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false)) {
-                ArrayList<String> paths = data.getStringArrayListExtra(FilePickerActivity.EXTRA_PATHS);
+                ArrayList<String> extraPaths = data.getStringArrayListExtra(FilePickerActivity.EXTRA_PATHS);
 
-                if (paths != null) {
+                if (extraPaths != null) {
+                    ArrayList<String> paths = new ArrayList<>(extraPaths.size());
+
+                    for (String path : extraPaths) {
+                        paths.add(Utils.getFileForUri(Uri.parse(path)).getAbsolutePath());
+                    }
+
                     onPickedFiles(paths);
                 }
 
@@ -90,7 +97,7 @@ public class FilesPickerActivity extends BaseActivity {
                 Uri picked = data.getData();
 
                 if (picked != null) {
-                    onPickedFiles(Collections.singletonList(picked.getPath()));
+                    onPickedFiles(Collections.singletonList(Utils.getFileForUri(picked).getAbsolutePath()));
                 }
             }
         }
