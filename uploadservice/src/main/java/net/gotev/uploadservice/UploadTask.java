@@ -215,7 +215,7 @@ public abstract class UploadTask implements Runnable {
         setLastProgressNotificationTime(currentTime);
 
         Logger.debug(LOG_TAG, "Broadcasting upload progress for " + params.getId()
-                              + ": " + uploadedBytes + " bytes of " + totalBytes);
+                + ": " + uploadedBytes + " bytes of " + totalBytes);
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
@@ -274,12 +274,12 @@ public abstract class UploadTask implements Runnable {
         Logger.debug(LOG_TAG, "Broadcasting upload completed for " + params.getId());
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
-                                                     totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles,
-                                                     params.getFiles().size());
+                totalBytes, (attempts - 1),
+                successfullyUploadedFiles,
+                params.getFiles().size());
 
         final ServerResponse serverResponse = new ServerResponse(responseCode, responseBody,
-                                                                 responseHeaders);
+                responseHeaders);
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.COMPLETED)
@@ -318,9 +318,9 @@ public abstract class UploadTask implements Runnable {
         Logger.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: " + params.getId());
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
-                                                     totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles,
-                                                     params.getFiles().size());
+                totalBytes, (attempts - 1),
+                successfullyUploadedFiles,
+                params.getFiles().size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.CANCELLED)
@@ -379,9 +379,9 @@ public abstract class UploadTask implements Runnable {
                 + params.getId() + ". " + exception.getMessage());
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
-                                                     totalBytes, (attempts - 1),
-                                                     successfullyUploadedFiles,
-                                                     params.getFiles().size());
+                totalBytes, (attempts - 1),
+                successfullyUploadedFiles,
+                params.getFiles().size());
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.ERROR)
@@ -420,6 +420,10 @@ public abstract class UploadTask implements Runnable {
                 .setGroup(UploadService.NAMESPACE)
                 .setProgress(100, 0, true)
                 .setOngoing(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+            notification.setPriority(Notification.PRIORITY_MAX);
+
+        addNotificationActions();
 
         Notification builtNotification = notification.build();
 
@@ -427,6 +431,15 @@ public abstract class UploadTask implements Runnable {
             notificationManager.cancel(notificationId);
         } else {
             notificationManager.notify(notificationId, builtNotification);
+        }
+    }
+
+    private void addNotificationActions() {
+        List<NotificationAction> notificationActions = params.getNotificationConfig().getNotificationActions();
+        for (NotificationAction notificationAction : notificationActions) {
+            notification.addAction(notificationAction.getResourceDrawable(),
+                    notificationAction.getText(),
+                    notificationAction.getClickIntent());
         }
     }
 
