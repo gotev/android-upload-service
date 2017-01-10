@@ -21,7 +21,7 @@ public class SchemeHandlerFactory {
     private LinkedHashMap<String, Class<? extends SchemeHandler>> handlers = new LinkedHashMap<>();
 
     private SchemeHandlerFactory() {
-        handlers.put("file://", FileSchemeHandler.class);
+        handlers.put("/", FileSchemeHandler.class);
         handlers.put("content://", ContentSchemeHandler.class);
     }
 

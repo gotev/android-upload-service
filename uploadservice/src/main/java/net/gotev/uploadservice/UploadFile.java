@@ -36,9 +36,6 @@ public class UploadFile implements Parcelable {
             throw new IllegalArgumentException("Please specify a file path!");
         }
 
-        if (path.startsWith("/"))
-            path = "file://" + path;
-
         if (!SchemeHandlerFactory.getInstance().isSupported(path))
             throw new UnsupportedOperationException("Unsupported scheme: " + path);
 
