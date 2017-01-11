@@ -34,4 +34,24 @@ public class Placeholders {
      * Placeholder to display the total number of files to upload.
      */
     public static final String TOTAL_FILES = "[[TOTAL_FILES]]";
+
+    /**
+     * Replace placeholders in a string.
+     * @param string string in which to replace placeholders
+     * @param uploadInfo upload information data
+     * @return string with replaced placeholders
+     */
+    public static String replace(String string, UploadInfo uploadInfo) {
+        if (string == null || string.isEmpty())
+            return "";
+
+        String tmp;
+        tmp = string.replace(ELAPSED_TIME, uploadInfo.getElapsedTimeString());
+        tmp = tmp.replace(PROGRESS, uploadInfo.getProgressPercent() + "%");
+        tmp = tmp.replace(UPLOAD_RATE, uploadInfo.getUploadRateString());
+        tmp = tmp.replace(UPLOADED_FILES, Integer.toString(uploadInfo.getSuccessfullyUploadedFiles().size()));
+        tmp = tmp.replace(TOTAL_FILES, Integer.toString(uploadInfo.getTotalFiles()));
+
+        return tmp;
+    }
 }
