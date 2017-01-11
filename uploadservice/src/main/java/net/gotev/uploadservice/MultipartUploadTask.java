@@ -144,7 +144,7 @@ public class MultipartUploadTask extends HttpUploadTask {
             broadcastProgress(uploadedBytes, totalBytes);
 
             final InputStream stream = file.getStream(service);
-            writeStream(bodyWriter, stream);
+            bodyWriter.writeStream(stream, this);
             stream.close();
         }
     }

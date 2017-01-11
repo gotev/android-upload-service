@@ -7,7 +7,6 @@ import net.gotev.uploadservice.http.BodyWriter;
 import net.gotev.uploadservice.http.HttpConnection;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -18,7 +17,8 @@ import java.io.UnsupportedEncodingException;
  * @author gotev (Aleksandar Gotev)
  * @author mabdurrahman
  */
-public abstract class HttpUploadTask extends UploadTask implements HttpConnection.RequestBodyDelegate {
+public abstract class HttpUploadTask extends UploadTask
+        implements HttpConnection.RequestBodyDelegate, BodyWriter.OnStreamWriteListener {
 
     private static final String LOG_TAG = HttpUploadTask.class.getSimpleName();
 
@@ -93,19 +93,17 @@ public abstract class HttpUploadTask extends UploadTask implements HttpConnectio
      */
     protected abstract long getBodyLength() throws UnsupportedEncodingException;
 
-    protected final void writeStream(BodyWriter bodyWriter, InputStream stream) throws IOException {
-        bodyWriter.writeStream(stream, new BodyWriter.OnStreamWriteListener() {
-            @Override
-            public boolean shouldContinueWriting() {
-                return shouldContinue;
-            }
+    // BodyWriter.OnStreamWriteListener methods implementation
 
-            @Override
-            public void onBytesWritten(int bytesWritten) {
-                uploadedBytes += bytesWritten;
-                broadcastProgress(uploadedBytes, totalBytes);
-            }
-        });
+    @Override
+    public boolean shouldContinueWriting() {
+        return shouldContinue;
+    }
+
+    @Override
+    public void onBytesWritten(int bytesWritten) {
+        uploadedBytes += bytesWritten;
+        broadcastProgress(uploadedBytes, totalBytes);
     }
 
 }
