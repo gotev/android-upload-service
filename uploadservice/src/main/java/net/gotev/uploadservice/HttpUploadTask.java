@@ -65,7 +65,7 @@ public abstract class HttpUploadTask extends UploadTask {
             connection = UploadService.HTTP_STACK
                     .createNewConnection(httpParams.getMethod(), params.getServerUrl())
                     .setHeaders(httpParams.getRequestHeaders())
-                    .setTotalBodyBytes(getBodyLength(), httpParams.isUsesFixedLengthStreamingMode());
+                    .setTotalBodyBytes(totalBytes, httpParams.isUsesFixedLengthStreamingMode());
 
             final ServerResponse response = connection.getResponse(new HttpConnection.RequestBodyDelegate() {
                 @Override
