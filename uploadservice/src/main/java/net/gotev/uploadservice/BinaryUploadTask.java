@@ -19,7 +19,7 @@ public class BinaryUploadTask extends HttpUploadTask {
     }
 
     @Override
-    protected void writeBody(BodyWriter bodyWriter) throws IOException {
+    public void onBodyReady(BodyWriter bodyWriter) throws IOException {
         writeStream(bodyWriter, params.getFiles().get(0).getStream(service));
     }
 

@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
  * @author gotev (Aleksandar Gotev)
  * @author mabdurrahman
  */
-public abstract class HttpUploadTask extends UploadTask {
+public abstract class HttpUploadTask extends UploadTask implements HttpConnection.RequestBodyDelegate {
 
     private static final String LOG_TAG = HttpUploadTask.class.getSimpleName();
 
@@ -67,12 +67,7 @@ public abstract class HttpUploadTask extends UploadTask {
                     .setHeaders(httpParams.getRequestHeaders())
                     .setTotalBodyBytes(totalBytes, httpParams.isUsesFixedLengthStreamingMode());
 
-            final ServerResponse response = connection.getResponse(new HttpConnection.RequestBodyDelegate() {
-                @Override
-                public void onBodyReady(BodyWriter bodyWriter) throws IOException {
-                    writeBody(bodyWriter);
-                }
-            });
+            final ServerResponse response = connection.getResponse(this);
             Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
                             + " to upload with ID: " + params.getId());
 
@@ -97,13 +92,6 @@ public abstract class HttpUploadTask extends UploadTask {
      * @throws UnsupportedEncodingException
      */
     protected abstract long getBodyLength() throws UnsupportedEncodingException;
-
-    /**
-     * Implement in subclasses to write the body of the http request.
-     * @param bodyWriter object with which to write on the request body
-     * @throws IOException if an error occurs while writing body
-     */
-    protected abstract void writeBody(BodyWriter bodyWriter) throws IOException;
 
     protected final void writeStream(BodyWriter bodyWriter, InputStream stream) throws IOException {
         bodyWriter.writeStream(stream, new BodyWriter.OnStreamWriteListener() {

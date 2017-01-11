@@ -7,6 +7,8 @@ import java.io.InputStream;
 
 /**
  * Exposes the methods to be implemented to write the request body.
+ * If you want to use an internal cache or buffer, remember to always get its size value from
+ * {@link UploadService#BUFFER_SIZE} and to clear everything when not needed to prevent memory leaks
  * @author Aleksandar Gotev
  */
 

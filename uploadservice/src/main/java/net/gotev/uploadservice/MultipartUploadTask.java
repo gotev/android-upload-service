@@ -59,7 +59,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     @Override
-    protected void writeBody(BodyWriter bodyWriter) throws IOException {
+    public void onBodyReady(BodyWriter bodyWriter) throws IOException {
         writeRequestParameters(bodyWriter);
         writeFiles(bodyWriter);
         bodyWriter.write(trailerBytes);
