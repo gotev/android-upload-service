@@ -3,21 +3,21 @@ package net.gotev.uploadservice.http.impl;
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.NameValue;
 import net.gotev.uploadservice.ServerResponse;
-import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.http.HttpConnection;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+import okhttp3.Headers;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.internal.huc.OkHttpURLConnection;
-import okhttp3.internal.huc.OkHttpsURLConnection;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.internal.http.HttpMethod;
+import okio.BufferedSink;
 
 /**
  * {@link HttpConnection} implementation using OkHttpClient.
@@ -27,142 +27,104 @@ public class OkHttpStackConnection implements HttpConnection {
 
     private static final String LOG_TAG = OkHttpStackConnection.class.getSimpleName();
 
-    private HttpURLConnection mConnection;
+    private OkHttpClient mClient;
+    private Request.Builder mRequestBuilder;
+    private String mMethod;
+    private long mBodyLength;
+    private String mContentType;
+    private Response mResponse;
 
     public OkHttpStackConnection(OkHttpClient client, String method, String url) throws IOException {
         Logger.debug(getClass().getSimpleName(), "creating new connection");
 
-        URL urlObj = new URL(url);
+        mResponse = null;
+        mClient = client;
+        mMethod = method;
 
-        if (urlObj.getProtocol().equals("https")) {
-            mConnection = new OkHttpsURLConnection(urlObj, client);
-        } else {
-            mConnection = new OkHttpURLConnection(urlObj, client);
-        }
-
-        mConnection.setDoInput(true);
-        mConnection.setDoOutput(true);
-        mConnection.setRequestMethod(method);
+        mRequestBuilder = new Request.Builder().url(new URL(url));
     }
 
     @Override
     public void setHeaders(List<NameValue> requestHeaders) throws IOException {
         for (final NameValue param : requestHeaders) {
-            mConnection.setRequestProperty(param.getName(), param.getValue());
+            if ("Content-Type".equalsIgnoreCase(param.getName()))
+                mContentType = param.getValue();
+
+            mRequestBuilder.header(param.getName(), param.getValue());
         }
     }
 
     @Override
     public void setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode) {
         if (isFixedLengthStreamingMode) {
-            if (android.os.Build.VERSION.SDK_INT >= 19) {
-                mConnection.setFixedLengthStreamingMode(totalBodyBytes);
+            if (android.os.Build.VERSION.SDK_INT < 19 && totalBodyBytes > Integer.MAX_VALUE)
+                throw new RuntimeException("You need Android API version 19 or newer to "
+                        + "upload more than 2GB in a single request using "
+                        + "fixed size content length. Try switching to "
+                        + "chunked mode instead, but make sure your server side supports it!");
 
-            } else {
-                if (totalBodyBytes > Integer.MAX_VALUE)
-                    throw new RuntimeException("You need Android API version 19 or newer to "
-                            + "upload more than 2GB in a single request using "
-                            + "fixed size content length. Try switching to "
-                            + "chunked mode instead, but make sure your server side supports it!");
+            mBodyLength = totalBodyBytes;
 
-                mConnection.setFixedLengthStreamingMode((int) totalBodyBytes);
-            }
         } else {
-            mConnection.setChunkedStreamingMode(0);
+            // http://stackoverflow.com/questions/33921894/how-do-i-enable-disable-chunked-transfer-encoding-for-a-multi-part-post-that-inc#comment55679982_33921894
+            mBodyLength = -1;
         }
     }
 
-    @Override
-    public void writeBody(byte[] bytes) throws IOException {
-        mConnection.getOutputStream().write(bytes, 0, bytes.length);
-    }
-
-    @Override
-    public void writeBody(byte[] bytes, int lengthToWriteFromStart) throws IOException {
-        mConnection.getOutputStream().write(bytes, 0, lengthToWriteFromStart);
-    }
-
-    private byte[] getServerResponseBody() throws IOException {
-        InputStream stream = null;
-
-        try {
-            if (mConnection.getResponseCode() / 100 == 2) {
-                stream = mConnection.getInputStream();
-            } else {
-                stream = mConnection.getErrorStream();
-            }
-
-            return getResponseBodyAsByteArray(stream);
-
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (Exception exc) {
-                    Logger.error(LOG_TAG, "Error while closing server response stream", exc);
-                }
-            }
-        }
-    }
-
-    private byte[] getResponseBodyAsByteArray(final InputStream inputStream) {
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-
-        byte[] buffer = new byte[UploadService.BUFFER_SIZE];
-        int bytesRead;
-
-        try {
-            while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) > 0) {
-                byteStream.write(buffer, 0, bytesRead);
-            }
-        } catch (Exception ignored) {}
-
-        return byteStream.toByteArray();
-    }
-
-    private LinkedHashMap<String, String> getServerResponseHeaders() throws IOException {
-        Map<String, List<String>> headers = mConnection.getHeaderFields();
-        if (headers == null)
-            return null;
-
+    private LinkedHashMap<String, String> getServerResponseHeaders(Headers headers) throws IOException {
         LinkedHashMap<String, String> out = new LinkedHashMap<>(headers.size());
 
-        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-            if (entry.getKey() != null) {
-                StringBuilder headerValue = new StringBuilder();
-                for (String value : entry.getValue()) {
-                    headerValue.append(value);
-                }
-                out.put(entry.getKey(), headerValue.toString());
-            }
+        for (String headerName : headers.names()) {
+            out.put(headerName, headers.get(headerName));
         }
 
         return out;
     }
 
     @Override
-    public ServerResponse getResponse() throws IOException {
-        return new ServerResponse(mConnection.getResponseCode(),
-                getServerResponseBody(), getServerResponseHeaders());
+    public ServerResponse getResponse(final RequestBodyDelegate delegate) throws IOException {
+        if (HttpMethod.permitsRequestBody(mMethod) || HttpMethod.requiresRequestBody(mMethod)) {
+            RequestBody body = new RequestBody() {
+                @Override
+                public long contentLength() throws IOException {
+                    return mBodyLength;
+                }
+
+                @Override
+                public MediaType contentType() {
+                    if (mContentType == null)
+                        return null;
+                    return MediaType.parse(mContentType);
+                }
+
+                @Override
+                public void writeTo(BufferedSink sink) throws IOException {
+                    final OkHttpBodyWriter bodyWriter = new OkHttpBodyWriter(sink);
+                    delegate.onBodyReady(bodyWriter);
+                    bodyWriter.flush();
+                }
+            };
+
+            mRequestBuilder.method(mMethod, body);
+        } else {
+            mRequestBuilder.method(mMethod, null);
+        }
+
+        mResponse = mClient.newCall(mRequestBuilder.build()).execute();
+
+        return new ServerResponse(mResponse.code(),
+                mResponse.body().bytes(),
+                getServerResponseHeaders(mResponse.headers()));
     }
 
     @Override
     public void close() {
         Logger.debug(getClass().getSimpleName(), "closing connection");
 
-        if (mConnection != null) {
+        if (mResponse != null) {
             try {
-                mConnection.getInputStream().close();
-            } catch (Exception ignored) { }
-
-            try {
-                mConnection.getOutputStream().flush();
-                mConnection.getOutputStream().close();
-            } catch (Exception ignored) { }
-
-            try {
-                mConnection.disconnect();
-            } catch (Exception exc) {
+                mResponse.close();
+            } catch (Throwable exc) {
                 Logger.error(LOG_TAG, "Error while closing connection", exc);
             }
         }

@@ -2,7 +2,7 @@ package net.gotev.uploadservice;
 
 import android.content.Intent;
 
-import net.gotev.uploadservice.http.HttpConnection;
+import net.gotev.uploadservice.http.BodyWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,10 +59,10 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     @Override
-    protected void writeBody(HttpConnection connection) throws IOException {
-        writeRequestParameters(connection);
-        writeFiles(connection);
-        connection.writeBody(trailerBytes);
+    protected void writeBody(BodyWriter bodyWriter) throws IOException {
+        writeRequestParameters(bodyWriter);
+        writeFiles(bodyWriter);
+        bodyWriter.write(trailerBytes);
     }
 
     private String getBoundary() {
@@ -118,12 +118,12 @@ public class MultipartUploadTask extends HttpUploadTask {
         return boundaryBytes.length + getMultipartHeader(file, isUtf8).length + file.length(service);
     }
 
-    private void writeRequestParameters(HttpConnection connection) throws IOException {
+    private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
         if (!httpParams.getRequestParameters().isEmpty()) {
             for (final NameValue parameter : httpParams.getRequestParameters()) {
-                connection.writeBody(boundaryBytes);
+                bodyWriter.write(boundaryBytes);
                 byte[] formItemBytes = parameter.getMultipartBytes(isUtf8Charset);
-                connection.writeBody(formItemBytes);
+                bodyWriter.write(formItemBytes);
 
                 uploadedBytes += boundaryBytes.length + formItemBytes.length;
                 broadcastProgress(uploadedBytes, totalBytes);
@@ -131,20 +131,21 @@ public class MultipartUploadTask extends HttpUploadTask {
         }
     }
 
-    private void writeFiles(HttpConnection connection) throws IOException {
+    private void writeFiles(BodyWriter bodyWriter) throws IOException {
         for (UploadFile file : params.getFiles()) {
             if (!shouldContinue)
                 break;
 
-            connection.writeBody(boundaryBytes);
+            bodyWriter.write(boundaryBytes);
             byte[] headerBytes = getMultipartHeader(file, isUtf8Charset);
-            connection.writeBody(headerBytes);
+            bodyWriter.write(headerBytes);
 
             uploadedBytes += boundaryBytes.length + headerBytes.length;
             broadcastProgress(uploadedBytes, totalBytes);
 
             final InputStream stream = file.getStream(service);
-            writeStream(stream);
+            writeStream(bodyWriter, stream);
+            stream.close();
         }
     }
 

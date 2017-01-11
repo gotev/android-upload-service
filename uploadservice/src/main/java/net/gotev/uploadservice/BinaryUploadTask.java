@@ -1,6 +1,6 @@
 package net.gotev.uploadservice;
 
-import net.gotev.uploadservice.http.HttpConnection;
+import net.gotev.uploadservice.http.BodyWriter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -19,8 +19,8 @@ public class BinaryUploadTask extends HttpUploadTask {
     }
 
     @Override
-    protected void writeBody(HttpConnection connection) throws IOException {
-        writeStream(params.getFiles().get(0).getStream(service));
+    protected void writeBody(BodyWriter bodyWriter) throws IOException {
+        writeStream(bodyWriter, params.getFiles().get(0).getStream(service));
     }
 
     @Override

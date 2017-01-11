@@ -17,6 +17,19 @@ import java.util.List;
 public interface HttpConnection {
 
     /**
+     * Delegate called when the body is ready to be written.
+     */
+    interface RequestBodyDelegate {
+
+        /**
+         * Handles the writing og the body.
+         * @param bodyWriter object with which to write on the body
+         * @throws IOException if an error occurs while writing the body
+         */
+        void onBodyReady(BodyWriter bodyWriter) throws IOException;
+    }
+
+    /**
      * Set request headers.
      * @param requestHeaders request headers to set
      * @throws IOException if an error occurs while setting request headers
@@ -32,27 +45,12 @@ public interface HttpConnection {
     void setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode);
 
     /**
-     * Write a byte array into the request body.
-     * @param bytes array with the bytes to write
-     * @throws IOException if an error occurs while writing
-     */
-    void writeBody(byte[] bytes) throws IOException;
-
-    /**
-     * Write a portion of a byte array into the request body.
-     * @param bytes array with the bytes to write
-     * @param lengthToWriteFromStart how many bytes to write, starting from the first one in
-     *                               the array
-     * @throws IOException if an error occurs while writing
-     */
-    void writeBody(byte[] bytes, int lengthToWriteFromStart) throws IOException;
-
-    /**
      * Gets the server response.
      * @return object containing the server response status, headers and body.
+     * @param delegate delegate which handles the writing of the request body
      * @throws IOException if an error occurs while getting the server response
      */
-    ServerResponse getResponse() throws IOException;
+    ServerResponse getResponse(RequestBodyDelegate delegate) throws IOException;
 
     /**
      * Closes the connection and frees all the allocated resources.

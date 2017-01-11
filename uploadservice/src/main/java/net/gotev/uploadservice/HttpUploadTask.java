@@ -3,6 +3,7 @@ package net.gotev.uploadservice;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 
+import net.gotev.uploadservice.http.BodyWriter;
 import net.gotev.uploadservice.http.HttpConnection;
 
 import java.io.IOException;
@@ -66,9 +67,13 @@ public abstract class HttpUploadTask extends UploadTask {
 
             connection.setHeaders(httpParams.getRequestHeaders());
             connection.setTotalBodyBytes(getBodyLength(), httpParams.isUsesFixedLengthStreamingMode());
-            writeBody(connection);
 
-            final ServerResponse response = connection.getResponse();
+            final ServerResponse response = connection.getResponse(new HttpConnection.RequestBodyDelegate() {
+                @Override
+                public void onBodyReady(BodyWriter bodyWriter) throws IOException {
+                    writeBody(bodyWriter);
+                }
+            });
             Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
                             + " to upload with ID: " + params.getId());
 
@@ -96,17 +101,17 @@ public abstract class HttpUploadTask extends UploadTask {
 
     /**
      * Implement in subclasses to write the body of the http request.
-     * @param connection connection on which to write the body
-     * @throws IOException
+     * @param bodyWriter object with which to write on the request body
+     * @throws IOException if an error occurs while writing body
      */
-    protected abstract void writeBody(HttpConnection connection) throws IOException;
+    protected abstract void writeBody(BodyWriter bodyWriter) throws IOException;
 
-    protected final void writeStream(InputStream stream) throws IOException {
+    protected final void writeStream(BodyWriter bodyWriter, InputStream stream) throws IOException {
         byte[] buffer = new byte[UploadService.BUFFER_SIZE];
         int bytesRead;
 
         while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0 && shouldContinue) {
-            connection.writeBody(buffer, bytesRead);
+            bodyWriter.write(buffer, bytesRead);
             uploadedBytes += bytesRead;
             broadcastProgress(uploadedBytes, totalBytes);
         }

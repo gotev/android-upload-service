@@ -76,16 +76,6 @@ public class HurlStackConnection implements HttpConnection {
         }
     }
 
-    @Override
-    public void writeBody(byte[] bytes) throws IOException {
-        mConnection.getOutputStream().write(bytes, 0, bytes.length);
-    }
-
-    @Override
-    public void writeBody(byte[] bytes, int lengthToWriteFromStart) throws IOException {
-        mConnection.getOutputStream().write(bytes, 0, lengthToWriteFromStart);
-    }
-
     private byte[] getServerResponseBody() throws IOException {
         InputStream stream = null;
 
@@ -145,7 +135,12 @@ public class HurlStackConnection implements HttpConnection {
     }
 
     @Override
-    public ServerResponse getResponse() throws IOException {
+    public ServerResponse getResponse(final RequestBodyDelegate delegate) throws IOException {
+
+        final HurlHttpBodyWriter bodyWriter = new HurlHttpBodyWriter(mConnection.getOutputStream());
+        delegate.onBodyReady(bodyWriter);
+        bodyWriter.flush();
+
         return new ServerResponse(mConnection.getResponseCode(),
                 getServerResponseBody(), getServerResponseHeaders());
     }

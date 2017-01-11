@@ -40,7 +40,6 @@ dependencies {
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
     compile "com.android.support:support-v4:${supportLibraryVersion}"
     compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-    compile "com.squareup.okhttp3:okhttp-urlconnection:${okHttpVersion}"
 }
 
 // add the following information to the file: local.properties situated in the parent directory of
