@@ -106,14 +106,18 @@ public abstract class HttpUploadTask extends UploadTask {
     protected abstract void writeBody(BodyWriter bodyWriter) throws IOException;
 
     protected final void writeStream(BodyWriter bodyWriter, InputStream stream) throws IOException {
-        byte[] buffer = new byte[UploadService.BUFFER_SIZE];
-        int bytesRead;
+        bodyWriter.writeStream(stream, new BodyWriter.OnStreamWriteListener() {
+            @Override
+            public boolean shouldContinueWriting() {
+                return shouldContinue;
+            }
 
-        while ((bytesRead = stream.read(buffer, 0, buffer.length)) > 0 && shouldContinue) {
-            bodyWriter.write(buffer, bytesRead);
-            uploadedBytes += bytesRead;
-            broadcastProgress(uploadedBytes, totalBytes);
-        }
+            @Override
+            public void onBytesWritten(int bytesWritten) {
+                uploadedBytes += bytesWritten;
+                broadcastProgress(uploadedBytes, totalBytes);
+            }
+        });
     }
 
 }

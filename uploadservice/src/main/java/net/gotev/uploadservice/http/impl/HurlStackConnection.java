@@ -141,7 +141,7 @@ public class HurlStackConnection implements HttpConnection {
     @Override
     public ServerResponse getResponse(final RequestBodyDelegate delegate) throws IOException {
 
-        final HurlHttpBodyWriter bodyWriter = new HurlHttpBodyWriter(mConnection.getOutputStream());
+        final HurlBodyWriter bodyWriter = new HurlBodyWriter(mConnection.getOutputStream());
         delegate.onBodyReady(bodyWriter);
         bodyWriter.flush();
 

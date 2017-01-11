@@ -10,7 +10,7 @@ import okio.BufferedSink;
  * @author Aleksandar Gotev
  */
 
-public class OkHttpBodyWriter implements BodyWriter {
+public class OkHttpBodyWriter extends BodyWriter {
 
     private BufferedSink mSink;
 

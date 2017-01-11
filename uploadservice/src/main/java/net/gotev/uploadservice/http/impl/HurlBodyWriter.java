@@ -9,11 +9,11 @@ import java.io.OutputStream;
  * @author Aleksandar Gotev
  */
 
-public class HurlHttpBodyWriter implements BodyWriter {
+public class HurlBodyWriter extends BodyWriter {
 
     private OutputStream mOutputStream;
 
-    public HurlHttpBodyWriter(OutputStream outputStream) {
+    public HurlBodyWriter(OutputStream outputStream) {
         mOutputStream = outputStream;
     }
 
