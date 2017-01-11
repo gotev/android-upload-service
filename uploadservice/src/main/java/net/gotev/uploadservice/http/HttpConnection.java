@@ -34,7 +34,7 @@ public interface HttpConnection {
      * @param requestHeaders request headers to set
      * @throws IOException if an error occurs while setting request headers
      */
-    void setHeaders(List<NameValue> requestHeaders) throws IOException;
+    HttpConnection setHeaders(List<NameValue> requestHeaders) throws IOException;
 
     /**
      * Sets the total body bytes.
@@ -42,7 +42,7 @@ public interface HttpConnection {
      * @param isFixedLengthStreamingMode true if the fixed length streaming mode must be used. If
      *                                   it's false, chunked streaming mode has to be used
      */
-    void setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode);
+    HttpConnection setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode);
 
     /**
      * Gets the server response.

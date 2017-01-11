@@ -62,11 +62,10 @@ public abstract class HttpUploadTask extends UploadTask {
                 httpParams.addRequestHeader("User-Agent", httpParams.getCustomUserAgent());
             }
 
-            connection = UploadService.HTTP_STACK.createNewConnection(httpParams.getMethod(),
-                                                                      params.getServerUrl());
-
-            connection.setHeaders(httpParams.getRequestHeaders());
-            connection.setTotalBodyBytes(getBodyLength(), httpParams.isUsesFixedLengthStreamingMode());
+            connection = UploadService.HTTP_STACK
+                    .createNewConnection(httpParams.getMethod(), params.getServerUrl())
+                    .setHeaders(httpParams.getRequestHeaders())
+                    .setTotalBodyBytes(getBodyLength(), httpParams.isUsesFixedLengthStreamingMode());
 
             final ServerResponse response = connection.getResponse(new HttpConnection.RequestBodyDelegate() {
                 @Override

@@ -45,17 +45,19 @@ public class OkHttpStackConnection implements HttpConnection {
     }
 
     @Override
-    public void setHeaders(List<NameValue> requestHeaders) throws IOException {
+    public HttpConnection setHeaders(List<NameValue> requestHeaders) throws IOException {
         for (final NameValue param : requestHeaders) {
             if ("Content-Type".equalsIgnoreCase(param.getName()))
                 mContentType = param.getValue();
 
             mRequestBuilder.header(param.getName(), param.getValue());
         }
+
+        return this;
     }
 
     @Override
-    public void setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode) {
+    public HttpConnection setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode) {
         if (isFixedLengthStreamingMode) {
             if (android.os.Build.VERSION.SDK_INT < 19 && totalBodyBytes > Integer.MAX_VALUE)
                 throw new RuntimeException("You need Android API version 19 or newer to "
@@ -69,6 +71,8 @@ public class OkHttpStackConnection implements HttpConnection {
             // http://stackoverflow.com/questions/33921894/how-do-i-enable-disable-chunked-transfer-encoding-for-a-multi-part-post-that-inc#comment55679982_33921894
             mBodyLength = -1;
         }
+
+        return this;
     }
 
     private LinkedHashMap<String, String> getServerResponseHeaders(Headers headers) throws IOException {
