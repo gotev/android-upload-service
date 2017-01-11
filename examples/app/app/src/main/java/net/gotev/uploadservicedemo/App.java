@@ -4,7 +4,7 @@ import android.app.Application;
 
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.UploadService;
-import net.gotev.uploadservice.http.impl.OkHttpStack;
+import net.gotev.uploadservice.okhttp.OkHttpStack;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

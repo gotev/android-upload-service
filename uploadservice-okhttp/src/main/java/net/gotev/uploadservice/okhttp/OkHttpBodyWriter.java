@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.http.impl;
+package net.gotev.uploadservice.okhttp;
 
 import net.gotev.uploadservice.http.BodyWriter;
 

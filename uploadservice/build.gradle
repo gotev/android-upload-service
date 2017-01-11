@@ -34,12 +34,10 @@ android {
 }
 
 def supportLibraryVersion = "25.1.0"
-def okHttpVersion = "3.5.0"
 
 dependencies {
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
     compile "com.android.support:support-v4:${supportLibraryVersion}"
-    compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
 }
 
 // add the following information to the file: local.properties situated in the parent directory of
