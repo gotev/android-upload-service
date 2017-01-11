@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -160,7 +159,14 @@ public abstract class UploadTask implements Runnable {
                     Logger.error(LOG_TAG, "Error in uploadId " + params.getId()
                             + " on attempt " + attempts
                             + ". Waiting " + errorDelay / 1000 + "s before next attempt. ", exc);
-                    SystemClock.sleep(errorDelay);
+
+                    long beforeSleepTs = System.currentTimeMillis();
+
+                    while (shouldContinue && System.currentTimeMillis() < (beforeSleepTs + errorDelay)) {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (Throwable ignored) { }
+                    }
 
                     errorDelay *= UploadService.BACKOFF_MULTIPLIER;
                     if (errorDelay > UploadService.MAX_RETRY_WAIT_TIME) {
