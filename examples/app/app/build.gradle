@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
 def sdkVersion = 25;
+def libraryVersion = "3.1"
 
 android {
     compileSdkVersion sdkVersion
@@ -12,7 +13,7 @@ android {
         minSdkVersion 16
         targetSdkVersion sdkVersion
         versionCode 15
-        versionName "3.1"
+        versionName libraryVersion
     }
     buildTypes {
         release {
@@ -33,9 +34,11 @@ dependencies {
     compile "com.android.support:design:${supportVersion}"
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
 
-    //compile 'net.gotev:uploadservice:3.0.3'
-    //compile 'net.gotev:uploadservice-okhttp:3.0.3'
-    //compile 'net.gotev:uploadservice-ftp:3.0.3'
+    /*
+    compile "net.gotev:uploadservice:${libraryVersion}"
+    compile "net.gotev:uploadservice-okhttp:${libraryVersion}"
+    compile "net.gotev:uploadservice-ftp:${libraryVersion}"
+    */
     //comment the previous lines and uncomment the next ones for development (it uses the local libs)
     compile project(':uploadservice')
     compile project(':uploadservice-okhttp')
