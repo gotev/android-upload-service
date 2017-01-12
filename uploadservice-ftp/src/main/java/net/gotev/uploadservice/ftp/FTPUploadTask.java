@@ -11,6 +11,7 @@ import net.gotev.uploadservice.UploadTask;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.io.CopyStreamEvent;
 import org.apache.commons.net.io.CopyStreamListener;
 
@@ -43,7 +44,22 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     @Override
     protected void upload() throws Exception {
         try {
-            ftpClient = new FTPClient();
+            if (ftpParams.isUseSSL()) {
+                String secureProtocol = ftpParams.getSecureSocketProtocol();
+
+                if (secureProtocol == null || secureProtocol.isEmpty())
+                    secureProtocol = FTPUploadTaskParameters.DEFAULT_SECURE_SOCKET_PROTOCOL;
+
+                ftpClient = new FTPSClient(secureProtocol, ftpParams.isImplicitSecurity());
+
+                Logger.debug(LOG_TAG, "Created FTP over SSL (FTPS) client with "
+                        + secureProtocol + " protocol and "
+                        + (ftpParams.isImplicitSecurity() ? "implicit security" : "explicit security"));
+
+            } else {
+                ftpClient = new FTPClient();
+            }
+
             ftpClient.setBufferSize(UploadService.BUFFER_SIZE);
             ftpClient.setCopyStreamListener(this);
             ftpClient.setDefaultTimeout(ftpParams.getConnectTimeout());

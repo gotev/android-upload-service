@@ -35,7 +35,7 @@ android {
 
 dependencies {
     compile 'commons-net:commons-net:3.5'
-    //compile 'net.gotev:uploadservice:3.+'
+    //compile "net.gotev:uploadservice:${version}"
     //comment the previous line and uncomment the next line for development (it uses the local lib)
     compile project(':uploadservice')
 }

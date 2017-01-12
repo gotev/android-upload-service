@@ -21,6 +21,11 @@ public class FTPUploadTaskParameters implements Parcelable {
      */
     public static final int DEFAULT_SOCKET_TIMEOUT = 30000;
 
+    /**
+     * The default protocol to use when FTP over SSL is enabled (FTPS).
+     */
+    public static final String DEFAULT_SECURE_SOCKET_PROTOCOL = "TLS";
+
     private int port;
     private String username;
     private String password;
@@ -28,6 +33,9 @@ public class FTPUploadTaskParameters implements Parcelable {
     private int socketTimeout;
     private boolean compressedFileTransfer;
     private String createdDirectoriesPermissions;
+    private boolean useSSL;
+    private boolean implicitSecurity;
+    private String secureSocketProtocol = DEFAULT_SECURE_SOCKET_PROTOCOL;
 
     public FTPUploadTaskParameters() {
 
@@ -57,6 +65,9 @@ public class FTPUploadTaskParameters implements Parcelable {
         parcel.writeInt(socketTimeout);
         parcel.writeByte((byte) (compressedFileTransfer ? 1 : 0));
         parcel.writeString(createdDirectoriesPermissions);
+        parcel.writeByte((byte) (useSSL ? 1 : 0));
+        parcel.writeByte((byte) (implicitSecurity ? 1 : 0));
+        parcel.writeString(secureSocketProtocol);
     }
 
     private FTPUploadTaskParameters(Parcel in) {
@@ -67,6 +78,9 @@ public class FTPUploadTaskParameters implements Parcelable {
         socketTimeout = in.readInt();
         compressedFileTransfer = in.readByte() == 1;
         createdDirectoriesPermissions = in.readString();
+        useSSL = in.readByte() == 1;
+        implicitSecurity = in.readByte() == 1;
+        secureSocketProtocol = in.readString();
     }
 
     @Override
@@ -134,6 +148,33 @@ public class FTPUploadTaskParameters implements Parcelable {
 
     public FTPUploadTaskParameters setCreatedDirectoriesPermissions(String createdDirectoriesPermissions) {
         this.createdDirectoriesPermissions = createdDirectoriesPermissions;
+        return this;
+    }
+
+    public boolean isUseSSL() {
+        return useSSL;
+    }
+
+    public FTPUploadTaskParameters setUseSSL(boolean useSSL) {
+        this.useSSL = useSSL;
+        return this;
+    }
+
+    public boolean isImplicitSecurity() {
+        return implicitSecurity;
+    }
+
+    public FTPUploadTaskParameters setImplicitSecurity(boolean implicitSecurity) {
+        this.implicitSecurity = implicitSecurity;
+        return this;
+    }
+
+    public String getSecureSocketProtocol() {
+        return secureSocketProtocol;
+    }
+
+    public FTPUploadTaskParameters setSecureSocketProtocol(String secureSocketProtocol) {
+        this.secureSocketProtocol = secureSocketProtocol;
         return this;
     }
 }

@@ -244,6 +244,39 @@ public class FTPUploadRequest extends UploadRequest {
         return this;
     }
 
+    /**
+     * Enables or disables FTP over SSL processing (FTPS). By default SSL is disabled.
+     * @param useSSL true to enable SSL, false to disable it
+     * @return {@link FTPUploadRequest}
+     */
+    public FTPUploadRequest useSSL(boolean useSSL) {
+        ftpParams.setUseSSL(useSSL);
+        return this;
+    }
+
+    /**
+     * Sets FTPS security mode. By default the security mode is explicit. This flag is used
+     * only if {@link FTPUploadRequest#useSSL(boolean)} is set to true.
+     * @see <a href="https://en.wikipedia.org/wiki/FTPS#Methods_of_invoking_security">FTPS Security modes</a>
+     * @param isImplicit true sets security mode to implicit, false sets it to explicit.
+     * @return {@link FTPUploadRequest}
+     */
+    public FTPUploadRequest setSecurityModeImplicit(boolean isImplicit) {
+        ftpParams.setImplicitSecurity(isImplicit);
+        return this;
+    }
+
+    /**
+     * Sets the secure socket protocol to use when {@link FTPUploadRequest#useSSL(boolean)}
+     * is set to true. The default protocol is TLS. Supported protocols are SSL and TLS.
+     * @param protocol TLS or SSL (TLS is the default)
+     * @return {@link FTPUploadRequest}
+     */
+    public FTPUploadRequest setSecureSocketProtocol(String protocol) {
+        ftpParams.setSecureSocketProtocol(protocol);
+        return this;
+    }
+
     @Override
     public FTPUploadRequest setNotificationConfig(UploadNotificationConfig config) {
         super.setNotificationConfig(config);
