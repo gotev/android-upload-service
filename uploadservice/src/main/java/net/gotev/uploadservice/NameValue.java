@@ -3,9 +3,6 @@ package net.gotev.uploadservice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-
 /**
  * Represents a request parameter.
  *
@@ -14,13 +11,8 @@ import java.nio.charset.Charset;
  */
 public final class NameValue implements Parcelable {
 
-    private static final String NEW_LINE = "\r\n";
-
     private final String name;
     private final String value;
-
-    private final Charset US_ASCII = Charset.forName("US-ASCII");
-    private final Charset UTF8 = Charset.forName("UTF-8");
 
     public NameValue(final String name, final String value) {
         this.name = name;
@@ -33,11 +25,6 @@ public final class NameValue implements Parcelable {
 
     public final String getValue() {
         return value;
-    }
-
-    public byte[] getMultipartBytes(boolean isUtf8) throws UnsupportedEncodingException {
-        return ("Content-Disposition: form-data; name=\"" + name + "\""
-                + NEW_LINE + NEW_LINE + value).getBytes(isUtf8 ? UTF8 : US_ASCII);
     }
 
     @Override

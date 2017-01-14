@@ -95,11 +95,16 @@ public class MultipartUploadTask extends HttpUploadTask {
                 // the bytes needed for every parameter are the sum of the boundary bytes
                 // and the bytes occupied by the parameter
                 parametersBytes += boundaryBytes.length
-                                + parameter.getMultipartBytes(isUtf8Charset).length;
+                                + getMultipartBytes(parameter, isUtf8Charset).length;
             }
         }
 
         return parametersBytes;
+    }
+
+    private byte[] getMultipartBytes(NameValue parameter, boolean isUtf8) throws UnsupportedEncodingException {
+        return ("Content-Disposition: form-data; name=\"" + parameter.getName() + "\""
+                + NEW_LINE + NEW_LINE + parameter.getValue()).getBytes(isUtf8 ? UTF8 : US_ASCII);
     }
 
     private byte[] getMultipartHeader(UploadFile file, boolean isUtf8)
@@ -122,7 +127,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         if (!httpParams.getRequestParameters().isEmpty()) {
             for (final NameValue parameter : httpParams.getRequestParameters()) {
                 bodyWriter.write(boundaryBytes);
-                byte[] formItemBytes = parameter.getMultipartBytes(isUtf8Charset);
+                byte[] formItemBytes = getMultipartBytes(parameter, isUtf8Charset);
                 bodyWriter.write(formItemBytes);
 
                 uploadedBytes += boundaryBytes.length + formItemBytes.length;
