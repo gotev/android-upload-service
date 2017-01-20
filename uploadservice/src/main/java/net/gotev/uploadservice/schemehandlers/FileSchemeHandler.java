@@ -17,7 +17,7 @@ class FileSchemeHandler implements SchemeHandler {
 
     final File file;
 
-    FileSchemeHandler(String path) throws FileNotFoundException {
+    public FileSchemeHandler(String path) throws FileNotFoundException {
         this.file = new File(path);
     }
 

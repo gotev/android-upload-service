@@ -21,7 +21,7 @@ class ContentSchemeHandler implements SchemeHandler {
 
     private final Uri uri;
 
-    ContentSchemeHandler(String path) {
+    public ContentSchemeHandler(String path) {
         this.uri = Uri.parse(path);
     }
 
