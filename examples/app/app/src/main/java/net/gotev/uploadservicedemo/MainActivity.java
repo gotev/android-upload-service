@@ -60,7 +60,7 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
     @BindView(R.id.parameterName) EditText parameterName;
     @BindView(R.id.displayNotification) CheckBox displayNotification;
     @BindView(R.id.autoDeleteUploadedFiles) CheckBox autoDeleteUploadedFiles;
-    @BindView(R.id.autoClearOnSuccess) CheckBox autoClearOnSuccess;
+    @BindView(R.id.autoClearNotification) CheckBox autoClearNotification;
     @BindView(R.id.fixedLengthStreamingMode) CheckBox fixedLengthStreamingMode;
     @BindView(R.id.useUtf8) CheckBox useUtf8;
 
@@ -89,11 +89,14 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
                 .setIcon(R.drawable.ic_upload)
                 .setCompletedIcon(R.drawable.ic_upload_success)
                 .setErrorIcon(R.drawable.ic_upload_error)
+                .setCancelledIcon(R.drawable.ic_cancelled)
                 .setTitle(filename)
                 .setInProgressMessage(getString(R.string.uploading))
                 .setCompletedMessage(getString(R.string.upload_success))
                 .setErrorMessage(getString(R.string.upload_error))
-                .setAutoClearOnSuccess(autoClearOnSuccess.isChecked())
+                .setCancelledMessage(getString(R.string.upload_cancelled))
+                .setAutoClearOnCancel(autoClearNotification.isChecked())
+                .setAutoClearOnSuccess(autoClearNotification.isChecked())
                 .setClickIntent(new Intent(this, MainActivity.class))
                 .setClearOnAction(true)
                 .setRingToneEnabled(true);

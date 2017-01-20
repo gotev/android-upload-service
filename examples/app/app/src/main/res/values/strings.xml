@@ -17,12 +17,13 @@
     <string name="uploading">Uploaded [[UPLOADED_FILES]] of [[TOTAL_FILES]] at [[UPLOAD_RATE]] - [[PROGRESS]]</string>
     <string name="upload_success">Upload completed successfully in [[ELAPSED_TIME]]</string>
     <string name="upload_error">Error while uploading</string>
+    <string name="upload_cancelled">Upload has been cancelled</string>
     <string name="server_url_hint">server.com/path/to/script</string>
     <string name="file_path_hint">/path/to/your/file.ext</string>
     <string name="display_notification">Display notification</string>
     <string name="auto_delete_uploaded_files">Auto delete uploaded files</string>
     <string name="options">Options</string>
-    <string name="auto_clear_on_success">Auto clear on success</string>
+    <string name="auto_clear_notification">Auto clear on success or cancellation</string>
     <string name="fixed_length_streaming_mode">Fixed length streaming mode</string>
     <string name="use_utf8_charset">Use UTF-8 charset (un-check to use US-ASCII)</string>
 

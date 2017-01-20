@@ -107,9 +107,9 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/auto_clear_on_success"
+            android:text="@string/auto_clear_notification"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:id="@+id/autoClearOnSuccess" />
+            android:id="@+id/autoClearNotification" />
 
         <CheckBox
             android:layout_width="wrap_content"

@@ -16,12 +16,15 @@ public final class UploadNotificationConfig implements Parcelable {
     private int iconResourceID;
     private int completedIconResourceID;
     private int errorIconResourceID;
+    private int cancelledIconResourceID;
     private String title;
     private String inProgress;
     private String completed;
     private String error;
+    private String cancelled;
     private boolean autoClearOnSuccess;
     private boolean autoClearOnError;
+    private boolean autoClearOnCancel;
     private boolean clearOnAction;
     private boolean ringToneEnabled;
     private Intent clickIntent;
@@ -43,12 +46,15 @@ public final class UploadNotificationConfig implements Parcelable {
         iconResourceID = android.R.drawable.ic_menu_upload;
         completedIconResourceID = iconResourceID;
         errorIconResourceID = iconResourceID;
+        cancelledIconResourceID = iconResourceID;
         title = "File Upload";
         inProgress = "Uploading at " + Placeholders.UPLOAD_RATE + " (" + Placeholders.PROGRESS + ")";
         completed = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
         error = "Error during upload";
+        cancelled = "Upload cancelled";
         autoClearOnSuccess = false;
         autoClearOnError = false;
+        autoClearOnCancel = false;
         clearOnAction = false;
         clickIntent = null;
         ringToneEnabled = true;
@@ -83,6 +89,17 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     public final UploadNotificationConfig setErrorIcon(int resourceID) {
         errorIconResourceID = resourceID;
+        return this;
+    }
+
+    /**
+     * Sets the icon to show in the notification when the upload is cancelled.
+     * By default it's the same as the icon used while the operation is in progress.
+     * @param resourceID Resource ID of the icon to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setCancelledIcon(int resourceID) {
+        cancelledIconResourceID = resourceID;
         return this;
     }
 
@@ -127,6 +144,16 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
+     * Sets the message to be shown when the upload is cancelled. Null if no message should be displayed.
+     * @param message Message to show
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setCancelledMessage(String message) {
+        cancelled = message;
+        return this;
+    }
+
+    /**
      * Sets whether or not to auto clear the notification when the upload is completed successfully.
      * @param clear true to automatically clear the notification, otherwise false
      * @return {@link UploadNotificationConfig}
@@ -143,6 +170,16 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     public final UploadNotificationConfig setAutoClearOnError(boolean clear) {
         autoClearOnError = clear;
+        return this;
+    }
+
+    /**
+     * Sets whether or not to auto clear the notification when the upload is cancelled.
+     * @param clear true to automatically clear the notification, otherwise false
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setAutoClearOnCancel(boolean clear) {
+        autoClearOnCancel = clear;
         return this;
     }
 
@@ -190,6 +227,10 @@ public final class UploadNotificationConfig implements Parcelable {
         return errorIconResourceID;
     }
 
+    final int getCancelledIconResourceID() {
+        return cancelledIconResourceID;
+    }
+
     final String getTitle() {
         return title;
     }
@@ -206,12 +247,20 @@ public final class UploadNotificationConfig implements Parcelable {
         return error;
     }
 
+    final String getCancelledMessage() {
+        return cancelled;
+    }
+
     final boolean isAutoClearOnSuccess() {
         return autoClearOnSuccess;
     }
 
     final boolean isAutoClearOnError() {
         return autoClearOnError;
+    }
+
+    final boolean isAutoClearOnCancel() {
+        return autoClearOnCancel;
     }
 
     final boolean isClearOnAction() {
@@ -255,12 +304,15 @@ public final class UploadNotificationConfig implements Parcelable {
         parcel.writeInt(iconResourceID);
         parcel.writeInt(completedIconResourceID);
         parcel.writeInt(errorIconResourceID);
+        parcel.writeInt(cancelledIconResourceID);
         parcel.writeString(title);
         parcel.writeString(inProgress);
         parcel.writeString(completed);
         parcel.writeString(error);
+        parcel.writeString(cancelled);
         parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
         parcel.writeByte((byte) (autoClearOnError ? 1 : 0));
+        parcel.writeByte((byte) (autoClearOnCancel ? 1 : 0));
         parcel.writeByte((byte) (clearOnAction ? 1 : 0));
         parcel.writeByte((byte) (ringToneEnabled ? 1 : 0));
         parcel.writeParcelable(clickIntent, 0);
@@ -270,12 +322,15 @@ public final class UploadNotificationConfig implements Parcelable {
         iconResourceID = in.readInt();
         completedIconResourceID = in.readInt();
         errorIconResourceID = in.readInt();
+        cancelledIconResourceID = in.readInt();
         title = in.readString();
         inProgress = in.readString();
         completed = in.readString();
         error = in.readString();
+        cancelled = in.readString();
         autoClearOnSuccess = in.readByte() == 1;
         autoClearOnError = in.readByte() == 1;
+        autoClearOnCancel = in.readByte() == 1;
         clearOnAction = in.readByte() == 1;
         ringToneEnabled = in.readByte() == 1;
         clickIntent = in.readParcelable(Intent.class.getClassLoader());
