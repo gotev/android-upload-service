@@ -16,7 +16,8 @@ import java.util.List;
  * @author eliasnaur
  * @author cankov
  */
-public abstract class HttpUploadRequest extends UploadRequest {
+public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
+        extends UploadRequest<B> {
 
     protected final HttpUploadTaskParameters httpParams = new HttpUploadTaskParameters();
 
@@ -58,23 +59,23 @@ public abstract class HttpUploadRequest extends UploadRequest {
      *
      * @param headerName header name
      * @param headerValue header value
-     * @return {@link HttpUploadRequest}
+     * @return self instance
      */
-    public HttpUploadRequest addHeader(final String headerName, final String headerValue) {
+    public B addHeader(final String headerName, final String headerValue) {
         httpParams.addRequestHeader(headerName, headerValue);
-        return this;
+        return self();
     }
 
     /**
      * Sets the HTTP Basic Authentication header.
      * @param username HTTP Basic Auth username
      * @param password HTTP Basic Auth password
-     * @return {@link HttpUploadRequest}
+     * @return self instance
      */
-    public HttpUploadRequest setBasicAuth(final String username, final String password) {
+    public B setBasicAuth(final String username, final String password) {
         String auth = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
         httpParams.addRequestHeader("Authorization", "Basic " + auth);
-        return this;
+        return self();
     }
 
     /**
@@ -82,11 +83,11 @@ public abstract class HttpUploadRequest extends UploadRequest {
      *
      * @param paramName parameter name
      * @param paramValue parameter value
-     * @return {@link HttpUploadRequest}
+     * @return self instance
      */
-    public HttpUploadRequest addParameter(final String paramName, final String paramValue) {
+    public B addParameter(final String paramName, final String paramValue) {
         httpParams.addRequestParameter(paramName, paramValue);
-        return this;
+        return self();
     }
 
     /**
@@ -94,13 +95,13 @@ public abstract class HttpUploadRequest extends UploadRequest {
      *
      * @param paramName parameter name
      * @param array values
-     * @return {@link HttpUploadRequest}
+     * @return self instance
      */
-    public HttpUploadRequest addArrayParameter(final String paramName, final String... array) {
+    public B addArrayParameter(final String paramName, final String... array) {
         for (String value : array) {
             httpParams.addRequestParameter(paramName, value);
         }
-        return this;
+        return self();
     }
 
     /**
@@ -108,24 +109,24 @@ public abstract class HttpUploadRequest extends UploadRequest {
      *
      * @param paramName parameter name
      * @param list values
-     * @return {@link HttpUploadRequest}
+     * @return self instance
      */
-    public HttpUploadRequest addArrayParameter(final String paramName, final List<String> list) {
+    public B addArrayParameter(final String paramName, final List<String> list) {
         for (String value : list) {
             httpParams.addRequestParameter(paramName, value);
         }
-        return this;
+        return self();
     }
 
     /**
      * Sets the HTTP method to use. By default it's set to POST.
      *
      * @param method new HTTP method to use
-     * @return {@link HttpUploadRequest}
+     * @return self instance
      */
-    public HttpUploadRequest setMethod(final String method) {
+    public B setMethod(final String method) {
         httpParams.setMethod(method);
-        return this;
+        return self();
     }
 
     /**
@@ -134,11 +135,11 @@ public abstract class HttpUploadRequest extends UploadRequest {
      * that setting will be overwritten by the value set with this method.
      *
      * @param customUserAgent custom user agent string
-     * @return {@link HttpUploadRequest}
+     * @return self instance
      */
-    public HttpUploadRequest setCustomUserAgent(String customUserAgent) {
+    public B setCustomUserAgent(String customUserAgent) {
         httpParams.setCustomUserAgent(customUserAgent);
-        return this;
+        return self();
     }
 
     /**
@@ -148,10 +149,10 @@ public abstract class HttpUploadRequest extends UploadRequest {
      * underlying {@link java.net.HttpURLConnection}, otherwise chunked streaming mode will be used.
      * @param fixedLength true to use fixed length streaming mode (this is the default setting) or
      *                    false to use chunked streaming mode.
-     * @return {@link HttpUploadRequest}
+     * @return self instance
      */
-    public HttpUploadRequest setUsesFixedLengthStreamingMode(boolean fixedLength) {
+    public B setUsesFixedLengthStreamingMode(boolean fixedLength) {
         httpParams.setUsesFixedLengthStreamingMode(fixedLength);
-        return this;
+        return self();
     }
 }

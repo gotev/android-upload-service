@@ -12,7 +12,7 @@ import java.util.List;
  * @author cankov
  * @author gotev (Aleksandar Gotev)
  */
-public class BinaryUploadRequest extends HttpUploadRequest {
+public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> {
 
     /**
      * Creates a binary file upload request.
@@ -62,67 +62,19 @@ public class BinaryUploadRequest extends HttpUploadRequest {
     }
 
     @Override
-    public BinaryUploadRequest setNotificationConfig(UploadNotificationConfig config) {
-        super.setNotificationConfig(config);
-        return this;
-    }
-
-    @Override
-    public BinaryUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
-        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFiles);
-        return this;
-    }
-
-    @Override
-    public BinaryUploadRequest addHeader(String headerName, String headerValue) {
-        super.addHeader(headerName, headerValue);
-        return this;
-    }
-
-    @Override
-    public BinaryUploadRequest setBasicAuth(final String username, final String password) {
-        super.setBasicAuth(username, password);
-        return this;
-    }
-
-    @Override
-    public BinaryUploadRequest setMethod(String method) {
-        super.setMethod(method);
-        return this;
-    }
-
-    @Override
-    public BinaryUploadRequest setCustomUserAgent(String customUserAgent) {
-        super.setCustomUserAgent(customUserAgent);
-        return this;
-    }
-
-    @Override
-    public BinaryUploadRequest setMaxRetries(int maxRetries) {
-        super.setMaxRetries(maxRetries);
-        return this;
-    }
-
-    @Override
-    public BinaryUploadRequest setUsesFixedLengthStreamingMode(boolean fixedLength) {
-        super.setUsesFixedLengthStreamingMode(fixedLength);
-        return this;
-    }
-
-    @Override
-    public HttpUploadRequest addParameter(String paramName, String paramValue) {
+    public BinaryUploadRequest addParameter(String paramName, String paramValue) {
         logDoesNotSupportParameters();
         return this;
     }
 
     @Override
-    public HttpUploadRequest addArrayParameter(String paramName, String... array) {
+    public BinaryUploadRequest addArrayParameter(String paramName, String... array) {
         logDoesNotSupportParameters();
         return this;
     }
 
     @Override
-    public HttpUploadRequest addArrayParameter(String paramName, List<String> list) {
+    public BinaryUploadRequest addArrayParameter(String paramName, List<String> list) {
         logDoesNotSupportParameters();
         return this;
     }

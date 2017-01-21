@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.io.FileNotFoundException;
-import java.util.List;
 
 /**
  * HTTP/Multipart upload request. This is the most common way to upload files on a server.
@@ -15,7 +14,7 @@ import java.util.List;
  * @author eliasnaur
  *
  */
-public class MultipartUploadRequest extends HttpUploadRequest {
+public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadRequest> {
 
     private static final String LOG_TAG = MultipartUploadRequest.class.getName();
     private boolean isUtf8Charset = false;
@@ -147,73 +146,6 @@ public class MultipartUploadRequest extends HttpUploadRequest {
     public MultipartUploadRequest addFileToUpload(final String path, final String parameterName)
             throws FileNotFoundException, IllegalArgumentException {
         return addFileToUpload(path, parameterName, null, null);
-    }
-
-    // override all the supported builder methods by calling the super method and returning this
-    @Override
-    public MultipartUploadRequest setNotificationConfig(UploadNotificationConfig config) {
-        super.setNotificationConfig(config);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
-        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFiles);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest addHeader(String headerName, String headerValue) {
-        super.addHeader(headerName, headerValue);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest setBasicAuth(final String username, final String password) {
-        super.setBasicAuth(username, password);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest addParameter(String paramName, String paramValue) {
-        super.addParameter(paramName, paramValue);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest addArrayParameter(String paramName, String... array) {
-        super.addArrayParameter(paramName, array);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest addArrayParameter(String paramName, List<String> list) {
-        super.addArrayParameter(paramName, list);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest setMethod(String method) {
-        super.setMethod(method);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest setCustomUserAgent(String customUserAgent) {
-        super.setCustomUserAgent(customUserAgent);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest setMaxRetries(int maxRetries) {
-        super.setMaxRetries(maxRetries);
-        return this;
-    }
-
-    @Override
-    public MultipartUploadRequest setUsesFixedLengthStreamingMode(boolean fixedLength) {
-        super.setUsesFixedLengthStreamingMode(fixedLength);
-        return this;
     }
 
     /**

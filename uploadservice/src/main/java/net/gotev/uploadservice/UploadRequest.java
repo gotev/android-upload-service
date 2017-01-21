@@ -12,7 +12,7 @@ import java.util.UUID;
  *
  * @author Aleksandar Gotev
  */
-public abstract class UploadRequest {
+public abstract class UploadRequest<B extends UploadRequest<B>> {
     private static final String LOG_TAG = UploadRequest.class.getSimpleName();
 
     protected final Context context;
@@ -100,6 +100,11 @@ public abstract class UploadRequest {
             throw new IllegalArgumentException("You have to add at least one file to upload");
     }
 
+    @SuppressWarnings("unchecked")
+    protected final B self() {
+        return (B)this;
+    }
+
     /**
      * Sets custom notification configuration.
      * If you don't want to display a notification in Notification Center, either pass null
@@ -107,11 +112,11 @@ public abstract class UploadRequest {
      *
      * @param config the upload configuration object or null if you don't want a notification
      *               to be displayed
-     * @return {@link UploadRequest}
+     * @return self instance
      */
-    public UploadRequest setNotificationConfig(UploadNotificationConfig config) {
+    public B setNotificationConfig(UploadNotificationConfig config) {
         params.setNotificationConfig(config);
-        return this;
+        return self();
     }
 
     /**
@@ -119,11 +124,11 @@ public abstract class UploadRequest {
      * @param autoDeleteFiles true to auto delete files included in the
      *                        request when the upload is completed successfully.
      *                        By default this setting is set to false, and nothing gets deleted.
-     * @return {@link UploadRequest}
+     * @return self instance
      */
-    public UploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
+    public B setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
         params.setAutoDeleteSuccessfullyUploadedFiles(autoDeleteFiles);
-        return this;
+        return self();
     }
 
     /**
@@ -131,11 +136,11 @@ public abstract class UploadRequest {
      * before returning an error.
      *
      * @param maxRetries number of maximum retries on error
-     * @return {@link UploadRequest}
+     * @return self instance
      */
-    public UploadRequest setMaxRetries(int maxRetries) {
+    public B setMaxRetries(int maxRetries) {
         params.setMaxRetries(maxRetries);
-        return this;
+        return self();
     }
 
     /**
@@ -145,11 +150,11 @@ public abstract class UploadRequest {
      * send events for this upload in broadcast, and handle them in the
      * {@link UploadServiceBroadcastReceiver}, do not set the delegate or set it to null.
      * @param delegate instance of the delegate which will receive the events
-     * @return {@link UploadRequest}
+     * @return self instance
      */
-    public UploadRequest setDelegate(UploadStatusDelegate delegate) {
+    public B setDelegate(UploadStatusDelegate delegate) {
         this.delegate = delegate;
-        return this;
+        return self();
     }
 
     /**
