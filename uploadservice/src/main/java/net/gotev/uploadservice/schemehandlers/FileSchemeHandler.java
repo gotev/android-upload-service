@@ -15,10 +15,11 @@ import java.io.InputStream;
  */
 class FileSchemeHandler implements SchemeHandler {
 
-    final File file;
+    private File file;
 
-    public FileSchemeHandler(String path) throws FileNotFoundException {
-        this.file = new File(path);
+    @Override
+    public void init(String path) {
+        file = new File(path);
     }
 
     @Override

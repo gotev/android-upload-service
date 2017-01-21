@@ -31,7 +31,9 @@ public class SchemeHandlerFactory {
 
         for (Map.Entry<String, Class<? extends SchemeHandler>> handler : handlers.entrySet()) {
             if (path.startsWith(handler.getKey())) {
-                return handler.getValue().getConstructor(String.class).newInstance(path);
+                SchemeHandler schemeHandler = handler.getValue().newInstance();
+                schemeHandler.init(path);
+                return schemeHandler;
             }
         }
 

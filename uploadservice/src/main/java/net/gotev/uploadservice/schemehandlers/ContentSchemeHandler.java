@@ -19,10 +19,11 @@ import java.io.InputStream;
  */
 class ContentSchemeHandler implements SchemeHandler {
 
-    private final Uri uri;
+    private Uri uri;
 
-    public ContentSchemeHandler(String path) {
-        this.uri = Uri.parse(path);
+    @Override
+    public void init(String path) {
+        uri = Uri.parse(path);
     }
 
     @Override
