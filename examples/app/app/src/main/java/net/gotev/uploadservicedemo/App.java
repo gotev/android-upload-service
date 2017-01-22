@@ -1,6 +1,7 @@
 package net.gotev.uploadservicedemo;
 
 import android.app.Application;
+import android.util.Log;
 
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.UploadService;
@@ -13,6 +14,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * @author gotev (Aleksandar Gotev)
@@ -30,29 +32,46 @@ public class App extends Application {
         // Set upload service debug log messages level
         Logger.setLogLevel(Logger.LogLevel.DEBUG);
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
+        // used by default
+        UploadService.HTTP_STACK = new OkHttpStack(getOkHttpClient());
+    }
+
+    private OkHttpClient getOkHttpClient() {
+        return new OkHttpClient.Builder()
                 .followRedirects(true)
                 .followSslRedirects(true)
                 .retryOnConnectionFailure(true)
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
+
+                // you can add your own request interceptors to add authorization headers.
+                // do not modify the body or the http method here, as they are set and managed
+                // internally by Upload Service, and tinkering with them will result in strange,
+                // erroneous and unpredicted behaviors
                 .addNetworkInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
-                        Request request = chain.request();
-                        Request newRequest;
-
-                        newRequest = request.newBuilder()
+                        Request.Builder request = chain.request().newBuilder()
                                 .addHeader("myheader", "myvalue")
-                                .addHeader("mysecondheader", "mysecondvalue")
-                                .build();
-                        return chain.proceed(newRequest);
+                                .addHeader("mysecondheader", "mysecondvalue");
+
+                        return chain.proceed(request.build());
                     }
                 })
+
+                // if you use HttpLoggingInterceptor, be sure to put it always as the last interceptor
+                // in the chain and to not use BODY level logging, otherwise you will get all your
+                // file contents in the log. Logging body is suitable only for small requests.
+                .addInterceptor(new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                    @Override
+                    public void log(String message) {
+                        Log.d("OkHttp", message);
+                    }
+                }).setLevel(HttpLoggingInterceptor.Level.HEADERS))
+
                 .cache(null)
                 .build();
-
-        UploadService.HTTP_STACK = new OkHttpStack(client);
     }
 }
