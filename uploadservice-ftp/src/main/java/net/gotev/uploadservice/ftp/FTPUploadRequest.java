@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import net.gotev.uploadservice.UploadFile;
-import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadRequest;
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 import net.gotev.uploadservice.UploadTask;
@@ -17,7 +16,7 @@ import java.net.MalformedURLException;
  * Creates a new FTP Upload Request.
  * @author Aleksandar Gotev
  */
-public class FTPUploadRequest extends UploadRequest {
+public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
 
     protected final FTPUploadTaskParameters ftpParams = new FTPUploadTaskParameters();
 
@@ -274,24 +273,6 @@ public class FTPUploadRequest extends UploadRequest {
      */
     public FTPUploadRequest setSecureSocketProtocol(String protocol) {
         ftpParams.setSecureSocketProtocol(protocol);
-        return this;
-    }
-
-    @Override
-    public FTPUploadRequest setNotificationConfig(UploadNotificationConfig config) {
-        super.setNotificationConfig(config);
-        return this;
-    }
-
-    @Override
-    public FTPUploadRequest setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
-        super.setAutoDeleteFilesAfterSuccessfulUpload(autoDeleteFiles);
-        return this;
-    }
-
-    @Override
-    public FTPUploadRequest setMaxRetries(int maxRetries) {
-        super.setMaxRetries(maxRetries);
         return this;
     }
 }
