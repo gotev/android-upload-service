@@ -3,6 +3,9 @@ package net.gotev.uploadservicedemo;
 import android.app.Application;
 import android.util.Log;
 
+import com.facebook.stetho.Stetho;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
@@ -24,6 +27,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Stetho.initializeWithDefaults(this);
 
         // Set your application namespace to avoid conflicts with other apps
         // using this library
@@ -60,6 +65,9 @@ public class App extends Application {
                         return chain.proceed(request.build());
                     }
                 })
+
+                // open up your Chrome and go to: chrome://inspect
+                .addNetworkInterceptor(new StethoInterceptor())
 
                 // if you use HttpLoggingInterceptor, be sure to put it always as the last interceptor
                 // in the chain and to not use BODY level logging, otherwise you will get all your
