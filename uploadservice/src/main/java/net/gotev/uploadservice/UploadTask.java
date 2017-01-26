@@ -297,11 +297,13 @@ public abstract class UploadTask implements Runnable {
         if (successfulUpload) {
             updateNotification(uploadInfo, notificationConfig.getCompletedMessage(),
                     notificationConfig.isAutoClearOnSuccess(),
-                    notificationConfig.getCompletedIconResourceID());
+                    notificationConfig.getCompletedIconResourceID(),
+                    notificationConfig.getCompletedIconColorResourceID());
         } else {
             updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
                     notificationConfig.isAutoClearOnError(),
-                    notificationConfig.getErrorIconResourceID());
+                    notificationConfig.getErrorIconResourceID(),
+                    notificationConfig.getErrorIconColorResourceID());
         }
 
         service.taskCompleted(params.getId());
@@ -343,7 +345,8 @@ public abstract class UploadTask implements Runnable {
 
         updateNotification(uploadInfo, notificationConfig.getCancelledMessage(),
                 notificationConfig.isAutoClearOnCancel(),
-                notificationConfig.getCancelledIconResourceID());
+                notificationConfig.getCancelledIconResourceID(),
+                notificationConfig.getCancelledIconColorResourceID());
 
         service.taskCompleted(params.getId());
     }
@@ -409,7 +412,8 @@ public abstract class UploadTask implements Runnable {
 
         updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
                 notificationConfig.isAutoClearOnError(),
-                notificationConfig.getErrorIconResourceID());
+                notificationConfig.getErrorIconResourceID(),
+                notificationConfig.getErrorIconColorResourceID());
 
         service.taskCompleted(params.getId());
     }
@@ -426,6 +430,7 @@ public abstract class UploadTask implements Runnable {
                 .setContentText(Placeholders.replace(params.getNotificationConfig().getInProgressMessage(), uploadInfo))
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                .setColor(params.getNotificationConfig().getIconColorResourceID())
                 .setGroup(UploadService.NAMESPACE)
                 .setProgress(100, 0, true)
                 .setOngoing(true);
@@ -451,6 +456,7 @@ public abstract class UploadTask implements Runnable {
                 .setContentText(Placeholders.replace(params.getNotificationConfig().getInProgressMessage(), uploadInfo))
                 .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                 .setSmallIcon(params.getNotificationConfig().getIconResourceID())
+                .setColor(params.getNotificationConfig().getIconColorResourceID())
                 .setGroup(UploadService.NAMESPACE)
                 .setProgress((int)uploadInfo.getTotalBytes(), (int)uploadInfo.getUploadedBytes(), false)
                 .setOngoing(true);
@@ -475,7 +481,8 @@ public abstract class UploadTask implements Runnable {
 
     private void updateNotification(UploadInfo uploadInfo, String message,
                                     boolean autoClearOnSuccess,
-                                    int iconResourceID) {
+                                    int iconResourceID,
+                                    int iconColorResourceID) {
         if (params.getNotificationConfig() == null) return;
 
         notificationManager.cancel(notificationId);
@@ -488,6 +495,7 @@ public abstract class UploadTask implements Runnable {
                     .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
                     .setAutoCancel(params.getNotificationConfig().isClearOnAction())
                     .setSmallIcon(iconResourceID)
+                    .setColor(iconColorResourceID)
                     .setGroup(UploadService.NAMESPACE)
                     .setProgress(0, 0, false)
                     .setOngoing(false);
