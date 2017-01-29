@@ -2,6 +2,7 @@ package net.gotev.uploadservicedemo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -90,6 +91,10 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
                 .setCompletedIcon(R.drawable.ic_upload_success)
                 .setErrorIcon(R.drawable.ic_upload_error)
                 .setCancelledIcon(R.drawable.ic_cancelled)
+                .setIconColor(Color.BLUE)
+                .setCompletedIconColor(Color.GREEN)
+                .setErrorIconColor(Color.RED)
+                .setCancelledIconColor(Color.YELLOW)
                 .setTitle(filename)
                 .setInProgressMessage(getString(R.string.uploading))
                 .setCompletedMessage(getString(R.string.upload_success))

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.app.NotificationCompat;
 
 /**
  * Contains the configuration of the upload notification.
@@ -17,6 +18,10 @@ public final class UploadNotificationConfig implements Parcelable {
     private int completedIconResourceID;
     private int errorIconResourceID;
     private int cancelledIconResourceID;
+    private int iconColorResourceID;
+    private int completedIconColorResourceID;
+    private int errorIconColorResourceID;
+    private int cancelledIconColorResourceID;
     private String title;
     private String inProgress;
     private String completed;
@@ -47,6 +52,10 @@ public final class UploadNotificationConfig implements Parcelable {
         completedIconResourceID = iconResourceID;
         errorIconResourceID = iconResourceID;
         cancelledIconResourceID = iconResourceID;
+        iconColorResourceID = NotificationCompat.COLOR_DEFAULT;
+        completedIconColorResourceID = iconColorResourceID;
+        errorIconColorResourceID = iconColorResourceID;
+        cancelledIconColorResourceID = iconColorResourceID;
         title = "File Upload";
         inProgress = "Uploading at " + Placeholders.UPLOAD_RATE + " (" + Placeholders.PROGRESS + ")";
         completed = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
@@ -100,6 +109,49 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     public final UploadNotificationConfig setCancelledIcon(int resourceID) {
         cancelledIconResourceID = resourceID;
+        return this;
+    }
+
+    /**
+     * Sets the notification icon color.
+     * @param resourceID Resource ID of the color to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setIconColor(int resourceID) {
+        this.iconColorResourceID = resourceID;
+        return this;
+    }
+
+    /**
+     * Sets the icon color to show in the notification when the operation is completed successfully.
+     * By default it's the same as the icon color used while the operation is in progress.
+     * @param resourceID Resource ID of the color to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setCompletedIconColor(int resourceID) {
+        this.completedIconColorResourceID = resourceID;
+        return this;
+    }
+
+    /**
+     * Sets the icon color to show in the notification when an error happens.
+     * By default it's the same as the icon color used while the operation is in progress.
+     * @param resourceID Resource ID of the color to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setErrorIconColor(int resourceID) {
+        this.errorIconColorResourceID = resourceID;
+        return this;
+    }
+
+    /**
+     * Sets the icon color to show in the notification when the upload is cancelled.
+     * By default it's the same as the icon color used while the operation is in progress.
+     * @param resourceID Resource ID of the color to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setCancelledIconColor(int resourceID) {
+        this.cancelledIconColorResourceID = resourceID;
         return this;
     }
 
@@ -231,6 +283,22 @@ public final class UploadNotificationConfig implements Parcelable {
         return cancelledIconResourceID;
     }
 
+    final int getIconColorResourceID() {
+        return iconColorResourceID;
+    }
+
+    final int getCompletedIconColorResourceID() {
+        return completedIconColorResourceID;
+    }
+
+    final int getErrorIconColorResourceID() {
+        return errorIconColorResourceID;
+    }
+
+    final int getCancelledIconColorResourceID() {
+        return cancelledIconColorResourceID;
+    }
+
     final String getTitle() {
         return title;
     }
@@ -305,6 +373,10 @@ public final class UploadNotificationConfig implements Parcelable {
         parcel.writeInt(completedIconResourceID);
         parcel.writeInt(errorIconResourceID);
         parcel.writeInt(cancelledIconResourceID);
+        parcel.writeInt(iconColorResourceID);
+        parcel.writeInt(completedIconColorResourceID);
+        parcel.writeInt(errorIconColorResourceID);
+        parcel.writeInt(cancelledIconColorResourceID);
         parcel.writeString(title);
         parcel.writeString(inProgress);
         parcel.writeString(completed);
@@ -323,6 +395,10 @@ public final class UploadNotificationConfig implements Parcelable {
         completedIconResourceID = in.readInt();
         errorIconResourceID = in.readInt();
         cancelledIconResourceID = in.readInt();
+        iconColorResourceID = in.readInt();
+        completedIconColorResourceID = in.readInt();
+        errorIconColorResourceID = in.readInt();
+        cancelledIconColorResourceID = in.readInt();
         title = in.readString();
         inProgress = in.readString();
         completed = in.readString();
