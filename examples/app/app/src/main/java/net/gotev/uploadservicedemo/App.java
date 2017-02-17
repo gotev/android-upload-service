@@ -19,6 +19,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
+import static com.facebook.stetho.Stetho.newInitializerBuilder;
+
 /**
  * @author gotev (Aleksandar Gotev)
  */
@@ -28,7 +30,13 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Stetho.initializeWithDefaults(this);
+        if (BuildConfig.DEBUG) {
+            Stetho.initialize(
+                    newInitializerBuilder(this)
+                            .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                            .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
+                            .build());
+        }
 
         // Set your application namespace to avoid conflicts with other apps
         // using this library

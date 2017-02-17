@@ -23,19 +23,32 @@ android {
     }
 }
 
+repositories {
+    maven { url 'http://dl.bintray.com/igenius-code/maven' }
+}
+
 def butterKnifeVersion = "8.4.0"
 def supportVersion = "25.1.0"
+def stethoVersion = "1.4.2"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.jakewharton:butterknife:${butterKnifeVersion}"
-    apt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+
+    // Debugging
+    debugCompile "com.facebook.stetho:stetho:${stethoVersion}"
+    debugCompile "com.facebook.stetho:stetho-okhttp3:${stethoVersion}"
+    releaseCompile "net.igenius:stetho-no-op:1.1"
+    compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
+
+    // Google support libraries
     compile "com.android.support:appcompat-v7:${supportVersion}"
     compile "com.android.support:design:${supportVersion}"
+
+    // ButterKnife
+    compile "com.jakewharton:butterknife:${butterKnifeVersion}"
+    apt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
-    compile 'com.facebook.stetho:stetho:1.4.2'
-    compile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
 
     /*
     compile "net.gotev:uploadservice:${libraryVersion}"
