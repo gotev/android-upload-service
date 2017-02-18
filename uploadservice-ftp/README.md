@@ -4,20 +4,10 @@ FTP Upload for Android Upload Service
 This module adds FTP upload ([RFC959](https://tools.ietf.org/html/rfc959)) capability to Android Upload Service. It wraps [Apache Commons Net FTP](https://commons.apache.org/proper/commons-net/dependency-info.html) library.
 
 ## Setup
-#### Gradle
-```
+```groovy
 dependencies {
     compile 'net.gotev:uploadservice-ftp:3.1'
 }
-```
-#### Maven
-```
-<dependency>
-  <groupId>net.gotev</groupId>
-  <artifactId>uploadservice-ftp</artifactId>
-  <version>3.1</version>
-  <type>aar</type>
-</dependency>
 ```
 
 ## Minimal example
@@ -48,7 +38,7 @@ cd android-upload-service/uploadservice-ftp/test-server
 ```
 
 ### OS X
-I'm assuming you've followed the instructions in the previous paragraph.
+I'm assuming you've followed the instructions in the previous paragraph and you are already in a terminal in `android-upload-service/uploadservice-ftp/test-server` directory.
 ```
 alex@mbp:~$ cd osx; ./start
 ```
