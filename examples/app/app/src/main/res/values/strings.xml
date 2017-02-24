@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">Upload Service</string>
-    <string name="multipart_upload">Multipart</string>
     <string name="binary_upload">Binary</string>
     <string name="ftp_upload">FTP</string>
     <string name="cancel_upload">Cancel upload</string>
@@ -11,8 +10,20 @@
     <string name="browse">Browse..</string>
     <string name="select_file">Select file to upload</string>
     <string name="files_to_upload_path">Path of the files to upload</string>
-    <string name="parameter_name">File parameter name</string>
-    <string name="parameter_name_hint">E.g. uploaded_file</string>
+    <string name="file_parameter_name">File parameter name</string>
+    <string name="file_parameter_name_hint">E.g. uploaded_file</string>
+    <string name="parameter_name_hint">Parameter name</string>
+    <string name="parameter_value_hint">Parameter value</string>
+    <string name="header_name_hint">Header name</string>
+    <string name="header_value_hint">Header value</string>
+    <string name="provide_parameter_name">Please provide a parameter name</string>
+    <string name="provide_parameter_value">Please provide a parameter value</string>
+    <string name="provide_header_name">Please provide a header name</string>
+    <string name="provide_header_value">Please provide a header value</string>
+    <string name="new_multipart_upload">New Multipart Upload</string>
+    <string name="no_whitespaces_here">Whitespaces are not allowed here!</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
     <string name="upload_progress">Upload progress: %s</string>
     <string name="uploading">Uploaded [[UPLOADED_FILES]] of [[TOTAL_FILES]] at [[UPLOAD_RATE]] - [[PROGRESS]]</string>
     <string name="upload_success">Upload completed successfully in [[ELAPSED_TIME]]</string>
@@ -27,17 +38,28 @@
     <string name="fixed_length_streaming_mode">Fixed length streaming mode</string>
     <string name="use_utf8_charset">Use UTF-8 charset (un-check to use US-ASCII)</string>
 
-    <string-array name="protocols">
-        <item>http://</item>
-        <item>https://</item>
+    <string-array name="http_methods">
+        <item>POST</item>
+        <item>PUT</item>
+        <item>PATCH</item>
+        <item>OPTIONS</item>
     </string-array>
 
-    <string name="new_multipart">New multipart upload</string>
+    <string name="multipart_upload">Multipart Upload</string>
     <string name="files_to_upload">Files to upload</string>
     <string name="upload_parameters">Upload parameters</string>
-    <string name="title_activity_multipart_upload">New multipart upload</string>
     <string name="no_files">No files to upload.\nTap on + to add one.</string>
     <string name="no_parameters">No parameters.\nTap on + to add one.</string>
+    <string name="settings">Settings</string>
     <string name="done">Done</string>
+    <string name="new_upload">New upload</string>
+    <string name="server_address">https://your.server.com</string>
+    <string name="add_header">Add header</string>
+    <string name="add_parameter">Add parameter</string>
+    <string name="add_file">Add file</string>
+    <string name="next">Next</string>
+    <string name="next_instructions">Fill in the parameter name and tap on next to select the file</string>
+    <string name="file_not_found">File %1$s not found! It will not be added to the upload request!</string>
+    <string name="empty_upload">Empty upload!\nAdd some files, headers or parameters</string>
 
 </resources>

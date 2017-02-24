@@ -49,6 +49,7 @@ dependencies {
     apt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
+    compile 'net.gotev:recycleradapter:1.5.2'
 
     /*
     compile "net.gotev:uploadservice:${libraryVersion}"

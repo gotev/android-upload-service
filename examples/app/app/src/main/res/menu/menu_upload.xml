@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="@string/settings"
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_action_settings"
+        app:showAsAction="ifRoom"
+        android:visible="false"
+        android:enabled="true" />
+
+    <item
+        android:title="@string/done"
+        app:showAsAction="always"
+        android:id="@+id/done"
+        android:icon="@drawable/ic_action_check"
+        android:visible="true"
+        android:enabled="true" />
+</menu>

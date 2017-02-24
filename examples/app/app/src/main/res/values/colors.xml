@@ -4,4 +4,5 @@
     <color name="colorPrimary">#03a9f4</color> <!-- 500 -->
     <color name="colorPrimaryDark">#0288d1</color> <!-- 700 -->
     <color name="colorAccent">#40c4ff</color> <!-- A200 -->
+    <color name="colorControlHighlight">#bbdefb</color> <!-- 100 -->
 </resources>

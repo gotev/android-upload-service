@@ -44,6 +44,12 @@
         </activity>
 
         <activity
+            android:name=".MultipartUploadActivity"
+            android:parentActivityName=".MainActivity"
+            android:label="@string/multipart_upload"
+            android:launchMode="singleTask" />
+
+        <activity
             android:name=".BackHandlingFilePickerActivity"
             android:label="@string/select_file"
             android:theme="@style/FilePickerTheme">
