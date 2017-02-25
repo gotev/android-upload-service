@@ -1,0 +1,8 @@
+title: Android Upload Service
+description: Easily upload files in the background with automatic Android Notification Center progress indication.
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-cayman
+
+gems:
+  - jekyll-mentions
