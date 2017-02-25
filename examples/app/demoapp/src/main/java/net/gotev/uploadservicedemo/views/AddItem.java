@@ -86,4 +86,9 @@ public class AddItem extends LinearLayout {
         }
         return super.dispatchTouchEvent(event);
     }
+
+    public AddItem setTitleText(String newTitleText) {
+        title.setText(newTitleText);
+        return this;
+    }
 }

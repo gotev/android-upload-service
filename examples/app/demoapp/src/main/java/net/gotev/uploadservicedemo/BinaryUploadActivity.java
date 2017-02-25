@@ -38,6 +38,7 @@ public class BinaryUploadActivity extends UploadActivity {
         super.onCreate(savedInstanceState);
 
         addParameter.setVisibility(View.GONE);
+        addFile.setTitleText(getString(R.string.set_file));
     }
 
     @Override

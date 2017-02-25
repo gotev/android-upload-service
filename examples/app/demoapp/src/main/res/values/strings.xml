@@ -44,6 +44,7 @@
     <string name="add_header">Add header</string>
     <string name="add_parameter">Add parameter</string>
     <string name="add_file">Add file</string>
+    <string name="set_file">Set file</string>
     <string name="next">Next</string>
     <string name="next_instructions">Fill in the parameter name and tap on next to select the file</string>
     <string name="file_not_found">File %1$s not found! It will not be added to the upload request!</string>
