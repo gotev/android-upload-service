@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:id="@+id/title"
+        android:textSize="@dimen/add_item_text_size"
         android:clickable="false"
         android:focusable="false"
         android:layout_weight="1" />

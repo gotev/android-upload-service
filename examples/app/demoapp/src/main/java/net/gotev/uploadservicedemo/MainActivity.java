@@ -7,13 +7,6 @@ import net.gotev.uploadservice.UploadService;
 
 import butterknife.OnClick;
 
-/**
- * Activity that demonstrates how to use Android Upload Service.
- *
- * @author gotev (Aleksandar Gotev)
- * @author mabdurrahman
- *
- */
 public class MainActivity extends BaseActivity {
 
     @Override
