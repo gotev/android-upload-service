@@ -56,6 +56,12 @@
             android:launchMode="singleTask" />
 
         <activity
+            android:name=".FTPUploadActivity"
+            android:parentActivityName=".MainActivity"
+            android:label="@string/ftp_upload"
+            android:launchMode="singleTask" />
+
+        <activity
             android:name=".utils.BackHandlingFilePickerActivity"
             android:label="@string/select_file"
             android:theme="@style/FilePickerTheme">

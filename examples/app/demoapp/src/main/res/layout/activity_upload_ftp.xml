@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="textUri"
+            android:hint="@string/ftp_server_url"
+            android:ems="10"
+            android:imeOptions="actionNext"
+            android:id="@+id/server_url" />
+
+        <EditText
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:digits="0123456789"
+            android:hint="@string/port"
+            android:ems="10"
+            android:imeOptions="actionNext"
+            android:id="@+id/server_port" />
+
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="@string/ftp_username_hint"
+        android:ems="10"
+        android:imeOptions="actionNext"
+        android:id="@+id/ftp_username" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="@string/ftp_password_hint"
+        android:ems="10"
+        android:imeOptions="actionDone"
+        android:id="@+id/ftp_password"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+
+    <net.gotev.uploadservicedemo.views.AddItem
+        android:id="@+id/add_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleText="@string/add_file"
+        android:clickable="true"
+        app:colorFilter="@color/colorPrimaryDark"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/request_items"
+        android:scrollbars="vertical"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

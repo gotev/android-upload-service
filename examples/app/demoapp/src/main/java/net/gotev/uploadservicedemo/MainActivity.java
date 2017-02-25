@@ -93,6 +93,10 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
             case R.id.new_binary_upload:
                 BinaryUploadActivity.show(this);
                 return true;
+
+            case R.id.new_ftp_upload:
+                FTPUploadActivity.show(this);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

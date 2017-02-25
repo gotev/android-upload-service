@@ -2,11 +2,13 @@ package net.gotev.uploadservicedemo.dialogs;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import net.gotev.uploadservicedemo.R;
 
@@ -26,7 +28,9 @@ public class AddFileParameterNameDialog implements View.OnClickListener {
     @BindView(R.id.input)
     EditText input;
 
-    private AppCompatActivity context;
+    @BindView(R.id.details)
+    TextView details;
+
     private Delegate delegate;
     private View dialogView;
     private InputMethodManager inputMethodManager;
@@ -34,18 +38,22 @@ public class AddFileParameterNameDialog implements View.OnClickListener {
 
     private String valueErrorString;
 
-    public AddFileParameterNameDialog(AppCompatActivity context, Delegate delegate) {
-        this.context = context;
+    public AddFileParameterNameDialog(AppCompatActivity context,
+                                      @StringRes int hint,
+                                      @StringRes int errorMessage,
+                                      @StringRes int detailsMessage,
+                                      Delegate delegate) {
         this.delegate = delegate;
 
-        valueErrorString = context.getString(R.string.provide_parameter_name);
+        valueErrorString = context.getString(errorMessage);
 
         inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 
         dialogView = context.getLayoutInflater().inflate(R.layout.dialog_add_file_parameter_name, null);
         ButterKnife.bind(this, dialogView);
 
-        input.setHint(R.string.parameter_name_hint);
+        input.setHint(hint);
+        details.setText(context.getString(detailsMessage));
 
         dialog = new AlertDialog.Builder(context)
                 .setTitle(R.string.add_file)

@@ -14,4 +14,10 @@
         android:visible="true"
         android:enabled="true" />
 
+    <item
+        android:id="@+id/new_ftp_upload"
+        android:title="@string/new_ftp_upload"
+        android:visible="true"
+        android:enabled="true" />
+
 </menu>

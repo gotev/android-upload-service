@@ -1,11 +1,8 @@
 package net.gotev.uploadservicedemo;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.app.NavUtils;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +16,6 @@ import android.widget.Spinner;
 
 import net.gotev.recycleradapter.AdapterItem;
 import net.gotev.recycleradapter.RecyclerAdapter;
-import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.dialogs.AddFileParameterNameDialog;
 import net.gotev.uploadservicedemo.dialogs.AddNameValueDialog;
@@ -59,7 +55,7 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
     @BindView(R.id.request_items)
     RecyclerView requestItems;
 
-    protected RecyclerAdapter uploadItemsAdapter;
+    private RecyclerAdapter uploadItemsAdapter;
     private AddFileParameterNameDialog addFileParameterNameDialog;
     private AddNameValueDialog addHeaderDialog;
     private AddNameValueDialog addParameterDialog;
@@ -103,13 +99,16 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
         }, R.string.add_parameter, R.string.parameter_name_hint, R.string.parameter_value_hint,
                 R.string.provide_parameter_name, R.string.provide_parameter_value);
 
-        addFileParameterNameDialog = new AddFileParameterNameDialog(this, new AddFileParameterNameDialog.Delegate() {
-            @Override
-            public void onValue(String value) {
-                fileParameterName = value;
-                openFilePicker(false);
-            }
-        });
+        addFileParameterNameDialog = new AddFileParameterNameDialog(this,
+                R.string.parameter_name_hint, R.string.provide_parameter_name,
+                R.string.next_instructions,
+                new AddFileParameterNameDialog.Delegate() {
+                    @Override
+                    public void onValue(String value) {
+                        fileParameterName = value;
+                        openFilePicker(false);
+                    }
+                });
     }
 
     @Override
@@ -148,7 +147,7 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
         // hide soft keyboard if shown
         View view = getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
@@ -194,33 +193,13 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
         uploadItemsAdapter.removeItemAtPosition(position);
     }
 
-    protected UploadNotificationConfig getNotificationConfig(@StringRes int title) {
-        return new UploadNotificationConfig()
-                .setIcon(R.drawable.ic_upload)
-                .setCompletedIcon(R.drawable.ic_upload_success)
-                .setErrorIcon(R.drawable.ic_upload_error)
-                .setCancelledIcon(R.drawable.ic_cancelled)
-                .setIconColor(Color.BLUE)
-                .setCompletedIconColor(Color.GREEN)
-                .setErrorIconColor(Color.RED)
-                .setCancelledIconColor(Color.YELLOW)
-                .setTitle(getString(title))
-                .setInProgressMessage(getString(R.string.uploading))
-                .setCompletedMessage(getString(R.string.upload_success))
-                .setErrorMessage(getString(R.string.upload_error))
-                .setCancelledMessage(getString(R.string.upload_cancelled))
-                .setClickIntent(new Intent(this, MainActivity.class))
-                .setClearOnAction(true)
-                .setRingToneEnabled(true);
-    }
-
     protected final void forEachUploadItem(MultipartUploadActivity.ForEachDelegate delegate) {
         for (int i = 0; i < uploadItemsAdapter.getItemCount(); i++) {
             AdapterItem adapterItem = uploadItemsAdapter.getItemAtPosition(i);
-            if (adapterItem == null || adapterItem.getClass().getClass() != UploadItem.class.getClass())
-                continue;
 
-            delegate.onUploadItem((UploadItem) uploadItemsAdapter.getItemAtPosition(i));
+            if (adapterItem != null && adapterItem.getClass().getClass() == UploadItem.class.getClass()) {
+                delegate.onUploadItem((UploadItem) adapterItem);
+            }
         }
     }
 

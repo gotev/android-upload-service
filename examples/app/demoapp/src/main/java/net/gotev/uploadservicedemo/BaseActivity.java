@@ -1,7 +1,12 @@
 package net.gotev.uploadservicedemo;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
+
+import net.gotev.uploadservice.UploadNotificationConfig;
 
 import butterknife.ButterKnife;
 
@@ -15,5 +20,25 @@ public class BaseActivity extends AppCompatActivity {
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
         ButterKnife.bind(this);
+    }
+
+    protected UploadNotificationConfig getNotificationConfig(@StringRes int title) {
+        return new UploadNotificationConfig()
+                .setIcon(R.drawable.ic_upload)
+                .setCompletedIcon(R.drawable.ic_upload_success)
+                .setErrorIcon(R.drawable.ic_upload_error)
+                .setCancelledIcon(R.drawable.ic_cancelled)
+                .setIconColor(Color.BLUE)
+                .setCompletedIconColor(Color.GREEN)
+                .setErrorIconColor(Color.RED)
+                .setCancelledIconColor(Color.YELLOW)
+                .setTitle(getString(title))
+                .setInProgressMessage(getString(R.string.uploading))
+                .setCompletedMessage(getString(R.string.upload_success))
+                .setErrorMessage(getString(R.string.upload_error))
+                .setCancelledMessage(getString(R.string.upload_cancelled))
+                .setClickIntent(new Intent(this, MainActivity.class))
+                .setClearOnAction(true)
+                .setRingToneEnabled(true);
     }
 }

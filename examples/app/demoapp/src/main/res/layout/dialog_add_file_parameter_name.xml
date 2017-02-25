@@ -15,11 +15,9 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin_half"/>
 
     <TextView
-        android:text="@string/next_instructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:id="@+id/textView" />
-
+        android:id="@+id/details" />
 
 </LinearLayout>
