@@ -1,6 +1,5 @@
 package net.gotev.uploadservicedemo;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,12 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import net.gotev.recycleradapter.AdapterItem;
 import net.gotev.recycleradapter.RecyclerAdapter;
 import net.gotev.uploadservice.ftp.FTPUploadRequest;
 import net.gotev.uploadservice.ftp.UnixPermissions;
@@ -23,6 +19,7 @@ import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.dialogs.AddFileParameterNameDialog;
 import net.gotev.uploadservicedemo.utils.FilesPickerActivity;
 import net.gotev.uploadservicedemo.utils.IPAddressAndHostnameValidator;
+import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,7 +33,7 @@ import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_FILE;
  * @author Aleksandar Gotev
  */
 
-public class FTPUploadActivity extends FilesPickerActivity implements UploadItem.Delegate {
+public class FTPUploadActivity extends FilesPickerActivity {
 
     public static void show(BaseActivity activity) {
         activity.startActivity(new Intent(activity, FTPUploadActivity.class));
@@ -61,6 +58,7 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
     private IPAddressAndHostnameValidator ipAddressAndHostnameValidator;
     private AddFileParameterNameDialog addFTPFile;
     private String remotePath;
+    private UploadItemUtils uploadItemUtils;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,6 +69,7 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         uploadItemsAdapter = new RecyclerAdapter();
+        uploadItemUtils = new UploadItemUtils(uploadItemsAdapter);
         requestItems.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         requestItems.setAdapter(uploadItemsAdapter);
 
@@ -123,13 +122,6 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
         super.onPause();
 
         addFTPFile.hide();
-
-        // hide soft keyboard if shown
-        View view = getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
     }
 
     @OnClick(R.id.add_file)
@@ -143,17 +135,7 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
             return;
 
 
-        addUploadItem(UploadItem.newFile(remotePath, pickedFiles.get(0), this));
-    }
-
-    private void addUploadItem(UploadItem item) {
-        uploadItemsAdapter.addOrUpdate(item);
-        uploadItemsAdapter.sort(true);
-    }
-
-    @Override
-    public void onRemoveUploadItem(int position) {
-        uploadItemsAdapter.removeItemAtPosition(position);
+        uploadItemUtils.addFile(remotePath, pickedFiles.get(0));
     }
 
     public void onDone() {
@@ -170,7 +152,7 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
             return;
         }
 
-        FTPUploadRequest request = new FTPUploadRequest(this, serverUrl.getText().toString(), ftpPort)
+        final FTPUploadRequest request = new FTPUploadRequest(this, serverUrl.getText().toString(), ftpPort)
                 .setMaxRetries(UploadActivity.MAX_RETRIES)
                 .setNotificationConfig(getNotificationConfig(R.string.ftp_upload))
                 .setUsernameAndPassword(ftpUsername.getText().toString(), ftpPassword.getText().toString())
@@ -178,19 +160,17 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
                 .setSocketTimeout(5000)
                 .setConnectTimeout(5000);
 
-        for (int i = 0; i < uploadItemsAdapter.getItemCount(); i++) {
-            AdapterItem adapterItem = uploadItemsAdapter.getItemAtPosition(i);
+        uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 
-            if (adapterItem != null && adapterItem.getClass().getClass() == UploadItem.class.getClass()) {
-                UploadItem uploadItem = (UploadItem) adapterItem;
-
-                switch (uploadItem.getType()) {
+            @Override
+            public void onUploadItem(UploadItem item) {
+                switch (item.getType()) {
                     case TYPE_FILE:
                         try {
-                            request.addFileToUpload(uploadItem.getSubtitle(), uploadItem.getTitle());
+                            request.addFileToUpload(item.getSubtitle(), item.getTitle());
                         } catch (IOException exc) {
                             Toast.makeText(FTPUploadActivity.this,
-                                    getString(R.string.file_not_found, uploadItem.getSubtitle()),
+                                    getString(R.string.file_not_found, item.getSubtitle()),
                                     Toast.LENGTH_LONG).show();
                         }
                         break;
@@ -199,7 +179,8 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
                         break;
                 }
             }
-        }
+
+        });
 
         try {
             request.startUpload();

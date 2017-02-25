@@ -1,11 +1,14 @@
 package net.gotev.uploadservicedemo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import net.gotev.uploadservice.UploadNotificationConfig;
 
@@ -21,6 +24,18 @@ public class BaseActivity extends AppCompatActivity {
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
         ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // hide soft keyboard if shown
+        View view = getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     protected UploadNotificationConfig getNotificationConfig(@StringRes int title) {

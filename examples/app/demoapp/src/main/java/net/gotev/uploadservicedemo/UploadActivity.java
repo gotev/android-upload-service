@@ -1,6 +1,5 @@
 package net.gotev.uploadservicedemo;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
@@ -8,18 +7,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import net.gotev.recycleradapter.AdapterItem;
 import net.gotev.recycleradapter.RecyclerAdapter;
-import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.dialogs.AddFileParameterNameDialog;
 import net.gotev.uploadservicedemo.dialogs.AddNameValueDialog;
 import net.gotev.uploadservicedemo.utils.FilesPickerActivity;
+import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 import net.gotev.uploadservicedemo.views.AddItem;
 
 import java.util.List;
@@ -31,11 +28,7 @@ import butterknife.OnClick;
  * @author Aleksandar Gotev
  */
 
-public class UploadActivity extends FilesPickerActivity implements UploadItem.Delegate {
-
-    public interface ForEachDelegate {
-        void onUploadItem(UploadItem item);
-    }
+public abstract class UploadActivity extends FilesPickerActivity {
 
     public static final int MAX_RETRIES = 3;
     public static final boolean FIXED_LENGTH_STREAMING_MODE = true;
@@ -60,6 +53,7 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
     private AddNameValueDialog addHeaderDialog;
     private AddNameValueDialog addParameterDialog;
     protected String fileParameterName;
+    protected UploadItemUtils uploadItemUtils;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +69,7 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
         httpMethod.setAdapter(spinnerAdapter);
 
         uploadItemsAdapter = new RecyclerAdapter();
+        uploadItemUtils = new UploadItemUtils(uploadItemsAdapter);
         requestItems.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         requestItems.setAdapter(uploadItemsAdapter);
 
@@ -147,13 +142,6 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
         addParameterDialog.hide();
         addHeaderDialog.hide();
         addFileParameterNameDialog.hide();
-
-        // hide soft keyboard if shown
-        View view = getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
     }
 
     @OnClick(R.id.add_header)
@@ -162,7 +150,7 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
     }
 
     public void onHeaderAdded(String name, String value) {
-        addUploadItem(UploadItem.newHeader(name, value, this));
+        uploadItemUtils.addHeader(name, value);
     }
 
     @OnClick(R.id.add_parameter)
@@ -171,7 +159,7 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
     }
 
     public void onParameterAdded(String name, String value) {
-        addUploadItem(UploadItem.newParameter(name, value, this));
+        uploadItemUtils.addParameter(name, value);
     }
 
     @OnClick(R.id.add_file)
@@ -184,42 +172,17 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
         if (fileParameterName == null || fileParameterName.isEmpty())
             return;
 
-        addUploadItem(UploadItem.newFile(fileParameterName, pickedFiles.get(0), this));
-    }
-
-    private void addUploadItem(UploadItem item) {
-        uploadItemsAdapter.addOrUpdate(item);
-        uploadItemsAdapter.sort(true);
-    }
-
-    @Override
-    public void onRemoveUploadItem(int position) {
-        uploadItemsAdapter.removeItemAtPosition(position);
-    }
-
-    protected final void forEachUploadItem(MultipartUploadActivity.ForEachDelegate delegate) {
-        for (int i = 0; i < uploadItemsAdapter.getItemCount(); i++) {
-            AdapterItem adapterItem = uploadItemsAdapter.getItemAtPosition(i);
-
-            if (adapterItem != null && adapterItem.getClass().getClass() == UploadItem.class.getClass()) {
-                delegate.onUploadItem((UploadItem) adapterItem);
-            }
-        }
-    }
-
-    public void onDone(String httpMethod, String serverUrl, RecyclerAdapter uploadItemsAdapter) {
-
-    }
-
-    public void onInfo() {
-
-    }
-
-    public AdapterItem getEmptyItem() {
-        return null;
+        uploadItemUtils.addFile(fileParameterName, pickedFiles.get(0));
     }
 
     public String getUserAgent() {
         return "AndroidUploadService/" + BuildConfig.VERSION_NAME;
     }
+
+    public abstract AdapterItem getEmptyItem();
+
+    public abstract void onDone(String httpMethod, String serverUrl, RecyclerAdapter uploadItemsAdapter);
+
+    public abstract void onInfo();
+
 }

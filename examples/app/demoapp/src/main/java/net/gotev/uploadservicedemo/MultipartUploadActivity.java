@@ -8,6 +8,7 @@ import net.gotev.recycleradapter.RecyclerAdapter;
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
+import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 
 import java.io.IOException;
 
@@ -42,7 +43,7 @@ public class MultipartUploadActivity extends UploadActivity {
                 .setCustomUserAgent(getUserAgent())
                 .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
 
-        forEachUploadItem(new ForEachDelegate() {
+        uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 
             @Override
             public void onUploadItem(UploadItem item) {

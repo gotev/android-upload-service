@@ -20,9 +20,6 @@ import butterknife.OnClick;
 
 public class UploadItem extends AdapterItem<UploadItem.Holder> {
 
-    private static final String KEY_EVENT = "event";
-    private static final String EVENT_REMOVE = "remove";
-
     public interface Delegate {
         void onRemoveUploadItem(int position);
     }
@@ -30,6 +27,9 @@ public class UploadItem extends AdapterItem<UploadItem.Holder> {
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_PARAMETER = 1;
     public static final int TYPE_FILE = 2;
+
+    private static final String KEY_EVENT = "event";
+    private static final String EVENT_REMOVE = "remove";
 
     private int mType;
     private String mTitle;
@@ -42,19 +42,7 @@ public class UploadItem extends AdapterItem<UploadItem.Holder> {
             R.drawable.ic_description
     };
 
-    public static UploadItem newHeader(String headerName, String headerValue, Delegate delegate) {
-        return new UploadItem(TYPE_HEADER, headerName, headerValue, delegate);
-    }
-
-    public static UploadItem newParameter(String paramName, String paramValue, Delegate delegate) {
-        return new UploadItem(TYPE_PARAMETER, paramName, paramValue, delegate);
-    }
-
-    public static UploadItem newFile(String paramName, String filePath, Delegate delegate) {
-        return new UploadItem(TYPE_FILE, paramName, filePath, delegate);
-    }
-
-    private UploadItem(int type, String title, String subtitle, Delegate delegate) {
+    public UploadItem(int type, String title, String subtitle, Delegate delegate) {
         mType = type;
         mTitle = title;
         mSubtitle = subtitle;

@@ -11,6 +11,7 @@ import net.gotev.recycleradapter.RecyclerAdapter;
 import net.gotev.uploadservice.BinaryUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
+import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 
 import java.io.IOException;
 
@@ -55,7 +56,7 @@ public class BinaryUploadActivity extends UploadActivity {
                 .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE)
                 .setCustomUserAgent(getUserAgent());
 
-        forEachUploadItem(new ForEachDelegate() {
+        uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 
             @Override
             public void onUploadItem(UploadItem item) {
