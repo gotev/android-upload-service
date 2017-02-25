@@ -1,11 +1,14 @@
 package net.gotev.uploadservicedemo;
 
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.View;
 import android.widget.Toast;
 
 import net.gotev.recycleradapter.AdapterItem;
 import net.gotev.recycleradapter.RecyclerAdapter;
-import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.BinaryUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 
@@ -13,34 +16,44 @@ import java.io.IOException;
 
 import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_FILE;
 import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_HEADER;
-import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_PARAMETER;
 
 /**
  * @author Aleksandar Gotev
  */
 
-public class MultipartUploadActivity extends UploadActivity {
+public class BinaryUploadActivity extends UploadActivity {
 
     public static void show(BaseActivity activity) {
-        activity.startActivity(new Intent(activity, MultipartUploadActivity.class));
+        activity.startActivity(new Intent(activity, BinaryUploadActivity.class));
     }
 
     @Override
     public AdapterItem getEmptyItem() {
-        return new EmptyItem(R.string.empty_multipart_upload);
+        return new EmptyItem(R.string.empty_binary_upload);
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        addParameter.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onAddFile() {
+        fileParameterName = "file";
+        openFilePicker(false);
     }
 
     @Override
     public void onDone(String httpMethod, String serverUrl, RecyclerAdapter uploadItemsAdapter) {
 
-        final MultipartUploadRequest request =
-                new MultipartUploadRequest(this, serverUrl)
+        final BinaryUploadRequest request = new BinaryUploadRequest(this, serverUrl)
                 .setMethod(httpMethod)
-                .setUtf8Charset()
-                .setNotificationConfig(getNotificationConfig(R.string.multipart_upload))
+                .setNotificationConfig(getNotificationConfig(R.string.binary_upload))
                 .setMaxRetries(MAX_RETRIES)
-                .setCustomUserAgent(getUserAgent())
-                .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
+                .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE)
+                .setCustomUserAgent(getUserAgent());
 
         forEachUploadItem(new ForEachDelegate() {
 
@@ -52,15 +65,11 @@ public class MultipartUploadActivity extends UploadActivity {
                         request.addHeader(item.getTitle(), item.getSubtitle());
                         break;
 
-                    case TYPE_PARAMETER:
-                        request.addParameter(item.getTitle(), item.getSubtitle());
-                        break;
-
                     case TYPE_FILE:
                         try {
-                            request.addFileToUpload(item.getSubtitle(), item.getTitle());
+                            request.setFileToUpload(item.getSubtitle());
                         } catch (IOException exc) {
-                            Toast.makeText(MultipartUploadActivity.this,
+                            Toast.makeText(BinaryUploadActivity.this,
                                     getString(R.string.file_not_found, item.getSubtitle()),
                                     Toast.LENGTH_LONG).show();
                         }

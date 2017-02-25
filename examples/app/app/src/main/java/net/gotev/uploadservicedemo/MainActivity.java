@@ -87,7 +87,11 @@ public class MainActivity extends FilesPickerActivity implements UploadStatusDel
 
         switch (item.getItemId()) {
             case R.id.new_multipart_upload:
-                startActivity(new Intent(this, MultipartUploadActivity.class));
+                MultipartUploadActivity.show(this);
+                return true;
+
+            case R.id.new_binary_upload:
+                BinaryUploadActivity.show(this);
                 return true;
         }
 

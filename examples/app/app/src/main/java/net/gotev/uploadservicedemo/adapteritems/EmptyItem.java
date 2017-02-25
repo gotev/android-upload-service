@@ -1,5 +1,7 @@
 package net.gotev.uploadservicedemo.adapteritems;
 
+import android.content.Context;
+import android.support.annotation.StringRes;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,6 +18,12 @@ import butterknife.BindView;
 
 public class EmptyItem extends AdapterItem<EmptyItem.Holder> {
 
+    private @StringRes int text;
+
+    public EmptyItem(@StringRes int textResource) {
+        text = textResource;
+    }
+
     @Override
     public int getLayoutId() {
         return R.layout.item_empty;
@@ -23,7 +31,8 @@ public class EmptyItem extends AdapterItem<EmptyItem.Holder> {
 
     @Override
     protected void bind(Holder holder) {
-
+        Context ctx = holder.textView.getContext();
+        holder.textView.setText(ctx.getString(text));
     }
 
     public static class Holder extends ButterKnifeViewHolder {

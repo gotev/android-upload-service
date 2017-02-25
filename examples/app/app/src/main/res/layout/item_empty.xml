@@ -4,7 +4,6 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:text="@string/empty_upload"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/textView"

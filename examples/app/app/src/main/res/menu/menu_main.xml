@@ -7,4 +7,11 @@
         android:title="@string/new_multipart_upload"
         android:visible="true"
         android:enabled="true" />
+
+    <item
+        android:id="@+id/new_binary_upload"
+        android:title="@string/new_binary_upload"
+        android:visible="true"
+        android:enabled="true" />
+
 </menu>

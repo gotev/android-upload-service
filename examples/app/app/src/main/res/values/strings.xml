@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">Upload Service</string>
-    <string name="binary_upload">Binary</string>
     <string name="ftp_upload">FTP</string>
     <string name="cancel_upload">Cancel upload</string>
     <string name="cancel_all_uploads">Cancel all uploads</string>
@@ -46,6 +45,8 @@
     </string-array>
 
     <string name="multipart_upload">Multipart Upload</string>
+    <string name="binary_upload">Binary Upload</string>
+    <string name="new_binary_upload">New Binary Upload</string>
     <string name="files_to_upload">Files to upload</string>
     <string name="upload_parameters">Upload parameters</string>
     <string name="no_files">No files to upload.\nTap on + to add one.</string>
@@ -60,6 +61,7 @@
     <string name="next">Next</string>
     <string name="next_instructions">Fill in the parameter name and tap on next to select the file</string>
     <string name="file_not_found">File %1$s not found! It will not be added to the upload request!</string>
-    <string name="empty_upload">Empty upload!\nAdd some files, headers or parameters</string>
+    <string name="empty_multipart_upload">Empty upload, add some files!\nYou can also add headers and parameters</string>
+    <string name="empty_binary_upload">Empty upload!\nAdd the file to be sent in the body of the request. You can also add headers.</string>
 
 </resources>

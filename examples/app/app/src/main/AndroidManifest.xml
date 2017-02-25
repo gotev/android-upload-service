@@ -50,6 +50,12 @@
             android:launchMode="singleTask" />
 
         <activity
+            android:name=".BinaryUploadActivity"
+            android:parentActivityName=".MainActivity"
+            android:label="@string/binary_upload"
+            android:launchMode="singleTask" />
+
+        <activity
             android:name=".utils.BackHandlingFilePickerActivity"
             android:label="@string/select_file"
             android:theme="@style/FilePickerTheme">
