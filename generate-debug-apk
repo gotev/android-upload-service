@@ -1,0 +1,4 @@
+#!/bin/bash -e
+cd examples/app
+./gradlew clean assembleDebug
+cp demoapp/build/outputs/apk/demoapp-debug.apk ../../uploadservice-demo-debug.apk
