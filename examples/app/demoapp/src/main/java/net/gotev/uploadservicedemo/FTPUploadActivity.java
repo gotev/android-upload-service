@@ -106,6 +106,10 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
             case R.id.settings:
                 return true;
 
+            case R.id.info:
+                onInfo();
+                return true;
+
             case R.id.done:
                 onDone();
                 return true;
@@ -203,5 +207,9 @@ public class FTPUploadActivity extends FilesPickerActivity implements UploadItem
         } catch (Exception exc) {
             Toast.makeText(this, exc.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void onInfo() {
+        openBrowser("https://github.com/gotev/android-upload-service/blob/master/uploadservice-ftp/README.md");
     }
 }

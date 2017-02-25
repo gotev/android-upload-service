@@ -2,6 +2,7 @@ package net.gotev.uploadservicedemo;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
@@ -40,5 +41,9 @@ public class BaseActivity extends AppCompatActivity {
                 .setClickIntent(new Intent(this, MainActivity.class))
                 .setClearOnAction(true)
                 .setRingToneEnabled(true);
+    }
+
+    protected void openBrowser(String url) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
 }

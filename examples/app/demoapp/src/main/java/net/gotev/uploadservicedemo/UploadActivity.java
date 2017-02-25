@@ -127,6 +127,10 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
             case R.id.settings:
                 return true;
 
+            case R.id.info:
+                onInfo();
+                return true;
+
             case R.id.done:
                 onDone((String) httpMethod.getSelectedItem(), serverUrl.getText().toString(),
                         uploadItemsAdapter);
@@ -204,6 +208,10 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
     }
 
     public void onDone(String httpMethod, String serverUrl, RecyclerAdapter uploadItemsAdapter) {
+
+    }
+
+    public void onInfo() {
 
     }
 

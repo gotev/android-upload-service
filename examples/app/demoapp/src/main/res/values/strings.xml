@@ -22,6 +22,7 @@
     <string name="no_whitespaces_here">Whitespaces are not allowed here!</string>
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
+    <string name="info">Info</string>
     <string name="upload_progress">Upload progress: %s</string>
     <string name="uploading">Uploaded [[UPLOADED_FILES]] of [[TOTAL_FILES]] at [[UPLOAD_RATE]] - [[PROGRESS]]</string>
     <string name="upload_success">Upload completed successfully in [[ELAPSED_TIME]]</string>

@@ -11,6 +11,14 @@
         android:enabled="true" />
 
     <item
+        android:title="@string/info"
+        android:id="@+id/info"
+        android:icon="@drawable/ic_action_info"
+        app:showAsAction="ifRoom"
+        android:visible="true"
+        android:enabled="true" />
+
+    <item
         android:title="@string/done"
         app:showAsAction="always"
         android:id="@+id/done"

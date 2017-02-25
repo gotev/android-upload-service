@@ -80,4 +80,9 @@ public class MultipartUploadActivity extends UploadActivity {
             Toast.makeText(this, exc.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
+    @Override
+    public void onInfo() {
+        openBrowser("https://github.com/gotev/android-upload-service/wiki/Recipes#http-multipartform-data-upload-rfc2388-");
+    }
 }
