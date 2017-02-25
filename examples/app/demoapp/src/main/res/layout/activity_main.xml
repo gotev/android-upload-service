@@ -12,143 +12,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="8sp">
+        android:layout_margin="@dimen/activity_horizontal_margin">
 
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10sp"
-            android:text="@string/server_upload_url" />
-
-        <EditText
-            android:id="@+id/serverURL"
-            android:inputType="textUri"
-            android:hint="@string/server_url_hint"
+        <net.gotev.uploadservicedemo.views.AddItem
+            android:id="@+id/multipart_upload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10" >
+            android:clickable="true"
+            app:titleText="@string/new_multipart_upload"
+            app:colorFilter="@color/colorAccent"/>
 
-            <requestFocus />
-        </EditText>
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10sp"
-            android:text="@string/files_to_upload_path" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/filesToUpload"
-                android:inputType="textUri"
-                android:hint="@string/file_path_hint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/browse"
-                android:id="@+id/pickFile" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10sp"
-            android:text="@string/file_parameter_name" />
-
-        <EditText
-            android:id="@+id/parameterName"
-            android:inputType="textUri"
-            android:hint="@string/file_parameter_name_hint"
+        <net.gotev.uploadservicedemo.views.AddItem
+            android:id="@+id/binary_upload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10" />
+            android:clickable="true"
+            app:titleText="@string/new_binary_upload"
+            app:colorFilter="@color/colorPrimary"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/options"
-            android:id="@+id/optionsTextView" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/use_utf8_charset"
-            android:id="@+id/useUtf8"
-            android:layout_gravity="start"
-            android:checked="true" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/fixed_length_streaming_mode"
-            android:id="@+id/fixedLengthStreamingMode"
-            android:layout_gravity="start"
-            android:checked="true" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/display_notification"
-            android:id="@+id/displayNotification"
-            android:layout_gravity="start"
-            android:checked="true" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/auto_clear_notification"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:id="@+id/autoClearNotification" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/auto_delete_uploaded_files"
-            android:id="@+id/autoDeleteUploadedFiles"
-            android:layout_gravity="start" />
-
-        <LinearLayout
-            android:orientation="horizontal"
+        <net.gotev.uploadservicedemo.views.AddItem
+            android:id="@+id/ftp_upload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
-
-            <Button
-                android:id="@+id/multipartUploadButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:text="@string/multipart_upload" />
-
-            <Button
-                android:id="@+id/binaryUploadButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:text="@string/binary_upload" />
-
-            <Button
-                android:id="@+id/ftpUploadButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:text="@string/ftp_upload" />
-        </LinearLayout>
+            app:titleText="@string/new_ftp_upload"
+            android:clickable="true"
+            app:colorFilter="@color/colorPrimaryDark"/>
 
         <Button
             android:id="@+id/cancelAllUploadsButton"

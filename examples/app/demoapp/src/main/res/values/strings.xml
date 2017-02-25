@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string-array name="http_methods">
+        <item>POST</item>
+        <item>PUT</item>
+        <item>PATCH</item>
+        <item>OPTIONS</item>
+    </string-array>
+
     <string name="app_name">Upload Service</string>
-    <string name="cancel_upload">Cancel upload</string>
     <string name="cancel_all_uploads">Cancel all uploads</string>
-    <string name="server_upload_url">Server upload URL</string>
-    <string name="browse">Browse..</string>
     <string name="select_file">Select file to upload</string>
-    <string name="files_to_upload_path">Path of the files to upload</string>
-    <string name="file_parameter_name">File parameter name</string>
-    <string name="file_parameter_name_hint">E.g. uploaded_file</string>
     <string name="parameter_name_hint">Parameter name</string>
     <string name="parameter_value_hint">Parameter value</string>
     <string name="header_name_hint">Header name</string>
@@ -23,39 +24,17 @@
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="info">Info</string>
-    <string name="upload_progress">Upload progress: %s</string>
     <string name="uploading">Uploaded [[UPLOADED_FILES]] of [[TOTAL_FILES]] at [[UPLOAD_RATE]] - [[PROGRESS]]</string>
     <string name="upload_success">Upload completed successfully in [[ELAPSED_TIME]]</string>
     <string name="upload_error">Error while uploading</string>
     <string name="upload_cancelled">Upload has been cancelled</string>
-    <string name="server_url_hint">server.com/path/to/script</string>
-    <string name="file_path_hint">/path/to/your/file.ext</string>
-    <string name="display_notification">Display notification</string>
-    <string name="auto_delete_uploaded_files">Auto delete uploaded files</string>
-    <string name="options">Options</string>
-    <string name="auto_clear_notification">Auto clear on success or cancellation</string>
-    <string name="fixed_length_streaming_mode">Fixed length streaming mode</string>
-    <string name="use_utf8_charset">Use UTF-8 charset (un-check to use US-ASCII)</string>
-
-    <string-array name="http_methods">
-        <item>POST</item>
-        <item>PUT</item>
-        <item>PATCH</item>
-        <item>OPTIONS</item>
-    </string-array>
-
     <string name="multipart_upload">Multipart Upload</string>
     <string name="binary_upload">Binary Upload</string>
     <string name="new_binary_upload">New Binary Upload</string>
     <string name="ftp_upload">FTP Upload</string>
     <string name="new_ftp_upload">New FTP Upload</string>
-    <string name="files_to_upload">Files to upload</string>
-    <string name="upload_parameters">Upload parameters</string>
-    <string name="no_files">No files to upload.\nTap on + to add one.</string>
-    <string name="no_parameters">No parameters.\nTap on + to add one.</string>
     <string name="settings">Settings</string>
     <string name="done">Done</string>
-    <string name="new_upload">New upload</string>
     <string name="port">Port (e.g. 21)</string>
     <string name="ftp_server_url">FTP Server IP or domain</string>
     <string name="ftp_username_hint">FTP Username</string>

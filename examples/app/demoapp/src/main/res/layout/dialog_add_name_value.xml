@@ -13,7 +13,7 @@
         android:maxLines="1"
         android:ems="10"
         android:hint="@string/parameter_name_hint"
-        android:layout_marginBottom="@dimen/activity_vertical_margin_half"/>
+        android:layout_marginBottom="@dimen/space_8"/>
 
     <EditText
         android:id="@+id/parameter_value"
@@ -22,7 +22,6 @@
         android:inputType="textNoSuggestions"
         android:maxLines="1"
         android:ems="10"
-        android:hint="@string/parameter_value_hint"
-        android:layout_marginBottom="@dimen/activity_vertical_margin_half"/>
+        android:hint="@string/parameter_value_hint"/>
 
 </LinearLayout>
