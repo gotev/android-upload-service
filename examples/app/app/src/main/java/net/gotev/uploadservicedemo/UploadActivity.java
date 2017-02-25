@@ -68,7 +68,7 @@ public class UploadActivity extends FilesPickerActivity implements UploadItem.De
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload_multipart);
+        setContentView(R.layout.activity_upload);
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
