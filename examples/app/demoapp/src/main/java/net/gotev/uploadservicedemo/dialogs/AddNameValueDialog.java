@@ -38,12 +38,15 @@ public class AddNameValueDialog implements View.OnClickListener {
 
     private String nameErrorString;
     private String valueErrorString;
+    private boolean asciiOnly;
 
-    public AddNameValueDialog(AppCompatActivity context, Delegate delegate, @StringRes int title,
+    public AddNameValueDialog(AppCompatActivity context, Delegate delegate,
+                              boolean asciiOnly, @StringRes int title,
                               @StringRes int nameHint, @StringRes int valueHint,
                               @StringRes int nameError, @StringRes int valueError) {
         this.context = context;
         this.delegate = delegate;
+        this.asciiOnly = asciiOnly;
 
         nameErrorString = context.getString(nameError);
         valueErrorString = context.getString(valueError);
@@ -92,6 +95,23 @@ public class AddNameValueDialog implements View.OnClickListener {
             return;
         }
 
+        if (asciiOnly) {
+            boolean fail = false;
+
+            if (!isAllASCII(paramName.getText().toString())) {
+                fail = true;
+                paramName.setError(view.getContext().getString(R.string.use_only_ascii));
+            }
+
+            if (!isAllASCII(paramValue.getText().toString())) {
+                fail = true;
+                paramValue.setError(view.getContext().getString(R.string.use_only_ascii));
+            }
+
+            if (fail)
+                return;
+        }
+
         delegate.onNew(paramName.getText().toString().trim(), paramValue.getText().toString().trim());
 
         hide();
@@ -114,5 +134,20 @@ public class AddNameValueDialog implements View.OnClickListener {
             inputMethodManager.hideSoftInputFromWindow(paramName.getWindowToken(), 0);
             dialog.dismiss();
         }
+    }
+
+    private boolean isAllASCII(String input) {
+        if (input == null || input.isEmpty())
+            return false;
+
+        boolean isASCII = true;
+        for (int i = 0; i < input.length(); i++) {
+            int c = input.charAt(i);
+            if (c > 127) {
+                isASCII = false;
+                break;
+            }
+        }
+        return isASCII;
     }
 }

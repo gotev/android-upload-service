@@ -63,11 +63,11 @@ public final class HttpUploadTaskParameters implements Parcelable {
     }
 
     public void addRequestHeader(String name, String value) {
-        requestHeaders.add(new NameValue(name, value));
+        requestHeaders.add(new NameValue(name, value, true));
     }
 
     public void addRequestParameter(String name, String value) {
-        requestParameters.add(new NameValue(name, value));
+        requestParameters.add(new NameValue(name, value, false));
     }
 
     public List<NameValue> getRequestHeaders() {

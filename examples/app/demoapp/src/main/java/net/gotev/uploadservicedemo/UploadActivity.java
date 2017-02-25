@@ -83,7 +83,7 @@ public abstract class UploadActivity extends FilesPickerActivity {
             public void onNew(String name, String value) {
                 onHeaderAdded(name, value);
             }
-        }, R.string.add_header, R.string.header_name_hint, R.string.header_value_hint,
+        }, true, R.string.add_header, R.string.header_name_hint, R.string.header_value_hint,
                 R.string.provide_header_name, R.string.provide_header_value);
 
         addParameterDialog = new AddNameValueDialog(this, new AddNameValueDialog.Delegate() {
@@ -91,7 +91,7 @@ public abstract class UploadActivity extends FilesPickerActivity {
             public void onNew(String name, String value) {
                 onParameterAdded(name, value);
             }
-        }, R.string.add_parameter, R.string.parameter_name_hint, R.string.parameter_value_hint,
+        }, false, R.string.add_parameter, R.string.parameter_name_hint, R.string.parameter_value_hint,
                 R.string.provide_parameter_name, R.string.provide_parameter_value);
 
         addFileParameterNameDialog = new AddFileParameterNameDialog(this,

@@ -14,7 +14,10 @@ public final class NameValue implements Parcelable {
     private final String name;
     private final String value;
 
-    public NameValue(final String name, final String value) {
+    public NameValue(final String name, final String value, boolean asciiOnly) {
+        if (asciiOnly && (!isAllASCII(name) || !isAllASCII(value)))
+            throw new IllegalArgumentException("Header " + name + " must be ASCII only! Read http://stackoverflow.com/a/4410331");
+
         this.name = name;
         this.value = value;
     }
@@ -70,5 +73,20 @@ public final class NameValue implements Parcelable {
     private NameValue(Parcel in) {
         name = in.readString();
         value = in.readString();
+    }
+
+    private static boolean isAllASCII(String input) {
+        if (input == null || input.isEmpty())
+            return false;
+
+        boolean isASCII = true;
+        for (int i = 0; i < input.length(); i++) {
+            int c = input.charAt(i);
+            if (c > 127) {
+                isASCII = false;
+                break;
+            }
+        }
+        return isASCII;
     }
 }

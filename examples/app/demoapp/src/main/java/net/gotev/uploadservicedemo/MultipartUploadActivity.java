@@ -50,7 +50,12 @@ public class MultipartUploadActivity extends UploadActivity {
 
                 switch (item.getType()) {
                     case TYPE_HEADER:
-                        request.addHeader(item.getTitle(), item.getSubtitle());
+                        try {
+                            request.addHeader(item.getTitle(), item.getSubtitle());
+                        } catch (IllegalArgumentException exc) {
+                            Toast.makeText(MultipartUploadActivity.this,
+                                    exc.getMessage(), Toast.LENGTH_LONG).show();
+                        }
                         break;
 
                     case TYPE_PARAMETER:
