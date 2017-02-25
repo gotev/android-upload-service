@@ -5,7 +5,9 @@ Android Upload Service
 
 ![Upload Notification](http://gotev.github.io/android-upload-service/upload.gif)
 
-Easily upload files in the background with automatic Android Notification Center progress indication.
+Easily upload files in the background with automatic Android Notification Center progress indication. 
+
+[Download the latest demo app APK](https://github.com/gotev/android-upload-service/releases/download/3.1/uploadservice-demo-debug.apk) which uses the library and try it yourself! You can do much more, the app is just a proof of concept.
 
 ## Purpose
 * have a tiny library (less than 60KB)
