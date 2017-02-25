@@ -1,4 +1,4 @@
-package net.gotev.uploadservicedemo.listitems;
+package net.gotev.uploadservicedemo.adapteritems;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

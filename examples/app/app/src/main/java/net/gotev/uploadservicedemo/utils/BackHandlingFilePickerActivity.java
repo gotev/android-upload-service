@@ -1,4 +1,4 @@
-package net.gotev.uploadservicedemo;
+package net.gotev.uploadservicedemo.utils;
 
 import android.os.Environment;
 

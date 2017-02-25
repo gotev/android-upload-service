@@ -25,6 +25,7 @@ import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.UploadStatusDelegate;
 import net.gotev.uploadservice.ftp.FTPUploadRequest;
 import net.gotev.uploadservice.ftp.UnixPermissions;
+import net.gotev.uploadservicedemo.utils.FilesPickerActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;

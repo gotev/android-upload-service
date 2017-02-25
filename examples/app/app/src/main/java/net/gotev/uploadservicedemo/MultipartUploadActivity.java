@@ -20,8 +20,9 @@ import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservicedemo.dialogs.AddFileParameterNameDialog;
 import net.gotev.uploadservicedemo.dialogs.AddNameValueDialog;
-import net.gotev.uploadservicedemo.listitems.EmptyItem;
-import net.gotev.uploadservicedemo.listitems.UploadItem;
+import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
+import net.gotev.uploadservicedemo.adapteritems.UploadItem;
+import net.gotev.uploadservicedemo.utils.FilesPickerActivity;
 import net.gotev.uploadservicedemo.views.AddItem;
 
 import java.io.IOException;
@@ -30,9 +31,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-import static net.gotev.uploadservicedemo.listitems.UploadItem.TYPE_FILE;
-import static net.gotev.uploadservicedemo.listitems.UploadItem.TYPE_HEADER;
-import static net.gotev.uploadservicedemo.listitems.UploadItem.TYPE_PARAMETER;
+import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_FILE;
+import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_HEADER;
+import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_PARAMETER;
 
 /**
  * @author Aleksandar Gotev

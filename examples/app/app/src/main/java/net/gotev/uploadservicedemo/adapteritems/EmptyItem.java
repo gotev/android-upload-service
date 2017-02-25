@@ -1,4 +1,4 @@
-package net.gotev.uploadservicedemo.listitems;
+package net.gotev.uploadservicedemo.adapteritems;
 
 import android.view.View;
 import android.widget.TextView;

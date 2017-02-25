@@ -1,4 +1,4 @@
-package net.gotev.uploadservicedemo;
+package net.gotev.uploadservicedemo.utils;
 
 import com.nononsenseapps.filepicker.FilePickerFragment;
 
@@ -15,7 +15,12 @@ public class BackHandlingFilePickerFragment extends FilePickerFragment {
      */
     public File getBackTop() {
         if (getArguments().containsKey(KEY_START_PATH)) {
-            return getPath(getArguments().getString(KEY_START_PATH));
+            String keyStartPath = getArguments().getString(KEY_START_PATH);
+
+            if (keyStartPath == null)
+                return new File("/");
+
+            return getPath(keyStartPath);
         } else {
             return new File("/");
         }

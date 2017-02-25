@@ -50,7 +50,7 @@
             android:launchMode="singleTask" />
 
         <activity
-            android:name=".BackHandlingFilePickerActivity"
+            android:name=".utils.BackHandlingFilePickerActivity"
             android:label="@string/select_file"
             android:theme="@style/FilePickerTheme">
             <intent-filter>
