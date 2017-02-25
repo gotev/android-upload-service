@@ -1,6 +1,8 @@
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice)
 
 ![Upload Notification](http://gotev.github.io/android-upload-service/upload.gif)
+
+[Download the latest demo app APK](https://github.com/gotev/android-upload-service/releases/download/3.1/uploadservice-demo-debug.apk) which uses the library and try it yourself! You can do much more, the app is just a proof of concept.
 
 ## Purpose
 * have a tiny library (less than 60KB)
@@ -27,9 +29,11 @@ Do you need help? [Read this](https://github.com/gotev/android-upload-service/wi
 ## Apps powered by Android Upload Service <a name="powered"></a>
 To be included in the following list, simply create an issue and provide the app name and a link.
 
+- [crystal.io](https://play.google.com/store/apps/details?id=net.igenius.crystal)
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
-- [DotShare](http://dot-share.com/index-en.html)
+- [Motolife](https://play.google.com/store/apps/details?id=bg.motolife.app)
 - [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
+- [MyCyberLaw](https://play.google.com/store/apps/details?id=com.mycyberlaw)
 
 ## Contributing <a name="contribute"></a>
 * Do you have a new feature in mind?
@@ -43,7 +47,7 @@ Put a star, spread the word and if you want to offer me a free beer, [![Donate](
 
 ## License <a name="license"></a>
 
-    Copyright (C) 2013-2016 Aleksandar Gotev
+    Copyright (C) 2013-2017 Aleksandar Gotev
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
