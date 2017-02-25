@@ -27,8 +27,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_FILE;
-
 /**
  * @author Aleksandar Gotev
  */
@@ -163,20 +161,23 @@ public class FTPUploadActivity extends FilesPickerActivity {
         uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 
             @Override
-            public void onUploadItem(UploadItem item) {
-                switch (item.getType()) {
-                    case TYPE_FILE:
-                        try {
-                            request.addFileToUpload(item.getSubtitle(), item.getTitle());
-                        } catch (IOException exc) {
-                            Toast.makeText(FTPUploadActivity.this,
-                                    getString(R.string.file_not_found, item.getSubtitle()),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                        break;
+            public void onHeader(UploadItem item) {
+                // FTP does not support headers
+            }
 
-                    default:
-                        break;
+            @Override
+            public void onParameter(UploadItem item) {
+                // FTP does not support parameters
+            }
+
+            @Override
+            public void onFile(UploadItem item) {
+                try {
+                    request.addFileToUpload(item.getSubtitle(), item.getTitle());
+                } catch (IOException exc) {
+                    Toast.makeText(FTPUploadActivity.this,
+                            getString(R.string.file_not_found, item.getSubtitle()),
+                            Toast.LENGTH_LONG).show();
                 }
             }
 

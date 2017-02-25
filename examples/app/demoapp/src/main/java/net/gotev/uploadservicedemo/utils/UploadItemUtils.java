@@ -15,7 +15,9 @@ import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_PARAMETER
 public class UploadItemUtils implements UploadItem.Delegate {
 
     public interface ForEachDelegate {
-        void onUploadItem(UploadItem item);
+        void onHeader(UploadItem item);
+        void onParameter(UploadItem item);
+        void onFile(UploadItem item);
     }
 
     private RecyclerAdapter mAdapter;
@@ -29,7 +31,24 @@ public class UploadItemUtils implements UploadItem.Delegate {
             AdapterItem adapterItem = mAdapter.getItemAtPosition(i);
 
             if (adapterItem != null && adapterItem.getClass().getClass() == UploadItem.class.getClass()) {
-                delegate.onUploadItem((UploadItem) adapterItem);
+                UploadItem uploadItem = (UploadItem) adapterItem;
+
+                switch (uploadItem.getType()) {
+                    case TYPE_HEADER:
+                        delegate.onHeader(uploadItem);
+                        break;
+
+                    case TYPE_PARAMETER:
+                        delegate.onParameter(uploadItem);
+                        break;
+
+                    case TYPE_FILE:
+                        delegate.onFile(uploadItem);
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
     }

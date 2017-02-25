@@ -7,16 +7,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import net.gotev.recycleradapter.AdapterItem;
-import net.gotev.recycleradapter.RecyclerAdapter;
 import net.gotev.uploadservice.BinaryUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 
 import java.io.IOException;
-
-import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_FILE;
-import static net.gotev.uploadservicedemo.adapteritems.UploadItem.TYPE_HEADER;
 
 /**
  * @author Aleksandar Gotev
@@ -48,7 +44,7 @@ public class BinaryUploadActivity extends UploadActivity {
     }
 
     @Override
-    public void onDone(String httpMethod, String serverUrl, RecyclerAdapter uploadItemsAdapter) {
+    public void onDone(String httpMethod, String serverUrl, UploadItemUtils uploadItemUtils) {
 
         final BinaryUploadRequest request = new BinaryUploadRequest(this, serverUrl)
                 .setMethod(httpMethod)
@@ -60,25 +56,23 @@ public class BinaryUploadActivity extends UploadActivity {
         uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 
             @Override
-            public void onUploadItem(UploadItem item) {
+            public void onHeader(UploadItem item) {
+                request.addHeader(item.getTitle(), item.getSubtitle());
+            }
 
-                switch (item.getType()) {
-                    case TYPE_HEADER:
-                        request.addHeader(item.getTitle(), item.getSubtitle());
-                        break;
+            @Override
+            public void onParameter(UploadItem item) {
+                // Binary uploads does not support parameters
+            }
 
-                    case TYPE_FILE:
-                        try {
-                            request.setFileToUpload(item.getSubtitle());
-                        } catch (IOException exc) {
-                            Toast.makeText(BinaryUploadActivity.this,
-                                    getString(R.string.file_not_found, item.getSubtitle()),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                        break;
-
-                    default:
-                        break;
+            @Override
+            public void onFile(UploadItem item) {
+                try {
+                    request.setFileToUpload(item.getSubtitle());
+                } catch (IOException exc) {
+                    Toast.makeText(BinaryUploadActivity.this,
+                            getString(R.string.file_not_found, item.getSubtitle()),
+                            Toast.LENGTH_LONG).show();
                 }
             }
 

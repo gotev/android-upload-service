@@ -53,7 +53,7 @@ public abstract class UploadActivity extends FilesPickerActivity {
     private AddNameValueDialog addHeaderDialog;
     private AddNameValueDialog addParameterDialog;
     protected String fileParameterName;
-    protected UploadItemUtils uploadItemUtils;
+    private UploadItemUtils uploadItemUtils;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,7 +128,7 @@ public abstract class UploadActivity extends FilesPickerActivity {
 
             case R.id.done:
                 onDone((String) httpMethod.getSelectedItem(), serverUrl.getText().toString(),
-                        uploadItemsAdapter);
+                        uploadItemUtils);
                 return true;
         }
 
@@ -181,7 +181,7 @@ public abstract class UploadActivity extends FilesPickerActivity {
 
     public abstract AdapterItem getEmptyItem();
 
-    public abstract void onDone(String httpMethod, String serverUrl, RecyclerAdapter uploadItemsAdapter);
+    public abstract void onDone(String httpMethod, String serverUrl, UploadItemUtils uploadItemUtils);
 
     public abstract void onInfo();
 
