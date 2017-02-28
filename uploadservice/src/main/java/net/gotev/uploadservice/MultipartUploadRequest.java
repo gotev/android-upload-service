@@ -16,7 +16,7 @@ import java.io.FileNotFoundException;
  */
 public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadRequest> {
 
-    private static final String LOG_TAG = MultipartUploadRequest.class.getName();
+    private static final String LOG_TAG = MultipartUploadRequest.class.getSimpleName();
     private boolean isUtf8Charset = false;
 
     /**
