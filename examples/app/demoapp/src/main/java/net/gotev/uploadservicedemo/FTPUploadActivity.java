@@ -150,42 +150,43 @@ public class FTPUploadActivity extends FilesPickerActivity {
             return;
         }
 
-        final FTPUploadRequest request = new FTPUploadRequest(this, serverUrl.getText().toString(), ftpPort)
-                .setMaxRetries(UploadActivity.MAX_RETRIES)
-                .setNotificationConfig(getNotificationConfig(R.string.ftp_upload))
-                .setUsernameAndPassword(ftpUsername.getText().toString(), ftpPassword.getText().toString())
-                .setCreatedDirectoriesPermissions(new UnixPermissions("777"))
-                .setSocketTimeout(5000)
-                .setConnectTimeout(5000);
-
-        uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
-
-            @Override
-            public void onHeader(UploadItem item) {
-                // FTP does not support headers
-            }
-
-            @Override
-            public void onParameter(UploadItem item) {
-                // FTP does not support parameters
-            }
-
-            @Override
-            public void onFile(UploadItem item) {
-                try {
-                    request.addFileToUpload(item.getSubtitle(), item.getTitle());
-                } catch (IOException exc) {
-                    Toast.makeText(FTPUploadActivity.this,
-                            getString(R.string.file_not_found, item.getSubtitle()),
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-
-        });
-
         try {
+            final FTPUploadRequest request = new FTPUploadRequest(this, serverUrl.getText().toString(), ftpPort)
+                    .setMaxRetries(UploadActivity.MAX_RETRIES)
+                    .setNotificationConfig(getNotificationConfig(R.string.ftp_upload))
+                    .setUsernameAndPassword(ftpUsername.getText().toString(), ftpPassword.getText().toString())
+                    .setCreatedDirectoriesPermissions(new UnixPermissions("777"))
+                    .setSocketTimeout(5000)
+                    .setConnectTimeout(5000);
+
+            uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
+
+                @Override
+                public void onHeader(UploadItem item) {
+                    // FTP does not support headers
+                }
+
+                @Override
+                public void onParameter(UploadItem item) {
+                    // FTP does not support parameters
+                }
+
+                @Override
+                public void onFile(UploadItem item) {
+                    try {
+                        request.addFileToUpload(item.getSubtitle(), item.getTitle());
+                    } catch (IOException exc) {
+                        Toast.makeText(FTPUploadActivity.this,
+                                getString(R.string.file_not_found, item.getSubtitle()),
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+
+            });
+
             request.startUpload();
             finish();
+
         } catch (Exception exc) {
             Toast.makeText(this, exc.getMessage(), Toast.LENGTH_LONG).show();
         }
