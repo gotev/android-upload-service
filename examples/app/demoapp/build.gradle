@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
 def sdkVersion = 25;
-def libraryVersion = "3.1"
+def libraryVersion = "3.2"
 
 android {
     compileSdkVersion sdkVersion
@@ -12,7 +12,7 @@ android {
         applicationId "net.gotev.uploadservicedemo"
         minSdkVersion 16
         targetSdkVersion sdkVersion
-        versionCode 15
+        versionCode 16
         versionName libraryVersion
     }
     buildTypes {
