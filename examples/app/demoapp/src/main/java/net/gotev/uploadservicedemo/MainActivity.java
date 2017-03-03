@@ -1,21 +1,25 @@
 package net.gotev.uploadservicedemo;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
-import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservicedemo.issues.Issue226;
 
+import butterknife.BindView;
 import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity {
+
+    @BindView(R.id.run_issue)
+    Button runIssue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        runIssue.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.multipart_upload)
@@ -35,24 +39,12 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.cancelAllUploadsButton)
     public void onCancelAllUploadsButtonClick() {
-        //upload(this, UUID.randomUUID().toString(), "http://posttestserver.com/post.php");
         UploadService.stopAllUploads();
     }
 
-    // Replicate https://github.com/gotev/android-upload-service/issues/245
-    private String upload(Context context, String uploadId, String endpoint) {
-        try {
-            return new MultipartUploadRequest(context, uploadId, endpoint)
-                    .setMethod("POST")
-                    .setNotificationConfig(null)
-                    .setAutoDeleteFilesAfterSuccessfulUpload(true)
-                    .addParameter("color", "#ffffff")
-                    .setMaxRetries(2)
-                    .startUpload();
-        } catch (Exception exc) {
-            Log.e(getClass().getSimpleName(), "Error", exc);
-            return null;
-        }
+    @OnClick(R.id.run_issue)
+    public void runIssue() {
+        new Issue226(this).run();
     }
 
 }
