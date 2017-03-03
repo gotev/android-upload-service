@@ -294,16 +294,18 @@ public abstract class UploadTask implements Runnable {
 
         final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
 
-        if (successfulUpload) {
-            updateNotification(uploadInfo, notificationConfig.getCompletedMessage(),
-                    notificationConfig.isAutoClearOnSuccess(),
-                    notificationConfig.getCompletedIconResourceID(),
-                    notificationConfig.getCompletedIconColorResourceID());
-        } else {
-            updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
-                    notificationConfig.isAutoClearOnError(),
-                    notificationConfig.getErrorIconResourceID(),
-                    notificationConfig.getErrorIconColorResourceID());
+        if (notificationConfig != null) {
+            if (successfulUpload) {
+                updateNotification(uploadInfo, notificationConfig.getCompletedMessage(),
+                        notificationConfig.isAutoClearOnSuccess(),
+                        notificationConfig.getCompletedIconResourceID(),
+                        notificationConfig.getCompletedIconColorResourceID());
+            } else {
+                updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
+                        notificationConfig.isAutoClearOnError(),
+                        notificationConfig.getErrorIconResourceID(),
+                        notificationConfig.getErrorIconColorResourceID());
+            }
         }
 
         service.taskCompleted(params.getId());
