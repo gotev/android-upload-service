@@ -128,7 +128,7 @@ public abstract class UploadTask implements Runnable {
     @Override
     public final void run() {
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+        if (!params.getFiles().isEmpty() && Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             int permissionCheck = ContextCompat.checkSelfPermission(service,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
             if (permissionCheck == PackageManager.PERMISSION_DENIED) {
@@ -410,10 +410,12 @@ public abstract class UploadTask implements Runnable {
 
         final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
 
-        updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
-                notificationConfig.isAutoClearOnError(),
-                notificationConfig.getErrorIconResourceID(),
-                notificationConfig.getErrorIconColorResourceID());
+        if (notificationConfig != null && notificationConfig.getErrorMessage() != null) {
+            updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
+                    notificationConfig.isAutoClearOnError(),
+                    notificationConfig.getErrorIconResourceID(),
+                    notificationConfig.getErrorIconColorResourceID());
+        }
 
         service.taskCompleted(params.getId());
     }
