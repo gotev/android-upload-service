@@ -3,7 +3,6 @@ package net.gotev.uploadservice;
 import android.content.Context;
 import android.content.Intent;
 
-import java.net.MalformedURLException;
 import java.util.UUID;
 
 /**
@@ -59,10 +58,8 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * @return the uploadId string. If you have passed your own uploadId in the constructor, this
      *         method will return that same uploadId, otherwise it will return the automatically
      *         generated uploadId
-     * @throws IllegalArgumentException if one or more arguments passed are invalid
-     * @throws MalformedURLException if the server URL is not valid
      */
-    public String startUpload() throws IllegalArgumentException, MalformedURLException {
+    public String startUpload() {
         UploadService.setUploadStatusDelegate(params.getId(), delegate);
 
         final Intent intent = new Intent(context, UploadService.class);

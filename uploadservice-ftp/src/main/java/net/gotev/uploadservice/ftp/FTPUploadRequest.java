@@ -10,7 +10,6 @@ import net.gotev.uploadservice.UploadTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
 
 /**
  * Creates a new FTP Upload Request.
@@ -273,7 +272,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
     }
 
     @Override
-    public String startUpload() throws IllegalArgumentException, MalformedURLException {
+    public String startUpload() {
         if (params.getFiles().isEmpty())
             throw new IllegalArgumentException("Add at least one file to start FTP upload!");
 

@@ -87,7 +87,7 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
     }
 
     @Override
-    public String startUpload() throws IllegalArgumentException, MalformedURLException {
+    public String startUpload() {
         if (params.getFiles().isEmpty())
             throw new IllegalArgumentException("Set the file to be used in the request body first!");
 
