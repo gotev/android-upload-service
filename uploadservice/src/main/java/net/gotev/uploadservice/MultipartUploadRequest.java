@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 
 /**
  * HTTP/Multipart upload request. This is the most common way to upload files on a server.
@@ -31,8 +32,11 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
      *                 you know to which upload they refer to.
      * @param serverUrl URL of the server side script that will handle the multipart form upload.
      *                  E.g.: http://www.yourcompany.com/your/script
+     * @throws IllegalArgumentException if one or more arguments are not valid
+     * @throws MalformedURLException if the server URL is not valid
      */
-    public MultipartUploadRequest(final Context context, final String uploadId, final String serverUrl) {
+    public MultipartUploadRequest(final Context context, final String uploadId, final String serverUrl)
+        throws IllegalArgumentException, MalformedURLException {
         super(context, uploadId, serverUrl);
     }
 
@@ -43,8 +47,11 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
      * @param context application context
      * @param serverUrl URL of the server side script that will handle the multipart form upload.
      *                  E.g.: http://www.yourcompany.com/your/script
+     * @throws IllegalArgumentException if one or more arguments are not valid
+     * @throws MalformedURLException if the server URL is not valid
      */
-    public MultipartUploadRequest(final Context context, final String serverUrl) {
+    public MultipartUploadRequest(final Context context, final String serverUrl)
+        throws MalformedURLException, IllegalArgumentException {
         this(context, null, serverUrl);
     }
 

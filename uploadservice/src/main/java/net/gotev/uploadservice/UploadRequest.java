@@ -27,10 +27,17 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      *                 UUID will be automatically generated. It's used in the broadcast receiver
      *                 when receiving updates.
      * @param serverUrl URL of the server side script that handles the request
+     * @throws IllegalArgumentException if one or more arguments are not valid
      */
-    public UploadRequest(final Context context, final String uploadId, final String serverUrl) {
+    public UploadRequest(final Context context, final String uploadId, final String serverUrl)
+        throws IllegalArgumentException {
+
         if (context == null)
             throw new IllegalArgumentException("Context MUST not be null!");
+
+        if (serverUrl == null || "".equals(serverUrl)) {
+            throw new IllegalArgumentException("Server URL cannot be null or empty");
+        }
 
         this.context = context;
 
@@ -55,9 +62,7 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * @throws IllegalArgumentException if one or more arguments passed are invalid
      * @throws MalformedURLException if the server URL is not valid
      */
-    public final String startUpload() throws IllegalArgumentException, MalformedURLException {
-        this.validate();
-
+    public String startUpload() throws IllegalArgumentException, MalformedURLException {
         UploadService.setUploadStatusDelegate(params.getId(), delegate);
 
         final Intent intent = new Intent(context, UploadService.class);
@@ -82,22 +87,6 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
             throw new RuntimeException("The request must specify a task class!");
 
         intent.putExtra(UploadService.PARAM_TASK_CLASS, taskClass.getName());
-    }
-
-    /**
-     * Validates the upload request and throws exceptions if one or more parameters are
-     * not properly set.
-     *
-     * @throws IllegalArgumentException if request protocol or URL are not correctly set
-     * @throws MalformedURLException if the provided server URL is not valid
-     */
-    protected void validate() throws IllegalArgumentException, MalformedURLException {
-        if (params.getServerUrl() == null || "".equals(params.getServerUrl())) {
-            throw new IllegalArgumentException("Server URL cannot be null or empty");
-        }
-
-        if (params.getFiles().isEmpty())
-            throw new IllegalArgumentException("You have to add at least one file to upload");
     }
 
     @SuppressWarnings("unchecked")

@@ -82,7 +82,8 @@ public abstract class HttpUploadTask extends UploadTask
             }
 
         } finally {
-            connection.close();
+            if (connection != null)
+                connection.close();
         }
     }
 

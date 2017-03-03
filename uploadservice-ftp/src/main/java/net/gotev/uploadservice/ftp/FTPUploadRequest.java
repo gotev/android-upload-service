@@ -10,7 +10,6 @@ import net.gotev.uploadservice.UploadTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
 
 /**
  * Creates a new FTP Upload Request.
@@ -40,6 +39,11 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      */
     public FTPUploadRequest(Context context, String uploadId, String serverUrl, int port) {
         super(context, uploadId, serverUrl);
+
+        if (port <= 0) {
+            throw new IllegalArgumentException("Specify valid FTP port!");
+        }
+
         ftpParams.setPort(port);
     }
 
@@ -61,31 +65,6 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
         intent.putExtra(FTPUploadTaskParameters.PARAM_FTP_TASK_PARAMETERS, ftpParams);
     }
 
-    @Override
-    protected void validate() throws IllegalArgumentException, MalformedURLException {
-        super.validate();
-
-        if (ftpParams.getUsername() == null || "".equals(ftpParams.getUsername())) {
-            throw new IllegalArgumentException("Specify FTP account username!");
-        }
-
-        if (ftpParams.getPassword() == null || "".equals(ftpParams.getPassword())) {
-            throw new IllegalArgumentException("Specify FTP account password!");
-        }
-
-        if (ftpParams.getPort() <= 0) {
-            throw new IllegalArgumentException("Specify FTP port!");
-        }
-
-        if (ftpParams.getSocketTimeout() < 2000) {
-            throw new IllegalArgumentException("Set at least 2000ms socket timeout!");
-        }
-
-        if (ftpParams.getConnectTimeout() < 2000) {
-            throw new IllegalArgumentException("Set at least 2000ms connect timeout!");
-        }
-    }
-
     /**
      * Set the credentials used to login on the FTP Server.
      * @param username account username
@@ -93,6 +72,14 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      * @return {@link FTPUploadRequest}
      */
     public FTPUploadRequest setUsernameAndPassword(String username, String password) {
+        if (username == null || "".equals(username)) {
+            throw new IllegalArgumentException("Specify FTP account username!");
+        }
+
+        if (password == null || "".equals(password)) {
+            throw new IllegalArgumentException("Specify FTP account password!");
+        }
+
         ftpParams.setUsername(username);
         ftpParams.setPassword(password);
         return this;
@@ -198,6 +185,10 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      * @return {@link FTPUploadRequest}
      */
     public FTPUploadRequest setConnectTimeout(int milliseconds) {
+        if (milliseconds < 2000) {
+            throw new IllegalArgumentException("Set at least 2000ms connect timeout!");
+        }
+
         ftpParams.setConnectTimeout(milliseconds);
         return this;
     }
@@ -209,6 +200,10 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      * @return {@link FTPUploadRequest}
      */
     public FTPUploadRequest setSocketTimeout(int milliseconds) {
+        if (milliseconds < 2000) {
+            throw new IllegalArgumentException("Set at least 2000ms socket timeout!");
+        }
+
         ftpParams.setSocketTimeout(milliseconds);
         return this;
     }

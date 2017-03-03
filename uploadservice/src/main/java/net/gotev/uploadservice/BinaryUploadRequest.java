@@ -3,6 +3,7 @@ package net.gotev.uploadservice;
 import android.content.Context;
 
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -26,8 +27,11 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
      *                 you know to which upload they refer to.
      * @param serverUrl URL of the server side script that will handle the multipart form upload.
      *                  E.g.: http://www.yourcompany.com/your/script
+     * @throws IllegalArgumentException if one or more arguments are not valid
+     * @throws MalformedURLException if the server URL is not valid
      */
-    public BinaryUploadRequest(final Context context, final String uploadId, final String serverUrl) {
+    public BinaryUploadRequest(final Context context, final String uploadId, final String serverUrl)
+        throws IllegalArgumentException, MalformedURLException {
         super(context, uploadId, serverUrl);
     }
 
@@ -38,8 +42,11 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
      * @param context application context
      * @param serverUrl URL of the server side script that will handle the multipart form upload.
      *                  E.g.: http://www.yourcompany.com/your/script
+     * @throws IllegalArgumentException if one or more arguments are not valid
+     * @throws MalformedURLException if the server URL is not valid
      */
-    public BinaryUploadRequest(final Context context, final String serverUrl) {
+    public BinaryUploadRequest(final Context context, final String serverUrl)
+        throws MalformedURLException, IllegalArgumentException {
         this(context, null, serverUrl);
     }
 
@@ -77,6 +84,14 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
     public BinaryUploadRequest addArrayParameter(String paramName, List<String> list) {
         logDoesNotSupportParameters();
         return this;
+    }
+
+    @Override
+    public String startUpload() throws IllegalArgumentException, MalformedURLException {
+        if (params.getFiles().isEmpty())
+            throw new IllegalArgumentException("Set the file to be used in the request body first!");
+
+        return super.startUpload();
     }
 
     private void logDoesNotSupportParameters() {

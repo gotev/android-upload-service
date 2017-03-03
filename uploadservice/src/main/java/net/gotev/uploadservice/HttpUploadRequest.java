@@ -29,20 +29,12 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      *                 UUID will be automatically generated. It's used in the broadcast receiver
      *                 when receiving updates.
      * @param serverUrl URL of the server side script that handles the request
+     * @throws IllegalArgumentException if one or more arguments are not valid
+     * @throws MalformedURLException if the server URL is not valid
      */
-    public HttpUploadRequest(final Context context, final String uploadId, final String serverUrl) {
+    public HttpUploadRequest(final Context context, final String uploadId, final String serverUrl)
+        throws MalformedURLException, IllegalArgumentException{
         super(context, uploadId, serverUrl);
-    }
-
-    @Override
-    protected void initializeIntent(Intent intent) {
-        super.initializeIntent(intent);
-        intent.putExtra(HttpUploadTaskParameters.PARAM_HTTP_TASK_PARAMETERS, httpParams);
-    }
-
-    @Override
-    protected void validate() throws IllegalArgumentException, MalformedURLException {
-        super.validate();
 
         if (!params.getServerUrl().startsWith("http://")
                 && !params.getServerUrl().startsWith("https://")) {
@@ -51,7 +43,12 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
 
         // Check if the URL is valid
         new URL(params.getServerUrl());
+    }
 
+    @Override
+    protected void initializeIntent(Intent intent) {
+        super.initializeIntent(intent);
+        intent.putExtra(HttpUploadTaskParameters.PARAM_HTTP_TASK_PARAMETERS, httpParams);
     }
 
     /**
