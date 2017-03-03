@@ -5,7 +5,7 @@ This module adds FTP upload ([RFC959](https://tools.ietf.org/html/rfc959)) capab
 
 ## Setup
 ```groovy
-compile 'net.gotev:uploadservice-ftp:3.1'
+compile 'net.gotev:uploadservice-ftp:3.2'
 ```
 
 ## Minimal example
