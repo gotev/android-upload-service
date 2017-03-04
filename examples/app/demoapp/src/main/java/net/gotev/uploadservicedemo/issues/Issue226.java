@@ -12,6 +12,9 @@ import net.gotev.uploadservice.UploadStatusDelegate;
 
 /**
  * https://github.com/gotev/android-upload-service/issues/226
+ *
+ * For the issue to be resolved, there shouldn't be any cancelled upload notifications.
+ *
  * @author Aleksandar Gotev
  */
 
@@ -27,17 +30,19 @@ public class Issue226 implements Runnable {
     public void run() {
         Handler handler = new Handler();
 
-        for (int a = 1; a<= 10; a++) {
+        final int total = 10;
+        for (int a = 1; a<= total; a++) {
+            final int requestNumber = a;
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    multipleRequests(ctx);
+                    multipleRequests(ctx, requestNumber, total);
                 }
             }, 1000 * a);
         }
     }
 
-    private void multipleRequests(Context ctx) {
+    private void multipleRequests(Context ctx, int requestNumber, int totalRequests) {
         final String endpoint = "http://posttestserver.com/post.php";
         final int maxRetries = 2;
 
@@ -46,7 +51,7 @@ public class Issue226 implements Runnable {
                 .setAutoClearOnSuccess(true);
 
         try {
-            String fatherId = "father" + Long.toString(System.nanoTime());
+            final String fatherId = "father " + requestNumber + "/" + totalRequests + "-" + Long.toString(System.nanoTime());
             new MultipartUploadRequest(ctx, fatherId, endpoint)
                     .setMethod("POST")
                     .setNotificationConfig(notificationConfig.setTitle(fatherId))
@@ -65,7 +70,7 @@ public class Issue226 implements Runnable {
 
                         @Override
                         public void onCompleted(final Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
-                            startChildRequest(context, endpoint, notificationConfig, maxRetries);
+                            startChildRequest(context, fatherId, endpoint, notificationConfig, maxRetries);
                         }
 
                         @Override
@@ -80,11 +85,12 @@ public class Issue226 implements Runnable {
     }
 
     private void startChildRequest(final Context context,
+                                   final String fatherId,
                                    final String endpoint,
                                    final UploadNotificationConfig notificationConfig,
                                    final int maxRetries) {
         try {
-            String childId = "child" + Long.toString(System.nanoTime());
+            String childId = fatherId + " -> child" + Long.toString(System.nanoTime());
             new MultipartUploadRequest(context, childId, endpoint)
                     .setMethod("POST")
                     .setNotificationConfig(notificationConfig.setTitle(childId))

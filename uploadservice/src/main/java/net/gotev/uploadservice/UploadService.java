@@ -339,10 +339,9 @@ public final class UploadService extends Service {
             foregroundUploadId = null;
         }
 
-        // when all the upload tasks are completed, release the wake lock and shut down the service
-        if (uploadTasksMap.isEmpty()) {
-            Logger.debug(TAG, "All tasks finished. UploadService is about to shutdown...");
-            stopSelf();
+        if (EXECUTE_IN_FOREGROUND && uploadTasksMap.isEmpty()) {
+            Logger.debug(TAG, "All tasks completed, stopping foreground execution");
+            stopForeground(true);
         }
     }
 
