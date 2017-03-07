@@ -6,7 +6,7 @@ def libraryVersion = "3.2.1"
 
 android {
     compileSdkVersion sdkVersion
-    buildToolsVersion "24.0.3"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "net.gotev.uploadservicedemo"
