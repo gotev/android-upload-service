@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 def sdkVersion = 25;
 def libraryVersion = "3.2.1"
