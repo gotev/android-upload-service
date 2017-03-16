@@ -8,7 +8,7 @@ def projectName = "android-upload-service"
 def projectDesc = "Easily upload files in the background with automatic Android Notification Center progress indication."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "3.2.1"
+version = "3.2.2"
 
 def sdkVersion = 25;
 
@@ -19,7 +19,7 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion sdkVersion
-        versionCode 22
+        versionCode 23
         versionName version
     }
     buildTypes {
@@ -33,7 +33,7 @@ android {
     }
 }
 
-def supportLibraryVersion = "25.2.0"
+def supportLibraryVersion = "25.+"
 
 dependencies {
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"

@@ -19,7 +19,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        runIssue.setVisibility(View.VISIBLE);
+        //runIssue.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.multipart_upload)

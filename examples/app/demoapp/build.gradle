@@ -3,7 +3,7 @@ apply plugin: 'android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 def sdkVersion = 25;
-def libraryVersion = "3.2.1"
+def libraryVersion = "3.2.2"
 
 android {
     compileSdkVersion sdkVersion
@@ -28,8 +28,8 @@ repositories {
     maven { url 'http://dl.bintray.com/igenius-code/maven' }
 }
 
-def butterKnifeVersion = "8.4.0"
-def supportVersion = "25.2.0"
+def butterKnifeVersion = "8.5.1"
+def supportVersion = "25.3.0"
 def stethoVersion = "1.4.2"
 
 dependencies {
@@ -52,13 +52,12 @@ dependencies {
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
     compile 'net.gotev:recycleradapter:1.5.2'
 
-    /*
     compile "net.gotev:uploadservice:${libraryVersion}"
     compile "net.gotev:uploadservice-okhttp:${libraryVersion}"
     compile "net.gotev:uploadservice-ftp:${libraryVersion}"
-    */
+
     //comment the previous lines and uncomment the next ones for development (it uses the local libs)
-    compile project(':uploadservice')
+    /*compile project(':uploadservice')
     compile project(':uploadservice-okhttp')
-    compile project(':uploadservice-ftp')
+    compile project(':uploadservice-ftp')*/
 }
