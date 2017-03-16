@@ -52,12 +52,14 @@ dependencies {
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
     compile 'net.gotev:recycleradapter:1.5.2'
 
+    /*
     compile "net.gotev:uploadservice:${libraryVersion}"
     compile "net.gotev:uploadservice-okhttp:${libraryVersion}"
     compile "net.gotev:uploadservice-ftp:${libraryVersion}"
+    */
 
     //comment the previous lines and uncomment the next ones for development (it uses the local libs)
-    /*compile project(':uploadservice')
+    compile project(':uploadservice')
     compile project(':uploadservice-okhttp')
-    compile project(':uploadservice-ftp')*/
+    compile project(':uploadservice-ftp')
 }
