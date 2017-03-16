@@ -50,6 +50,7 @@ public class UploadFile implements Parcelable {
 
     /**
      * Gets the file length in bytes.
+     * @param context service context
      * @return file length
      */
     public long length(Context context) {
@@ -58,6 +59,7 @@ public class UploadFile implements Parcelable {
 
     /**
      * Gets the {@link InputStream} to read the content of this file.
+     * @param context service context
      * @return file input stream
      * @throws FileNotFoundException if the file can't be found at the path specified in the
      * constructor
@@ -68,6 +70,7 @@ public class UploadFile implements Parcelable {
 
     /**
      * Returns the content type for the file
+     * @param context service context
      * @return content type
      */
     public final String getContentType(Context context) {
@@ -76,6 +79,7 @@ public class UploadFile implements Parcelable {
 
     /**
      * Returns the name of this file.
+     * @param context service context
      * @return string
      */
     public final String getName(Context context) {

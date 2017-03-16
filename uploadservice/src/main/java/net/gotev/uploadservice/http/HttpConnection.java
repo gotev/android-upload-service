@@ -33,6 +33,7 @@ public interface HttpConnection {
      * Set request headers.
      * @param requestHeaders request headers to set
      * @throws IOException if an error occurs while setting request headers
+     * @return instance
      */
     HttpConnection setHeaders(List<NameValue> requestHeaders) throws IOException;
 
@@ -41,6 +42,7 @@ public interface HttpConnection {
      * @param totalBodyBytes total number of bytes
      * @param isFixedLengthStreamingMode true if the fixed length streaming mode must be used. If
      *                                   it's false, chunked streaming mode has to be used
+     * @return instance
      */
     HttpConnection setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode);
 
@@ -49,6 +51,7 @@ public interface HttpConnection {
      * @return object containing the server response status, headers and body.
      * @param delegate delegate which handles the writing of the request body
      * @throws IOException if an error occurs while getting the server response
+     * @return response from server
      */
     ServerResponse getResponse(RequestBodyDelegate delegate) throws IOException;
 
