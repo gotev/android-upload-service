@@ -345,10 +345,12 @@ public abstract class UploadTask implements Runnable {
 
         final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
 
-        updateNotification(uploadInfo, notificationConfig.getCancelledMessage(),
-                notificationConfig.isAutoClearOnCancel(),
-                notificationConfig.getCancelledIconResourceID(),
-                notificationConfig.getCancelledIconColorResourceID());
+        if (notificationConfig != null) {
+            updateNotification(uploadInfo, notificationConfig.getCancelledMessage(),
+                    notificationConfig.isAutoClearOnCancel(),
+                    notificationConfig.getCancelledIconResourceID(),
+                    notificationConfig.getCancelledIconColorResourceID());
+        }
 
         service.taskCompleted(params.getId());
     }
