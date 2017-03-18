@@ -1,16 +1,12 @@
 package net.gotev.uploadservice;
 
-import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
-import android.os.Build;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,15 +123,6 @@ public abstract class UploadTask implements Runnable {
 
     @Override
     public final void run() {
-
-        if (!params.getFiles().isEmpty() && Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            int permissionCheck = ContextCompat.checkSelfPermission(service,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (permissionCheck == PackageManager.PERMISSION_DENIED) {
-                broadcastError(new RuntimeException("Please request " + Manifest.permission.WRITE_EXTERNAL_STORAGE + " permission before performing the request! Check this: https://gist.github.com/gotev/67c300c563bdf68a502c"));
-                return;
-            }
-        }
 
         createNotification(new UploadInfo(params.getId()));
 
