@@ -8,7 +8,7 @@ def projectName = "android-upload-service-okhttp"
 def projectDesc = "OkHttp stack implementation for Android Upload Service."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "3.2.2"
+version = "3.2.3"
 
 def sdkVersion = 25;
 
@@ -19,7 +19,7 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion sdkVersion
-        versionCode 7
+        versionCode 8
         versionName version
     }
     buildTypes {

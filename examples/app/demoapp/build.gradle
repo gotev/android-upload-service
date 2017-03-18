@@ -3,7 +3,7 @@ apply plugin: 'android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 def sdkVersion = 25;
-def libraryVersion = "3.2.2"
+def libraryVersion = "3.2.3"
 
 android {
     compileSdkVersion sdkVersion
@@ -13,7 +13,7 @@ android {
         applicationId "net.gotev.uploadservicedemo"
         minSdkVersion 16
         targetSdkVersion sdkVersion
-        versionCode 17
+        versionCode 18
         versionName libraryVersion
     }
     buildTypes {
@@ -52,11 +52,9 @@ dependencies {
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
     compile 'net.gotev:recycleradapter:1.5.2'
 
-    /*
-    compile "net.gotev:uploadservice:${libraryVersion}"
+    /*compile "net.gotev:uploadservice:${libraryVersion}"
     compile "net.gotev:uploadservice-okhttp:${libraryVersion}"
-    compile "net.gotev:uploadservice-ftp:${libraryVersion}"
-    */
+    compile "net.gotev:uploadservice-ftp:${libraryVersion}"*/
 
     //comment the previous lines and uncomment the next ones for development (it uses the local libs)
     compile project(':uploadservice')
