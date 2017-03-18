@@ -128,15 +128,6 @@ public abstract class UploadTask implements Runnable {
     @Override
     public final void run() {
 
-        if (!params.getFiles().isEmpty() && Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            int permissionCheck = ContextCompat.checkSelfPermission(service,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (permissionCheck == PackageManager.PERMISSION_DENIED) {
-                broadcastError(new RuntimeException("Please request " + Manifest.permission.WRITE_EXTERNAL_STORAGE + " permission before performing the request! Check this: https://gist.github.com/gotev/67c300c563bdf68a502c"));
-                return;
-            }
-        }
-
         createNotification(new UploadInfo(params.getId()));
 
         attempts = 0;
