@@ -3,11 +3,11 @@ apply plugin: 'android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 def sdkVersion = 25;
-def libraryVersion = "3.2.3"
+def libraryVersion = "3.2.4"
 
 android {
     compileSdkVersion sdkVersion
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         applicationId "net.gotev.uploadservicedemo"
@@ -29,7 +29,7 @@ repositories {
 }
 
 def butterKnifeVersion = "8.5.1"
-def supportVersion = "25.3.0"
+def supportVersion = "25.3.1"
 def stethoVersion = "1.4.2"
 
 dependencies {
