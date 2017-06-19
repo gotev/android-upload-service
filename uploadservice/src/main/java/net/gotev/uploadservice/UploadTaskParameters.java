@@ -24,6 +24,8 @@ public final class UploadTaskParameters implements Parcelable {
     private boolean autoDeleteSuccessfullyUploadedFiles = false;
     private UploadNotificationConfig notificationConfig;
     private ArrayList<UploadFile> files = new ArrayList<>();
+    private boolean isChunkUpload = false;
+    private boolean autoDeleteSuccessfullyUploadedChunks = true;
 
     public UploadTaskParameters() {
 
@@ -52,6 +54,8 @@ public final class UploadTaskParameters implements Parcelable {
         parcel.writeByte((byte) (autoDeleteSuccessfullyUploadedFiles ? 1 : 0));
         parcel.writeParcelable(notificationConfig, 0);
         parcel.writeList(files);
+        parcel.writeByte((byte) (isChunkUpload ? 1 : 0));
+        parcel.writeByte((byte) (autoDeleteSuccessfullyUploadedChunks ? 1 : 0));
     }
 
     private UploadTaskParameters(Parcel in) {
@@ -61,6 +65,8 @@ public final class UploadTaskParameters implements Parcelable {
         autoDeleteSuccessfullyUploadedFiles = in.readByte() == 1;
         notificationConfig = in.readParcelable(UploadNotificationConfig.class.getClassLoader());
         in.readList(files, UploadFile.class.getClassLoader());
+        isChunkUpload = in.readByte() == 1;
+        autoDeleteSuccessfullyUploadedChunks = in.readByte() == 1;
     }
 
     @Override
@@ -124,5 +130,21 @@ public final class UploadTaskParameters implements Parcelable {
     public UploadTaskParameters setAutoDeleteSuccessfullyUploadedFiles(boolean autoDeleteSuccessfullyUploadedFiles) {
         this.autoDeleteSuccessfullyUploadedFiles = autoDeleteSuccessfullyUploadedFiles;
         return this;
+    }
+
+    public boolean isChunkUpload() {
+        return isChunkUpload;
+    }
+
+    public void setChunkUpload(boolean chunkUpload) {
+        isChunkUpload = chunkUpload;
+    }
+
+    public boolean isAutoDeleteSuccessfullyUploadedChunks() {
+        return autoDeleteSuccessfullyUploadedChunks;
+    }
+
+    public void setAutoDeleteSuccessfullyUploadedChunks(boolean autoDeleteSuccessfullyUploadedChunks) {
+        this.autoDeleteSuccessfullyUploadedChunks = autoDeleteSuccessfullyUploadedChunks;
     }
 }

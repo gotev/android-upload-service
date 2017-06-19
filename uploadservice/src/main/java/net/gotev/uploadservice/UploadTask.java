@@ -50,6 +50,11 @@ public abstract class UploadTask implements Runnable {
     private final List<String> successfullyUploadedFiles = new ArrayList<>();
 
     /**
+     * Contains the absolute local path of the successfully uploaded file chunks.
+     */
+    private final List<String> successfullyUploadedChunks = new ArrayList<>();
+
+    /**
      * Flag indicating if the operation should continue or is cancelled. You should never
      * explicitly set this value in your subclasses, as it's written by the Upload Service
      * when you call {@link UploadService#stopUpload(String)}. If this value is false, you should
@@ -100,6 +105,11 @@ public abstract class UploadTask implements Runnable {
      */
     protected void onSuccessfulUpload() {}
 
+    /**
+     * Implement in subclasses to be able to do something when the file chunk upload is successful.
+     */
+    protected void onSuccessfulChunkUpload() {}
+
     public UploadTask() {
         startTime = new Date().getTime();
     }
@@ -134,7 +144,9 @@ public abstract class UploadTask implements Runnable {
             attempts++;
 
             try {
+
                 upload();
+
                 break;
 
             } catch (Exception exc) {
@@ -299,6 +311,56 @@ public abstract class UploadTask implements Runnable {
     }
 
     /**
+     * Broadcasts a file chunk upload completion status update and updates the progress accordingly
+     * Call this when the the file chunk upload request has completed and has received the response
+     * from the server.
+     *
+     * @param response response got from the server
+     */
+    protected final void broadcastChunkCompleted(final ServerResponse response) {
+
+        boolean successfulUpload = ((response.getHttpCode() / 100) == 2);
+        final UploadFile currentFile = params.getFiles().get(0);
+        uploadedBytes = currentFile.getStartByte();
+
+        if (successfulUpload) {
+            onSuccessfulChunkUpload();
+
+            if (params.isAutoDeleteSuccessfullyUploadedChunks() && !successfullyUploadedChunks.isEmpty()) {
+                for (String filePath : successfullyUploadedChunks) {
+                    deleteFile(new File(filePath));
+                }
+            }
+        }
+
+        Logger.debug(LOG_TAG, "Broadcasting upload chunk completed for " + params.getId());
+
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
+                currentFile.length(service), (attempts - 1),
+                successfullyUploadedFiles,
+                params.getFiles().size() + successfullyUploadedFiles.size());
+
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
+        if (delegate != null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    delegate.onChunkCompleted(service, uploadInfo, response);
+                }
+            });
+        } else {
+            BroadcastData data = new BroadcastData()
+                    .setStatus(BroadcastData.Status.CHUNK_COMPLETED)
+                    .setUploadInfo(uploadInfo)
+                    .setServerResponse(response);
+
+            service.sendBroadcast(data.getIntent());
+        }
+
+        updateNotificationProgress(uploadInfo);
+    }
+
+    /**
      * Broadcast a cancelled status.
      * This called automatically by {@link UploadTask} when the user cancels the request,
      * and the specific implementation of {@link UploadTask#upload()} either
@@ -353,6 +415,16 @@ public abstract class UploadTask implements Runnable {
     }
 
     /**
+     * Add a file to the list of the successfully uploaded chunks.
+     * @param absolutePath absolute path to the file on the device
+     */
+    protected final void addSuccessfullyUploadedChunk(String absolutePath) {
+        if (!successfullyUploadedChunks.contains(absolutePath)) {
+            successfullyUploadedChunks.add(absolutePath);
+        }
+    }
+
+    /**
      * Gets the list of all the successfully uploaded files.
      * You must not modify this list in your subclasses! You can only read its contents.
      * If you want to add an element into it,
@@ -361,6 +433,17 @@ public abstract class UploadTask implements Runnable {
      */
     protected final List<String> getSuccessfullyUploadedFiles() {
         return successfullyUploadedFiles;
+    }
+
+    /**
+     * Gets the list of all the successfully uploaded chunks.
+     * You must not modify this list in your subclasses! You can only read its contents.
+     * If you want to add an element into it,
+     * use {@link UploadTask#addSuccessfullyUploadedChunk(String)}
+     * @return list of strings
+     */
+    protected final List<String> getSuccessfullyUploadedChunks() {
+        return successfullyUploadedChunks;
     }
 
     /**

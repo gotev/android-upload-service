@@ -16,6 +16,7 @@ class BroadcastData implements Parcelable {
         IN_PROGRESS,
         ERROR,
         COMPLETED,
+        CHUNK_COMPLETED,
         CANCELLED
     }
 

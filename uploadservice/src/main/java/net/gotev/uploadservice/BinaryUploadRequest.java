@@ -68,6 +68,17 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
         return this;
     }
 
+    /**
+     * sets the flag to determine if the upload is a chunked upload or not
+     *
+     * @param chunkUpload chunk upload flag
+     * @return
+     */
+    public BinaryUploadRequest setChunkUpload(boolean chunkUpload) {
+        params.setChunkUpload(chunkUpload);
+        return this;
+    }
+
     @Override
     public BinaryUploadRequest addParameter(String paramName, String paramValue) {
         logDoesNotSupportParameters();

@@ -7,8 +7,13 @@ import android.os.Parcelable;
 import net.gotev.uploadservice.schemehandlers.SchemeHandler;
 import net.gotev.uploadservice.schemehandlers.SchemeHandlerFactory;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.LinkedHashMap;
 
 /**
@@ -22,6 +27,9 @@ public class UploadFile implements Parcelable {
     protected final String path;
     private LinkedHashMap<String, String> properties = new LinkedHashMap<>();
     protected final SchemeHandler handler;
+    private long startByte = 0;
+    private long endByte;
+    private UploadFile currentChunk;
 
     /**
      * Creates a new UploadFile.
@@ -119,12 +127,18 @@ public class UploadFile implements Parcelable {
     public void writeToParcel(Parcel parcel, int arg1) {
         parcel.writeString(path);
         parcel.writeSerializable(properties);
+        parcel.writeLong(startByte);
+        parcel.writeLong(endByte);
+        parcel.writeParcelable(currentChunk, arg1);
     }
 
     @SuppressWarnings("unchecked")
     private UploadFile(Parcel in) {
         this.path = in.readString();
         this.properties = (LinkedHashMap<String, String>) in.readSerializable();
+        this.startByte = in.readLong();
+        this.endByte = in.readLong();
+        this.currentChunk = in.readParcelable(UploadFile.class.getClassLoader());
 
         try {
             this.handler = SchemeHandlerFactory.getInstance().get(path);
@@ -168,4 +182,95 @@ public class UploadFile implements Parcelable {
         return val;
     }
 
+    /**
+     * if this file is a chunk file, this will return the start byte of this chunk from the parent file
+     *
+     * @return the number of the start byte or 0 if it's first chunk or main file
+     */
+    public long getStartByte() {
+        return startByte;
+    }
+
+    /**
+     * sets this chunk's start byte in the parent file
+     *
+     * @param startByte
+     */
+    public void setStartByte(long startByte) {
+        this.startByte = startByte;
+    }
+
+    /**
+     * if this file is a chunk file, this will return the end byte of this chunk from the parent file
+     *
+     * @return the number of the start byte or null if this is the main file
+     */
+    public long getEndByte() {
+        return endByte;
+    }
+
+    /**
+     * sets this chunk's end byte in the parent file
+     *
+     * @param endByte
+     */
+    public void setEndByte(long endByte) {
+        this.endByte = endByte;
+    }
+
+    /**
+     * generates a chunk file based on the startByte parameter and the UploadService.CHUNK_SIZE limit
+     * the chunk can be obtained with getCurrentChunk()
+     *
+     */
+    public void generateChunk() {
+
+        try {
+            File currentFile = new File(getPath());
+
+            RandomAccessFile randomAccessFile = new RandomAccessFile(currentFile, "r");
+            randomAccessFile.seek(startByte);
+
+            int dataSize = UploadService.CHUNK_SIZE;
+            if (currentFile.length() - startByte < dataSize) {
+                dataSize = (int) (currentFile.length() - startByte);
+            }
+
+            byte[] data = new byte[dataSize];
+            randomAccessFile.read(data, 0, data.length);
+
+            String partFilename = getPath() + ".part";
+            File partFile = new File(partFilename);
+
+            OutputStream outfile = new BufferedOutputStream(new FileOutputStream(partFile));
+            outfile.write(data);
+            outfile.close();
+
+            UploadFile chunk = new UploadFile(partFilename);
+            chunk.setStartByte(startByte);
+            chunk.setEndByte(startByte + partFile.length() - 1);
+
+            setCurrentChunk(chunk);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * returns the current generated chunk
+     *
+     * @return
+     */
+    public UploadFile getCurrentChunk() {
+        return currentChunk;
+    }
+
+    /**
+     * sets the current generated chunk
+     *
+     * @param currentChunk
+     */
+    public void setCurrentChunk(UploadFile currentChunk) {
+        this.currentChunk = currentChunk;
+    }
 }

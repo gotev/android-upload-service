@@ -36,6 +36,15 @@ public interface UploadStatusDelegate {
     void onCompleted(final Context context, final UploadInfo uploadInfo, final ServerResponse serverResponse);
 
     /**
+     * Called when the file chunk upload is completed successfully. Override this method to add your own logic.
+     *
+     * @param context context
+     * @param uploadInfo upload status information
+     * @param serverResponse response got from the server
+     */
+    void onChunkCompleted(final Context context, final UploadInfo uploadInfo, final ServerResponse serverResponse);
+
+    /**
      * Called when the upload is cancelled. Override this method to add your own logic.
      *
      * @param context context

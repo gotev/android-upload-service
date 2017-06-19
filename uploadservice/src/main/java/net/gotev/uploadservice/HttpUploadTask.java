@@ -53,23 +53,43 @@ public abstract class HttpUploadTask extends UploadTask
 
         Logger.debug(LOG_TAG, "Starting upload task with ID " + params.getId());
 
-        try {
-            getSuccessfullyUploadedFiles().clear();
-            uploadedBytes = 0;
-            totalBytes = getBodyLength();
+        getSuccessfullyUploadedFiles().clear();
+        totalBytes = getBodyLength();
 
-            if (httpParams.isCustomUserAgentDefined()) {
-                httpParams.addRequestHeader("User-Agent", httpParams.getCustomUserAgent());
+        if (params.isChunkUpload()) {
+            UploadFile currentFile = params.getFiles().get(0);
+            currentFile.generateChunk();
+            UploadFile currentChunk = currentFile.getCurrentChunk();
+            if (currentChunk != null) {
+                uploadedBytes = currentChunk.getStartByte();
+                final String contentRange = Long.toString(currentChunk.getStartByte()) + "-" + Long.toString(currentChunk.getEndByte()) + "/" + currentFile.length(service);
+                httpParams.addRequestHeader("Content-Range", contentRange);
+
+                Logger.debug(LOG_TAG, "Starting chunk " + contentRange);
+
+                ServerResponse response = startRequest(httpParams, currentChunk.length(service));
+
+                if (shouldContinue) {
+                    long endByte = currentChunk.getEndByte() + 1;
+                    Logger.debug(LOG_TAG, "Setting next chunk start point: " + Long.toString(endByte));
+                    params.getFiles().get(0).setStartByte(endByte);
+
+                    broadcastChunkCompleted(response);
+
+                    closeConnection();
+
+                    if (endByte < currentFile.length(service)) {
+                        upload();
+                    } else {
+                        broadcastCompleted(response);
+                        closeConnection();
+                    }
+
+                }
             }
-
-            connection = UploadService.HTTP_STACK
-                    .createNewConnection(httpParams.getMethod(), params.getServerUrl())
-                    .setHeaders(httpParams.getRequestHeaders())
-                    .setTotalBodyBytes(totalBytes, httpParams.isUsesFixedLengthStreamingMode());
-
-            final ServerResponse response = connection.getResponse(this);
-            Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
-                            + " to upload with ID: " + params.getId());
+        } else {
+            uploadedBytes = 0;
+            ServerResponse response = startRequest(httpParams, totalBytes);
 
             // Broadcast completion only if the user has not cancelled the operation.
             // It may happen that when the body is not completely written and the client
@@ -79,11 +99,8 @@ public abstract class HttpUploadTask extends UploadTask
             // library user couldn't execute code on user cancellation.
             if (shouldContinue) {
                 broadcastCompleted(response);
+                closeConnection();
             }
-
-        } finally {
-            if (connection != null)
-                connection.close();
         }
     }
 
@@ -105,6 +122,31 @@ public abstract class HttpUploadTask extends UploadTask
     public void onBytesWritten(int bytesWritten) {
         uploadedBytes += bytesWritten;
         broadcastProgress(uploadedBytes, totalBytes);
+    }
+
+    @Override
+    protected ServerResponse startRequest(HttpUploadTaskParameters httpParams, long totalBytes) throws IOException {
+        if (httpParams.isCustomUserAgentDefined()) {
+            httpParams.addRequestHeader("User-Agent", httpParams.getCustomUserAgent());
+        }
+
+        connection = UploadService.HTTP_STACK
+                .createNewConnection(httpParams.getMethod(), params.getServerUrl())
+                .setHeaders(httpParams.getRequestHeaders())
+                .setTotalBodyBytes(totalBytes, httpParams.isUsesFixedLengthStreamingMode());
+
+        final ServerResponse response = connection.getResponse(this);
+        Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
+                + " to upload with ID: " + params.getId());
+
+        return response;
+    }
+
+    void closeConnection() {
+        if (connection != null) {
+            connection.close();
+            connection = null;
+        }
     }
 
 }

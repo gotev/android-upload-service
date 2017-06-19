@@ -20,12 +20,26 @@ public class BinaryUploadTask extends HttpUploadTask {
 
     @Override
     public void onBodyReady(BodyWriter bodyWriter) throws IOException {
-        bodyWriter.writeStream(params.getFiles().get(0).getStream(service), this);
+        if (params.isChunkUpload()) {
+            bodyWriter.writeStream(params.getFiles().get(0).getCurrentChunk().getStream(service), this);
+        } else {
+            bodyWriter.writeStream(params.getFiles().get(0).getStream(service), this);
+        }
     }
 
     @Override
     protected void onSuccessfulUpload() {
         addSuccessfullyUploadedFile(params.getFiles().get(0).getPath());
         params.getFiles().clear();
+    }
+
+    @Override
+    protected void onSuccessfulChunkUpload() {
+        addSuccessfullyUploadedChunk(params.getFiles().get(0).getCurrentChunk().getPath());
+    }
+
+    @Override
+    protected void upload() throws Exception {
+        super.upload();
     }
 }

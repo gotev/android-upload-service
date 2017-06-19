@@ -118,6 +118,18 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
     }
 
     /**
+     * Sets the automatic file chunk deletion after successful upload.
+     * @param autoDeleteChunks true to auto delete chunks included in the
+     *                        request when the upload is completed successfully.
+     *                        By default this setting is set to true, and all chunks get deleted.
+     * @return self instance
+     */
+    public B setAutoDeleteChunksAfterSuccessfulUpload(boolean autoDeleteChunks) {
+        params.setAutoDeleteSuccessfullyUploadedChunks(autoDeleteChunks);
+        return self();
+    }
+
+    /**
      * Sets the maximum number of retries that the library will try if an error occurs,
      * before returning an error.
      *

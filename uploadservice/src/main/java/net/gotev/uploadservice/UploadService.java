@@ -73,6 +73,11 @@ public final class UploadService extends Service {
     public static int BUFFER_SIZE = 4096;
 
     /**
+     * Maximum chunk size in bytes
+     */
+    public static int CHUNK_SIZE = 5 * 1000 * 1000;
+
+    /**
      * Sets the time to wait in milliseconds before the next attempt when an upload fails
      * for the first time. From the second time onwards, this value will be multiplied by
      * {@link UploadService#BACKOFF_MULTIPLIER} to get the time to wait before the next attempt.

@@ -41,6 +41,10 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
                 onCompleted(context, data.getUploadInfo(), data.getServerResponse());
                 break;
 
+            case CHUNK_COMPLETED:
+                onChunkCompleted(context, data.getUploadInfo(), data.getServerResponse());
+                break;
+
             case IN_PROGRESS:
                 onProgress(context, data.getUploadInfo());
                 break;
@@ -92,6 +96,10 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
 
     @Override
     public void onCompleted(final Context context, final UploadInfo uploadInfo, final ServerResponse serverResponse) {
+    }
+
+    @Override
+    public void onChunkCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
     }
 
     @Override
