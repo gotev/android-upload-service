@@ -212,7 +212,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     params.getFiles().size() + successfullyUploadedFiles.size());
+                                                     uploadFilesToPaths(params.getFiles()));
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.IN_PROGRESS)
@@ -260,7 +260,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     params.getFiles().size());
+                                                     uploadFilesToPaths(params.getFiles()));
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
@@ -312,7 +312,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     params.getFiles().size());
+                                                     uploadFilesToPaths(params.getFiles()));
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.CANCELLED)
@@ -380,7 +380,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     params.getFiles().size());
+                                                     uploadFilesToPaths(params.getFiles()));
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.ERROR)
@@ -528,6 +528,14 @@ public abstract class UploadTask implements Runnable {
         }
 
         return deleted;
+    }
+
+    private static List<String> uploadFilesToPaths(List<UploadFile> files) {
+        final List<String> filesLeft = new ArrayList<>(files.size());
+        for (UploadFile f : files) {
+            filesLeft.add(f.getPath());
+        }
+        return filesLeft;
     }
 
     public final void cancel() {
