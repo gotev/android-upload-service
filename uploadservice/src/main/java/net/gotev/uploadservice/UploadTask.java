@@ -101,12 +101,6 @@ public abstract class UploadTask implements Runnable {
     abstract protected void upload() throws Exception;
 
     /**
-     * Implementation of the connection request logic.
-     * @throws IOException if an error occurs
-     */
-    abstract protected ServerResponse startRequest(HttpUploadTaskParameters httpParams, long totalBytes) throws IOException;
-
-    /**
      * Implement in subclasses to be able to do something when the upload is successful.
      */
     protected void onSuccessfulUpload() {}

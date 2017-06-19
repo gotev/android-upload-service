@@ -124,7 +124,10 @@ public abstract class HttpUploadTask extends UploadTask
         broadcastProgress(uploadedBytes, totalBytes);
     }
 
-    @Override
+    /**
+     * Implementation of the connection request logic.
+     * @throws IOException if an error occurs
+     */
     protected ServerResponse startRequest(HttpUploadTaskParameters httpParams, long totalBytes) throws IOException {
         if (httpParams.isCustomUserAgentDefined()) {
             httpParams.addRequestHeader("User-Agent", httpParams.getCustomUserAgent());
