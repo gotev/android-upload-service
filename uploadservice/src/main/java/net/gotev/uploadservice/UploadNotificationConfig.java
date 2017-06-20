@@ -3,6 +3,7 @@ package net.gotev.uploadservice;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.app.NotificationCompat;
@@ -15,6 +16,7 @@ import android.support.v4.app.NotificationCompat;
 public final class UploadNotificationConfig implements Parcelable {
 
     private int iconResourceID;
+    private Bitmap largeIcon;
     private int completedIconResourceID;
     private int errorIconResourceID;
     private int cancelledIconResourceID;
@@ -76,6 +78,17 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     public final UploadNotificationConfig setIcon(int resourceID) {
         this.iconResourceID = resourceID;
+        return this;
+    }
+
+    
+    /**
+     * Sets the large notification icon.
+     * @param largeIcon Bitmap of the icon to use
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setLargeIcon(Bitmap largeIcon) {
+        this.largeIcon = largeIcon;
         return this;
     }
 
@@ -271,6 +284,10 @@ public final class UploadNotificationConfig implements Parcelable {
         return iconResourceID;
     }
 
+    final Bitmap getLargeIcon() {
+        return largeIcon;
+    }
+
     final int getCompletedIconResourceID() {
         return completedIconResourceID;
     }
@@ -370,6 +387,7 @@ public final class UploadNotificationConfig implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int arg1) {
         parcel.writeInt(iconResourceID);
+        parcel.writeParcelable(largeIcon, 0);
         parcel.writeInt(completedIconResourceID);
         parcel.writeInt(errorIconResourceID);
         parcel.writeInt(cancelledIconResourceID);
@@ -392,6 +410,7 @@ public final class UploadNotificationConfig implements Parcelable {
 
     private UploadNotificationConfig(Parcel in) {
         iconResourceID = in.readInt();
+	largeIcon = in.readParcelable(Bitmap.class.getClassLoader());
         completedIconResourceID = in.readInt();
         errorIconResourceID = in.readInt();
         cancelledIconResourceID = in.readInt();
