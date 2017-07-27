@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -71,6 +72,10 @@ public final class UploadTaskParameters implements Parcelable {
     public void addFile(UploadFile file)
             throws FileNotFoundException {
         files.add(file);
+    }
+
+    public void removeFile(UploadFile file) {
+        files.remove(file);
     }
 
     public List<UploadFile> getFiles() {

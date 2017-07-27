@@ -212,7 +212,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     uploadFilesToPaths(params.getFiles()));
+                                                     pathStringListFrom(params.getFiles()));
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.IN_PROGRESS)
@@ -260,7 +260,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     uploadFilesToPaths(params.getFiles()));
+                                                     pathStringListFrom(params.getFiles()));
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
@@ -312,7 +312,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     uploadFilesToPaths(params.getFiles()));
+                                                     pathStringListFrom(params.getFiles()));
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.CANCELLED)
@@ -343,12 +343,13 @@ public abstract class UploadTask implements Runnable {
     }
 
     /**
-     * Add a file to the list of the successfully uploaded files.
-     * @param absolutePath absolute path to the file on the device
+     * Add a file to the list of the successfully uploaded files and remove it from the file list
+     * @param file file on the device
      */
-    protected final void addSuccessfullyUploadedFile(String absolutePath) {
-        if (!successfullyUploadedFiles.contains(absolutePath)) {
-            successfullyUploadedFiles.add(absolutePath);
+    protected final void addSuccessfullyUploadedFile(UploadFile file) {
+        if (!successfullyUploadedFiles.contains(file.path)) {
+            successfullyUploadedFiles.add(file.path);
+            params.removeFile(file);
         }
     }
 
@@ -356,7 +357,7 @@ public abstract class UploadTask implements Runnable {
      * Gets the list of all the successfully uploaded files.
      * You must not modify this list in your subclasses! You can only read its contents.
      * If you want to add an element into it,
-     * use {@link UploadTask#addSuccessfullyUploadedFile(String)}
+     * use {@link UploadTask#addSuccessfullyUploadedFile(UploadFile)}
      * @return list of strings
      */
     protected final List<String> getSuccessfullyUploadedFiles() {
@@ -380,7 +381,7 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     uploadFilesToPaths(params.getFiles()));
+                                                     pathStringListFrom(params.getFiles()));
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.ERROR)
@@ -530,7 +531,7 @@ public abstract class UploadTask implements Runnable {
         return deleted;
     }
 
-    private static List<String> uploadFilesToPaths(List<UploadFile> files) {
+    private static List<String> pathStringListFrom(List<UploadFile> files) {
         final List<String> filesLeft = new ArrayList<>(files.size());
         for (UploadFile f : files) {
             filesLeft.add(f.getPath());
