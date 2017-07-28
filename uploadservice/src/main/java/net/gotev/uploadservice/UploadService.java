@@ -183,6 +183,19 @@ public final class UploadService extends Service {
      * @return true if the service is getting stopped, false otherwise
      */
     public static synchronized boolean stop(final Context context) {
+        return stop(context, false);
+    }
+
+    /**
+     * Stops the service.
+     * @param context application context
+     * @param forceStop stops the service no matter if some tasks are running
+     * @return true if the service is getting stopped, false otherwise
+     */
+    public static synchronized boolean stop(final Context context, boolean forceStop) {
+        if (forceStop) {
+            return context.stopService(new Intent(context, UploadService.class));
+        }
         return uploadTasksMap.isEmpty() && context.stopService(new Intent(context, UploadService.class));
     }
 
