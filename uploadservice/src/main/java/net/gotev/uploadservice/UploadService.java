@@ -2,6 +2,7 @@ package net.gotev.uploadservice;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -174,6 +175,15 @@ public final class UploadService extends Service {
             UploadTask taskToCancel = uploadTasksMap.get(iterator.next());
             taskToCancel.cancel();
         }
+    }
+
+    /**
+     * Stops the service if no upload tasks are currently running
+     * @param context application context
+     * @return true if the service is getting stopped, false otherwise
+     */
+    public static synchronized boolean stop(final Context context) {
+        return uploadTasksMap.isEmpty() && context.stopService(new Intent(context, UploadService.class));
     }
 
     @Override
