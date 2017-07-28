@@ -21,6 +21,7 @@ public class UploadInfo implements Parcelable {
     private int numberOfRetries;
     private ArrayList<String> filesLeft = new ArrayList<>();
     private ArrayList<String> successfullyUploadedFiles = new ArrayList<>();
+    private int notificationId;
 
     protected UploadInfo(String uploadId) {
         this.uploadId = uploadId;
@@ -29,10 +30,12 @@ public class UploadInfo implements Parcelable {
         uploadedBytes = 0;
         totalBytes = 0;
         numberOfRetries = 0;
+        notificationId = 0;
     }
 
     protected UploadInfo(String uploadId, long startTime, long uploadedBytes, long totalBytes,
-                      int numberOfRetries, List<String> uploadedFiles, List<String> filesLeft) {
+                         int numberOfRetries, List<String> uploadedFiles, List<String> filesLeft,
+                         int notificationId) {
         this.uploadId = uploadId;
         this.startTime = startTime;
         currentTime = new Date().getTime();
@@ -44,8 +47,10 @@ public class UploadInfo implements Parcelable {
             this.filesLeft.addAll(filesLeft);
         }
 
-        if (uploadedFiles != null && !uploadedFiles.isEmpty())
+        if (uploadedFiles != null && !uploadedFiles.isEmpty()) {
             successfullyUploadedFiles.addAll(uploadedFiles);
+        }
+        this.notificationId = notificationId;
     }
 
     // This is used to regenerate the object.
@@ -73,6 +78,7 @@ public class UploadInfo implements Parcelable {
         parcel.writeInt(numberOfRetries);
         parcel.writeStringList(filesLeft);
         parcel.writeStringList(successfullyUploadedFiles);
+        parcel.writeInt(notificationId);
     }
 
     private UploadInfo(Parcel in) {
@@ -84,6 +90,7 @@ public class UploadInfo implements Parcelable {
         numberOfRetries = in.readInt();
         in.readStringList(filesLeft);
         in.readStringList(successfullyUploadedFiles);
+        notificationId = in.readInt();
     }
 
     @Override
@@ -227,5 +234,13 @@ public class UploadInfo implements Parcelable {
      */
     public int getTotalFiles() {
         return successfullyUploadedFiles.size() + filesLeft.size();
+    }
+
+    /**
+     * Get the id of the notification shown to the user during upload
+     * @return integer value
+     */
+    public int getNotificationId() {
+        return notificationId;
     }
 }

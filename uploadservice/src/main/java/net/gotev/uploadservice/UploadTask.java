@@ -212,7 +212,8 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     pathStringListFrom(params.getFiles()));
+                                                     pathStringListFrom(params.getFiles()),
+                                                     notificationId);
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.IN_PROGRESS)
@@ -260,7 +261,8 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     pathStringListFrom(params.getFiles()));
+                                                     pathStringListFrom(params.getFiles()),
+                                                     notificationId);
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
@@ -312,7 +314,8 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     pathStringListFrom(params.getFiles()));
+                                                     pathStringListFrom(params.getFiles()),
+                                                     notificationId);
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.CANCELLED)
@@ -381,7 +384,8 @@ public abstract class UploadTask implements Runnable {
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
                                                      successfullyUploadedFiles,
-                                                     pathStringListFrom(params.getFiles()));
+                                                     pathStringListFrom(params.getFiles()),
+                                                     notificationId);
 
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.ERROR)
@@ -479,11 +483,7 @@ public abstract class UploadTask implements Runnable {
                                     int iconColorResourceID) {
         if (params.getNotificationConfig() == null) return;
 
-        notificationManager.cancel(notificationId);
-
-        if (message == null) return;
-
-        if (!autoClearOnSuccess) {
+        if (message != null && !autoClearOnSuccess) {
             notification.setContentTitle(Placeholders.replace(params.getNotificationConfig().getTitle(), uploadInfo))
                     .setContentText(Placeholders.replace(message, uploadInfo))
                     .setContentIntent(params.getNotificationConfig().getPendingIntent(service))
@@ -495,9 +495,10 @@ public abstract class UploadTask implements Runnable {
                     .setOngoing(false);
             setRingtone();
 
-            // this is needed because the main notification used to show progress is ongoing
-            // and a new one has to be created to allow the user to dismiss it
-            notificationManager.notify(notificationId + 1, notification.build());
+            // Replace the existing ongoing progress notification by the new one
+            notificationManager.notify(notificationId, notification.build());
+        } else {
+            notificationManager.cancel(notificationId);
         }
     }
 
