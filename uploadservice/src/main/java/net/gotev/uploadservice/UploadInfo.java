@@ -19,7 +19,7 @@ public class UploadInfo implements Parcelable {
     private long uploadedBytes;
     private long totalBytes;
     private int numberOfRetries;
-    private int totalFiles;
+    private ArrayList<String> filesLeft = new ArrayList<>();
     private ArrayList<String> successfullyUploadedFiles = new ArrayList<>();
 
     protected UploadInfo(String uploadId) {
@@ -29,18 +29,20 @@ public class UploadInfo implements Parcelable {
         uploadedBytes = 0;
         totalBytes = 0;
         numberOfRetries = 0;
-        totalFiles = 0;
     }
 
     protected UploadInfo(String uploadId, long startTime, long uploadedBytes, long totalBytes,
-                      int numberOfRetries, List<String> uploadedFiles, int totalFiles) {
+                      int numberOfRetries, List<String> uploadedFiles, List<String> filesLeft) {
         this.uploadId = uploadId;
         this.startTime = startTime;
         currentTime = new Date().getTime();
         this.uploadedBytes = uploadedBytes;
         this.totalBytes = totalBytes;
         this.numberOfRetries = numberOfRetries;
-        this.totalFiles = totalFiles;
+
+        if (filesLeft != null && !filesLeft.isEmpty()) {
+            this.filesLeft.addAll(filesLeft);
+        }
 
         if (uploadedFiles != null && !uploadedFiles.isEmpty())
             successfullyUploadedFiles.addAll(uploadedFiles);
@@ -69,7 +71,7 @@ public class UploadInfo implements Parcelable {
         parcel.writeLong(uploadedBytes);
         parcel.writeLong(totalBytes);
         parcel.writeInt(numberOfRetries);
-        parcel.writeInt(totalFiles);
+        parcel.writeStringList(filesLeft);
         parcel.writeStringList(successfullyUploadedFiles);
     }
 
@@ -80,7 +82,7 @@ public class UploadInfo implements Parcelable {
         uploadedBytes = in.readLong();
         totalBytes = in.readLong();
         numberOfRetries = in.readInt();
-        totalFiles = in.readInt();
+        in.readStringList(filesLeft);
         in.readStringList(successfullyUploadedFiles);
     }
 
@@ -176,6 +178,14 @@ public class UploadInfo implements Parcelable {
     }
 
     /**
+     * Gets the list of all files to be uploaded, containing also the successfully uploaded ones.
+     * @return list of strings
+     */
+    public ArrayList<String> getFilesLeft() {
+        return filesLeft;
+    }
+
+    /**
      * Gets the uploaded bytes.
      * @return long value
      */
@@ -216,6 +226,6 @@ public class UploadInfo implements Parcelable {
      * @return total number of files to upload
      */
     public int getTotalFiles() {
-        return totalFiles;
+        return successfullyUploadedFiles.size() + filesLeft.size();
     }
 }

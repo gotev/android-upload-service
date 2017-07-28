@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements an HTTP Multipart upload task.
@@ -146,10 +148,13 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     @Override
     protected void onSuccessfulUpload() {
-        for (UploadFile file : params.getFiles()) {
-            addSuccessfullyUploadedFile(file.getPath());
+        // addSuccessfullyUploadedFile removes the file from the list so we have
+        // to use a copy to not get a java.util.ConcurrentModificationException
+        List<UploadFile> files = new ArrayList<>(params.getFiles());
+        for (UploadFile file : files) {
+            addSuccessfullyUploadedFile(file);
         }
-        params.getFiles().clear();
+        assert params.getFiles().isEmpty();
     }
 
 }
