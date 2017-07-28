@@ -60,6 +60,8 @@ public abstract class HttpUploadTask extends UploadTask
 
             if (httpParams.isCustomUserAgentDefined()) {
                 httpParams.addRequestHeader("User-Agent", httpParams.getCustomUserAgent());
+            } else {
+                httpParams.addRequestHeader("User-Agent", "AndroidUploadService/" + BuildConfig.VERSION_NAME);
             }
 
             connection = UploadService.HTTP_STACK

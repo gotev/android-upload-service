@@ -35,7 +35,7 @@ public class MultipartUploadActivity extends UploadActivity {
                     .setUtf8Charset()
                     .setNotificationConfig(getNotificationConfig(R.string.multipart_upload))
                     .setMaxRetries(MAX_RETRIES)
-                    .setCustomUserAgent(getUserAgent())
+                    //.setCustomUserAgent(getUserAgent())
                     .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
 
             uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {

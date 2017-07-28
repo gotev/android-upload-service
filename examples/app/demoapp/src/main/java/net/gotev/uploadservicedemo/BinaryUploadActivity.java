@@ -50,9 +50,10 @@ public class BinaryUploadActivity extends UploadActivity {
             final BinaryUploadRequest request = new BinaryUploadRequest(this, serverUrl)
                     .setMethod(httpMethod)
                     .setNotificationConfig(getNotificationConfig(R.string.binary_upload))
+                    //.setCustomUserAgent(getUserAgent())
                     .setMaxRetries(MAX_RETRIES)
-                    .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE)
-                    .setCustomUserAgent(getUserAgent());
+                    .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
+
 
             uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 
