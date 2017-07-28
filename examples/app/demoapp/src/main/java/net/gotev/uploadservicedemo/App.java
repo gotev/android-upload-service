@@ -48,6 +48,9 @@ public class App extends Application {
         // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
         // used by default
         UploadService.HTTP_STACK = new OkHttpStack(getOkHttpClient());
+
+        // setup backoff multiplier
+        UploadService.BACKOFF_MULTIPLIER = 2;
     }
 
     private OkHttpClient getOkHttpClient() {
