@@ -35,8 +35,7 @@ public class Issue251 implements Runnable {
                         }
 
                         @Override
-                        public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
-
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
                         }
 
                         @Override

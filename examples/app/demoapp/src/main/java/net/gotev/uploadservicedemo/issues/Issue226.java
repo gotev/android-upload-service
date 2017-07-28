@@ -64,7 +64,7 @@ public class Issue226 implements Runnable {
                         }
 
                         @Override
-                        public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
 
                         }
 
@@ -105,7 +105,7 @@ public class Issue226 implements Runnable {
                         }
 
                         @Override
-                        public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
 
                         }
 

@@ -244,7 +244,7 @@ public abstract class UploadTask implements Runnable {
      */
     protected final void broadcastCompleted(final ServerResponse response) {
 
-        boolean successfulUpload = ((response.getHttpCode() / 100) == 2);
+        final boolean successfulUpload = ((response.getHttpCode() / 100) == 2);
 
         if (successfulUpload) {
             onSuccessfulUpload();
@@ -256,7 +256,8 @@ public abstract class UploadTask implements Runnable {
             }
         }
 
-        Logger.debug(LOG_TAG, "Broadcasting upload completed for " + params.getId());
+        Logger.debug(LOG_TAG, "Broadcasting upload " + (successfulUpload ? "completed" : "error")
+                + " for " + params.getId());
 
         final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                                                      totalBytes, (attempts - 1),
@@ -268,12 +269,16 @@ public abstract class UploadTask implements Runnable {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.onCompleted(service, uploadInfo, response);
+                    if (successfulUpload) {
+                        delegate.onCompleted(service, uploadInfo, response);
+                    } else {
+                        delegate.onError(service, uploadInfo, response, null);
+                    }
                 }
             });
         } else {
             BroadcastData data = new BroadcastData()
-                    .setStatus(BroadcastData.Status.COMPLETED)
+                    .setStatus(successfulUpload ? BroadcastData.Status.COMPLETED : BroadcastData.Status.ERROR)
                     .setUploadInfo(uploadInfo)
                     .setServerResponse(response);
 
@@ -409,7 +414,7 @@ public abstract class UploadTask implements Runnable {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.onError(service, uploadInfo, exception);
+                    delegate.onError(service, uploadInfo, null, exception);
                 }
             });
         } else {

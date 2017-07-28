@@ -34,7 +34,7 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
 
         switch (data.getStatus()) {
             case ERROR:
-                onError(context, data.getUploadInfo(), data.getException());
+                onError(context, data.getUploadInfo(), data.getServerResponse(), data.getException());
                 break;
 
             case COMPLETED:
@@ -87,7 +87,8 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
     }
 
     @Override
-    public void onError(final Context context, final UploadInfo uploadInfo, final Exception exception) {
+    public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+
     }
 
     @Override
