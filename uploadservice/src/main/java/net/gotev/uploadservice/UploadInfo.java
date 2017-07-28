@@ -19,6 +19,7 @@ public class UploadInfo implements Parcelable {
     private long uploadedBytes;
     private long totalBytes;
     private int numberOfRetries;
+    private Integer notificationID;
     private ArrayList<String> filesLeft = new ArrayList<>();
     private ArrayList<String> successfullyUploadedFiles = new ArrayList<>();
 
@@ -29,10 +30,11 @@ public class UploadInfo implements Parcelable {
         uploadedBytes = 0;
         totalBytes = 0;
         numberOfRetries = 0;
+        notificationID = null;
     }
 
     protected UploadInfo(String uploadId, long startTime, long uploadedBytes, long totalBytes,
-                      int numberOfRetries, List<String> uploadedFiles, List<String> filesLeft) {
+                         int numberOfRetries, List<String> uploadedFiles, List<String> filesLeft) {
         this.uploadId = uploadId;
         this.startTime = startTime;
         currentTime = new Date().getTime();
@@ -71,6 +73,7 @@ public class UploadInfo implements Parcelable {
         parcel.writeLong(uploadedBytes);
         parcel.writeLong(totalBytes);
         parcel.writeInt(numberOfRetries);
+        parcel.writeInt(notificationID == null ? -1 : notificationID);
         parcel.writeStringList(filesLeft);
         parcel.writeStringList(successfullyUploadedFiles);
     }
@@ -82,6 +85,12 @@ public class UploadInfo implements Parcelable {
         uploadedBytes = in.readLong();
         totalBytes = in.readLong();
         numberOfRetries = in.readInt();
+
+        notificationID = in.readInt();
+        if (notificationID == -1) {
+            notificationID = null;
+        }
+
         in.readStringList(filesLeft);
         in.readStringList(successfullyUploadedFiles);
     }
@@ -227,5 +236,18 @@ public class UploadInfo implements Parcelable {
      */
     public int getTotalFiles() {
         return successfullyUploadedFiles.size() + filesLeft.size();
+    }
+
+    /**
+     * Gets the notification ID.
+     * @return Integer number or null if the upload task does not have a notification or the
+     * notification is not dismissable at the moment (for example during upload progress).
+     */
+    public Integer getNotificationID() {
+        return notificationID;
+    }
+
+    protected void setNotificationID(int id) {
+        notificationID = id;
     }
 }

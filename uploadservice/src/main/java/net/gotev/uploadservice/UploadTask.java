@@ -264,6 +264,22 @@ public abstract class UploadTask implements Runnable {
                                                      successfullyUploadedFiles,
                                                      pathStringListFrom(params.getFiles()));
 
+        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
+
+        if (notificationConfig != null) {
+            if (successfulUpload) {
+                updateNotification(uploadInfo, notificationConfig.getCompletedMessage(),
+                        notificationConfig.isAutoClearOnSuccess(),
+                        notificationConfig.getCompletedIconResourceID(),
+                        notificationConfig.getCompletedIconColorResourceID());
+            } else {
+                updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
+                        notificationConfig.isAutoClearOnError(),
+                        notificationConfig.getErrorIconResourceID(),
+                        notificationConfig.getErrorIconColorResourceID());
+            }
+        }
+
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
             mainThreadHandler.post(new Runnable() {
@@ -285,22 +301,6 @@ public abstract class UploadTask implements Runnable {
             service.sendBroadcast(data.getIntent());
         }
 
-        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
-
-        if (notificationConfig != null) {
-            if (successfulUpload) {
-                updateNotification(uploadInfo, notificationConfig.getCompletedMessage(),
-                        notificationConfig.isAutoClearOnSuccess(),
-                        notificationConfig.getCompletedIconResourceID(),
-                        notificationConfig.getCompletedIconColorResourceID());
-            } else {
-                updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
-                        notificationConfig.isAutoClearOnError(),
-                        notificationConfig.getErrorIconResourceID(),
-                        notificationConfig.getErrorIconColorResourceID());
-            }
-        }
-
         service.taskCompleted(params.getId());
     }
 
@@ -320,6 +320,15 @@ public abstract class UploadTask implements Runnable {
                                                      successfullyUploadedFiles,
                                                      pathStringListFrom(params.getFiles()));
 
+        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
+
+        if (notificationConfig != null) {
+            updateNotification(uploadInfo, notificationConfig.getCancelledMessage(),
+                    notificationConfig.isAutoClearOnCancel(),
+                    notificationConfig.getCancelledIconResourceID(),
+                    notificationConfig.getCancelledIconColorResourceID());
+        }
+
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.CANCELLED)
                 .setUploadInfo(uploadInfo);
@@ -334,15 +343,6 @@ public abstract class UploadTask implements Runnable {
             });
         } else {
             service.sendBroadcast(data.getIntent());
-        }
-
-        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
-
-        if (notificationConfig != null) {
-            updateNotification(uploadInfo, notificationConfig.getCancelledMessage(),
-                    notificationConfig.isAutoClearOnCancel(),
-                    notificationConfig.getCancelledIconResourceID(),
-                    notificationConfig.getCancelledIconColorResourceID());
         }
 
         service.taskCompleted(params.getId());
@@ -404,6 +404,15 @@ public abstract class UploadTask implements Runnable {
                                                      successfullyUploadedFiles,
                                                      pathStringListFrom(params.getFiles()));
 
+        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
+
+        if (notificationConfig != null && notificationConfig.getErrorMessage() != null) {
+            updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
+                    notificationConfig.isAutoClearOnError(),
+                    notificationConfig.getErrorIconResourceID(),
+                    notificationConfig.getErrorIconColorResourceID());
+        }
+
         BroadcastData data = new BroadcastData()
                 .setStatus(BroadcastData.Status.ERROR)
                 .setUploadInfo(uploadInfo)
@@ -419,15 +428,6 @@ public abstract class UploadTask implements Runnable {
             });
         } else {
             service.sendBroadcast(data.getIntent());
-        }
-
-        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
-
-        if (notificationConfig != null && notificationConfig.getErrorMessage() != null) {
-            updateNotification(uploadInfo, notificationConfig.getErrorMessage(),
-                    notificationConfig.isAutoClearOnError(),
-                    notificationConfig.getErrorIconResourceID(),
-                    notificationConfig.getErrorIconColorResourceID());
         }
 
         service.taskCompleted(params.getId());
@@ -521,6 +521,7 @@ public abstract class UploadTask implements Runnable {
 
             // this is needed because the main notification used to show progress is ongoing
             // and a new one has to be created to allow the user to dismiss it
+            uploadInfo.setNotificationID(notificationId + 1);
             notificationManager.notify(notificationId + 1, notification.build());
         }
     }
