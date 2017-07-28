@@ -178,7 +178,7 @@ public class UploadInfo implements Parcelable {
     }
 
     /**
-     * Gets the list of all files to be uploaded, containing also the successfully uploaded ones.
+     * Gets the list of all the files left to be uploaded.
      * @return list of strings
      */
     public ArrayList<String> getFilesLeft() {

@@ -39,7 +39,7 @@ dependencies {
     debugCompile "com.facebook.stetho:stetho:${stethoVersion}"
     debugCompile "com.facebook.stetho:stetho-okhttp3:${stethoVersion}"
     releaseCompile "net.igenius:stetho-no-op:1.1"
-    compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
 
     // Google support libraries
     compile "com.android.support:appcompat-v7:${supportVersion}"
