@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -349,7 +350,22 @@ public abstract class UploadTask implements Runnable {
     protected final void addSuccessfullyUploadedFile(UploadFile file) {
         if (!successfullyUploadedFiles.contains(file.path)) {
             successfullyUploadedFiles.add(file.path);
-            params.removeFile(file);
+            params.getFiles().remove(file);
+        }
+    }
+
+    /**
+     * Adds all the files to the list of successfully uploaded files.
+     * This will automatically remove them from the params.getFiles() list.
+     */
+    protected final void addAllFilesToSuccessfullyUploadedFiles() {
+        for (Iterator<UploadFile> iterator = params.getFiles().iterator(); iterator.hasNext();) {
+            UploadFile file = iterator.next();
+
+            if (!successfullyUploadedFiles.contains(file.path)) {
+                successfullyUploadedFiles.add(file.path);
+            }
+            iterator.remove();
         }
     }
 
