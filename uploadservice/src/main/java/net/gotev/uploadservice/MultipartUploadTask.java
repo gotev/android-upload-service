@@ -38,9 +38,9 @@ public class MultipartUploadTask extends HttpUploadTask {
     protected void init(UploadService service, Intent intent) throws IOException {
         super.init(service, intent);
 
-        String boundary = BOUNDARY_SIGNATURE + System.currentTimeMillis();
-        boundaryBytes = (NEW_LINE + TWO_HYPHENS + boundary + NEW_LINE).getBytes(US_ASCII);
-        trailerBytes = (NEW_LINE + TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes(US_ASCII);
+        String boundary = BOUNDARY_SIGNATURE + System.nanoTime();
+        boundaryBytes = (TWO_HYPHENS + boundary + NEW_LINE).getBytes(US_ASCII);
+        trailerBytes = (TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes(US_ASCII);
         charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false) ?
                 Charset.forName("UTF-8") : US_ASCII;
 
@@ -94,7 +94,7 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private byte[] getMultipartBytes(NameValue parameter) throws UnsupportedEncodingException {
         return ("Content-Disposition: form-data; name=\"" + parameter.getName() + "\""
-                + NEW_LINE + NEW_LINE + parameter.getValue()).getBytes(charset);
+                + NEW_LINE + NEW_LINE + parameter.getValue() + NEW_LINE).getBytes(charset);
     }
 
     private byte[] getMultipartHeader(UploadFile file)
@@ -110,7 +110,8 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private long getTotalMultipartBytes(UploadFile file)
             throws UnsupportedEncodingException {
-        return boundaryBytes.length + getMultipartHeader(file).length + file.length(service);
+        return boundaryBytes.length + getMultipartHeader(file).length + file.length(service)
+                + NEW_LINE.getBytes(charset).length;
     }
 
     private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
@@ -141,6 +142,7 @@ public class MultipartUploadTask extends HttpUploadTask {
             final InputStream stream = file.getStream(service);
             bodyWriter.writeStream(stream, this);
             stream.close();
+            bodyWriter.write(NEW_LINE.getBytes(charset));
         }
     }
 

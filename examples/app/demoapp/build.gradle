@@ -3,7 +3,7 @@ apply plugin: 'android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 def sdkVersion = 25;
-def libraryVersion = "3.2.4"
+def libraryVersion = "3.3"
 
 android {
     compileSdkVersion sdkVersion
