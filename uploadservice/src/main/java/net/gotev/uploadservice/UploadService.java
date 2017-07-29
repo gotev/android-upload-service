@@ -82,20 +82,20 @@ public final class UploadService extends Service {
     public static int INITIAL_RETRY_WAIT_TIME = 1000;
 
     /**
-     * Sets the backoff timer multiplier. By default is set to 10, so every time that an upload
-     * fails, the time to wait between retries will be multiplied by 10.
-     * E.g. if the first time the wait time is 1s, the second time it will be 10s and the third
-     * time it will be 100s.
+     * Sets the backoff timer multiplier. By default is set to 2, so every time that an upload
+     * fails, the time to wait between retries will be multiplied by 2.
+     * E.g. if the first time the wait time is 1s, the second time it will be 2s and the third
+     * time it will be 4s.
      */
-    public static int BACKOFF_MULTIPLIER = 10;
+    public static int BACKOFF_MULTIPLIER = 2;
 
-    /**
+    /** 
      * Sets the maximum time to wait in milliseconds between two upload attempts.
      * This is useful because every time an upload fails, the wait time gets multiplied by
      * {@link UploadService#BACKOFF_MULTIPLIER} and it's not convenient that the value grows
      * indefinitely.
      */
-    public static int MAX_RETRY_WAIT_TIME = 10 * 60 * 1000;
+    public static int MAX_RETRY_WAIT_TIME = 10 * 10 * 1000;
     // end configurable values
 
     protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
