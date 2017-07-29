@@ -34,6 +34,7 @@
     <string name="new_binary_upload">New Binary Upload</string>
     <string name="ftp_upload">FTP Upload</string>
     <string name="new_ftp_upload">New FTP Upload</string>
+    <string name="cancel_upload">Cancel</string>
     <string name="settings">Settings</string>
     <string name="done">Done</string>
     <string name="port">Port (e.g. 21)</string>

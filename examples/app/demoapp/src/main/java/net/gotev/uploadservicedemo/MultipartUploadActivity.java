@@ -10,6 +10,7 @@ import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * @author Aleksandar Gotev
@@ -29,11 +30,13 @@ public class MultipartUploadActivity extends UploadActivity {
     @Override
     public void onDone(String httpMethod, String serverUrl, UploadItemUtils uploadItemUtils) {
         try {
+            final String uploadId = UUID.randomUUID().toString();
+
             final MultipartUploadRequest request =
-                    new MultipartUploadRequest(this, serverUrl)
+                    new MultipartUploadRequest(this, uploadId, serverUrl)
                     .setMethod(httpMethod)
                     .setUtf8Charset()
-                    .setNotificationConfig(getNotificationConfig(R.string.multipart_upload))
+                    .setNotificationConfig(getNotificationConfig(uploadId, R.string.multipart_upload))
                     .setMaxRetries(MAX_RETRIES)
                     //.setCustomUserAgent(getUserAgent())
                     .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
