@@ -44,13 +44,13 @@ public class MultipartUploadTask extends HttpUploadTask {
         charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false) ?
                 Charset.forName("UTF-8") : US_ASCII;
 
-        if (params.getFiles().size() <= 1) {
-            httpParams.addRequestHeader("Connection", "close");
+        if (params.files.size() <= 1) {
+            httpParams.requestHeaders.add(NameValue.header("Connection", "close"));
         } else {
-            httpParams.addRequestHeader("Connection", "Keep-Alive");
+            httpParams.requestHeaders.add(NameValue.header("Connection", "Keep-Alive"));
         }
 
-        httpParams.addRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+        httpParams.requestHeaders.add(NameValue.header("Content-Type", "multipart/form-data; boundary=" + boundary));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     private long getFilesLength() throws UnsupportedEncodingException {
         long total = 0;
 
-        for (UploadFile file : params.getFiles()) {
+        for (UploadFile file : params.files) {
             total += getTotalMultipartBytes(file);
         }
 
@@ -81,8 +81,8 @@ public class MultipartUploadTask extends HttpUploadTask {
     private long getRequestParametersLength() throws UnsupportedEncodingException {
         long parametersBytes = 0;
 
-        if (!httpParams.getRequestParameters().isEmpty()) {
-            for (final NameValue parameter : httpParams.getRequestParameters()) {
+        if (!httpParams.requestParameters.isEmpty()) {
+            for (final NameValue parameter : httpParams.requestParameters) {
                 // the bytes needed for every parameter are the sum of the boundary bytes
                 // and the bytes occupied by the parameter
                 parametersBytes += boundaryBytes.length + getMultipartBytes(parameter).length;
@@ -115,8 +115,8 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
-        if (!httpParams.getRequestParameters().isEmpty()) {
-            for (final NameValue parameter : httpParams.getRequestParameters()) {
+        if (!httpParams.requestParameters.isEmpty()) {
+            for (final NameValue parameter : httpParams.requestParameters) {
                 bodyWriter.write(boundaryBytes);
                 byte[] formItemBytes = getMultipartBytes(parameter);
                 bodyWriter.write(formItemBytes);
@@ -128,7 +128,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     private void writeFiles(BodyWriter bodyWriter) throws IOException {
-        for (UploadFile file : params.getFiles()) {
+        for (UploadFile file : params.files) {
             if (!shouldContinue)
                 break;
 

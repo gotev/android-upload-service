@@ -42,15 +42,15 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
 
         if (uploadId == null || uploadId.isEmpty()) {
             Logger.debug(LOG_TAG, "null or empty upload ID. Generating it");
-            params.setId(UUID.randomUUID().toString());
+            params.id = UUID.randomUUID().toString();
         } else {
             Logger.debug(LOG_TAG, "setting provided upload ID");
-            params.setId(uploadId);
+            params.id = uploadId;
         }
 
-        params.setServerUrl(serverUrl);
+        params.serverUrl = serverUrl;
         Logger.debug(LOG_TAG, "Created new upload request to "
-                     + params.getServerUrl() + " with ID: " + params.getId());
+                     + params.serverUrl + " with ID: " + params.id);
     }
 
     /**
@@ -60,14 +60,14 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      *         generated uploadId
      */
     public String startUpload() {
-        UploadService.setUploadStatusDelegate(params.getId(), delegate);
+        UploadService.setUploadStatusDelegate(params.id, delegate);
 
         final Intent intent = new Intent(context, UploadService.class);
         this.initializeIntent(intent);
         intent.setAction(UploadService.getActionUpload());
         context.startService(intent);
 
-        return params.getId();
+        return params.id;
     }
 
     /**
@@ -101,7 +101,7 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * @return self instance
      */
     public B setNotificationConfig(UploadNotificationConfig config) {
-        params.setNotificationConfig(config);
+        params.notificationConfig = config;
         return self();
     }
 
@@ -113,7 +113,7 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * @return self instance
      */
     public B setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
-        params.setAutoDeleteSuccessfullyUploadedFiles(autoDeleteFiles);
+        params.autoDeleteSuccessfullyUploadedFiles = autoDeleteFiles;
         return self();
     }
 

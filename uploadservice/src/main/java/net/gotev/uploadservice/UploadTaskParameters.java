@@ -3,9 +3,7 @@ package net.gotev.uploadservice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class which contains all the basic parameters passed to the upload task.
@@ -18,12 +16,12 @@ import java.util.List;
  */
 public final class UploadTaskParameters implements Parcelable {
 
-    private String id;
-    private String serverUrl;
+    public String id;
+    public String serverUrl;
     private int maxRetries = 0;
-    private boolean autoDeleteSuccessfullyUploadedFiles = false;
-    private UploadNotificationConfig notificationConfig;
-    private ArrayList<UploadFile> files = new ArrayList<>();
+    public boolean autoDeleteSuccessfullyUploadedFiles = false;
+    public UploadNotificationConfig notificationConfig;
+    public ArrayList<UploadFile> files = new ArrayList<>();
 
     public UploadTaskParameters() {
 
@@ -68,42 +66,6 @@ public final class UploadTaskParameters implements Parcelable {
         return 0;
     }
 
-    public void addFile(UploadFile file)
-            throws FileNotFoundException {
-        files.add(file);
-    }
-
-    public List<UploadFile> getFiles() {
-        return files;
-    }
-
-    public UploadNotificationConfig getNotificationConfig() {
-        return notificationConfig;
-    }
-
-    public UploadTaskParameters setNotificationConfig(UploadNotificationConfig notificationConfig) {
-        this.notificationConfig = notificationConfig;
-        return this;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public UploadTaskParameters setId(String id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getServerUrl() {
-        return serverUrl;
-    }
-
-    public UploadTaskParameters setServerUrl(String url) {
-        this.serverUrl = url;
-        return this;
-    }
-
     public int getMaxRetries() {
         return maxRetries;
     }
@@ -117,12 +79,4 @@ public final class UploadTaskParameters implements Parcelable {
         return this;
     }
 
-    public boolean isAutoDeleteSuccessfullyUploadedFiles() {
-        return autoDeleteSuccessfullyUploadedFiles;
-    }
-
-    public UploadTaskParameters setAutoDeleteSuccessfullyUploadedFiles(boolean autoDeleteSuccessfullyUploadedFiles) {
-        this.autoDeleteSuccessfullyUploadedFiles = autoDeleteSuccessfullyUploadedFiles;
-        return this;
-    }
 }
