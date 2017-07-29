@@ -1,0 +1,6 @@
+#!/bin/bash
+./gradlew clean assembleDebug
+echo
+echo
+echo
+cat demoapp/build/outputs/dexcount/debug.txt | grep "net.gotev.uploadservice" | grep -v "net.gotev.uploadservicedemo"
