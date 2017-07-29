@@ -122,6 +122,22 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     /**
+     * Adds the same notification action for all the notification statuses.
+     * So for example, if you want to have the same action while the notification is in progress,
+     * cancelled, completed or with an error, this method will save you lines of code.
+     *
+     * @param action {@link UploadNotificationAction} action to add
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig addActionForAllStatuses(UploadNotificationAction action) {
+        progress.actions.add(action);
+        completed.actions.add(action);
+        error.actions.add(action);
+        cancelled.actions.add(action);
+        return this;
+    }
+
+    /**
      * Sets whether or not to clear the notification when the user taps on it
      * for all the notification statuses.
      *
