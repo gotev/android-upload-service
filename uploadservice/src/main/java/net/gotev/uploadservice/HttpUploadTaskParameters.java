@@ -17,8 +17,8 @@ public final class HttpUploadTaskParameters implements Parcelable {
     public String customUserAgent;
     public String method = "POST";
     public boolean usesFixedLengthStreamingMode = true;
-    public ArrayList<NameValue> requestHeaders = new ArrayList<>(10);
-    public ArrayList<NameValue> requestParameters = new ArrayList<>(10);
+    private ArrayList<NameValue> requestHeaders = new ArrayList<>(10);
+    private ArrayList<NameValue> requestParameters = new ArrayList<>(10);
 
     public HttpUploadTaskParameters() {
 
@@ -63,5 +63,23 @@ public final class HttpUploadTaskParameters implements Parcelable {
 
     public boolean isCustomUserAgentDefined() {
         return customUserAgent != null && !"".equals(customUserAgent);
+    }
+
+    public HttpUploadTaskParameters addHeader(String name, String value) {
+        requestHeaders.add(NameValue.header(name, value));
+        return this;
+    }
+
+    public ArrayList<NameValue> getRequestHeaders() {
+        return requestHeaders;
+    }
+
+    public HttpUploadTaskParameters addParameter(String name, String value) {
+        requestParameters.add(new NameValue(name, value));
+        return this;
+    }
+
+    public ArrayList<NameValue> getRequestParameters() {
+        return requestParameters;
     }
 }

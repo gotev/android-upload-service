@@ -59,14 +59,14 @@ public abstract class HttpUploadTask extends UploadTask
             totalBytes = getBodyLength();
 
             if (httpParams.isCustomUserAgentDefined()) {
-                httpParams.requestHeaders.add(NameValue.header("User-Agent", httpParams.customUserAgent));
+                httpParams.addHeader("User-Agent", httpParams.customUserAgent);
             } else {
-                httpParams.requestHeaders.add(NameValue.header("User-Agent", "AndroidUploadService/" + BuildConfig.VERSION_NAME));
+                httpParams.addHeader("User-Agent", "AndroidUploadService/" + BuildConfig.VERSION_NAME);
             }
 
             connection = UploadService.HTTP_STACK
                     .createNewConnection(httpParams.method, params.serverUrl)
-                    .setHeaders(httpParams.requestHeaders)
+                    .setHeaders(httpParams.getRequestHeaders())
                     .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode);
 
             final ServerResponse response = connection.getResponse(this);

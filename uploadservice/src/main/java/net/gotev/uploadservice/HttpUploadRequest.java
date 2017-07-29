@@ -59,7 +59,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      * @return self instance
      */
     public B addHeader(final String headerName, final String headerValue) {
-        httpParams.requestHeaders.add(NameValue.header(headerName, headerValue));
+        httpParams.addHeader(headerName, headerValue);
         return self();
     }
 
@@ -71,7 +71,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      */
     public B setBasicAuth(final String username, final String password) {
         String auth = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
-        httpParams.requestHeaders.add(NameValue.header("Authorization", "Basic " + auth));
+        httpParams.addHeader("Authorization", "Basic " + auth);
         return self();
     }
 
@@ -83,7 +83,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      * @return self instance
      */
     public B addParameter(final String paramName, final String paramValue) {
-        httpParams.requestParameters.add(new NameValue(paramName, paramValue));
+        httpParams.addParameter(paramName, paramValue);
         return self();
     }
 
@@ -96,7 +96,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      */
     public B addArrayParameter(final String paramName, final String... array) {
         for (String value : array) {
-            httpParams.requestParameters.add(new NameValue(paramName, value));
+            httpParams.addParameter(paramName, value);
         }
         return self();
     }
@@ -110,7 +110,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      */
     public B addArrayParameter(final String paramName, final List<String> list) {
         for (String value : list) {
-            httpParams.requestParameters.add(new NameValue(paramName, value));
+            httpParams.addParameter(paramName, value);
         }
         return self();
     }
