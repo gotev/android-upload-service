@@ -1,0 +1,4 @@
+#!/bin/bash
+PACKAGE="net.gotev.uploadservicedemo"
+adb shell am set-inactive "$PACKAGE" false
+adb shell am get-inactive "$PACKAGE"
