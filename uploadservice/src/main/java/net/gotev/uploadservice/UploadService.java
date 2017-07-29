@@ -10,6 +10,7 @@ import android.os.PowerManager;
 import net.gotev.uploadservice.http.HttpStack;
 import net.gotev.uploadservice.http.impl.HurlStack;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -119,7 +120,7 @@ public final class UploadService extends Service {
     private PowerManager.WakeLock wakeLock;
     private int notificationIncrementalId = 0;
     private static final Map<String, UploadTask> uploadTasksMap = new ConcurrentHashMap<>();
-    private static final Map<String, UploadStatusDelegate> uploadDelegates = new ConcurrentHashMap<>();
+    private static final Map<String, WeakReference<UploadStatusDelegate>> uploadDelegates = new ConcurrentHashMap<>();
     private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
     private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
@@ -378,7 +379,7 @@ public final class UploadService extends Service {
         if (delegate == null)
             return;
 
-        uploadDelegates.put(uploadId, delegate);
+        uploadDelegates.put(uploadId, new WeakReference<>(delegate));
     }
 
     /**
@@ -388,6 +389,24 @@ public final class UploadService extends Service {
      * uploadId
      */
     protected static UploadStatusDelegate getUploadStatusDelegate(String uploadId) {
-        return uploadDelegates.get(uploadId);
+        WeakReference<UploadStatusDelegate> reference = uploadDelegates.get(uploadId);
+
+        if (reference == null)
+            return null;
+
+        UploadStatusDelegate delegate = reference.get();
+
+        if (delegate == null) {
+            uploadDelegates.remove(uploadId);
+            Logger.info(TAG, "\n\n\nUpload delegate for upload with Id " + uploadId + " is gone!\n" +
+                    "Probably you have set it in an activity and the user navigated away from it\n" +
+                    "before the upload was completed. From now on, the events will be dispatched\n" +
+                    "with broadcast intents. If you see this message, consider switching to the\n" +
+                    "UploadServiceBroadcastReceiver registered globally in your manifest.\n" +
+                    "Read this:\n" +
+                    "https://github.com/gotev/android-upload-service/wiki/Monitoring-upload-status\n");
+        }
+
+        return delegate;
     }
 }
