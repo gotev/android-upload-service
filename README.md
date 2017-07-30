@@ -5,10 +5,6 @@ Android Upload Service
 
 ![Upload Notification](http://gotev.github.io/android-upload-service/upload.gif)
 
-Easily upload files in the background with automatic Android Notification Center progress indication.
-
-[Download the latest demo app APK](https://github.com/gotev/android-upload-service/releases/download/3.3/uploadservice-demo-debug.apk) which uses the library and try it yourself! You can do much more, the app is just a proof of concept.
-
 ## Features
 * tiny library
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
@@ -20,6 +16,8 @@ Easily upload files in the background with automatic Android Notification Center
 * be able to change the underlying HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported. You can also implement your own.
 * be able to set library log level and to provide custom logger implementation
 * easily customize the notification with text, icons and actions for the different states
+
+[Download the latest demo app APK](https://github.com/gotev/android-upload-service/releases/download/3.3/uploadservice-demo-debug.apk) which uses the library and try it yourself! You can do much more, the app is just a proof of concept.
 
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
 
