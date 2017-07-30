@@ -4,8 +4,9 @@ FTP Upload for Android Upload Service
 This module adds FTP upload ([RFC959](https://tools.ietf.org/html/rfc959)) capability to Android Upload Service. It wraps [Apache Commons Net FTP](https://commons.apache.org/proper/commons-net/dependency-info.html) library.
 
 ## Setup
+Refer to [UploadService Setup](https://github.com/gotev/android-upload-service/wiki/Setup) to get the latest upload service version
 ```groovy
-compile 'net.gotev:uploadservice-ftp:3.2.5'
+compile "net.gotev:uploadservice-ftp:$uploadServiceVersion"
 ```
 
 ## Minimal example
