@@ -242,7 +242,7 @@ public abstract class UploadTask implements Runnable {
      */
     protected final void broadcastCompleted(final ServerResponse response) {
 
-        final boolean successfulUpload = ((response.getHttpCode() / 100) == 2);
+        final boolean successfulUpload = response.getHttpCode() >= 200 && response.getHttpCode() < 400;
 
         if (successfulUpload) {
             onSuccessfulUpload();
