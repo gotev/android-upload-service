@@ -24,9 +24,7 @@ Easily upload files in the background with automatic Android Notification Center
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
 
 ## Getting started <a name="setup"></a>
-[Read this page](https://github.com/gotev/android-upload-service/wiki/Setup) for full setup instructions with Maven and Gradle.
-
-[Check the wiki](https://github.com/gotev/android-upload-service/wiki) to discover how to get started.
+[Check the wiki](https://github.com/gotev/android-upload-service/wiki/Setup) to discover how to get started.
 
 [Check JavaDocs](http://gotev.github.io/android-upload-service/javadoc/) for a complete reference of the library's API
 
