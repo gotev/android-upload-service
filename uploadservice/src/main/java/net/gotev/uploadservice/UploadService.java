@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -45,7 +47,13 @@ public final class UploadService extends Service {
      * When the number of threads is greater than UPLOAD_POOL_SIZE, this is the maximum time that
      * excess idle threads will wait for new tasks before terminating.
      */
-    public static int KEEP_ALIVE_TIME_IN_SECONDS = 1;
+    public static int KEEP_ALIVE_TIME_IN_SECONDS = 5;
+
+    /**
+     * How many time to wait in idle (in milliseconds) before shutting down the service.
+     * The service is idle when is running, but no tasks are running.
+     */
+    public static int IDLE_TIMEOUT = 10 * 1000;
 
     /**
      * If set to true, the service will go in foreground mode when doing uploads,
@@ -89,7 +97,7 @@ public final class UploadService extends Service {
      */
     public static int BACKOFF_MULTIPLIER = 2;
 
-    /** 
+    /**
      * Sets the maximum time to wait in milliseconds between two upload attempts.
      * This is useful because every time an upload fails, the wait time gets multiplied by
      * {@link UploadService#BACKOFF_MULTIPLIER} and it's not convenient that the value grows
@@ -124,6 +132,7 @@ public final class UploadService extends Service {
     private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
     private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
+    private Timer idleTimer = null;
 
     protected static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
@@ -252,6 +261,8 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
+        clearIdleTimer();
+
         // increment by 2 because the notificationIncrementalId + 1 is used internally
         // in each UploadTask. Check its sources for more info about this.
         notificationIncrementalId += 2;
@@ -264,9 +275,29 @@ public final class UploadService extends Service {
         return START_STICKY;
     }
 
+    private void clearIdleTimer() {
+        if (idleTimer != null) {
+            Logger.info(TAG, "Clearing idle timer");
+            idleTimer.cancel();
+            idleTimer = null;
+        }
+    }
+
     private int shutdownIfThereArentAnyActiveTasks() {
         if (uploadTasksMap.isEmpty()) {
-            stopSelf();
+            clearIdleTimer();
+
+            Logger.info(TAG, "Service will be shut down in " + IDLE_TIMEOUT + "ms if no new tasks are received");
+            idleTimer = new Timer(TAG + "IdleTimer");
+            idleTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Logger.info(TAG, "Service is about to be stopped because idle timeout of "
+                            + IDLE_TIMEOUT + "ms has been reached");
+                    stopSelf();
+                }
+            }, IDLE_TIMEOUT);
+
             return START_NOT_STICKY;
         }
 
@@ -366,6 +397,7 @@ public final class UploadService extends Service {
         if (EXECUTE_IN_FOREGROUND && uploadTasksMap.isEmpty()) {
             Logger.debug(TAG, "All tasks completed, stopping foreground execution");
             stopForeground(true);
+            shutdownIfThereArentAnyActiveTasks();
         }
     }
 
