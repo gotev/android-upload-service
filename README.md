@@ -1,7 +1,7 @@
 Android Upload Service
 ======================
 
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice) <a href="http://www.methodscount.com/?lib=net.gotev%3Auploadservice%3A3.2.4"><img src="https://img.shields.io/badge/Methods and size-core: 623 | deps: 19376 | 84 KB-e91e63.svg"/></a>
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice) <a href="http://www.methodscount.com/?lib=net.gotev%3Auploadservice%3A3.3"><img src="https://img.shields.io/badge/Methods and size-core: 658 | deps: 19372 | 91 KB-e91e63.svg"/></a>
 
 ![Upload Notification](http://gotev.github.io/android-upload-service/upload.gif)
 
@@ -10,7 +10,7 @@ Easily upload files in the background with automatic Android Notification Center
 [Download the latest demo app APK](https://github.com/gotev/android-upload-service/releases/download/3.2.3/uploadservice-demo-debug.apk) which uses the library and try it yourself! You can do much more, the app is just a proof of concept.
 
 ## Features
-* tiny library (less than 90KB)
+* tiny library
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
 * be able to easily implement other upload protocols as plugins
 * handle multiple concurrent uploads in the background, even if the device is idle (Doze mode)
