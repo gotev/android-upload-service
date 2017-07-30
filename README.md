@@ -6,6 +6,11 @@ Android Upload Service
 ![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
+| :information_source: | [Get started!](https://github.com/gotev/android-upload-service/wiki/Setup) |
+|--|--|
+| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.3/uploadservice-demo-debug.apk)|
+| :question: | [Ask for help](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help) |
+
 ## Features
 * tiny library
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
@@ -18,16 +23,7 @@ Android Upload Service
 * be able to set library log level and to provide custom logger implementation
 * easily customize the notification with text, icons and actions for the different states
 
-[Download the latest demo app APK](https://github.com/gotev/android-upload-service/releases/download/3.3/uploadservice-demo-debug.apk) which uses the library and try it yourself! You can do much more, the app is just a proof of concept.
-
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
-
-## Getting started <a name="setup"></a>
-[Check the wiki](https://github.com/gotev/android-upload-service/wiki/Setup) to discover how to get started.
-
-[Check JavaDocs](http://gotev.github.io/android-upload-service/javadoc/) for a complete reference of the library's API
-
-Do you need help? [Read this](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help)
 
 ## Apps powered by Android Upload Service <a name="powered"></a>
 To be included in the following list, simply create an issue and provide the app name and a link.
