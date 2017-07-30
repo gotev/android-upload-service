@@ -1,30 +1,26 @@
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice) <a href="http://www.methodscount.com/?lib=net.gotev%3Auploadservice%3A3.3"><img src="https://img.shields.io/badge/Methods and size-core: 658 | deps: 19372 | 91 KB-e91e63.svg"/></a>
 
-![Upload Notification](http://gotev.github.io/android-upload-service/upload.gif)
+![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
+![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
-[Download the latest demo app APK](https://github.com/gotev/android-upload-service/releases/download/3.1/uploadservice-demo-debug.apk) which uses the library and try it yourself! You can do much more, the app is just a proof of concept.
+| :information_source: | [Get started!](https://github.com/gotev/android-upload-service/wiki/Setup) |
+|--|--|
+| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.3/uploadservice-demo-debug.apk)|
+| :question: | [Ask for help](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help) |
 
-## Purpose
-* have a tiny library (less than 60KB)
-* upload files to a server with FTP, HTTP `multipart/form-data` or binary requests
+## Features
+* tiny library
+* upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
 * be able to easily implement other upload protocols as plugins
-* handle multiple concurrent uploads in the background, even if the device is idle
+* handle multiple concurrent uploads in the background, even if the device is idle (Doze mode)
 * automatically retry failed uploads, with a configurable exponential backoff
 * possibility to automatically delete uploaded files when the upload is successful
 * show status in the Android Notification Center (with support for [stacking notifications](http://developer.android.com/training/wearables/notifications/stacks.html)).
 * be able to change the underlying HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported. You can also implement your own.
 * be able to set library log level and to provide custom logger implementation
+* easily customize the notification with text, icons and actions for the different states
 
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
-
-## Getting started <a name="setup"></a>
-[Read this page](https://github.com/gotev/android-upload-service/wiki/Setup) for full setup instructions with Maven and Gradle.
-
-[Check the wiki](https://github.com/gotev/android-upload-service/wiki) to discover how to get started.
-
-[Check JavaDocs](http://gotev.github.io/android-upload-service/javadoc/) for a complete reference of the library's API
-
-Do you need help? [Read this](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help)
 
 ## Apps powered by Android Upload Service <a name="powered"></a>
 To be included in the following list, simply create an issue and provide the app name and a link.
