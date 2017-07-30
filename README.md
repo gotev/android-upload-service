@@ -3,8 +3,8 @@ Android Upload Service
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice) <a href="http://www.methodscount.com/?lib=net.gotev%3Auploadservice%3A3.3"><img src="https://img.shields.io/badge/Methods and size-core: 658 | deps: 19372 | 91 KB-e91e63.svg"/></a>
 
-![compose-upload](https://user-images.githubusercontent.com/16792495/28752623-826bb44e-7524-11e7-97c3-f8ed8f05c516.gif)
-![upload](https://user-images.githubusercontent.com/16792495/28752647-f6f6a26a-7524-11e7-84e6-dc7fc7506007.gif)
+![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
+![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
 ## Features
 * tiny library
