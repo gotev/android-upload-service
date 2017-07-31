@@ -38,19 +38,19 @@ public final class UploadNotificationConfig implements Parcelable {
         ringToneEnabled = true;
 
         // progress notification configuration
-        progress = new UploadNotificationStatusConfig();
+        progress = new UploadNotificationStatusConfig("net.gotev.uploadservice");
         progress.message = "Uploading at " + Placeholders.UPLOAD_RATE + " (" + Placeholders.PROGRESS + ")";
 
         // completed notification configuration
-        completed = new UploadNotificationStatusConfig();
+        completed = new UploadNotificationStatusConfig("net.gotev.uploadservice");
         completed.message = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
 
         // error notification configuration
-        error = new UploadNotificationStatusConfig();
+        error = new UploadNotificationStatusConfig("net.gotev.uploadservice");
         error.message = "Error during upload";
 
         // cancelled notification configuration
-        cancelled = new UploadNotificationStatusConfig();
+        cancelled = new UploadNotificationStatusConfig("net.gotev.uploadservice");
         cancelled.message = "Upload cancelled";
     }
 
