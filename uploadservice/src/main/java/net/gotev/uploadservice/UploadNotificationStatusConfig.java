@@ -18,10 +18,10 @@ import java.util.ArrayList;
 public class UploadNotificationStatusConfig implements Parcelable {
 
     /**
-     * Notification channel
+     * Notification channel ID
      */
     @NonNull
-    public String notificationChannel;
+    public String notificationChannelId;
     /**
      * Notification title.
      */
@@ -93,7 +93,7 @@ public class UploadNotificationStatusConfig implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.notificationChannel);
+        dest.writeString(this.notificationChannelId);
         dest.writeString(this.title);
         dest.writeString(this.message);
         dest.writeByte(this.autoClear ? (byte) 1 : (byte) 0);
@@ -106,11 +106,11 @@ public class UploadNotificationStatusConfig implements Parcelable {
     }
 
     public UploadNotificationStatusConfig(){
-        this.notificationChannel = UploadService.NAMESPACE;
+        this.notificationChannelId = UploadService.NAMESPACE;
     }
 
     protected UploadNotificationStatusConfig(Parcel in) {
-        this.notificationChannel = in.readString();
+        this.notificationChannelId = in.readString();
         this.title = in.readString();
         this.message = in.readString();
         this.autoClear = in.readByte() != 0;

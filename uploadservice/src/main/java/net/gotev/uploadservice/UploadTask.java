@@ -120,7 +120,7 @@ public abstract class UploadTask implements Runnable {
     protected void init(UploadService service, Intent intent) throws IOException {
         this.notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = createNotificationChannel("net.gotev.uploadservice");
+            NotificationChannel channel = createNotificationChannel(UploadService.NAMESPACE);
             this.notificationManager.createNotificationChannel(channel);
         }
         this.service = service;
@@ -443,7 +443,7 @@ public abstract class UploadTask implements Runnable {
 
         UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, statusConfig.channel)
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, statusConfig.notificationChannelId)
                 .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
@@ -475,7 +475,7 @@ public abstract class UploadTask implements Runnable {
 
         UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, statusConfig.channel)
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, statusConfig.notificationChannelId)
                 .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
@@ -514,7 +514,7 @@ public abstract class UploadTask implements Runnable {
         if (statusConfig.message == null) return;
 
         if (!statusConfig.autoClear) {
-            NotificationCompat.Builder notification = new NotificationCompat.Builder(service, statusConfig.channel)
+            NotificationCompat.Builder notification = new NotificationCompat.Builder(service, statusConfig.notificationChannelId)
                     .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                     .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                     .setContentIntent(statusConfig.getClickIntent(service))
