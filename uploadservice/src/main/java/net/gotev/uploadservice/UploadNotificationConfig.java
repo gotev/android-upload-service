@@ -96,14 +96,14 @@ public final class UploadNotificationConfig implements Parcelable {
 
     /**
      * Sets the same notification channel ID for all the notification statuses.
-     * @param notificationChannel Notification channel ID
+     * @param notificationChannelId Notification channel ID
      * @return {@link UploadNotificationConfig}
      */
-    public final UploadNotificationConfig setNotificationChannelForAllStatuses(@NonNull String notificationChannel) {
-        progress.notificationChannel = notificationChannel;
-        completed.notificationChannel = notificationChannel;
-        error.notificationChannel = notificationChannel;
-        cancelled.notificationChannel = notificationChannel;
+    public final UploadNotificationConfig setNotificationChannelForAllStatuses(@NonNull String notificationChannelId) {
+        progress.notificationChannelId = notificationChannelId;
+        completed.notificationChannelId = notificationChannelId;
+        error.notificationChannelId = notificationChannelId;
+        cancelled.notificationChannelId = notificationChannelId;
         return this;
     }
 
