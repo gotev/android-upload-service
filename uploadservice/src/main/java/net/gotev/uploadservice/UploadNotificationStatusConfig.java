@@ -21,7 +21,7 @@ public class UploadNotificationStatusConfig implements Parcelable {
      * Notification channel
      */
     @NonNull
-    public String channel;
+    public String notificationChannel;
     /**
      * Notification title.
      */
@@ -93,7 +93,7 @@ public class UploadNotificationStatusConfig implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.channel);
+        dest.writeString(this.notificationChannel);
         dest.writeString(this.title);
         dest.writeString(this.message);
         dest.writeByte(this.autoClear ? (byte) 1 : (byte) 0);
@@ -105,12 +105,12 @@ public class UploadNotificationStatusConfig implements Parcelable {
         dest.writeTypedList(this.actions);
     }
 
-    public UploadNotificationStatusConfig(@NonNull String notificationChannel){
-        this.channel = notificationChannel;
+    public UploadNotificationStatusConfig(){
+        this.notificationChannel = UploadService.NAMESPACE;
     }
 
     protected UploadNotificationStatusConfig(Parcel in) {
-        this.channel = in.readString();
+        this.notificationChannel = in.readString();
         this.title = in.readString();
         this.message = in.readString();
         this.autoClear = in.readByte() != 0;

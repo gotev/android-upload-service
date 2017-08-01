@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 /**
  * Contains the configuration of the upload notification.
@@ -38,19 +39,19 @@ public final class UploadNotificationConfig implements Parcelable {
         ringToneEnabled = true;
 
         // progress notification configuration
-        progress = new UploadNotificationStatusConfig("net.gotev.uploadservice");
+        progress = new UploadNotificationStatusConfig();
         progress.message = "Uploading at " + Placeholders.UPLOAD_RATE + " (" + Placeholders.PROGRESS + ")";
 
         // completed notification configuration
-        completed = new UploadNotificationStatusConfig("net.gotev.uploadservice");
+        completed = new UploadNotificationStatusConfig();
         completed.message = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
 
         // error notification configuration
-        error = new UploadNotificationStatusConfig("net.gotev.uploadservice");
+        error = new UploadNotificationStatusConfig();
         error.message = "Error during upload";
 
         // cancelled notification configuration
-        cancelled = new UploadNotificationStatusConfig("net.gotev.uploadservice");
+        cancelled = new UploadNotificationStatusConfig();
         cancelled.message = "Upload cancelled";
     }
 
@@ -90,6 +91,19 @@ public final class UploadNotificationConfig implements Parcelable {
         completed.iconColorResourceID = iconColorResourceID;
         error.iconColorResourceID = iconColorResourceID;
         cancelled.iconColorResourceID = iconColorResourceID;
+        return this;
+    }
+
+    /**
+     * Sets the same notification channel ID for all the notification statuses.
+     * @param notificationChannel Notification channel ID
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setNotificationChannelForAllStatuses(@NonNull String notificationChannel) {
+        progress.notificationChannel = notificationChannel;
+        completed.notificationChannel = notificationChannel;
+        error.notificationChannel = notificationChannel;
+        cancelled.notificationChannel = notificationChannel;
         return this;
     }
 
