@@ -30,6 +30,7 @@ Apps and libraries powered by this library. To be included in the following list
 
 - [crystal.io](https://play.google.com/store/apps/details?id=net.igenius.crystal)
 - [Fliiby](https://play.google.com/store/apps/details?id=flii.by.app)
+- [Vydia](https://play.google.com/store/apps/details?id=com.vydia.app)
 - [React Native Background Upload](https://github.com/Vydia/react-native-background-upload)
 - [Background Upload Plugin for Cordova](https://www.npmjs.com/package/cordova-plugin-background-upload)
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
