@@ -98,7 +98,7 @@ public class UploadNotificationStatusConfig implements Parcelable {
         dest.writeTypedList(this.actions);
     }
 
-    public UploadNotificationStatusConfig() {
+    public UploadNotificationStatusConfig(){
     }
 
     protected UploadNotificationStatusConfig(Parcel in) {

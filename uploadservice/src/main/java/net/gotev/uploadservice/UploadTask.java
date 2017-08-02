@@ -1,10 +1,12 @@
 package net.gotev.uploadservice;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 
@@ -115,6 +117,16 @@ public abstract class UploadTask implements Runnable {
      */
     protected void init(UploadService service, Intent intent) throws IOException {
         this.notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String notificationChannelId = params.notificationConfig.getNotificationChannelId();
+            if (notificationChannelId == null) {
+                notificationChannelId = UploadService.NAMESPACE;
+            }
+            if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
+                NotificationChannel channel = new NotificationChannel(notificationChannelId, "Upload Service channel", NotificationManager.IMPORTANCE_DEFAULT);
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
         this.service = service;
         this.mainThreadHandler = new Handler(service.getMainLooper());
         this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS);
@@ -430,7 +442,7 @@ public abstract class UploadTask implements Runnable {
 
         UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(service)
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
                 .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
@@ -462,7 +474,7 @@ public abstract class UploadTask implements Runnable {
 
         UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(service)
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
                 .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
@@ -501,7 +513,7 @@ public abstract class UploadTask implements Runnable {
         if (statusConfig.message == null) return;
 
         if (!statusConfig.autoClear) {
-            NotificationCompat.Builder notification = new NotificationCompat.Builder(service)
+            NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
                     .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                     .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                     .setContentIntent(statusConfig.getClickIntent(service))
