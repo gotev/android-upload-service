@@ -3,7 +3,7 @@ apply plugin: 'android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 def sdkVersion = 25;
-def libraryVersion = "3.3"
+def libraryVersion = "3.3.1"
 
 android {
     compileSdkVersion sdkVersion
@@ -13,7 +13,7 @@ android {
         applicationId "net.gotev.uploadservicedemo"
         minSdkVersion 16
         targetSdkVersion sdkVersion
-        versionCode 18
+        versionCode 19
         versionName libraryVersion
     }
     buildTypes {
