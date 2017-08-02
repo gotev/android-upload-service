@@ -1,6 +1,7 @@
 package net.gotev.uploadservicedemo;
 
 import android.app.Application;
+import android.os.StrictMode;
 import android.util.Log;
 
 import com.facebook.stetho.Stetho;
@@ -36,6 +37,8 @@ public class App extends Application {
                             .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                             .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
                             .build());
+
+            enableStrictMode();
         }
 
         // Set your application namespace to avoid conflicts with other apps
@@ -92,5 +95,16 @@ public class App extends Application {
 
                 .cache(null)
                 .build();
+    }
+
+    private void enableStrictMode() {
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .penaltyDialog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll()
+                .penaltyLog()
+                .build());
     }
 }

@@ -5,7 +5,6 @@ import android.content.Intent;
 import net.gotev.uploadservice.http.BodyWriter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
@@ -139,9 +138,7 @@ public class MultipartUploadTask extends HttpUploadTask {
             uploadedBytes += boundaryBytes.length + headerBytes.length;
             broadcastProgress(uploadedBytes, totalBytes);
 
-            final InputStream stream = file.getStream(service);
-            bodyWriter.writeStream(stream, this);
-            stream.close();
+            bodyWriter.writeStream(file.getStream(service), this);
             bodyWriter.write(NEW_LINE.getBytes(charset));
         }
     }
