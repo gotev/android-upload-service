@@ -1,13 +1,11 @@
-Be sure to check [Asking for help](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help) page on the Wiki before opening a new issue! Delete this text when you create a new issue.
+### What did you expect?
+
+### What happened instead?
 
 ### Version info
 * Android Upload Service version:
 * Android version and API version:
 * HTTP stack (e.g. HurlStack or OkHttpStack):
-
-### What did you expect?
-
-### What happened instead?
 
 ### Steps to reproduce (if applicable):
 
