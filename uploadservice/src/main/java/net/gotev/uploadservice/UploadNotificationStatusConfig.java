@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
@@ -17,11 +16,6 @@ import java.util.ArrayList;
 
 public class UploadNotificationStatusConfig implements Parcelable {
 
-    /**
-     * Notification channel ID
-     */
-    @NonNull
-    public String notificationChannelId;
     /**
      * Notification title.
      */
@@ -93,7 +87,6 @@ public class UploadNotificationStatusConfig implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.notificationChannelId);
         dest.writeString(this.title);
         dest.writeString(this.message);
         dest.writeByte(this.autoClear ? (byte) 1 : (byte) 0);
@@ -106,11 +99,9 @@ public class UploadNotificationStatusConfig implements Parcelable {
     }
 
     public UploadNotificationStatusConfig(){
-        this.notificationChannelId = UploadService.NAMESPACE;
     }
 
     protected UploadNotificationStatusConfig(Parcel in) {
-        this.notificationChannelId = in.readString();
         this.title = in.readString();
         this.message = in.readString();
         this.autoClear = in.readByte() != 0;
