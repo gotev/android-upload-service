@@ -25,10 +25,14 @@ Android Upload Service
 
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
 
-## Apps powered by Android Upload Service <a name="powered"></a>
-To be included in the following list, simply create an issue and provide the app name and a link.
+## Powered by Android Upload Service <a name="powered"></a>
+Apps and libraries powered by this library. To be included in the following list, simply create an issue and provide the app name and a link.
 
 - [crystal.io](https://play.google.com/store/apps/details?id=net.igenius.crystal)
+- [Fliiby](https://play.google.com/store/apps/details?id=flii.by.app)
+- [Vydia](https://play.google.com/store/apps/details?id=com.vydia.app)
+- [React Native Background Upload](https://github.com/Vydia/react-native-background-upload)
+- [Background Upload Plugin for Cordova](https://www.npmjs.com/package/cordova-plugin-background-upload)
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
 - [Motolife](https://play.google.com/store/apps/details?id=bg.motolife.app)
 - [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
