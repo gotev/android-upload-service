@@ -8,7 +8,7 @@ Android Upload Service
 
 | :information_source: | [Get started!](https://github.com/gotev/android-upload-service/wiki/Setup) |
 |--|--|
-| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.3/uploadservice-demo-debug.apk)|
+| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.3.1/uploadservice-demo-debug.apk)|
 
 ## Features
 * tiny library
