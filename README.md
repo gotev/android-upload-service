@@ -28,6 +28,7 @@ At the core of the library there is a `Service` which handles multiple concurren
 Apps and libraries powered by this library. To be included in the following list, simply create an issue and provide the app name and a link.
 
 - [JIRA Cloud](https://play.google.com/store/apps/details?id=com.atlassian.android.jira.core)
+- [Quora](https://play.google.com/store/apps/details?id=com.quora.android)
 - [crystal.io](https://play.google.com/store/apps/details?id=net.igenius.crystal)
 - [Fliiby](https://play.google.com/store/apps/details?id=flii.by.app)
 - [Vydia](https://play.google.com/store/apps/details?id=com.vydia.app)
