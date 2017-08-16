@@ -117,19 +117,24 @@ public abstract class UploadTask implements Runnable {
      */
     protected void init(UploadService service, Intent intent) throws IOException {
         this.notificationManager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
+        this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS);
+        this.service = service;
+        this.mainThreadHandler = new Handler(service.getMainLooper());
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String notificationChannelId = params.notificationConfig.getNotificationChannelId();
+
             if (notificationChannelId == null) {
+                params.notificationConfig.setNotificationChannelId(UploadService.NAMESPACE);
                 notificationChannelId = UploadService.NAMESPACE;
             }
+
             if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
-                NotificationChannel channel = new NotificationChannel(notificationChannelId, "Upload Service channel", NotificationManager.IMPORTANCE_DEFAULT);
+                NotificationChannel channel = new NotificationChannel(notificationChannelId, "Upload Service channel", NotificationManager.IMPORTANCE_HIGH);
                 notificationManager.createNotificationChannel(channel);
             }
         }
-        this.service = service;
-        this.mainThreadHandler = new Handler(service.getMainLooper());
-        this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS);
+
     }
 
     @Override

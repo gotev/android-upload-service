@@ -38,7 +38,7 @@ public class App extends Application {
                             .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
                             .build());
 
-            enableStrictMode();
+            //enableStrictMode();
         }
 
         // Set your application namespace to avoid conflicts with other apps
