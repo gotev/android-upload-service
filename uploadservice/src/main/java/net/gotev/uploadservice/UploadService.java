@@ -244,6 +244,10 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
+        if ("net.gotev".equals(NAMESPACE)) {
+            throw new IllegalArgumentException("Hey dude, please set the namespace for your app by following the setup instructions: https://github.com/gotev/android-upload-service/wiki/Setup");
+        }
+
         Logger.info(TAG, String.format(Locale.getDefault(), "Starting service with namespace: %s, " +
                 "upload pool size: %d, %ds idle thread keep alive time. Foreground execution is %s",
                 NAMESPACE, UPLOAD_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECONDS,
