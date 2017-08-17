@@ -21,13 +21,13 @@
                 android:resource="@xml/nnf_provider_paths" />
         </provider>
 
-        <receiver android:name=".events.UploadReceiver">
+        <receiver android:name=".events.UploadReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="net.gotev.uploadservicedemo.uploadservice.broadcast.status" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".events.NotificationActionsReceiver">
+        <receiver android:name=".events.NotificationActionsReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="net.gotev.uploadservicedemo.notification.action" />
             </intent-filter>
