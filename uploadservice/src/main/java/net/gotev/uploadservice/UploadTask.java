@@ -68,6 +68,7 @@ public abstract class UploadTask implements Runnable {
     private long lastProgressNotificationTime;
     private NotificationManager notificationManager;
     private Handler mainThreadHandler;
+    private long notificationCreationTimeMillis;
 
     /**
      * Total bytes to transfer. You should initialize this value in the
@@ -447,8 +448,10 @@ public abstract class UploadTask implements Runnable {
         if (params.notificationConfig == null || params.notificationConfig.getProgress().message == null) return;
 
         UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
+        notificationCreationTimeMillis = System.currentTimeMillis();
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
+                .setWhen(notificationCreationTimeMillis)
                 .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
@@ -481,6 +484,7 @@ public abstract class UploadTask implements Runnable {
         UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
+                .setWhen(notificationCreationTimeMillis)
                 .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
@@ -520,6 +524,7 @@ public abstract class UploadTask implements Runnable {
 
         if (!statusConfig.autoClear) {
             NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
+                    .setWhen(notificationCreationTimeMillis)
                     .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                     .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                     .setContentIntent(statusConfig.getClickIntent(service))
