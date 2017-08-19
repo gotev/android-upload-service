@@ -524,7 +524,6 @@ public abstract class UploadTask implements Runnable {
 
         if (!statusConfig.autoClear) {
             NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
-                    .setWhen(notificationCreationTimeMillis)
                     .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                     .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                     .setContentIntent(statusConfig.getClickIntent(service))
