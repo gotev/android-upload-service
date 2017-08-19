@@ -70,6 +70,11 @@ public abstract class UploadTask implements Runnable {
     private Handler mainThreadHandler;
 
     /**
+     * Save the NotificationBuilder to avoid create it repeatly
+     */
+    private NotificationCompat.Builder progressNotificationBuilder = null;
+
+    /**
      * Total bytes to transfer. You should initialize this value in the
      * {@link UploadTask#upload()} method of your subclasses, before starting the upload data
      * transfer.
@@ -448,7 +453,7 @@ public abstract class UploadTask implements Runnable {
 
         UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
+        progressNotificationBuilder = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
                 .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
@@ -459,9 +464,9 @@ public abstract class UploadTask implements Runnable {
                 .setProgress(100, 0, true)
                 .setOngoing(true);
 
-        statusConfig.addActionsToNotificationBuilder(notification);
+        statusConfig.addActionsToNotificationBuilder(progressNotificationBuilder);
 
-        Notification builtNotification = notification.build();
+        Notification builtNotification = progressNotificationBuilder.build();
 
         if (service.holdForegroundNotification(params.id, builtNotification)) {
             notificationManager.cancel(notificationId);
@@ -480,7 +485,7 @@ public abstract class UploadTask implements Runnable {
 
         UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
+        progressNotificationBuilder
                 .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
@@ -491,9 +496,9 @@ public abstract class UploadTask implements Runnable {
                 .setProgress((int)uploadInfo.getTotalBytes(), (int)uploadInfo.getUploadedBytes(), false)
                 .setOngoing(true);
 
-        statusConfig.addActionsToNotificationBuilder(notification);
+        statusConfig.addActionsToNotificationBuilder(progressNotificationBuilder);
 
-        Notification builtNotification = notification.build();
+        Notification builtNotification = progressNotificationBuilder.build();
 
         if (service.holdForegroundNotification(params.id, builtNotification)) {
             notificationManager.cancel(notificationId);
