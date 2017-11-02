@@ -170,7 +170,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         String remoteDestination = file.getProperty(PARAM_REMOTE_PATH);
 
         if (remoteDestination.startsWith(baseWorkingDir)) {
-            remoteDestination = remoteDestination.replace(baseWorkingDir, "");
+            remoteDestination = remoteDestination.substring(baseWorkingDir.length());
         }
 
         makeDirectories(remoteDestination, ftpParams.createdDirectoriesPermissions);
