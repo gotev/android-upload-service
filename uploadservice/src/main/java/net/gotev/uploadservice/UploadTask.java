@@ -218,7 +218,7 @@ public abstract class UploadTask implements Runnable {
     protected final void broadcastProgress(final long uploadedBytes, final long totalBytes) {
 
         long currentTime = System.currentTimeMillis();
-        if (currentTime < lastProgressNotificationTime + UploadService.PROGRESS_REPORT_INTERVAL) {
+        if (uploadedBytes < totalBytes && currentTime < lastProgressNotificationTime + UploadService.PROGRESS_REPORT_INTERVAL) {
             return;
         }
 
