@@ -56,15 +56,14 @@ public abstract class HttpUploadTask extends UploadTask
         getSuccessfullyUploadedFiles().clear();
         totalBytes = getBodyLength();
 
-<<<<<<< HEAD
         if (params.isChunkUpload()) {
-            UploadFile currentFile = params.getFiles().get(0);
+            UploadFile currentFile = params.files.get(0);
             currentFile.generateChunk();
             UploadFile currentChunk = currentFile.getCurrentChunk();
             if (currentChunk != null) {
                 uploadedBytes = currentChunk.getStartByte();
                 final String contentRange = Long.toString(currentChunk.getStartByte()) + "-" + Long.toString(currentChunk.getEndByte()) + "/" + currentFile.length(service);
-                httpParams.addRequestHeader("Content-Range", contentRange);
+                httpParams.addHeader("Content-Range", contentRange);
 
                 Logger.debug(LOG_TAG, "Starting chunk " + contentRange);
 
@@ -73,7 +72,7 @@ public abstract class HttpUploadTask extends UploadTask
                 if (shouldContinue) {
                     long endByte = currentChunk.getEndByte() + 1;
                     Logger.debug(LOG_TAG, "Setting next chunk start point: " + Long.toString(endByte));
-                    params.getFiles().get(0).setStartByte(endByte);
+                    params.files.get(0).setStartByte(endByte);
 
                     broadcastChunkCompleted(response);
 
@@ -107,7 +106,7 @@ public abstract class HttpUploadTask extends UploadTask
             Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
                             + " to upload with ID: " + params.id);
 >>>>>>> cb2259d47968c85462c0c5990cd091d6ec112d47
-/*
+*/
 
             // Broadcast completion only if the user has not cancelled the operation.
             // It may happen that when the body is not completely written and the client
@@ -148,17 +147,17 @@ public abstract class HttpUploadTask extends UploadTask
      */
     protected ServerResponse startRequest(HttpUploadTaskParameters httpParams, long totalBytes) throws IOException {
         if (httpParams.isCustomUserAgentDefined()) {
-            httpParams.addRequestHeader("User-Agent", httpParams.getCustomUserAgent());
+            httpParams.addHeader("User-Agent", httpParams.customUserAgent);
         }
 
         connection = UploadService.HTTP_STACK
-                .createNewConnection(httpParams.getMethod(), params.getServerUrl())
+                .createNewConnection(httpParams.method, params.serverUrl)
                 .setHeaders(httpParams.getRequestHeaders())
-                .setTotalBodyBytes(totalBytes, httpParams.isUsesFixedLengthStreamingMode());
+                .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode);
 
         final ServerResponse response = connection.getResponse(this);
         Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
-                + " to upload with ID: " + params.getId());
+                + " to upload with ID: " + params.id);
 
         return response;
     }

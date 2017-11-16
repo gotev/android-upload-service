@@ -338,7 +338,7 @@ public abstract class UploadTask implements Runnable {
     protected final void broadcastChunkCompleted(final ServerResponse response) {
 
         boolean successfulUpload = ((response.getHttpCode() / 100) == 2);
-        final UploadFile currentFile = params.getFiles().get(0);
+        final UploadFile currentFile = params.files.get(0);
         uploadedBytes = currentFile.getStartByte();
 
         if (successfulUpload) {
@@ -351,14 +351,14 @@ public abstract class UploadTask implements Runnable {
             }
         }
 
-        Logger.debug(LOG_TAG, "Broadcasting upload chunk completed for " + params.getId());
+        Logger.debug(LOG_TAG, "Broadcasting upload chunk completed for " + params.id);
 
-        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
+        final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
                 currentFile.length(service), (attempts - 1),
                 successfullyUploadedFiles,
-                params.getFiles().size() + successfullyUploadedFiles.size());
+                pathStringListFrom(params.files));
 
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
         if (delegate != null) {
             mainThreadHandler.post(new Runnable() {
                 @Override
