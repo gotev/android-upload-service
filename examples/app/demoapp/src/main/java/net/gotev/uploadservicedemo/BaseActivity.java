@@ -1,5 +1,6 @@
 package net.gotev.uploadservicedemo;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -10,7 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import net.gotev.uploadservice.UploadNotificationAction;
 import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservicedemo.events.NotificationActions;
 
 import butterknife.ButterKnife;
 
@@ -38,24 +41,38 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected UploadNotificationConfig getNotificationConfig(@StringRes int title) {
-        return new UploadNotificationConfig()
-                .setIcon(R.drawable.ic_upload)
-                .setCompletedIcon(R.drawable.ic_upload_success)
-                .setErrorIcon(R.drawable.ic_upload_error)
-                .setCancelledIcon(R.drawable.ic_cancelled)
-                .setIconColor(Color.BLUE)
-                .setCompletedIconColor(Color.GREEN)
-                .setErrorIconColor(Color.RED)
-                .setCancelledIconColor(Color.YELLOW)
-                .setTitle(getString(title))
-                .setInProgressMessage(getString(R.string.uploading))
-                .setCompletedMessage(getString(R.string.upload_success))
-                .setErrorMessage(getString(R.string.upload_error))
-                .setCancelledMessage(getString(R.string.upload_cancelled))
-                .setClickIntent(new Intent(this, MainActivity.class))
-                .setClearOnAction(true)
-                .setRingToneEnabled(true);
+    protected UploadNotificationConfig getNotificationConfig(final String uploadId, @StringRes int title) {
+        UploadNotificationConfig config = new UploadNotificationConfig();
+
+        PendingIntent clickIntent = PendingIntent.getActivity(
+                this, 1, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        config.setTitleForAllStatuses(getString(title))
+                .setRingToneEnabled(true)
+                .setClickIntentForAllStatuses(clickIntent)
+                .setClearOnActionForAllStatuses(true);
+
+        config.getProgress().message = getString(R.string.uploading);
+        config.getProgress().iconResourceID = R.drawable.ic_upload;
+        config.getProgress().iconColorResourceID = Color.BLUE;
+        config.getProgress().actions.add(new UploadNotificationAction(
+                R.drawable.ic_cancelled,
+                getString(R.string.cancel_upload),
+                NotificationActions.getCancelUploadAction(this, 1, uploadId)));
+
+        config.getCompleted().message = getString(R.string.upload_success);
+        config.getCompleted().iconResourceID = R.drawable.ic_upload_success;
+        config.getCompleted().iconColorResourceID = Color.GREEN;
+
+        config.getError().message = getString(R.string.upload_error);
+        config.getError().iconResourceID = R.drawable.ic_upload_error;
+        config.getError().iconColorResourceID = Color.RED;
+
+        config.getCancelled().message = getString(R.string.upload_cancelled);
+        config.getCancelled().iconResourceID = R.drawable.ic_cancelled;
+        config.getCancelled().iconColorResourceID = Color.YELLOW;
+
+        return config;
     }
 
     protected void openBrowser(String url) {

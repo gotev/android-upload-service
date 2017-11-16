@@ -46,15 +46,16 @@ public class Issue226 implements Runnable {
         final String endpoint = "http://posttestserver.com/post.php";
         final int maxRetries = 2;
 
-        final UploadNotificationConfig notificationConfig = new UploadNotificationConfig()
-                .setAutoClearOnCancel(false)
-                .setAutoClearOnSuccess(true);
+        final UploadNotificationConfig notificationConfig = new UploadNotificationConfig();
+
+        notificationConfig.getCancelled().autoClear = false;
+        notificationConfig.getCompleted().autoClear = true;
 
         try {
             final String fatherId = "father " + requestNumber + "/" + totalRequests + "-" + Long.toString(System.nanoTime());
             new MultipartUploadRequest(ctx, fatherId, endpoint)
                     .setMethod("POST")
-                    .setNotificationConfig(notificationConfig.setTitle(fatherId))
+                    .setNotificationConfig(notificationConfig.setTitleForAllStatuses(fatherId))
                     .addParameter("color", "#ffffff")
                     .setMaxRetries(maxRetries)
                     .setDelegate(new UploadStatusDelegate() {
@@ -64,7 +65,7 @@ public class Issue226 implements Runnable {
                         }
 
                         @Override
-                        public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
 
                         }
 
@@ -93,7 +94,7 @@ public class Issue226 implements Runnable {
             String childId = fatherId + " -> child" + Long.toString(System.nanoTime());
             new MultipartUploadRequest(context, childId, endpoint)
                     .setMethod("POST")
-                    .setNotificationConfig(notificationConfig.setTitle(childId))
+                    .setNotificationConfig(notificationConfig.setTitleForAllStatuses(childId))
                     .addParameter("color", "#ffffff")
                     .addParameter("test", "value")
                     .addParameter("new", "parameter")
@@ -105,7 +106,7 @@ public class Issue226 implements Runnable {
                         }
 
                         @Override
-                        public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
 
                         }
 

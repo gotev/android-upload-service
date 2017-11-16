@@ -36,13 +36,13 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
         throws MalformedURLException, IllegalArgumentException{
         super(context, uploadId, serverUrl);
 
-        if (!params.getServerUrl().startsWith("http://")
-                && !params.getServerUrl().startsWith("https://")) {
+        if (!params.serverUrl.startsWith("http://")
+                && !params.serverUrl.startsWith("https://")) {
             throw new IllegalArgumentException("Specify either http:// or https:// as protocol");
         }
 
         // Check if the URL is valid
-        new URL(params.getServerUrl());
+        new URL(params.serverUrl);
     }
 
     @Override
@@ -59,7 +59,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      * @return self instance
      */
     public B addHeader(final String headerName, final String headerValue) {
-        httpParams.addRequestHeader(headerName, headerValue);
+        httpParams.addHeader(headerName, headerValue);
         return self();
     }
 
@@ -71,7 +71,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      */
     public B setBasicAuth(final String username, final String password) {
         String auth = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
-        httpParams.addRequestHeader("Authorization", "Basic " + auth);
+        httpParams.addHeader("Authorization", "Basic " + auth);
         return self();
     }
 
@@ -83,7 +83,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      * @return self instance
      */
     public B addParameter(final String paramName, final String paramValue) {
-        httpParams.addRequestParameter(paramName, paramValue);
+        httpParams.addParameter(paramName, paramValue);
         return self();
     }
 
@@ -96,7 +96,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      */
     public B addArrayParameter(final String paramName, final String... array) {
         for (String value : array) {
-            httpParams.addRequestParameter(paramName, value);
+            httpParams.addParameter(paramName, value);
         }
         return self();
     }
@@ -110,7 +110,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      */
     public B addArrayParameter(final String paramName, final List<String> list) {
         for (String value : list) {
-            httpParams.addRequestParameter(paramName, value);
+            httpParams.addParameter(paramName, value);
         }
         return self();
     }
@@ -122,7 +122,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      * @return self instance
      */
     public B setMethod(final String method) {
-        httpParams.setMethod(method);
+        httpParams.method = method;
         return self();
     }
 
@@ -135,7 +135,9 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      * @return self instance
      */
     public B setCustomUserAgent(String customUserAgent) {
-        httpParams.setCustomUserAgent(customUserAgent);
+        if (customUserAgent != null && !customUserAgent.isEmpty()) {
+            httpParams.customUserAgent = customUserAgent;
+        }
         return self();
     }
 
@@ -149,7 +151,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      * @return self instance
      */
     public B setUsesFixedLengthStreamingMode(boolean fixedLength) {
-        httpParams.setUsesFixedLengthStreamingMode(fixedLength);
+        httpParams.usesFixedLengthStreamingMode = fixedLength;
         return self();
     }
 }

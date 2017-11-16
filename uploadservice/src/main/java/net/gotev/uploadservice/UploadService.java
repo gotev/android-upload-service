@@ -2,6 +2,7 @@ package net.gotev.uploadservice;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -9,11 +10,14 @@ import android.os.PowerManager;
 import net.gotev.uploadservice.http.HttpStack;
 import net.gotev.uploadservice.http.impl.HurlStack;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,7 +47,13 @@ public final class UploadService extends Service {
      * When the number of threads is greater than UPLOAD_POOL_SIZE, this is the maximum time that
      * excess idle threads will wait for new tasks before terminating.
      */
-    public static int KEEP_ALIVE_TIME_IN_SECONDS = 1;
+    public static int KEEP_ALIVE_TIME_IN_SECONDS = 5;
+
+    /**
+     * How many time to wait in idle (in milliseconds) before shutting down the service.
+     * The service is idle when is running, but no tasks are running.
+     */
+    public static int IDLE_TIMEOUT = 10 * 1000;
 
     /**
      * If set to true, the service will go in foreground mode when doing uploads,
@@ -85,12 +95,12 @@ public final class UploadService extends Service {
     public static int INITIAL_RETRY_WAIT_TIME = 1000;
 
     /**
-     * Sets the backoff timer multiplier. By default is set to 10, so every time that an upload
-     * fails, the time to wait between retries will be multiplied by 10.
-     * E.g. if the first time the wait time is 1s, the second time it will be 10s and the third
-     * time it will be 100s.
+     * Sets the backoff timer multiplier. By default is set to 2, so every time that an upload
+     * fails, the time to wait between retries will be multiplied by 2.
+     * E.g. if the first time the wait time is 1s, the second time it will be 2s and the third
+     * time it will be 4s.
      */
-    public static int BACKOFF_MULTIPLIER = 10;
+    public static int BACKOFF_MULTIPLIER = 2;
 
     /**
      * Sets the maximum time to wait in milliseconds between two upload attempts.
@@ -98,7 +108,7 @@ public final class UploadService extends Service {
      * {@link UploadService#BACKOFF_MULTIPLIER} and it's not convenient that the value grows
      * indefinitely.
      */
-    public static int MAX_RETRY_WAIT_TIME = 10 * 60 * 1000;
+    public static int MAX_RETRY_WAIT_TIME = 10 * 10 * 1000;
     // end configurable values
 
     protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
@@ -123,10 +133,11 @@ public final class UploadService extends Service {
     private PowerManager.WakeLock wakeLock;
     private int notificationIncrementalId = 0;
     private static final Map<String, UploadTask> uploadTasksMap = new ConcurrentHashMap<>();
-    private static final Map<String, UploadStatusDelegate> uploadDelegates = new ConcurrentHashMap<>();
+    private static final Map<String, WeakReference<UploadStatusDelegate>> uploadDelegates = new ConcurrentHashMap<>();
     private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
     private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
+    private Timer idleTimer = null;
 
     protected static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
@@ -181,6 +192,28 @@ public final class UploadService extends Service {
         }
     }
 
+    /**
+     * Stops the service if no upload tasks are currently running
+     * @param context application context
+     * @return true if the service is getting stopped, false otherwise
+     */
+    public static synchronized boolean stop(final Context context) {
+        return stop(context, false);
+    }
+
+    /**
+     * Stops the service.
+     * @param context application context
+     * @param forceStop stops the service no matter if some tasks are running
+     * @return true if the service is getting stopped, false otherwise
+     */
+    public static synchronized boolean stop(final Context context, boolean forceStop) {
+        if (forceStop) {
+            return context.stopService(new Intent(context, UploadService.class));
+        }
+        return uploadTasksMap.isEmpty() && context.stopService(new Intent(context, UploadService.class));
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -216,6 +249,10 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
+        if ("net.gotev".equals(NAMESPACE)) {
+            throw new IllegalArgumentException("Hey dude, please set the namespace for your app by following the setup instructions: https://github.com/gotev/android-upload-service/wiki/Setup");
+        }
+
         Logger.info(TAG, String.format(Locale.getDefault(), "Starting service with namespace: %s, " +
                 "upload pool size: %d, %ds idle thread keep alive time. Foreground execution is %s",
                 NAMESPACE, UPLOAD_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECONDS,
@@ -227,11 +264,13 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
-        if (uploadTasksMap.containsKey(currentTask.params.getId())) {
-            Logger.error(TAG, "Preventing upload with id: " + currentTask.params.getId()
+        if (uploadTasksMap.containsKey(currentTask.params.id)) {
+            Logger.error(TAG, "Preventing upload with id: " + currentTask.params.id
                     + " to be uploaded twice! Please check your code and fix it!");
             return shutdownIfThereArentAnyActiveTasks();
         }
+
+        clearIdleTimer();
 
         // increment by 2 because the notificationIncrementalId + 1 is used internally
         // in each UploadTask. Check its sources for more info about this.
@@ -239,15 +278,35 @@ public final class UploadService extends Service {
         currentTask.setLastProgressNotificationTime(0)
                    .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
 
-        uploadTasksMap.put(currentTask.params.getId(), currentTask);
+        uploadTasksMap.put(currentTask.params.id, currentTask);
         uploadThreadPool.execute(currentTask);
 
         return START_STICKY;
     }
 
+    private void clearIdleTimer() {
+        if (idleTimer != null) {
+            Logger.info(TAG, "Clearing idle timer");
+            idleTimer.cancel();
+            idleTimer = null;
+        }
+    }
+
     private int shutdownIfThereArentAnyActiveTasks() {
         if (uploadTasksMap.isEmpty()) {
-            stopSelf();
+            clearIdleTimer();
+
+            Logger.info(TAG, "Service will be shut down in " + IDLE_TIMEOUT + "ms if no new tasks are received");
+            idleTimer = new Timer(TAG + "IdleTimer");
+            idleTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Logger.info(TAG, "Service is about to be stopped because idle timeout of "
+                            + IDLE_TIMEOUT + "ms has been reached");
+                    stopSelf();
+                }
+            }, IDLE_TIMEOUT);
+
             return START_NOT_STICKY;
         }
 
@@ -339,7 +398,7 @@ public final class UploadService extends Service {
         uploadDelegates.remove(uploadId);
 
         // un-hold foreground upload ID if it's been hold
-        if (EXECUTE_IN_FOREGROUND && task != null && task.params.getId().equals(foregroundUploadId)) {
+        if (EXECUTE_IN_FOREGROUND && task != null && task.params.id.equals(foregroundUploadId)) {
             Logger.debug(TAG, uploadId + " now un-holded the foreground notification");
             foregroundUploadId = null;
         }
@@ -347,6 +406,7 @@ public final class UploadService extends Service {
         if (EXECUTE_IN_FOREGROUND && uploadTasksMap.isEmpty()) {
             Logger.debug(TAG, "All tasks completed, stopping foreground execution");
             stopForeground(true);
+            shutdownIfThereArentAnyActiveTasks();
         }
     }
 
@@ -360,7 +420,7 @@ public final class UploadService extends Service {
         if (delegate == null)
             return;
 
-        uploadDelegates.put(uploadId, delegate);
+        uploadDelegates.put(uploadId, new WeakReference<>(delegate));
     }
 
     /**
@@ -370,6 +430,24 @@ public final class UploadService extends Service {
      * uploadId
      */
     protected static UploadStatusDelegate getUploadStatusDelegate(String uploadId) {
-        return uploadDelegates.get(uploadId);
+        WeakReference<UploadStatusDelegate> reference = uploadDelegates.get(uploadId);
+
+        if (reference == null)
+            return null;
+
+        UploadStatusDelegate delegate = reference.get();
+
+        if (delegate == null) {
+            uploadDelegates.remove(uploadId);
+            Logger.info(TAG, "\n\n\nUpload delegate for upload with Id " + uploadId + " is gone!\n" +
+                    "Probably you have set it in an activity and the user navigated away from it\n" +
+                    "before the upload was completed. From now on, the events will be dispatched\n" +
+                    "with broadcast intents. If you see this message, consider switching to the\n" +
+                    "UploadServiceBroadcastReceiver registered globally in your manifest.\n" +
+                    "Read this:\n" +
+                    "https://github.com/gotev/android-upload-service/wiki/Monitoring-upload-status\n");
+        }
+
+        return delegate;
     }
 }

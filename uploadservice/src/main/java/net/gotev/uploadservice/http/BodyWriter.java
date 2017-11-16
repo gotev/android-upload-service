@@ -32,7 +32,8 @@ public abstract class BodyWriter {
     }
 
     /**
-     * Writes an input stream to the request body
+     * Writes an input stream to the request body.
+     * The stream will be automatically closed after successful write or if an exception is thrown.
      * @param stream input stream from which to read
      * @param listener listener which gets notified when bytes are written and which controls if
      *                 the transfer should continue
@@ -45,10 +46,14 @@ public abstract class BodyWriter {
         byte[] buffer = new byte[UploadService.BUFFER_SIZE];
         int bytesRead;
 
-        while (listener.shouldContinueWriting() && (bytesRead = stream.read(buffer, 0, buffer.length)) > 0) {
-            write(buffer, bytesRead);
-            flush();
-            listener.onBytesWritten(bytesRead);
+        try {
+            while (listener.shouldContinueWriting() && (bytesRead = stream.read(buffer, 0, buffer.length)) > 0) {
+                write(buffer, bytesRead);
+                flush();
+                listener.onBytesWritten(bytesRead);
+            }
+        } finally {
+            stream.close();
         }
     }
 

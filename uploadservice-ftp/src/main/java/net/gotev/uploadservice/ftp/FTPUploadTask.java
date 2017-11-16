@@ -44,17 +44,17 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     @Override
     protected void upload() throws Exception {
         try {
-            if (ftpParams.isUseSSL()) {
-                String secureProtocol = ftpParams.getSecureSocketProtocol();
+            if (ftpParams.useSSL) {
+                String secureProtocol = ftpParams.secureSocketProtocol;
 
                 if (secureProtocol == null || secureProtocol.isEmpty())
                     secureProtocol = FTPUploadTaskParameters.DEFAULT_SECURE_SOCKET_PROTOCOL;
 
-                ftpClient = new FTPSClient(secureProtocol, ftpParams.isImplicitSecurity());
+                ftpClient = new FTPSClient(secureProtocol, ftpParams.implicitSecurity);
 
                 Logger.debug(LOG_TAG, "Created FTP over SSL (FTPS) client with "
                         + secureProtocol + " protocol and "
-                        + (ftpParams.isImplicitSecurity() ? "implicit security" : "explicit security"));
+                        + (ftpParams.implicitSecurity ? "implicit security" : "explicit security"));
 
             } else {
                 ftpClient = new FTPClient();
@@ -62,43 +62,43 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
             ftpClient.setBufferSize(UploadService.BUFFER_SIZE);
             ftpClient.setCopyStreamListener(this);
-            ftpClient.setDefaultTimeout(ftpParams.getConnectTimeout());
-            ftpClient.setConnectTimeout(ftpParams.getConnectTimeout());
+            ftpClient.setDefaultTimeout(ftpParams.connectTimeout);
+            ftpClient.setConnectTimeout(ftpParams.connectTimeout);
             ftpClient.setAutodetectUTF8(true);
 
-            Logger.debug(LOG_TAG, "Connect timeout set to " + ftpParams.getConnectTimeout() + "ms");
+            Logger.debug(LOG_TAG, "Connect timeout set to " + ftpParams.connectTimeout + "ms");
 
-            Logger.debug(LOG_TAG, "Connecting to " + params.getServerUrl()
-                                  + ":" + ftpParams.getPort() + " as " + ftpParams.getUsername());
-            ftpClient.connect(params.getServerUrl(), ftpParams.getPort());
+            Logger.debug(LOG_TAG, "Connecting to " + params.serverUrl
+                                  + ":" + ftpParams.port + " as " + ftpParams.username);
+            ftpClient.connect(params.serverUrl, ftpParams.port);
 
             if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
-                throw new Exception("Can't connect to " + params.getServerUrl()
-                                    + ":" + ftpParams.getPort()
+                throw new Exception("Can't connect to " + params.serverUrl
+                                    + ":" + ftpParams.port
                                     + ". The server response is: " + ftpClient.getReplyString());
             }
 
-            if (!ftpClient.login(ftpParams.getUsername(), ftpParams.getPassword())) {
-                throw new Exception("Error while performing login on " + params.getServerUrl()
-                                    + ":" + ftpParams.getPort()
-                                    + " with username: " + ftpParams.getUsername()
+            if (!ftpClient.login(ftpParams.username, ftpParams.password)) {
+                throw new Exception("Error while performing login on " + params.serverUrl
+                                    + ":" + ftpParams.port
+                                    + " with username: " + ftpParams.username
                                     + ". Check your credentials and try again.");
             }
 
             // to prevent the socket timeout on the control socket during file transfer,
             // set the control keep alive timeout to a half of the socket timeout
-            int controlKeepAliveTimeout = ftpParams.getSocketTimeout() / 2 / 1000;
+            int controlKeepAliveTimeout = ftpParams.socketTimeout / 2 / 1000;
 
-            ftpClient.setSoTimeout(ftpParams.getSocketTimeout());
+            ftpClient.setSoTimeout(ftpParams.socketTimeout);
             ftpClient.setControlKeepAliveTimeout(controlKeepAliveTimeout);
             ftpClient.setControlKeepAliveReplyTimeout(controlKeepAliveTimeout * 1000);
 
-            Logger.debug(LOG_TAG, "Socket timeout set to " + ftpParams.getSocketTimeout()
+            Logger.debug(LOG_TAG, "Socket timeout set to " + ftpParams.socketTimeout
                          + "ms. Enabled control keep alive every " + controlKeepAliveTimeout + "s");
 
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-            ftpClient.setFileTransferMode(ftpParams.isCompressedFileTransfer() ?
+            ftpClient.setFileTransferMode(ftpParams.compressedFileTransfer ?
                                           FTP.COMPRESSED_TRANSFER_MODE : FTP.STREAM_TRANSFER_MODE);
 
             // this is needed to calculate the total bytes and the uploaded bytes, because if the
@@ -110,7 +110,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             String baseWorkingDir = ftpClient.printWorkingDirectory();
             Logger.debug(LOG_TAG, "FTP default working directory is: " + baseWorkingDir);
 
-            Iterator<UploadFile> iterator = params.getFiles().iterator();
+            Iterator<UploadFile> iterator = params.files.iterator();
             while (iterator.hasNext()) {
                 UploadFile file = iterator.next();
 
@@ -118,7 +118,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
                     break;
 
                 uploadFile(baseWorkingDir, file);
-                addSuccessfullyUploadedFile(file.getName(service));
+                addSuccessfullyUploadedFile(file);
                 iterator.remove();
             }
 
@@ -132,12 +132,12 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             if (ftpClient.isConnected()) {
                 try {
                     Logger.debug(LOG_TAG, "Logout and disconnect from FTP server: "
-                                          + params.getServerUrl() + ":" + ftpParams.getPort());
+                                          + params.serverUrl + ":" + ftpParams.port);
                     ftpClient.logout();
                     ftpClient.disconnect();
                 } catch (Exception exc) {
                     Logger.error(LOG_TAG, "Error while closing FTP connection to: "
-                                          + params.getServerUrl() + ":" + ftpParams.getPort(), exc);
+                                          + params.serverUrl + ":" + ftpParams.port, exc);
                 }
             }
             ftpClient = null;
@@ -158,7 +158,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
         totalBytes = uploadedBytes;
 
-        for (UploadFile file : params.getFiles()) {
+        for (UploadFile file : params.files) {
             totalBytes += file.length(service);
         }
     }
@@ -170,10 +170,10 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         String remoteDestination = file.getProperty(PARAM_REMOTE_PATH);
 
         if (remoteDestination.startsWith(baseWorkingDir)) {
-            remoteDestination = remoteDestination.replace(baseWorkingDir, "");
+            remoteDestination = remoteDestination.substring(baseWorkingDir.length());
         }
 
-        makeDirectories(remoteDestination, ftpParams.getCreatedDirectoriesPermissions());
+        makeDirectories(remoteDestination, ftpParams.createdDirectoriesPermissions);
 
         InputStream localStream = file.getStream(service);
         try {

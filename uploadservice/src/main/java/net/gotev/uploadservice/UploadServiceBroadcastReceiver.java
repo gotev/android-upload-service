@@ -32,13 +32,19 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
             return;
         }
 
+        UploadInfo uploadInfo = data.getUploadInfo();
+
+        if (!shouldAcceptEventFrom(uploadInfo)) {
+            return;
+        }
+
         switch (data.getStatus()) {
             case ERROR:
-                onError(context, data.getUploadInfo(), data.getException());
+                onError(context, uploadInfo, data.getServerResponse(), data.getException());
                 break;
 
             case COMPLETED:
-                onCompleted(context, data.getUploadInfo(), data.getServerResponse());
+                onCompleted(context, uploadInfo, data.getServerResponse());
                 break;
 
             case CHUNK_COMPLETED:
@@ -46,16 +52,27 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
                 break;
 
             case IN_PROGRESS:
-                onProgress(context, data.getUploadInfo());
+                onProgress(context, uploadInfo);
                 break;
 
             case CANCELLED:
-                onCancelled(context, data.getUploadInfo());
+                onCancelled(context, uploadInfo);
                 break;
 
             default:
                 break;
         }
+    }
+
+    /**
+     * Method called every time a new event arrives from an upload task, to decide whether or not
+     * to process it. This is useful if you want to filter events based on custom business logic.
+     *
+     * @param uploadInfo upload info to
+     * @return true to accept the event, false to discard it
+     */
+    protected boolean shouldAcceptEventFrom(UploadInfo uploadInfo) {
+        return true;
     }
 
     /**
@@ -91,7 +108,8 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
     }
 
     @Override
-    public void onError(final Context context, final UploadInfo uploadInfo, final Exception exception) {
+    public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+
     }
 
     @Override

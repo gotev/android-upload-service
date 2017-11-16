@@ -2,18 +2,18 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
-def sdkVersion = 25;
-def libraryVersion = "3.2.4"
+def sdkVersion = 26;
+def libraryVersion = "3.4"
 
 android {
     compileSdkVersion sdkVersion
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '26.0.1'
 
     defaultConfig {
         applicationId "net.gotev.uploadservicedemo"
         minSdkVersion 16
         targetSdkVersion sdkVersion
-        versionCode 18
+        versionCode 20
         versionName libraryVersion
     }
     buildTypes {
@@ -29,7 +29,7 @@ repositories {
 }
 
 def butterKnifeVersion = "8.5.1"
-def supportVersion = "25.3.1"
+def supportVersion = "26.0.0"
 def stethoVersion = "1.4.2"
 
 dependencies {
@@ -39,7 +39,7 @@ dependencies {
     debugCompile "com.facebook.stetho:stetho:${stethoVersion}"
     debugCompile "com.facebook.stetho:stetho-okhttp3:${stethoVersion}"
     releaseCompile "net.igenius:stetho-no-op:1.1"
-    compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
 
     // Google support libraries
     compile "com.android.support:appcompat-v7:${supportVersion}"

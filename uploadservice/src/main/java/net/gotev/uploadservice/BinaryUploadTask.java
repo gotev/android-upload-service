@@ -15,7 +15,7 @@ public class BinaryUploadTask extends HttpUploadTask {
 
     @Override
     protected long getBodyLength() throws UnsupportedEncodingException {
-        return params.getFiles().get(0).length(service);
+        return params.files.get(0).length(service);
     }
 
     @Override
@@ -29,8 +29,7 @@ public class BinaryUploadTask extends HttpUploadTask {
 
     @Override
     protected void onSuccessfulUpload() {
-        addSuccessfullyUploadedFile(params.getFiles().get(0).getPath());
-        params.getFiles().clear();
+        addSuccessfullyUploadedFile(params.files.get(0));
     }
 
     @Override

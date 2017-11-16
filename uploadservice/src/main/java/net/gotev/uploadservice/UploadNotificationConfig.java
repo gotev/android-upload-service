@@ -1,11 +1,10 @@
 package net.gotev.uploadservice;
 
 import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.app.NotificationCompat;
+import android.support.annotation.NonNull;
 
 /**
  * Contains the configuration of the upload notification.
@@ -14,25 +13,17 @@ import android.support.v4.app.NotificationCompat;
  */
 public final class UploadNotificationConfig implements Parcelable {
 
-    private int iconResourceID;
-    private int completedIconResourceID;
-    private int errorIconResourceID;
-    private int cancelledIconResourceID;
-    private int iconColorResourceID;
-    private int completedIconColorResourceID;
-    private int errorIconColorResourceID;
-    private int cancelledIconColorResourceID;
-    private String title;
-    private String inProgress;
-    private String completed;
-    private String error;
-    private String cancelled;
-    private boolean autoClearOnSuccess;
-    private boolean autoClearOnError;
-    private boolean autoClearOnCancel;
-    private boolean clearOnAction;
     private boolean ringToneEnabled;
-    private Intent clickIntent;
+
+    /**
+     * Notification channel ID
+     */
+    private String notificationChannelId;
+
+    private UploadNotificationStatusConfig progress;
+    private UploadNotificationStatusConfig completed;
+    private UploadNotificationStatusConfig error;
+    private UploadNotificationStatusConfig cancelled;
 
     /**
      * Creates a new upload notification configuration with default settings:
@@ -48,217 +39,132 @@ public final class UploadNotificationConfig implements Parcelable {
      * </ul>
      */
     public UploadNotificationConfig() {
-        iconResourceID = android.R.drawable.ic_menu_upload;
-        completedIconResourceID = iconResourceID;
-        errorIconResourceID = iconResourceID;
-        cancelledIconResourceID = iconResourceID;
-        iconColorResourceID = NotificationCompat.COLOR_DEFAULT;
-        completedIconColorResourceID = iconColorResourceID;
-        errorIconColorResourceID = iconColorResourceID;
-        cancelledIconColorResourceID = iconColorResourceID;
-        title = "File Upload";
-        inProgress = "Uploading at " + Placeholders.UPLOAD_RATE + " (" + Placeholders.PROGRESS + ")";
-        completed = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
-        error = "Error during upload";
-        cancelled = "Upload cancelled";
-        autoClearOnSuccess = false;
-        autoClearOnError = false;
-        autoClearOnCancel = false;
-        clearOnAction = false;
-        clickIntent = null;
+
+        // common configuration for all the notification statuses
         ringToneEnabled = true;
+
+        // progress notification configuration
+        progress = new UploadNotificationStatusConfig();
+        progress.message = "Uploading at " + Placeholders.UPLOAD_RATE + " (" + Placeholders.PROGRESS + ")";
+
+        // completed notification configuration
+        completed = new UploadNotificationStatusConfig();
+        completed.message = "Upload completed successfully in " + Placeholders.ELAPSED_TIME;
+
+        // error notification configuration
+        error = new UploadNotificationStatusConfig();
+        error.message = "Error during upload";
+
+        // cancelled notification configuration
+        cancelled = new UploadNotificationStatusConfig();
+        cancelled.message = "Upload cancelled";
     }
 
     /**
-     * Sets the notification icon.
-     * @param resourceID Resource ID of the icon to use
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setIcon(int resourceID) {
-        this.iconResourceID = resourceID;
-        return this;
-    }
-
-    /**
-     * Sets the icon to show in the notification when the operation is completed successfully.
-     * By default it's the same as the icon used while the operation is in progress.
-     * @param resourceID Resource ID of the icon to use
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setCompletedIcon(int resourceID) {
-        completedIconResourceID = resourceID;
-        return this;
-    }
-
-    /**
-     * Sets the icon to show in the notification when an error happens.
-     * By default it's the same as the icon used while the operation is in progress.
-     * @param resourceID Resource ID of the icon to use
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setErrorIcon(int resourceID) {
-        errorIconResourceID = resourceID;
-        return this;
-    }
-
-    /**
-     * Sets the icon to show in the notification when the upload is cancelled.
-     * By default it's the same as the icon used while the operation is in progress.
-     * @param resourceID Resource ID of the icon to use
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setCancelledIcon(int resourceID) {
-        cancelledIconResourceID = resourceID;
-        return this;
-    }
-
-    /**
-     * Sets the notification icon color.
-     * @param resourceID Resource ID of the color to use
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setIconColor(int resourceID) {
-        this.iconColorResourceID = resourceID;
-        return this;
-    }
-
-    /**
-     * Sets the icon color to show in the notification when the operation is completed successfully.
-     * By default it's the same as the icon color used while the operation is in progress.
-     * @param resourceID Resource ID of the color to use
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setCompletedIconColor(int resourceID) {
-        this.completedIconColorResourceID = resourceID;
-        return this;
-    }
-
-    /**
-     * Sets the icon color to show in the notification when an error happens.
-     * By default it's the same as the icon color used while the operation is in progress.
-     * @param resourceID Resource ID of the color to use
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setErrorIconColor(int resourceID) {
-        this.errorIconColorResourceID = resourceID;
-        return this;
-    }
-
-    /**
-     * Sets the icon color to show in the notification when the upload is cancelled.
-     * By default it's the same as the icon color used while the operation is in progress.
-     * @param resourceID Resource ID of the color to use
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setCancelledIconColor(int resourceID) {
-        this.cancelledIconColorResourceID = resourceID;
-        return this;
-    }
-
-    /**
-     * Sets the notification title.
+     * Sets the notification title for all the notification statuses.
      * @param title Title to show in the notification icon
      * @return {@link UploadNotificationConfig}
      */
-    public final UploadNotificationConfig setTitle(String title) {
-        this.title = title;
+    public final UploadNotificationConfig setTitleForAllStatuses(String title) {
+        progress.title = title;
+        completed.title = title;
+        error.title = title;
+        cancelled.title = title;
         return this;
     }
 
     /**
-     * Sets the message to be shown while upload is in progress. Null if no message should be displayed.
-     * @param message Message to show
+     * Sets the same notification icon for all the notification statuses.
+     * @param resourceID Resource ID of the icon to use
      * @return {@link UploadNotificationConfig}
      */
-    public final UploadNotificationConfig setInProgressMessage(String message) {
-        inProgress = message;
+    public final UploadNotificationConfig setIconForAllStatuses(int resourceID) {
+        progress.iconResourceID = resourceID;
+        completed.iconResourceID = resourceID;
+        error.iconResourceID = resourceID;
+        cancelled.iconResourceID = resourceID;
         return this;
     }
 
     /**
-     * Sets the message to be shown if an error occurs. Null if no message should be displayed.
-     * @param message Message to show
+     * Sets the same notification icon for all the notification statuses.
+     * @param iconColorResourceID Resource ID of the color to use
      * @return {@link UploadNotificationConfig}
      */
-    public final UploadNotificationConfig setErrorMessage(String message) {
-        error = message;
+    public final UploadNotificationConfig setIconColorForAllStatuses(int iconColorResourceID) {
+        progress.iconColorResourceID = iconColorResourceID;
+        completed.iconColorResourceID = iconColorResourceID;
+        error.iconColorResourceID = iconColorResourceID;
+        cancelled.iconColorResourceID = iconColorResourceID;
         return this;
     }
 
     /**
-     * Sets the message to be shown when the upload is completed. Null if no message should be displayed.
-     * @param message Message to show
+     * Sets the same large notification icon for all the notification statuses.
+     * @param largeIcon Bitmap of the icon to use
      * @return {@link UploadNotificationConfig}
      */
-    public final UploadNotificationConfig setCompletedMessage(String message) {
-        completed = message;
+    public final UploadNotificationConfig setLargeIconForAllStatuses(Bitmap largeIcon) {
+        progress.largeIcon = largeIcon;
+        completed.largeIcon = largeIcon;
+        error.largeIcon = largeIcon;
+        cancelled.largeIcon = largeIcon;
         return this;
     }
 
     /**
-     * Sets the message to be shown when the upload is cancelled. Null if no message should be displayed.
-     * @param message Message to show
+     * Sets the same intent to be executed when the user taps on the notification
+     * for all the notification statuses.
+     *
+     * @param clickIntent {@link android.app.PendingIntent} containing the user's action
      * @return {@link UploadNotificationConfig}
      */
-    public final UploadNotificationConfig setCancelledMessage(String message) {
-        cancelled = message;
+    public final UploadNotificationConfig setClickIntentForAllStatuses(PendingIntent clickIntent) {
+        progress.clickIntent = clickIntent;
+        completed.clickIntent = clickIntent;
+        error.clickIntent = clickIntent;
+        cancelled.clickIntent = clickIntent;
         return this;
     }
 
     /**
-     * Sets whether or not to auto clear the notification when the upload is completed successfully.
-     * @param clear true to automatically clear the notification, otherwise false
+     * Adds the same notification action for all the notification statuses.
+     * So for example, if you want to have the same action while the notification is in progress,
+     * cancelled, completed or with an error, this method will save you lines of code.
+     *
+     * @param action {@link UploadNotificationAction} action to add
      * @return {@link UploadNotificationConfig}
      */
-    public final UploadNotificationConfig setAutoClearOnSuccess(boolean clear) {
-        autoClearOnSuccess = clear;
+    public final UploadNotificationConfig addActionForAllStatuses(UploadNotificationAction action) {
+        progress.actions.add(action);
+        completed.actions.add(action);
+        error.actions.add(action);
+        cancelled.actions.add(action);
         return this;
     }
 
     /**
-     * Sets whether or not to auto clear the notification when an error happens during upload.
-     * @param clear true to automatically clear the notification, otherwise false
+     * Sets whether or not to clear the notification when the user taps on it
+     * for all the notification statuses.
+     *
+     * This would not affect progress notification, as it's ongoing and managed by the upload
+     * service.
+     *
+     * @param clearOnAction true to clear the notification, otherwise false
      * @return {@link UploadNotificationConfig}
      */
-    public final UploadNotificationConfig setAutoClearOnError(boolean clear) {
-        autoClearOnError = clear;
-        return this;
-    }
-
-    /**
-     * Sets whether or not to auto clear the notification when the upload is cancelled.
-     * @param clear true to automatically clear the notification, otherwise false
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setAutoClearOnCancel(boolean clear) {
-        autoClearOnCancel = clear;
-        return this;
-    }
-
-    /**
-     * Sets whether or not to clear the notification when the user taps on it.
-     * @param clear true to clear the notification, otherwise false
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setClearOnAction(boolean clear) {
-        clearOnAction = clear;
-        return this;
-    }
-
-    /**
-     * Sets the intent to be executed when the user taps on the notification.
-     * @param clickIntent {@link android.content.Intent}.
-     *                    For example: new Intent(context, YourActivity.class)
-     * @return {@link UploadNotificationConfig}
-     */
-    public final UploadNotificationConfig setClickIntent(Intent clickIntent) {
-        this.clickIntent = clickIntent;
+    public final UploadNotificationConfig setClearOnActionForAllStatuses(boolean clearOnAction) {
+        progress.clearOnAction = clearOnAction;
+        completed.clearOnAction = clearOnAction;
+        error.clearOnAction = clearOnAction;
+        cancelled.clearOnAction = clearOnAction;
         return this;
     }
 
     /**
      * Sets whether or not to enable the notification sound when the upload gets completed with
-     * success or error
+     * success or error.
+     *
      * @param enabled true to enable the default ringtone
      * @return {@link UploadNotificationConfig}
      */
@@ -267,100 +173,40 @@ public final class UploadNotificationConfig implements Parcelable {
         return this;
     }
 
-    final int getIconResourceID() {
-        return iconResourceID;
+    /**
+     * Sets notification channel ID
+     *
+     * @param channelId notification channel ID
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setNotificationChannelId(@NonNull String channelId){
+        this.notificationChannelId = channelId;
+        return this;
     }
 
-    final int getCompletedIconResourceID() {
-        return completedIconResourceID;
-    }
-
-    final int getErrorIconResourceID() {
-        return errorIconResourceID;
-    }
-
-    final int getCancelledIconResourceID() {
-        return cancelledIconResourceID;
-    }
-
-    final int getIconColorResourceID() {
-        return iconColorResourceID;
-    }
-
-    final int getCompletedIconColorResourceID() {
-        return completedIconColorResourceID;
-    }
-
-    final int getErrorIconColorResourceID() {
-        return errorIconColorResourceID;
-    }
-
-    final int getCancelledIconColorResourceID() {
-        return cancelledIconColorResourceID;
-    }
-
-    final String getTitle() {
-        return title;
-    }
-
-    final String getInProgressMessage() {
-        return inProgress;
-    }
-
-    final String getCompletedMessage() {
-        return completed;
-    }
-
-    final String getErrorMessage() {
-        return error;
-    }
-
-    final String getCancelledMessage() {
-        return cancelled;
-    }
-
-    final boolean isAutoClearOnSuccess() {
-        return autoClearOnSuccess;
-    }
-
-    final boolean isAutoClearOnError() {
-        return autoClearOnError;
-    }
-
-    final boolean isAutoClearOnCancel() {
-        return autoClearOnCancel;
-    }
-
-    final boolean isClearOnAction() {
-        return clearOnAction;
-    }
-
-    final boolean isRingToneEnabled() {
+    public boolean isRingToneEnabled() {
         return ringToneEnabled;
     }
 
-    final PendingIntent getPendingIntent(Context context) {
-        if (clickIntent == null) {
-            return PendingIntent.getBroadcast(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
-        }
-
-        return PendingIntent.getActivity(context, 1, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    public UploadNotificationStatusConfig getProgress() {
+        return progress;
     }
 
-    // This is used to regenerate the object.
-    // All Parcelables must have a CREATOR that implements these two methods
-    public static final Parcelable.Creator<UploadNotificationConfig> CREATOR =
-            new Parcelable.Creator<UploadNotificationConfig>() {
-        @Override
-        public UploadNotificationConfig createFromParcel(final Parcel in) {
-            return new UploadNotificationConfig(in);
-        }
+    public UploadNotificationStatusConfig getCompleted() {
+        return completed;
+    }
 
-        @Override
-        public UploadNotificationConfig[] newArray(final int size) {
-            return new UploadNotificationConfig[size];
-        }
-    };
+    public UploadNotificationStatusConfig getError() {
+        return error;
+    }
+
+    public UploadNotificationStatusConfig getCancelled() {
+        return cancelled;
+    }
+
+    public String getNotificationChannelId(){
+        return notificationChannelId;
+    }
 
     @Override
     public int describeContents() {
@@ -368,47 +214,33 @@ public final class UploadNotificationConfig implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int arg1) {
-        parcel.writeInt(iconResourceID);
-        parcel.writeInt(completedIconResourceID);
-        parcel.writeInt(errorIconResourceID);
-        parcel.writeInt(cancelledIconResourceID);
-        parcel.writeInt(iconColorResourceID);
-        parcel.writeInt(completedIconColorResourceID);
-        parcel.writeInt(errorIconColorResourceID);
-        parcel.writeInt(cancelledIconColorResourceID);
-        parcel.writeString(title);
-        parcel.writeString(inProgress);
-        parcel.writeString(completed);
-        parcel.writeString(error);
-        parcel.writeString(cancelled);
-        parcel.writeByte((byte) (autoClearOnSuccess ? 1 : 0));
-        parcel.writeByte((byte) (autoClearOnError ? 1 : 0));
-        parcel.writeByte((byte) (autoClearOnCancel ? 1 : 0));
-        parcel.writeByte((byte) (clearOnAction ? 1 : 0));
-        parcel.writeByte((byte) (ringToneEnabled ? 1 : 0));
-        parcel.writeParcelable(clickIntent, 0);
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.notificationChannelId);
+        dest.writeByte(this.ringToneEnabled ? (byte) 1 : (byte) 0);
+        dest.writeParcelable(this.progress, flags);
+        dest.writeParcelable(this.completed, flags);
+        dest.writeParcelable(this.error, flags);
+        dest.writeParcelable(this.cancelled, flags);
     }
 
-    private UploadNotificationConfig(Parcel in) {
-        iconResourceID = in.readInt();
-        completedIconResourceID = in.readInt();
-        errorIconResourceID = in.readInt();
-        cancelledIconResourceID = in.readInt();
-        iconColorResourceID = in.readInt();
-        completedIconColorResourceID = in.readInt();
-        errorIconColorResourceID = in.readInt();
-        cancelledIconColorResourceID = in.readInt();
-        title = in.readString();
-        inProgress = in.readString();
-        completed = in.readString();
-        error = in.readString();
-        cancelled = in.readString();
-        autoClearOnSuccess = in.readByte() == 1;
-        autoClearOnError = in.readByte() == 1;
-        autoClearOnCancel = in.readByte() == 1;
-        clearOnAction = in.readByte() == 1;
-        ringToneEnabled = in.readByte() == 1;
-        clickIntent = in.readParcelable(Intent.class.getClassLoader());
+    protected UploadNotificationConfig(Parcel in) {
+        this.notificationChannelId = in.readString();
+        this.ringToneEnabled = in.readByte() != 0;
+        this.progress = in.readParcelable(UploadNotificationStatusConfig.class.getClassLoader());
+        this.completed = in.readParcelable(UploadNotificationStatusConfig.class.getClassLoader());
+        this.error = in.readParcelable(UploadNotificationStatusConfig.class.getClassLoader());
+        this.cancelled = in.readParcelable(UploadNotificationStatusConfig.class.getClassLoader());
     }
+
+    public static final Creator<UploadNotificationConfig> CREATOR = new Creator<UploadNotificationConfig>() {
+        @Override
+        public UploadNotificationConfig createFromParcel(Parcel source) {
+            return new UploadNotificationConfig(source);
+        }
+
+        @Override
+        public UploadNotificationConfig[] newArray(int size) {
+            return new UploadNotificationConfig[size];
+        }
+    };
 }

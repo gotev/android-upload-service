@@ -1,5 +1,7 @@
 package net.gotev.uploadservice;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Android Upload Service library logger.
  * You can provide your own logger delegate implementation, to be able to log in a different way.
@@ -24,8 +26,8 @@ public class Logger {
     }
 
     private LogLevel mLogLevel = BuildConfig.DEBUG ? LogLevel.DEBUG : LogLevel.OFF;
-
-    private LoggerDelegate mDelegate = new DefaultLoggerDelegate();
+    private static LoggerDelegate mDefaultLogger = new DefaultLoggerDelegate();
+    private WeakReference<LoggerDelegate> mDelegate = new WeakReference<>(mDefaultLogger);
 
     private Logger() { }
 
@@ -35,7 +37,7 @@ public class Logger {
 
     public static void resetLoggerDelegate() {
         synchronized (Logger.class) {
-            SingletonHolder.instance.mDelegate = new DefaultLoggerDelegate();
+            SingletonHolder.instance.mDelegate = new WeakReference<>(mDefaultLogger);
         }
     }
 
@@ -44,7 +46,7 @@ public class Logger {
             throw new IllegalArgumentException("delegate MUST not be null!");
 
         synchronized (Logger.class) {
-            SingletonHolder.instance.mDelegate = delegate;
+            SingletonHolder.instance.mDelegate = new WeakReference<>(delegate);
         }
     }
 
@@ -54,27 +56,32 @@ public class Logger {
         }
     }
 
+    private static boolean delegateIsDefinedAndLogLevelIsAtLeast(LogLevel level) {
+        return SingletonHolder.instance.mDelegate.get() != null
+                && SingletonHolder.instance.mLogLevel.compareTo(level) <= 0;
+    }
+
     public static void error(String tag, String message) {
-        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.ERROR) <= 0) {
-            SingletonHolder.instance.mDelegate.error(tag, message);
+        if (delegateIsDefinedAndLogLevelIsAtLeast(LogLevel.ERROR)) {
+            SingletonHolder.instance.mDelegate.get().error(tag, message);
         }
     }
 
     public static void error(String tag, String message, Throwable exception) {
-        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.ERROR) <= 0) {
-            SingletonHolder.instance.mDelegate.error(tag, message, exception);
+        if (delegateIsDefinedAndLogLevelIsAtLeast(LogLevel.ERROR)) {
+            SingletonHolder.instance.mDelegate.get().error(tag, message, exception);
         }
     }
 
     public static void info(String tag, String message) {
-        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.INFO) <= 0) {
-            SingletonHolder.instance.mDelegate.info(tag, message);
+        if (delegateIsDefinedAndLogLevelIsAtLeast(LogLevel.INFO)) {
+            SingletonHolder.instance.mDelegate.get().info(tag, message);
         }
     }
 
     public static void debug(String tag, String message) {
-        if (SingletonHolder.instance.mLogLevel.compareTo(LogLevel.DEBUG) <= 0) {
-            SingletonHolder.instance.mDelegate.debug(tag, message);
+        if (delegateIsDefinedAndLogLevelIsAtLeast(LogLevel.DEBUG)) {
+            SingletonHolder.instance.mDelegate.get().debug(tag, message);
         }
     }
 }

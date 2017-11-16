@@ -51,11 +51,12 @@ public abstract class HttpUploadTask extends UploadTask
     @SuppressLint("NewApi")
     protected void upload() throws Exception {
 
-        Logger.debug(LOG_TAG, "Starting upload task with ID " + params.getId());
+        Logger.debug(LOG_TAG, "Starting upload task with ID " + params.id);
 
         getSuccessfullyUploadedFiles().clear();
         totalBytes = getBodyLength();
 
+<<<<<<< HEAD
         if (params.isChunkUpload()) {
             UploadFile currentFile = params.getFiles().get(0);
             currentFile.generateChunk();
@@ -90,6 +91,23 @@ public abstract class HttpUploadTask extends UploadTask
         } else {
             uploadedBytes = 0;
             ServerResponse response = startRequest(httpParams, totalBytes);
+/*
+            if (httpParams.isCustomUserAgentDefined()) {
+                httpParams.addHeader("User-Agent", httpParams.customUserAgent);
+            } else {
+                httpParams.addHeader("User-Agent", "AndroidUploadService/" + BuildConfig.VERSION_NAME);
+            }
+
+            connection = UploadService.HTTP_STACK
+                    .createNewConnection(httpParams.method, params.serverUrl)
+                    .setHeaders(httpParams.getRequestHeaders())
+                    .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode);
+
+            final ServerResponse response = connection.getResponse(this);
+            Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
+                            + " to upload with ID: " + params.id);
+>>>>>>> cb2259d47968c85462c0c5990cd091d6ec112d47
+/*
 
             // Broadcast completion only if the user has not cancelled the operation.
             // It may happen that when the body is not completely written and the client

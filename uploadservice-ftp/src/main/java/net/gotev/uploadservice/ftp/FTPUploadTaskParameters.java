@@ -26,16 +26,16 @@ public class FTPUploadTaskParameters implements Parcelable {
      */
     public static final String DEFAULT_SECURE_SOCKET_PROTOCOL = "TLS";
 
-    private int port;
-    private String username;
-    private String password;
-    private int connectTimeout;
-    private int socketTimeout;
-    private boolean compressedFileTransfer;
-    private String createdDirectoriesPermissions;
-    private boolean useSSL;
-    private boolean implicitSecurity;
-    private String secureSocketProtocol = DEFAULT_SECURE_SOCKET_PROTOCOL;
+    public int port;
+    public String username;
+    public String password;
+    public int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+    public int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
+    public boolean compressedFileTransfer;
+    public String createdDirectoriesPermissions;
+    public boolean useSSL;
+    public boolean implicitSecurity;
+    public String secureSocketProtocol = DEFAULT_SECURE_SOCKET_PROTOCOL;
 
     public FTPUploadTaskParameters() {
 
@@ -86,95 +86,5 @@ public class FTPUploadTaskParameters implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public FTPUploadTaskParameters setPort(int port) {
-        this.port = port;
-        return this;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public FTPUploadTaskParameters setUsername(String username) {
-        this.username = username;
-        return this;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public FTPUploadTaskParameters setPassword(String password) {
-        this.password = password;
-        return this;
-    }
-
-    public int getConnectTimeout() {
-        return connectTimeout <= 0 ? DEFAULT_CONNECT_TIMEOUT : socketTimeout;
-    }
-
-    public FTPUploadTaskParameters setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
-        return this;
-    }
-
-    public int getSocketTimeout() {
-        return socketTimeout <= 0 ? DEFAULT_SOCKET_TIMEOUT : socketTimeout;
-    }
-
-    public FTPUploadTaskParameters setSocketTimeout(int socketTimeout) {
-        this.socketTimeout = socketTimeout;
-        return this;
-    }
-
-    public boolean isCompressedFileTransfer() {
-        return compressedFileTransfer;
-    }
-
-    public FTPUploadTaskParameters setCompressedFileTransfer(boolean compressedFileTransfer) {
-        this.compressedFileTransfer = compressedFileTransfer;
-        return this;
-    }
-
-    public String getCreatedDirectoriesPermissions() {
-        return createdDirectoriesPermissions;
-    }
-
-    public FTPUploadTaskParameters setCreatedDirectoriesPermissions(String createdDirectoriesPermissions) {
-        this.createdDirectoriesPermissions = createdDirectoriesPermissions;
-        return this;
-    }
-
-    public boolean isUseSSL() {
-        return useSSL;
-    }
-
-    public FTPUploadTaskParameters setUseSSL(boolean useSSL) {
-        this.useSSL = useSSL;
-        return this;
-    }
-
-    public boolean isImplicitSecurity() {
-        return implicitSecurity;
-    }
-
-    public FTPUploadTaskParameters setImplicitSecurity(boolean implicitSecurity) {
-        this.implicitSecurity = implicitSecurity;
-        return this;
-    }
-
-    public String getSecureSocketProtocol() {
-        return secureSocketProtocol;
-    }
-
-    public FTPUploadTaskParameters setSecureSocketProtocol(String secureSocketProtocol) {
-        this.secureSocketProtocol = secureSocketProtocol;
-        return this;
     }
 }

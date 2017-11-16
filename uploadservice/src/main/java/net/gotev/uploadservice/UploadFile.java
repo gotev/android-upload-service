@@ -182,6 +182,7 @@ public class UploadFile implements Parcelable {
         return val;
     }
 
+<<<<<<< HEAD
     /**
      * if this file is a chunk file, this will return the start byte of this chunk from the parent file
      *
@@ -272,5 +273,21 @@ public class UploadFile implements Parcelable {
      */
     public void setCurrentChunk(UploadFile currentChunk) {
         this.currentChunk = currentChunk;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UploadFile)) return false;
+
+        UploadFile that = (UploadFile) o;
+
+        return path.equals(that.path);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return path.hashCode();
     }
 }

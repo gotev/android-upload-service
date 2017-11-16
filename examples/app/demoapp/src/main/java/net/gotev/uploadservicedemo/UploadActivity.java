@@ -176,7 +176,7 @@ public abstract class UploadActivity extends FilesPickerActivity {
     }
 
     public String getUserAgent() {
-        return "AndroidUploadService/" + BuildConfig.VERSION_NAME;
+        return "AndroidUploadServiceDemo/" + BuildConfig.VERSION_NAME;
     }
 
     public abstract AdapterItem getEmptyItem();
