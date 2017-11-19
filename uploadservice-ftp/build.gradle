@@ -10,11 +10,11 @@ def projectGroup = "net.gotev"
 group = projectGroup
 version = "3.4"
 
-def sdkVersion = 26;
+def sdkVersion = 26
 
 android {
     compileSdkVersion sdkVersion
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         minSdkVersion 14

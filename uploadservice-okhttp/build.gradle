@@ -10,11 +10,11 @@ def projectGroup = "net.gotev"
 group = projectGroup
 version = "3.4"
 
-def sdkVersion = 26;
+def sdkVersion = 26
 
 android {
     compileSdkVersion sdkVersion
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         minSdkVersion 14
@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    compile 'com.squareup.okhttp3:okhttp:3.8.1'
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
     //compile "net.gotev:uploadservice:${version}"
     //comment the previous line and uncomment the next line for development (it uses the local lib)
     compile project(':uploadservice')
