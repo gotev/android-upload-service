@@ -182,7 +182,6 @@ public class UploadFile implements Parcelable {
         return val;
     }
 
-<<<<<<< HEAD
     /**
      * if this file is a chunk file, this will return the start byte of this chunk from the parent file
      *
