@@ -1,7 +1,8 @@
 Android Upload Service
 ======================
 
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice) <a href="http://www.methodscount.com/?lib=net.gotev%3Auploadservice%3A3.3"><img src="https://img.shields.io/badge/Methods and size-core: 658 | deps: 19372 | 91 KB-e91e63.svg"/></a>
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice) <a href="http://www.methodscount.com/?lib=net.gotev%3Auploadservice%3A3.4.1"><img src="https://img.shields.io/badge/Methods and size-core: 664 | deps: 18388 | 93 KB-e91e63.svg"/></a>
+</a>
 
 ### If you're already using the library, upgrading to 3.4.1 is strongly recommended for security reasons! [Read here](https://github.com/gotev/android-upload-service/releases/tag/3.4)
 
