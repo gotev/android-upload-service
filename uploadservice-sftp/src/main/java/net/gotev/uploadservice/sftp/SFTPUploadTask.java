@@ -300,12 +300,14 @@ public class SFTPUploadTask extends UploadTask implements SftpProgressMonitor {
                 channel = null;
                 channelSftp = null;
                 session = null;
+
+                return false;
             } catch (Exception exc) {
                 Logger.error(LOG_TAG, "Failed to abort current file transfer", exc);
             }
         }
 
-        return false;
+        return true;
     }
 
     @Override
