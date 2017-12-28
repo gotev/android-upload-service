@@ -1,0 +1,2 @@
+#!/bin/bash
+./gradlew :uploadservice-sftp:clean :uploadservice-sftp:bintrayUpload
