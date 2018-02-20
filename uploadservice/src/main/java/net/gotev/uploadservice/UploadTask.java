@@ -133,7 +133,7 @@ public abstract class UploadTask implements Runnable {
         this.service = service;
         this.mainThreadHandler = new Handler(service.getMainLooper());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && params.notificationConfig != null) {
             String notificationChannelId = params.notificationConfig.getNotificationChannelId();
 
             if (notificationChannelId == null) {

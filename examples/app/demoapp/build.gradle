@@ -1,19 +1,18 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
-def sdkVersion = 26;
-def libraryVersion = "3.4"
+def sdkVersion = 26
+def libraryVersion = "3.4.1"
 
 android {
     compileSdkVersion sdkVersion
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "net.gotev.uploadservicedemo"
         minSdkVersion 16
         targetSdkVersion sdkVersion
-        versionCode 20
+        versionCode 21
         versionName libraryVersion
     }
     buildTypes {
@@ -28,8 +27,8 @@ repositories {
     maven { url 'http://dl.bintray.com/igenius-code/maven' }
 }
 
-def butterKnifeVersion = "8.5.1"
-def supportVersion = "26.0.0"
+def butterKnifeVersion = "8.8.1"
+def supportVersion = "26.0.1"
 def stethoVersion = "1.4.2"
 
 dependencies {
@@ -47,10 +46,10 @@ dependencies {
 
     // ButterKnife
     compile "com.jakewharton:butterknife:${butterKnifeVersion}"
-    apt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 
     compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
-    compile 'net.gotev:recycleradapter:1.5.2'
+    compile 'net.gotev:recycleradapter:1.6'
 
     /*compile "net.gotev:uploadservice:${libraryVersion}"
     compile "net.gotev:uploadservice-okhttp:${libraryVersion}"

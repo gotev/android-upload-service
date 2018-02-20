@@ -18,6 +18,7 @@ import org.apache.commons.net.io.CopyStreamListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -110,7 +111,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             String baseWorkingDir = ftpClient.printWorkingDirectory();
             Logger.debug(LOG_TAG, "FTP default working directory is: " + baseWorkingDir);
 
-            Iterator<UploadFile> iterator = params.files.iterator();
+            Iterator<UploadFile> iterator = new ArrayList<>(params.files).iterator();
             while (iterator.hasNext()) {
                 UploadFile file = iterator.next();
 
