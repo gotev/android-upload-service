@@ -23,7 +23,7 @@ public final class UploadTaskParameters implements Parcelable {
     public UploadNotificationConfig notificationConfig;
     public ArrayList<UploadFile> files = new ArrayList<>();
     private boolean isChunkUpload = false;
-    private boolean autoDeleteSuccessfullyUploadedChunks = true;
+    public boolean autoDeleteSuccessfullyUploadedChunks = true;
 
     public UploadTaskParameters() {
 
