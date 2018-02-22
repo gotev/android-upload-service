@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 
@@ -62,6 +63,10 @@ public final class UploadService extends Service {
      * It's not possible to run in foreground without notifications, as per Android policy
      * constraints, so if you set this to true, but you do upload tasks without a
      * notification configuration, the service will simply run in background mode.
+     *
+     * NOTE: As of Android Oreo, this setting is ignored as it always has to be true,
+     * because the service must run in the foreground and expose a notification to the user.
+     * https://developer.android.com/reference/android/content/Context.html#startForegroundService(android.content.Intent)
      */
     public static boolean EXECUTE_IN_FOREGROUND = true;
 
@@ -209,6 +214,10 @@ public final class UploadService extends Service {
         return uploadTasksMap.isEmpty() && context.stopService(new Intent(context, UploadService.class));
     }
 
+    private boolean isExecuteInForeground() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O || EXECUTE_IN_FOREGROUND;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -251,7 +260,7 @@ public final class UploadService extends Service {
         Logger.info(TAG, String.format(Locale.getDefault(), "Starting service with namespace: %s, " +
                 "upload pool size: %d, %ds idle thread keep alive time. Foreground execution is %s",
                 NAMESPACE, UPLOAD_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECONDS,
-                (EXECUTE_IN_FOREGROUND ? "enabled" : "disabled")));
+                (isExecuteInForeground() ? "enabled" : "disabled")));
 
         UploadTask currentTask = getTask(intent);
 
@@ -315,7 +324,7 @@ public final class UploadService extends Service {
         stopAllUploads();
         uploadThreadPool.shutdown();
 
-        if (EXECUTE_IN_FOREGROUND) {
+        if (isExecuteInForeground()) {
             Logger.debug(TAG, "Stopping foreground execution");
             stopForeground(true);
         }
@@ -368,7 +377,7 @@ public final class UploadService extends Service {
      * @return true if the current upload task holds the foreground notification, otherwise false
      */
     protected synchronized boolean holdForegroundNotification(String uploadId, Notification notification) {
-        if (!EXECUTE_IN_FOREGROUND) return false;
+        if (!isExecuteInForeground()) return false;
 
         if (foregroundUploadId == null) {
             foregroundUploadId = uploadId;
@@ -393,12 +402,12 @@ public final class UploadService extends Service {
         uploadDelegates.remove(uploadId);
 
         // un-hold foreground upload ID if it's been hold
-        if (EXECUTE_IN_FOREGROUND && task != null && task.params.id.equals(foregroundUploadId)) {
+        if (isExecuteInForeground() && task != null && task.params.id.equals(foregroundUploadId)) {
             Logger.debug(TAG, uploadId + " now un-holded the foreground notification");
             foregroundUploadId = null;
         }
 
-        if (EXECUTE_IN_FOREGROUND && uploadTasksMap.isEmpty()) {
+        if (isExecuteInForeground() && uploadTasksMap.isEmpty()) {
             Logger.debug(TAG, "All tasks completed, stopping foreground execution");
             stopForeground(true);
             shutdownIfThereArentAnyActiveTasks();

@@ -2,6 +2,7 @@ package net.gotev.uploadservice;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 import java.util.UUID;
 
@@ -65,7 +66,15 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
         final Intent intent = new Intent(context, UploadService.class);
         this.initializeIntent(intent);
         intent.setAction(UploadService.getActionUpload());
-        context.startService(intent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (params.notificationConfig == null) {
+                throw new IllegalArgumentException("Android Oreo requires a notification configuration for the service to run. https://developer.android.com/reference/android/content/Context.html#startForegroundService(android.content.Intent)");
+            }
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
 
         return params.id;
     }
