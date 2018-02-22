@@ -33,7 +33,7 @@ android {
     }
 }
 
-def supportLibraryVersion = "26.0.1"
+def supportLibraryVersion = "27.0.2"
 
 dependencies {
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
