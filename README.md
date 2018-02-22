@@ -4,14 +4,14 @@ Android Upload Service
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice) <a href="http://www.methodscount.com/?lib=net.gotev%3Auploadservice%3A3.4.1"><img src="https://img.shields.io/badge/Methods and size-core: 664 | deps: 18388 | 93 KB-e91e63.svg"/></a>
 </a>
 
-### If you're already using the library, upgrading to 3.4.1 is strongly recommended for security reasons! [Read here](https://github.com/gotev/android-upload-service/releases/tag/3.4)
+### If you're already using the library, upgrading to 3.4.2 is strongly recommended for security reasons! [Read here](https://github.com/gotev/android-upload-service/releases/tag/3.4
 
 ![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
 | :information_source: | [Get started!](https://github.com/gotev/android-upload-service/wiki/Setup) |
 |--|--|
-| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.4.1/uploadservice-demo-debug.apk)|
+| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.4.2/uploadservice-demo-debug.apk)|
 
 ## Features
 * tiny library
@@ -55,7 +55,7 @@ Put a star, spread the word and if you want to offer me a free beer, [![Donate](
 
 ## License <a name="license"></a>
 
-    Copyright (C) 2013-2017 Aleksandar Gotev
+    Copyright (C) 2013-2018 Aleksandar Gotev
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
