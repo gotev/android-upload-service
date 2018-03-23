@@ -123,19 +123,19 @@ public abstract class UploadTask implements Runnable {
         this.service = service;
         this.mainThreadHandler = new Handler(service.getMainLooper());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && params.notificationConfig != null) {
-            String notificationChannelId = params.notificationConfig.getNotificationChannelId();
-
-            if (notificationChannelId == null) {
-                params.notificationConfig.setNotificationChannelId(UploadService.NAMESPACE);
-                notificationChannelId = UploadService.NAMESPACE;
-            }
-
-            if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
-                NotificationChannel channel = new NotificationChannel(notificationChannelId, "Upload Service channel", NotificationManager.IMPORTANCE_LOW);
-                notificationManager.createNotificationChannel(channel);
-            }
-        }
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && params.notificationConfig != null) {
+        //    String notificationChannelId = params.notificationConfig.getNotificationChannelId();
+        //
+        //    if (notificationChannelId == null) {
+        //        params.notificationConfig.setNotificationChannelId(UploadService.NAMESPACE);
+        //        notificationChannelId = UploadService.NAMESPACE;
+        //    }
+        //
+        //    if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
+        //        NotificationChannel channel = new NotificationChannel(notificationChannelId, "Upload Service channel", NotificationManager.IMPORTANCE_LOW);
+        //        notificationManager.createNotificationChannel(channel);
+        //    }
+        //}
 
     }
 

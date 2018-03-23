@@ -10,7 +10,7 @@ def projectGroup = "net.gotev"
 group = projectGroup
 version = "3.4.2"
 
-def sdkVersion = 26
+def sdkVersion = 27
 
 android {
     compileSdkVersion sdkVersion
