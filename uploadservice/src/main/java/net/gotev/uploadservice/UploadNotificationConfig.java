@@ -19,6 +19,9 @@ public final class UploadNotificationConfig implements Parcelable {
      * Notification channel ID
      */
     private String notificationChannelId;
+    private String notificationChannelName;
+    private String notificationChannelGroupId;
+    private String notificationChannelGroupName;
 
     private UploadNotificationStatusConfig progress;
     private UploadNotificationStatusConfig completed;
@@ -184,6 +187,39 @@ public final class UploadNotificationConfig implements Parcelable {
         return this;
     }
 
+    /**
+     * Sets notification channel name
+     *
+     * @param channelName notification channel name
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setNotificationChannelName(@NonNull String channelName){
+        this.notificationChannelName = channelName;
+        return this;
+    }
+
+    /**
+     * Sets notification channel group ID
+     *
+     * @param channelGroupId notification channel group id
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setNotificationChannelGroupId(@NonNull String channelGroupId){
+        this.notificationChannelGroupId = channelGroupId;
+        return this;
+    }
+
+    /**
+     * Sets notification channel group name
+     *
+     * @param channelGroupName notification channel group name
+     * @return {@link UploadNotificationConfig}
+     */
+    public final UploadNotificationConfig setNotificationChannelGroupName(@NonNull String channelGroupName){
+        this.notificationChannelGroupName = channelGroupName;
+        return this;
+    }
+
     public boolean isRingToneEnabled() {
         return ringToneEnabled;
     }
@@ -208,6 +244,18 @@ public final class UploadNotificationConfig implements Parcelable {
         return notificationChannelId;
     }
 
+    public String getNotificationChannelName() {
+        return notificationChannelName;
+    }
+
+    public String getNotificationChannelGroupId() {
+        return notificationChannelGroupId;
+    }
+
+    public String getNotificationChannelGroupName() {
+        return notificationChannelGroupName;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -216,6 +264,9 @@ public final class UploadNotificationConfig implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.notificationChannelId);
+        dest.writeString(this.notificationChannelName);
+        dest.writeString(this.notificationChannelGroupId);
+        dest.writeString(this.notificationChannelGroupName);
         dest.writeByte(this.ringToneEnabled ? (byte) 1 : (byte) 0);
         dest.writeParcelable(this.progress, flags);
         dest.writeParcelable(this.completed, flags);
@@ -225,6 +276,9 @@ public final class UploadNotificationConfig implements Parcelable {
 
     protected UploadNotificationConfig(Parcel in) {
         this.notificationChannelId = in.readString();
+        this.notificationChannelName = in.readString();
+        this.notificationChannelGroupId = in.readString();
+        this.notificationChannelGroupName = in.readString();
         this.ringToneEnabled = in.readByte() != 0;
         this.progress = in.readParcelable(UploadNotificationStatusConfig.class.getClassLoader());
         this.completed = in.readParcelable(UploadNotificationStatusConfig.class.getClassLoader());

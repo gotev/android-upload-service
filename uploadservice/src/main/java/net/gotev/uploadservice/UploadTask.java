@@ -2,6 +2,7 @@ package net.gotev.uploadservice;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -125,14 +126,32 @@ public abstract class UploadTask implements Runnable {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && params.notificationConfig != null) {
             String notificationChannelId = params.notificationConfig.getNotificationChannelId();
+            String notificationChannelName = params.notificationConfig.getNotificationChannelName();
+            String notificationChannelGroupId = params.notificationConfig.getNotificationChannelGroupId();
+            String notificationChannelGroupName = params.notificationConfig.getNotificationChannelGroupName();
 
             if (notificationChannelId == null) {
                 params.notificationConfig.setNotificationChannelId(UploadService.NAMESPACE);
                 notificationChannelId = UploadService.NAMESPACE;
             }
 
+            if (notificationChannelGroupId != null){
+                boolean groupIdExist = false;
+                for (NotificationChannelGroup channelGroup :notificationManager.getNotificationChannelGroups()){
+                    if (channelGroup.getId().equals(notificationChannelId)) groupIdExist = true;
+                }
+                if (!groupIdExist) {
+                    final String channelGroupName = notificationChannelGroupName == null ? "Other" : notificationChannelGroupName;
+                    NotificationChannelGroup channelGroup =
+                        new NotificationChannelGroup(notificationChannelGroupId, channelGroupName);
+                    notificationManager.createNotificationChannelGroup(channelGroup);
+                }
+            }
+
             if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
-                NotificationChannel channel = new NotificationChannel(notificationChannelId, "Upload Service channel", NotificationManager.IMPORTANCE_LOW);
+                NotificationChannel channel = new NotificationChannel(notificationChannelId,
+                        notificationChannelName == null ? "Upload Service channel" : notificationChannelName, NotificationManager.IMPORTANCE_LOW);
+                if (notificationChannelGroupId != null) channel.setGroup(notificationChannelGroupId);
                 notificationManager.createNotificationChannel(channel);
             }
         }
