@@ -131,7 +131,7 @@ public final class UploadService extends Service {
 
     // internal variables
     private PowerManager.WakeLock wakeLock;
-    private int notificationIncrementalId = 0;
+    private static int notificationIncrementalId = 0;
     private static final Map<String, UploadTask> uploadTasksMap = new ConcurrentHashMap<>();
     private static final Map<String, WeakReference<UploadStatusDelegate>> uploadDelegates = new ConcurrentHashMap<>();
     private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
