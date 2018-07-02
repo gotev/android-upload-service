@@ -50,7 +50,7 @@ public class HttpJsonTask extends HttpUploadTask {
         if (!httpParams.getRequestParameters().isEmpty()) {
             for (final NameValue parameter : httpParams.getRequestParameters()) {
                 paramCount = paramCount + 1;
-                boolean isLastPram = paramCount == totalParamCount ? true : false;
+                boolean isLastPram = paramCount == totalParamCount;
                 parametersBytes += getMultipartBytes(parameter, isLastPram).length;
             }
         }
@@ -93,19 +93,30 @@ public class HttpJsonTask extends HttpUploadTask {
         return parameterCount;
     }
 
+    private byte[] joinParams(byte[] body, byte[] el) throws UnsupportedEncodingException {
+        byte[] result = new byte[body.length + el.length];
+        System.arraycopy(body, 0, result, 0, body.length);
+        System.arraycopy(el, 0, result, body.length, el.length);
+        return result;
+    }
+
     private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
+        byte[] jsonPrefix = "{".getBytes(charset);
+        byte[] jsonSuffix = "}".getBytes(charset);
         int paramCount = 0;
         int totalParamCount = getRequestParametersCount();
+
+        byte[] encodedJson = jsonPrefix;
         if (!httpParams.getRequestParameters().isEmpty()) {
-            bodyWriter.write("{".getBytes(charset));
             for (final NameValue parameter : httpParams.getRequestParameters()) {
                 paramCount = paramCount + 1;
                 byte[] jsonBytes;
-                boolean isLastPram = paramCount == totalParamCount ? true : false;
+                boolean isLastPram = paramCount == totalParamCount;
                 jsonBytes = getMultipartBytes(parameter, isLastPram);
-                bodyWriter.write(jsonBytes);
+                encodedJson = joinParams(encodedJson, jsonBytes);
             }
-            bodyWriter.write("}".getBytes(charset));
+            encodedJson = joinParams(encodedJson, jsonSuffix);
+            bodyWriter.write(encodedJson);
         }
     }
 
