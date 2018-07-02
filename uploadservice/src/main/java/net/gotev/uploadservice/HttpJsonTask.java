@@ -44,19 +44,28 @@ public class HttpJsonTask extends HttpUploadTask {
 
     private long getRequestParametersLength() throws UnsupportedEncodingException {
         long parametersBytes = 0;
-
+        int paramCount = 0;
+        int totalParamCount = getRequestParametersCount();
         parametersBytes += "{".getBytes(charset).length;
         if (!httpParams.getRequestParameters().isEmpty()) {
             for (final NameValue parameter : httpParams.getRequestParameters()) {
-                parametersBytes += getMultipartBytes(parameter).length;
+                paramCount = paramCount + 1;
+                boolean isLastPram = false;
+                if (paramCount > totalParamCount) {
+                    isLastPram = true;
+                }
+                parametersBytes += getMultipartBytes(parameter, isLastPram).length;
             }
         }
         parametersBytes += "}".getBytes(charset).length;
         return parametersBytes;
     }
 
-    private byte[] getMultipartBytes(NameValue parameter) throws UnsupportedEncodingException {
-        return ("\"" + parameter.getName() + "\"" + ":" + "\"" + parameter.getValue() + "\"").getBytes(charset);
+    private byte[] getMultipartBytes(NameValue parameter, boolean isLastPram) throws UnsupportedEncodingException {
+        if (isLastPram) {
+            return ("\"" + parameter.getName() + "\"" + ":" + "\"" + parameter.getValue() + "\"").getBytes(charset);
+        }
+        return ("\"" + parameter.getName() + "\"" + ":" + "\"" + parameter.getValue() + "\"" + ",").getBytes(charset);
     }
 
     // private byte[] getMultipartHeader(UploadFile file)
@@ -75,11 +84,31 @@ public class HttpJsonTask extends HttpUploadTask {
     //     return boundaryBytes.length + getMultipartHeader(file).length + file.length(service);
     // }
 
+   
+
+    private int getRequestParametersCount () throws UnsupportedEncodingException {
+        int parameterCount = 0;
+        if (!httpParams.getRequestParameters().isEmpty()) {
+            for (final NameValue parameter : httpParams.getRequestParameters()) {
+                parameterCount = parameterCount + 1;
+            }
+        }
+        return parameterCount;
+    }
+
     private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
+        int paramCount = 0;
+        int totalParamCount = getRequestParametersCount();
         if (!httpParams.getRequestParameters().isEmpty()) {
             bodyWriter.write("{".getBytes(charset));
             for (final NameValue parameter : httpParams.getRequestParameters()) {
-                byte[] jsonBytes = getMultipartBytes(parameter);
+                paramCount = paramCount + 1;
+                byte[] jsonBytes;
+                boolean isLastPram = false;
+                if (paramCount > totalParamCount) {
+                    isLastPram = true;
+                }
+                jsonBytes = getMultipartBytes(parameter, isLastPram);
                 bodyWriter.write(jsonBytes);
             }
             bodyWriter.write("}".getBytes(charset));
