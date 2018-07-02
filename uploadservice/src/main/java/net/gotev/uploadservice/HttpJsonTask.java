@@ -50,10 +50,7 @@ public class HttpJsonTask extends HttpUploadTask {
         if (!httpParams.getRequestParameters().isEmpty()) {
             for (final NameValue parameter : httpParams.getRequestParameters()) {
                 paramCount = paramCount + 1;
-                boolean isLastPram = false;
-                if (paramCount > totalParamCount) {
-                    isLastPram = true;
-                }
+                boolean isLastPram = paramCount == totalParamCount ? true : false;
                 parametersBytes += getMultipartBytes(parameter, isLastPram).length;
             }
         }
@@ -104,10 +101,7 @@ public class HttpJsonTask extends HttpUploadTask {
             for (final NameValue parameter : httpParams.getRequestParameters()) {
                 paramCount = paramCount + 1;
                 byte[] jsonBytes;
-                boolean isLastPram = false;
-                if (paramCount > totalParamCount) {
-                    isLastPram = true;
-                }
+                boolean isLastPram = paramCount == totalParamCount ? true : false;
                 jsonBytes = getMultipartBytes(parameter, isLastPram);
                 bodyWriter.write(jsonBytes);
             }
