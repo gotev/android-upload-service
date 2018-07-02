@@ -58,7 +58,7 @@ public class HttpJsonRequest extends HttpUploadRequest<HttpJsonRequest> {
     @Override
     protected void initializeIntent(Intent intent) {
         super.initializeIntent(intent);
-        intent.putExtra(HttpJsonTask.PARAM_UTF8_CHARSET, isUtf8Charset);
+//        intent.putExtra(HttpJsonTask.PARAM_UTF8_CHARSET, isUtf8Charset);
     }
 
     @Override

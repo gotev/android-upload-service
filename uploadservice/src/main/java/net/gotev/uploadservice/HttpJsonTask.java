@@ -18,52 +18,46 @@ import java.nio.charset.Charset;
  */
 public class HttpJsonTask extends HttpUploadTask {
 
+    private static final Charset US_ASCII = Charset.forName("US-ASCII");
+    protected static final String PARAM_UTF8_CHARSET = "multipartUtf8Charset";
+
+    private byte[] boundaryBytes;
+    private Charset charset;
+
     @Override
     protected void init(UploadService service, Intent intent) throws IOException {
         super.init(service, intent);
         httpParams.addRequestHeader("Content-Type", "application/json");
+        charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false) ? Charset.forName("UTF-8") : US_ASCII;
     }
 
-    // @Override
-    // protected long getBodyLength() throws UnsupportedEncodingException {
-    //     return (getRequestParametersLength() + getFilesLength() + trailerBytes.length);
-    // }
+    @Override
+    protected long getBodyLength() throws UnsupportedEncodingException {
+        return getRequestParametersLength();
+    }
 
-    // @Override
-    // public void onBodyReady(BodyWriter bodyWriter) throws IOException {
-    //     writeRequestParameters(bodyWriter);
-    //     writeFiles(bodyWriter);
-    //     bodyWriter.write(trailerBytes);
-    // }
+    @Override
+    public void onBodyReady(BodyWriter bodyWriter) throws IOException {
+        writeRequestParameters(bodyWriter);
+    }
 
-    // private long getFilesLength() throws UnsupportedEncodingException {
-    //     long total = 0;
 
-    //     for (UploadFile file : params.getFiles()) {
-    //         total += getTotalMultipartBytes(file);
-    //     }
+    private long getRequestParametersLength() throws UnsupportedEncodingException {
+        long parametersBytes = 0;
 
-    //     return total;
-    // }
+        parametersBytes += "{".getBytes(charset).length;
+        if (!httpParams.getRequestParameters().isEmpty()) {
+            for (final NameValue parameter : httpParams.getRequestParameters()) {
+                parametersBytes += getMultipartBytes(parameter).length;
+            }
+        }
+        parametersBytes += "}".getBytes(charset).length;
+        return parametersBytes;
+    }
 
-    // private long getRequestParametersLength() throws UnsupportedEncodingException {
-    //     long parametersBytes = 0;
-
-    //     if (!httpParams.getRequestParameters().isEmpty()) {
-    //         for (final NameValue parameter : httpParams.getRequestParameters()) {
-    //             // the bytes needed for every parameter are the sum of the boundary bytes
-    //             // and the bytes occupied by the parameter
-    //             parametersBytes += boundaryBytes.length + getMultipartBytes(parameter).length;
-    //         }
-    //     }
-
-    //     return parametersBytes;
-    // }
-
-    // private byte[] getMultipartBytes(NameValue parameter) throws UnsupportedEncodingException {
-    //     return ("Content-Disposition: form-data; name=\"" + parameter.getName() + "\""
-    //             + NEW_LINE + NEW_LINE + parameter.getValue()).getBytes(charset);
-    // }
+    private byte[] getMultipartBytes(NameValue parameter) throws UnsupportedEncodingException {
+        return ("\"" + parameter.getName() + "\"" + ":" + "\"" + parameter.getValue() + "\"").getBytes(charset);
+    }
 
     // private byte[] getMultipartHeader(UploadFile file)
     //         throws UnsupportedEncodingException {
@@ -81,18 +75,16 @@ public class HttpJsonTask extends HttpUploadTask {
     //     return boundaryBytes.length + getMultipartHeader(file).length + file.length(service);
     // }
 
-    // private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
-    //     if (!httpParams.getRequestParameters().isEmpty()) {
-    //         for (final NameValue parameter : httpParams.getRequestParameters()) {
-    //             bodyWriter.write(boundaryBytes);
-    //             byte[] formItemBytes = getMultipartBytes(parameter);
-    //             bodyWriter.write(formItemBytes);
-
-    //             uploadedBytes += boundaryBytes.length + formItemBytes.length;
-    //             broadcastProgress(uploadedBytes, totalBytes);
-    //         }
-    //     }
-    // }
+    private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
+        if (!httpParams.getRequestParameters().isEmpty()) {
+            bodyWriter.write("{".getBytes(charset));
+            for (final NameValue parameter : httpParams.getRequestParameters()) {
+                byte[] jsonBytes = getMultipartBytes(parameter);
+                bodyWriter.write(jsonBytes);
+            }
+            bodyWriter.write("}".getBytes(charset));
+        }
+    }
 
     // private void writeFiles(BodyWriter bodyWriter) throws IOException {
     //     for (UploadFile file : params.getFiles()) {
@@ -112,12 +104,12 @@ public class HttpJsonTask extends HttpUploadTask {
     //     }
     // }
 
-    // @Override
-    // protected void onSuccessfulUpload() {
-    //     for (UploadFile file : params.getFiles()) {
-    //         addSuccessfullyUploadedFile(file.getPath());
-    //     }
-    //     params.getFiles().clear();
-    // }
+    @Override
+    protected void onSuccessfulUpload() {
+        for (UploadFile file : params.getFiles()) {
+            addSuccessfullyUploadedFile(file.getPath());
+        }
+        params.getFiles().clear();
+    }
 
 }
