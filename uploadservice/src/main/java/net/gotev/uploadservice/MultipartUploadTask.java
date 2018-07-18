@@ -5,7 +5,6 @@ import android.content.Intent;
 import net.gotev.uploadservice.http.BodyWriter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
@@ -38,19 +37,19 @@ public class MultipartUploadTask extends HttpUploadTask {
     protected void init(UploadService service, Intent intent) throws IOException {
         super.init(service, intent);
 
-        String boundary = BOUNDARY_SIGNATURE + System.currentTimeMillis();
-        boundaryBytes = (NEW_LINE + TWO_HYPHENS + boundary + NEW_LINE).getBytes(US_ASCII);
-        trailerBytes = (NEW_LINE + TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes(US_ASCII);
+        String boundary = BOUNDARY_SIGNATURE + System.nanoTime();
+        boundaryBytes = (TWO_HYPHENS + boundary + NEW_LINE).getBytes(US_ASCII);
+        trailerBytes = (TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes(US_ASCII);
         charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false) ?
                 Charset.forName("UTF-8") : US_ASCII;
 
-        if (params.getFiles().size() <= 1) {
-            httpParams.addRequestHeader("Connection", "close");
+        if (params.files.size() <= 1) {
+            httpParams.addHeader("Connection", "close");
         } else {
-            httpParams.addRequestHeader("Connection", "Keep-Alive");
+            httpParams.addHeader("Connection", "Keep-Alive");
         }
 
-        httpParams.addRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+        httpParams.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
     }
 
     @Override
@@ -60,15 +59,20 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     @Override
     public void onBodyReady(BodyWriter bodyWriter) throws IOException {
+        //reset uploaded bytes when the body is ready to be written
+        //because sometimes this gets invoked when network changes
+        uploadedBytes = 0;
         writeRequestParameters(bodyWriter);
         writeFiles(bodyWriter);
         bodyWriter.write(trailerBytes);
+        uploadedBytes += trailerBytes.length;
+        broadcastProgress(uploadedBytes, totalBytes);
     }
 
     private long getFilesLength() throws UnsupportedEncodingException {
         long total = 0;
 
-        for (UploadFile file : params.getFiles()) {
+        for (UploadFile file : params.files) {
             total += getTotalMultipartBytes(file);
         }
 
@@ -91,7 +95,7 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private byte[] getMultipartBytes(NameValue parameter) throws UnsupportedEncodingException {
         return ("Content-Disposition: form-data; name=\"" + parameter.getName() + "\""
-                + NEW_LINE + NEW_LINE + parameter.getValue()).getBytes(charset);
+                + NEW_LINE + NEW_LINE + parameter.getValue() + NEW_LINE).getBytes(charset);
     }
 
     private byte[] getMultipartHeader(UploadFile file)
@@ -107,7 +111,8 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private long getTotalMultipartBytes(UploadFile file)
             throws UnsupportedEncodingException {
-        return boundaryBytes.length + getMultipartHeader(file).length + file.length(service);
+        return boundaryBytes.length + getMultipartHeader(file).length + file.length(service)
+                + NEW_LINE.getBytes(charset).length;
     }
 
     private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
@@ -124,7 +129,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     private void writeFiles(BodyWriter bodyWriter) throws IOException {
-        for (UploadFile file : params.getFiles()) {
+        for (UploadFile file : params.files) {
             if (!shouldContinue)
                 break;
 
@@ -135,18 +140,17 @@ public class MultipartUploadTask extends HttpUploadTask {
             uploadedBytes += boundaryBytes.length + headerBytes.length;
             broadcastProgress(uploadedBytes, totalBytes);
 
-            final InputStream stream = file.getStream(service);
-            bodyWriter.writeStream(stream, this);
-            stream.close();
+            bodyWriter.writeStream(file.getStream(service), this);
+
+            byte[] newLineBytes = NEW_LINE.getBytes(charset);
+            bodyWriter.write(newLineBytes);
+            uploadedBytes += newLineBytes.length;
         }
     }
 
     @Override
     protected void onSuccessfulUpload() {
-        for (UploadFile file : params.getFiles()) {
-            addSuccessfullyUploadedFile(file.getPath());
-        }
-        params.getFiles().clear();
+        addAllFilesToSuccessfullyUploadedFiles();
     }
 
 }

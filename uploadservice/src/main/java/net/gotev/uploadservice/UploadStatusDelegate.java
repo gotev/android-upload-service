@@ -22,9 +22,14 @@ public interface UploadStatusDelegate {
      *
      * @param context context
      * @param uploadInfo upload status information
-     * @param exception exception that caused the error
+     * @param serverResponse response got from the server. It can be null if the server has not
+     *                       responded or if the request has not reached the server due to a
+     *                       networking problem.
+     * @param exception exception that caused the error. It can be null if the request successfully
+     *                  reached the server, but it responded with a 4xx or 5xx status code.
      */
-    void onError(final Context context, final UploadInfo uploadInfo, final Exception exception);
+    void onError(final Context context, final UploadInfo uploadInfo,
+                 final ServerResponse serverResponse, final Exception exception);
 
     /**
      * Called when the upload is completed successfully. Override this method to add your own logic.

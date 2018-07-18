@@ -116,7 +116,7 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
 
         file.setProperty(MultipartUploadTask.PROPERTY_REMOTE_FILE_NAME, fileName);
 
-        params.addFile(file);
+        params.files.add(file);
         return this;
     }
 

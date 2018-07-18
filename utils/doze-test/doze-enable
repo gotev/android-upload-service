@@ -1,0 +1,4 @@
+#!/bin/bash
+adb shell dumpsys deviceidle enable
+adb shell dumpsys deviceidle force-idle
+

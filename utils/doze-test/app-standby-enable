@@ -1,0 +1,5 @@
+#!/bin/bash
+PACKAGE="net.gotev.uploadservicedemo"
+adb shell dumpsys battery unplug
+adb shell am set-inactive "$PACKAGE" true
+adb shell am get-inactive "$PACKAGE"

@@ -8,18 +8,18 @@ def projectName = "android-upload-service-okhttp"
 def projectDesc = "OkHttp stack implementation for Android Upload Service."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "3.2.3"
+version = "3.4.2"
 
-def sdkVersion = 25;
+def sdkVersion = 26
 
 android {
     compileSdkVersion sdkVersion
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
-        minSdkVersion 10
+        minSdkVersion 14
         targetSdkVersion sdkVersion
-        versionCode 8
+        versionCode 14
         versionName version
     }
     buildTypes {
@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    compile 'com.squareup.okhttp3:okhttp:3.+'
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
     //compile "net.gotev:uploadservice:${version}"
     //comment the previous line and uncomment the next line for development (it uses the local lib)
     compile project(':uploadservice')

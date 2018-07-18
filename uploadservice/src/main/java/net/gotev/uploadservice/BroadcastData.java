@@ -30,6 +30,7 @@ class BroadcastData implements Parcelable {
 
     public Intent getIntent() {
         Intent intent = new Intent(UploadService.getActionBroadcast());
+        intent.setPackage(UploadService.NAMESPACE);
         intent.putExtra(UploadService.PARAM_BROADCAST_DATA, this);
         return intent;
     }

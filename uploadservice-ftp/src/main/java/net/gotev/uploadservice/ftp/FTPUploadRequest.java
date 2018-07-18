@@ -44,7 +44,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
             throw new IllegalArgumentException("Specify valid FTP port!");
         }
 
-        ftpParams.setPort(port);
+        ftpParams.port = port;
     }
 
     /**
@@ -80,8 +80,8 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
             throw new IllegalArgumentException("Specify FTP account password!");
         }
 
-        ftpParams.setUsername(username);
-        ftpParams.setPassword(password);
+        ftpParams.username = username;
+        ftpParams.password = password;
         return this;
     }
 
@@ -152,7 +152,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
             file.setProperty(FTPUploadTask.PARAM_PERMISSIONS, permissions.toString());
         }
 
-        params.addFile(file);
+        params.files.add(file);
         return this;
     }
 
@@ -174,7 +174,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
 
         file.setProperty(FTPUploadTask.PARAM_REMOTE_PATH, new File(filePath).getName());
 
-        params.addFile(file);
+        params.files.add(file);
         return this;
     }
 
@@ -189,7 +189,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
             throw new IllegalArgumentException("Set at least 2000ms connect timeout!");
         }
 
-        ftpParams.setConnectTimeout(milliseconds);
+        ftpParams.connectTimeout = milliseconds;
         return this;
     }
 
@@ -204,7 +204,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
             throw new IllegalArgumentException("Set at least 2000ms socket timeout!");
         }
 
-        ftpParams.setSocketTimeout(milliseconds);
+        ftpParams.socketTimeout = milliseconds;
         return this;
     }
 
@@ -218,7 +218,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      * @return {@link FTPUploadRequest}
      */
     public FTPUploadRequest useCompressedFileTransferMode(boolean value) {
-        ftpParams.setCompressedFileTransfer(value);
+        ftpParams.compressedFileTransfer = value;
         return this;
     }
 
@@ -234,7 +234,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
         if (permissions == null)
             return this;
 
-        ftpParams.setCreatedDirectoriesPermissions(permissions.toString());
+        ftpParams.createdDirectoriesPermissions = permissions.toString();
         return this;
     }
 
@@ -244,7 +244,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      * @return {@link FTPUploadRequest}
      */
     public FTPUploadRequest useSSL(boolean useSSL) {
-        ftpParams.setUseSSL(useSSL);
+        ftpParams.useSSL = useSSL;
         return this;
     }
 
@@ -256,7 +256,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      * @return {@link FTPUploadRequest}
      */
     public FTPUploadRequest setSecurityModeImplicit(boolean isImplicit) {
-        ftpParams.setImplicitSecurity(isImplicit);
+        ftpParams.implicitSecurity = isImplicit;
         return this;
     }
 
@@ -267,13 +267,13 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      * @return {@link FTPUploadRequest}
      */
     public FTPUploadRequest setSecureSocketProtocol(String protocol) {
-        ftpParams.setSecureSocketProtocol(protocol);
+        ftpParams.secureSocketProtocol = protocol;
         return this;
     }
 
     @Override
     public String startUpload() {
-        if (params.getFiles().isEmpty())
+        if (params.files.isEmpty())
             throw new IllegalArgumentException("Add at least one file to start FTP upload!");
 
         return super.startUpload();

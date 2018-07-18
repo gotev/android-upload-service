@@ -168,4 +168,19 @@ public class UploadFile implements Parcelable {
         return val;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UploadFile)) return false;
+
+        UploadFile that = (UploadFile) o;
+
+        return path.equals(that.path);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return path.hashCode();
+    }
 }

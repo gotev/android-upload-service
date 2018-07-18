@@ -51,7 +51,7 @@ public abstract class HttpUploadTask extends UploadTask
     @SuppressLint("NewApi")
     protected void upload() throws Exception {
 
-        Logger.debug(LOG_TAG, "Starting upload task with ID " + params.getId());
+        Logger.debug(LOG_TAG, "Starting upload task with ID " + params.id);
 
         try {
             getSuccessfullyUploadedFiles().clear();
@@ -59,17 +59,19 @@ public abstract class HttpUploadTask extends UploadTask
             totalBytes = getBodyLength();
 
             if (httpParams.isCustomUserAgentDefined()) {
-                httpParams.addRequestHeader("User-Agent", httpParams.getCustomUserAgent());
+                httpParams.addHeader("User-Agent", httpParams.customUserAgent);
+            } else {
+                httpParams.addHeader("User-Agent", "AndroidUploadService/" + BuildConfig.VERSION_NAME);
             }
 
             connection = UploadService.HTTP_STACK
-                    .createNewConnection(httpParams.getMethod(), params.getServerUrl())
+                    .createNewConnection(httpParams.method, params.serverUrl)
                     .setHeaders(httpParams.getRequestHeaders())
-                    .setTotalBodyBytes(totalBytes, httpParams.isUsesFixedLengthStreamingMode());
+                    .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode);
 
             final ServerResponse response = connection.getResponse(this);
             Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
-                            + " to upload with ID: " + params.getId());
+                            + " to upload with ID: " + params.id);
 
             // Broadcast completion only if the user has not cancelled the operation.
             // It may happen that when the body is not completely written and the client

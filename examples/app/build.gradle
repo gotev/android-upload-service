@@ -5,12 +5,12 @@ buildscript {
         jcenter()
         mavenCentral()
         maven { url "https://jitpack.io" }
+        maven { url "https://maven.google.com" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.6.2'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -23,6 +23,7 @@ allprojects {
         jcenter()
         mavenCentral()
         mavenLocal()
+        maven { url "https://maven.google.com" }
     }
 }
 
