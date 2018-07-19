@@ -1,6 +1,7 @@
 package net.gotev.uploadservice;
 
 import android.content.Intent;
+import android.util.Log;
 
 import net.gotev.uploadservice.http.BodyWriter;
 
@@ -33,7 +34,9 @@ public class HttpJsonTask extends HttpUploadTask {
 
     @Override
     protected long getBodyLength() throws UnsupportedEncodingException {
-        return getRequestParametersLength();
+        long bodyLength = getRequestParametersLength();
+        Log.d("AndroidUploadService", String.format("Content Length: %d", bodyLength));
+        return bodyLength;
     }
 
     @Override
