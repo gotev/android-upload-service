@@ -27,7 +27,7 @@ public class HttpJsonTask extends HttpUploadTask {
     @Override
     protected void init(UploadService service, Intent intent) throws IOException {
         super.init(service, intent);
-        httpParams.addRequestHeader("Content-Type", "application/json");
+        httpParams.addHeader("Content-Type", "application/json");
         charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false) ? Charset.forName("UTF-8") : US_ASCII;
     }
 
@@ -140,10 +140,10 @@ public class HttpJsonTask extends HttpUploadTask {
 
     @Override
     protected void onSuccessfulUpload() {
-        for (UploadFile file : params.getFiles()) {
-            addSuccessfullyUploadedFile(file.getPath());
+        for (UploadFile file : params.files) {
+            addSuccessfullyUploadedFile(file);
         }
-        params.getFiles().clear();
+        params.files.clear();
     }
 
 }
