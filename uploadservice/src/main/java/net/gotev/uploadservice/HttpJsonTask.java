@@ -39,13 +39,4 @@ public class HttpJsonTask extends HttpUploadTask {
     public void onBodyReady(BodyWriter bodyWriter) throws IOException {
         bodyWriter.write(jsonBody.getBytes(charset));
     }
-
-    @Override
-    protected void onSuccessfulUpload() {
-        for (UploadFile file : params.files) {
-            addSuccessfullyUploadedFile(file);
-        }
-        params.files.clear();
-    }
-
 }
