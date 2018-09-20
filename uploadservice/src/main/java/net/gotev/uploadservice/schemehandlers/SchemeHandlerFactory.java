@@ -26,8 +26,8 @@ public class SchemeHandlerFactory {
     }
 
     public SchemeHandler get(String path)
-            throws NoSuchMethodException, IllegalAccessException,
-                   InvocationTargetException, InstantiationException {
+            throws IllegalAccessException,
+        InstantiationException {
 
         for (Map.Entry<String, Class<? extends SchemeHandler>> handler : handlers.entrySet()) {
             if (path.startsWith(handler.getKey())) {

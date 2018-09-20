@@ -111,8 +111,8 @@ task javadoc(type: Javadoc) {
         locale = 'en_US'
         encoding = 'UTF-8'
         charSet = 'UTF-8'
-        links("http://docs.oracle.com/javase/7/docs/api/");
-        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+        links("http://docs.oracle.com/javase/7/docs/api/")
+        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
         setMemberLevel(JavadocMemberLevel.PUBLIC)
     }
     failOnError false

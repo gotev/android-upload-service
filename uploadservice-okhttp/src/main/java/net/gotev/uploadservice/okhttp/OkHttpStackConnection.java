@@ -45,7 +45,7 @@ public class OkHttpStackConnection implements HttpConnection {
     }
 
     @Override
-    public HttpConnection setHeaders(List<NameValue> requestHeaders) throws IOException {
+    public HttpConnection setHeaders(List<NameValue> requestHeaders) {
         for (final NameValue param : requestHeaders) {
             if ("Content-Type".equalsIgnoreCase(param.getName()))
                 mContentType = param.getValue();
@@ -75,7 +75,7 @@ public class OkHttpStackConnection implements HttpConnection {
         return this;
     }
 
-    private LinkedHashMap<String, String> getServerResponseHeaders(Headers headers) throws IOException {
+    private LinkedHashMap<String, String> getServerResponseHeaders(Headers headers) {
         LinkedHashMap<String, String> out = new LinkedHashMap<>(headers.size());
 
         for (String headerName : headers.names()) {
@@ -90,7 +90,7 @@ public class OkHttpStackConnection implements HttpConnection {
         if (HttpMethod.permitsRequestBody(mMethod) || HttpMethod.requiresRequestBody(mMethod)) {
             RequestBody body = new RequestBody() {
                 @Override
-                public long contentLength() throws IOException {
+                public long contentLength() {
                     return mBodyLength;
                 }
 

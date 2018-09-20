@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 
+import android.util.Log;
 import net.gotev.uploadservice.http.HttpStack;
 import net.gotev.uploadservice.http.impl.HurlStack;
 
@@ -127,7 +128,7 @@ public final class UploadService extends Service {
 
     // constants used in broadcast intents
     private static final String BROADCAST_ACTION_SUFFIX = ".uploadservice.broadcast.status";
-    protected static final String PARAM_BROADCAST_DATA = "broadcastData";
+    public static final String PARAM_BROADCAST_DATA = "broadcastData";
 
     // internal variables
     private PowerManager.WakeLock wakeLock;
@@ -143,7 +144,7 @@ public final class UploadService extends Service {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
     }
 
-    protected static String getActionBroadcast() {
+    public static String getActionBroadcast() {
         return NAMESPACE + BROADCAST_ACTION_SUFFIX;
     }
 
@@ -227,7 +228,7 @@ public final class UploadService extends Service {
         wakeLock.setReferenceCounted(false);
 
         if (!wakeLock.isHeld())
-            wakeLock.acquire();
+            wakeLock.acquire(10*60*1000L /*10 minutes*/);
 
         if (UPLOAD_POOL_SIZE <= 0) {
             UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
@@ -319,6 +320,7 @@ public final class UploadService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.e("DESTROY", "SERVICE DESTROYED");
         super.onDestroy();
 
         stopAllUploads();

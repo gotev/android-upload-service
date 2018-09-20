@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 public class BinaryUploadTask extends HttpUploadTask {
 
     @Override
-    protected long getBodyLength() throws UnsupportedEncodingException {
+    protected long getBodyLength() {
         return params.files.get(0).length(service);
     }
 
