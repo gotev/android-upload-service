@@ -93,13 +93,12 @@ public class MultipartUploadTask extends HttpUploadTask {
         return parametersBytes;
     }
 
-    private byte[] getMultipartBytes(NameValue parameter) throws UnsupportedEncodingException {
+    private byte[] getMultipartBytes(NameValue parameter) {
         return ("Content-Disposition: form-data; name=\"" + parameter.getName() + "\""
                 + NEW_LINE + NEW_LINE + parameter.getValue() + NEW_LINE).getBytes(charset);
     }
 
-    private byte[] getMultipartHeader(UploadFile file)
-            throws UnsupportedEncodingException {
+    private byte[] getMultipartHeader(UploadFile file) {
         String header = "Content-Disposition: form-data; name=\"" +
                 file.getProperty(PROPERTY_PARAM_NAME) + "\"; filename=\"" +
                 file.getProperty(PROPERTY_REMOTE_FILE_NAME) + "\"" + NEW_LINE +

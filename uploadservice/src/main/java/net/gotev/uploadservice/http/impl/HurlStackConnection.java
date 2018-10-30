@@ -50,7 +50,7 @@ public class HurlStackConnection implements HttpConnection {
     }
 
     @Override
-    public HttpConnection setHeaders(List<NameValue> requestHeaders) throws IOException {
+    public HttpConnection setHeaders(List<NameValue> requestHeaders) {
         for (final NameValue param : requestHeaders) {
             mConnection.setRequestProperty(param.getName(), param.getValue());
         }
@@ -118,7 +118,7 @@ public class HurlStackConnection implements HttpConnection {
         return byteStream.toByteArray();
     }
 
-    private LinkedHashMap<String, String> getServerResponseHeaders() throws IOException {
+    private LinkedHashMap<String, String> getServerResponseHeaders() {
         Map<String, List<String>> headers = mConnection.getHeaderFields();
         if (headers == null)
             return null;

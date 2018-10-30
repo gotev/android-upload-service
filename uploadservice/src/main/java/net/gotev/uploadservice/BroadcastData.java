@@ -10,7 +10,7 @@ import android.os.Parcelable;
  *
  * @author gotev (Aleksandar Gotev)
  */
-class BroadcastData implements Parcelable {
+public class BroadcastData implements Parcelable {
 
     public enum Status {
         IN_PROGRESS,

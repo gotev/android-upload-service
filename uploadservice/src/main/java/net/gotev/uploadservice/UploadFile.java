@@ -30,7 +30,7 @@ public class UploadFile implements Parcelable {
      * @throws FileNotFoundException if the file can't be found at the specified path
      * @throws IllegalArgumentException if you passed invalid argument values
      */
-    public UploadFile(String path) throws FileNotFoundException {
+    public UploadFile(String path) {
 
         if (path == null || "".equals(path)) {
             throw new IllegalArgumentException("Please specify a file path!");

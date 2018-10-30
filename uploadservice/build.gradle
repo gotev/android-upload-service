@@ -10,11 +10,11 @@ def projectGroup = "net.gotev"
 group = projectGroup
 version = "3.4.2"
 
-def sdkVersion = 26
+def sdkVersion = 27
 
 android {
     compileSdkVersion sdkVersion
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 14
@@ -118,8 +118,8 @@ task javadoc(type: Javadoc) {
         locale = 'en_US'
         encoding = 'UTF-8'
         charSet = 'UTF-8'
-        links("http://docs.oracle.com/javase/7/docs/api/");
-        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+        links("http://docs.oracle.com/javase/7/docs/api/")
+        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
         setMemberLevel(JavadocMemberLevel.PUBLIC)
     }
 }
