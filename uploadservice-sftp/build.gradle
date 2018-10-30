@@ -8,13 +8,13 @@ def projectName = "android-upload-service-sftp"
 def projectDesc = "SFTP Upload implementation for Android Upload Service."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "3.4.1"
+version = "3.4.3"
 
-def sdkVersion = 26
+def sdkVersion = 28
 
 android {
-    compileSdkVersion sdkVersion
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion 14
@@ -31,14 +31,20 @@ android {
     lintOptions {
         warning 'InvalidPackage'
     }
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.legacy:legacy-support-v4:1.0.0'
+            force 'androidx.media:media:1.0.0'
+        }
+    }
 }
 
 dependencies {
-    compile 'commons-net:commons-net:3.6'
-    compile 'com.jcraft:jsch:0.1.54'
-    //compile "net.gotev:uploadservice:${version}"
+    implementation 'commons-net:commons-net:3.6'
+    implementation 'com.jcraft:jsch:0.1.54'
+    //implementation "net.gotev:uploadservice:${version}"
     //comment the previous line and uncomment the next line for development (it uses the local lib)
-    compile project(':uploadservice')
+    implementation project(':uploadservice')
 }
 
 Properties properties = new Properties()

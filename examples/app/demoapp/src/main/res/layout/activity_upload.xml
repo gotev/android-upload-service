@@ -50,7 +50,7 @@
         android:clickable="true"
         app:colorFilter="@color/colorPrimaryDark"/>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/request_items"
         android:scrollbars="vertical"
         android:paddingTop="@dimen/activity_vertical_margin"

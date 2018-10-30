@@ -1,3 +1,4 @@
+include ':examples:app:demoapp'
 include ':uploadservice'
 include ':uploadservice-okhttp'
 include ':uploadservice-ftp'

@@ -8,9 +8,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/examples" />
+            <option value="$PROJECT_DIR$/examples/app" />
+            <option value="$PROJECT_DIR$/examples/app/demoapp" />
             <option value="$PROJECT_DIR$/uploadservice" />
             <option value="$PROJECT_DIR$/uploadservice-ftp" />
             <option value="$PROJECT_DIR$/uploadservice-okhttp" />
+            <option value="$PROJECT_DIR$/uploadservice-sftp" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

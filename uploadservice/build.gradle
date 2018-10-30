@@ -8,13 +8,13 @@ def projectName = "android-upload-service"
 def projectDesc = "Easily upload files in the background with automatic Android Notification Center progress indication."
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "3.4.2"
+version = "3.4.3"
 
-def sdkVersion = 27
+def sdkVersion = 28
 
 android {
-    compileSdkVersion sdkVersion
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion 14
@@ -31,13 +31,19 @@ android {
     lintOptions {
         warning 'InvalidPackage'
     }
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.legacy:legacy-support-v4:1.0.0'
+            force 'androidx.media:media:1.0.0'
+        }
+    }
 }
 
-def supportLibraryVersion = "27.0.2"
+def supportLibraryVersion = "28.0.0"
 
 dependencies {
-    compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
-    compile "com.android.support:support-v4:${supportLibraryVersion}"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }
 
 // add the following information to the file: local.properties situated in the parent directory of
