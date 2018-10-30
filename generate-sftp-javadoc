@@ -1,0 +1,13 @@
+#!/bin/bash -e
+./gradlew :uploadservice-sftp:clean :uploadservice-sftp:javadoc
+rm -rf ../javadoc-sftp
+mv uploadservice-sftp/build/docs/javadoc/ ../javadoc-sftp
+git checkout gh-pages
+rm -rf javadoc-sftp
+mv ../javadoc-sftp .
+cd javadoc-sftp
+git add . --force
+git commit -m "updated sftp module javadocs"
+git push
+cd ..
+git checkout master
