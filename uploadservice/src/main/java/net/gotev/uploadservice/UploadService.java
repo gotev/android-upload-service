@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.util.Log;
 
 import net.gotev.uploadservice.http.HttpStack;
 import net.gotev.uploadservice.http.impl.HurlStack;
@@ -24,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Service to upload files in background using HTTP POST with notification center progress
@@ -138,6 +140,8 @@ public final class UploadService extends Service {
     private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
     private Timer idleTimer = null;
+    private AtomicInteger filesCount = new AtomicInteger(0);
+    private AtomicInteger filesUploadedCount = new AtomicInteger(0);
 
     protected static String getActionUpload() {
         return NAMESPACE + ACTION_UPLOAD_SUFFIX;
@@ -279,6 +283,7 @@ public final class UploadService extends Service {
         // increment by 2 because the notificationIncrementalId + 1 is used internally
         // in each UploadTask. Check its sources for more info about this.
         notificationIncrementalId += 2;
+        filesCount.incrementAndGet();
         currentTask.setLastProgressNotificationTime(0)
                    .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
 
@@ -307,6 +312,7 @@ public final class UploadService extends Service {
                 public void run() {
                     Logger.info(TAG, "Service is about to be stopped because idle timeout of "
                             + IDLE_TIMEOUT + "ms has been reached");
+                    cleanService();
                     stopSelf();
                 }
             }, IDLE_TIMEOUT);
@@ -315,6 +321,11 @@ public final class UploadService extends Service {
         }
 
         return START_STICKY;
+    }
+
+    private void cleanService() {
+        filesCount.set(0);
+        filesUploadedCount.set(0);
     }
 
     @Override
@@ -453,5 +464,17 @@ public final class UploadService extends Service {
         }
 
         return delegate;
+    }
+
+    public int getFilesCount() {
+        return filesCount.get();
+    }
+
+    public int fileUploaded() {
+        return filesUploadedCount.incrementAndGet();
+    }
+
+    public int getFilesUploaded() {
+        return filesUploadedCount.get();
     }
 }

@@ -20,6 +20,11 @@ public final class UploadNotificationConfig implements Parcelable {
      */
     private String notificationChannelId;
 
+    /**
+     * Parameter to check if we want simplified notifications
+     */
+    private boolean simplifiedNotification;
+
     private UploadNotificationStatusConfig progress;
     private UploadNotificationStatusConfig completed;
     private UploadNotificationStatusConfig error;
@@ -42,6 +47,7 @@ public final class UploadNotificationConfig implements Parcelable {
 
         // common configuration for all the notification statuses
         ringToneEnabled = true;
+        simplifiedNotification = false;
 
         // progress notification configuration
         progress = new UploadNotificationStatusConfig();
@@ -184,8 +190,17 @@ public final class UploadNotificationConfig implements Parcelable {
         return this;
     }
 
+    public final UploadNotificationConfig setSimplifiedNotification(boolean simplifiedNotification){
+        this.simplifiedNotification = simplifiedNotification;
+        return this;
+    }
+
     public boolean isRingToneEnabled() {
         return ringToneEnabled;
+    }
+
+    public boolean isSimplifiedNotification() {
+        return simplifiedNotification;
     }
 
     public UploadNotificationStatusConfig getProgress() {
@@ -216,6 +231,7 @@ public final class UploadNotificationConfig implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.notificationChannelId);
+        dest.writeInt(this.simplifiedNotification ? 1 : 0);
         dest.writeByte(this.ringToneEnabled ? (byte) 1 : (byte) 0);
         dest.writeParcelable(this.progress, flags);
         dest.writeParcelable(this.completed, flags);
@@ -225,6 +241,7 @@ public final class UploadNotificationConfig implements Parcelable {
 
     protected UploadNotificationConfig(Parcel in) {
         this.notificationChannelId = in.readString();
+        this.simplifiedNotification = in.readInt() != 0;
         this.ringToneEnabled = in.readByte() != 0;
         this.progress = in.readParcelable(UploadNotificationStatusConfig.class.getClassLoader());
         this.completed = in.readParcelable(UploadNotificationStatusConfig.class.getClassLoader());
