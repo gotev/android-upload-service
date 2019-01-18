@@ -1,26 +1,41 @@
 {
-  "name": "nodejs-upload-server-example",
-  "version": "1.0.0",
-  "description": "A simple node.js multipart form upload server",
+  "name": "node-js-test-mj",
+  "version": "0.3.0",
+  "description": "A backed for android-upload-service",
+  "engines": {
+    "node": "10.x"
+  },
   "main": "index.js",
+  "author": "mritunjay",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "start:dev": "nodemon ./bin/www",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.15.2",
+    "express-fileupload": "^1.0.0",
+    "express-myconnection": "^1.0.4",
+    "express-session": "^1.15.6",
+    "express-validator": "^5.3.0",
+    "fs-extra": "^7.0.1",
+    "moment": "^2.23.0",
+    "request-promise": "^4.2.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.8",
+    "request": "^2.81.0",
+    "tape": "^4.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mritunjay10/node-js-test-mj"
   },
   "keywords": [
-    "android",
-    "upload",
-    "service",
-    "nodejs",
-    "form",
-    "upload",
-    "server"
+    "node",
+    "android file upload"
   ],
-  "author": "Aleksandar Gotev",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.14.0",
-    "multer": "^0.1.8",
-    "passport": "^0.3.2",
-    "passport-http": "^0.3.0"
-  }
+  "license": "MIT"
 }
