@@ -1,62 +1,75 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.getkeepsafe.dexcount'
-
-def sdkVersion = 26
-def libraryVersion = "3.4.2"
 
 android {
-    compileSdkVersion sdkVersion
-    buildToolsVersion '26.0.2'
+    compileSdkVersion target_sdk
 
     defaultConfig {
-        applicationId "net.gotev.uploadservicedemo"
-        minSdkVersion 16
-        targetSdkVersion sdkVersion
-        versionCode 22
-        versionName libraryVersion
+        applicationId demo_app_id
+        minSdkVersion min_sdk
+        targetSdkVersion target_sdk
+        versionCode version_code
+        versionName library_version
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
-repositories {
-    maven { url 'http://dl.bintray.com/igenius-code/maven' }
-}
-
-def butterKnifeVersion = "8.8.1"
-def supportVersion = "27.0.2"
+def butterKnifeVersion = "10.0.0"
 def stethoVersion = "1.4.2"
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    // Testing - https://developer.android.com/training/testing/set-up-project
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+
+    // Core library
+    androidTestImplementation "androidx.test:core:$androidx_test_core_version"
+
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation "androidx.test:runner:$androidx_test_runner_version"
+    androidTestImplementation "androidx.test:rules:$androidx_test_rules_version"
+
+    // Assertions
+    androidTestImplementation "androidx.test.ext:junit:$androidx_test_ext_junit_version"
+    androidTestImplementation "androidx.test.ext:truth:$androidx_test_ext_truth_version"
+    androidTestImplementation "com.google.truth:truth:$truth_version"
+
+    // Espresso dependencies
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidx_test_espresso_version"
+
+    // Support
+    implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
+    implementation 'com.google.android.material:material:1.0.0'
 
     // Debugging
-    debugCompile "com.facebook.stetho:stetho:${stethoVersion}"
-    debugCompile "com.facebook.stetho:stetho-okhttp3:${stethoVersion}"
-    releaseCompile "net.igenius:stetho-no-op:1.1"
-    compile 'com.squareup.okhttp3:logging-interceptor:3.9.1'
-
-    // Google support libraries
-    compile "com.android.support:appcompat-v7:${supportVersion}"
-    compile "com.android.support:design:${supportVersion}"
+    implementation "com.facebook.stetho:stetho:${stethoVersion}"
+    implementation "com.facebook.stetho:stetho-okhttp3:${stethoVersion}"
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
 
     // ButterKnife
-    compile "com.jakewharton:butterknife:${butterKnifeVersion}"
+    implementation "com.jakewharton:butterknife:${butterKnifeVersion}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 
-    compile 'com.nononsenseapps:filepicker:4.0.0-beta1'
-    compile 'net.gotev:recycleradapter:1.6'
+    implementation 'com.nononsenseapps:filepicker:4.0.0-beta1'
+    implementation 'net.gotev:recycleradapter:1.8.0'
 
-    /*compile "net.gotev:uploadservice:${libraryVersion}"
-    compile "net.gotev:uploadservice-okhttp:${libraryVersion}"
-    compile "net.gotev:uploadservice-ftp:${libraryVersion}"*/
+    /*implementation "net.gotev:uploadservice:${libraryVersion}"
+    implementation "net.gotev:uploadservice-okhttp:${libraryVersion}"
+    implementation "net.gotev:uploadservice-ftp:${libraryVersion}"*/
 
     //comment the previous lines and uncomment the next ones for development (it uses the local libs)
-    compile project(':uploadservice')
-    compile project(':uploadservice-okhttp')
-    compile project(':uploadservice-ftp')
+    implementation project(':uploadservice')
+    implementation project(':uploadservice-okhttp')
+    implementation project(':uploadservice-ftp')
 }

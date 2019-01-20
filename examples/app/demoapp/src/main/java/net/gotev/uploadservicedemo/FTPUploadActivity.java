@@ -2,10 +2,6 @@ package net.gotev.uploadservicedemo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NavUtils;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -25,6 +21,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NavUtils;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -69,7 +69,7 @@ public class FTPUploadActivity extends FilesPickerActivity {
 
         uploadItemsAdapter = new RecyclerAdapter();
         uploadItemUtils = new UploadItemUtils(uploadItemsAdapter);
-        requestItems.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        requestItems.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         requestItems.setAdapter(uploadItemsAdapter);
 
         ipAddressAndHostnameValidator = new IPAddressAndHostnameValidator();

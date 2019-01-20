@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:gravity="bottom"
-            android:ellipsize="middle"
+            android:singleLine="true"
             android:maxLines="1"
             android:id="@+id/title" />
 
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:gravity="top"
-            android:ellipsize="middle"
+            android:singleLine="true"
             android:maxLines="1"
             android:id="@+id/subtitle" />
 

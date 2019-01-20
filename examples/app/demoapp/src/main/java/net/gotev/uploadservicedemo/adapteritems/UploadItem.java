@@ -1,7 +1,7 @@
 package net.gotev.uploadservicedemo.adapteritems;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;

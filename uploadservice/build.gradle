@@ -1,43 +1,67 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.ben-manes.versions'
 
-def siteUrl = 'https://github.com/gotev/android-upload-service'
-def gitUrl = 'https://github.com/gotev/android-upload-service.git'
-def projectName = "android-upload-service"
-def projectDesc = "Easily upload files in the background with automatic Android Notification Center progress indication."
-def projectGroup = "net.gotev"
-group = projectGroup
-version = "3.4.2"
+// start - do not modify this if your project is on github
+def siteUrl = "https://github.com/${github_username}/${github_repository_name}"
+def gitUrl = siteUrl + '.git'
+def bugTrackerUrl = siteUrl + '/issues/'
+def projectName = github_repository_name
+// end - do not modify this if your project is on github
 
-def sdkVersion = 26
+group = library_project_group
+version = library_version
 
 android {
-    compileSdkVersion sdkVersion
-    buildToolsVersion '26.0.2'
+    compileSdkVersion target_sdk
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion sdkVersion
-        versionCode 30
-        versionName version
+        minSdkVersion min_sdk
+        targetSdkVersion target_sdk
+        versionCode version_code
+        versionName library_version
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     lintOptions {
         warning 'InvalidPackage'
     }
 }
 
-def supportLibraryVersion = "27.0.2"
-
 dependencies {
-    compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
-    compile "com.android.support:support-v4:${supportLibraryVersion}"
+    // Testing - https://developer.android.com/training/testing/set-up-project
+    testImplementation "junit:junit:$junit_version"
+
+    // Core library
+    androidTestImplementation "androidx.test:core:$androidx_test_core_version"
+
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation "androidx.test:runner:$androidx_test_runner_version"
+    androidTestImplementation "androidx.test:rules:$androidx_test_rules_version"
+
+    // Assertions
+    androidTestImplementation "androidx.test.ext:junit:$androidx_test_ext_junit_version"
+    androidTestImplementation "androidx.test.ext:truth:$androidx_test_ext_truth_version"
+    androidTestImplementation "com.google.truth:truth:$truth_version"
+
+    // Espresso dependencies
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidx_test_espresso_version"
+
+    // Support
+    implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
 }
 
 // add the following information to the file: local.properties situated in the parent directory of
@@ -57,21 +81,21 @@ install {
     repositories.mavenInstaller {
         pom.project {
             name projectName
-            description projectDesc
+            description library_description
             packaging 'aar'
-            groupId projectGroup
+            groupId library_project_group
             version version
             url siteUrl
             licenses {
                 license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    name library_licenses[0]
+                    url library_licenses_url
                 }
             }
             developers {
                 developer {
-                    id 'gotev'
-                    name 'Aleksandar Gotev'
+                    id properties.getProperty("bintray.user")
+                    name maintainer
                 }
             }
             scm {
@@ -91,12 +115,12 @@ bintray {
     pkg {
         repo = "maven"
         name = projectName
-        desc = projectDesc
+        desc = library_description
         websiteUrl = siteUrl
         vcsUrl = gitUrl
-        issueTrackerUrl = siteUrl + "/issues/"
-        licenses = ["Apache-2.0"]
-        labels = ['android', 'upload', 'service', 'library', 'background', 'notification']
+        issueTrackerUrl = bugTrackerUrl
+        licenses = library_licenses
+        labels = library_keywords
         publicDownloadNumbers = true
         publish = true
     }
@@ -108,19 +132,22 @@ task sourcesJar(type: Jar) {
 }
 
 task javadoc(type: Javadoc) {
-    title = "Android Upload Service $project.version API"
+    excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
+
+    title = "$projectName $project.version API"
     description "Generates Javadoc"
     source = android.sourceSets.main.java.srcDirs
     classpath += files(android.bootClasspath)
     exclude '**/BuildConfig.java', '**/R.java'
     options {
-        windowTitle("Android Upload Service $project.version Reference")
+        windowTitle("$projectName $project.version Reference")
         locale = 'en_US'
         encoding = 'UTF-8'
         charSet = 'UTF-8'
-        links("http://docs.oracle.com/javase/7/docs/api/");
-        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+        links("http://docs.oracle.com/javase/7/docs/api/")
+        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
         setMemberLevel(JavadocMemberLevel.PUBLIC)
+        addStringOption('Xdoclint:none', '-quiet')
     }
 }
 

@@ -3,8 +3,9 @@ package net.gotev.uploadservice;
 import android.app.PendingIntent;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
+
+import androidx.core.app.NotificationCompat;
 
 /**
  * Class which represents a notification action.
@@ -22,6 +23,7 @@ public class UploadNotificationAction implements Parcelable {
 
     /**
      * Creates a new object from an existing NotificationCompat.Action object.
+     *
      * @param action notification compat action
      * @return new instance
      */
@@ -31,8 +33,9 @@ public class UploadNotificationAction implements Parcelable {
 
     /**
      * Creates a new {@link UploadNotificationAction} object.
-     * @param icon icon to show for this action
-     * @param title the title of the action
+     *
+     * @param icon   icon to show for this action
+     * @param title  the title of the action
      * @param intent the {@link PendingIntent} to fire when users trigger this action
      */
     public UploadNotificationAction(int icon, CharSequence title, PendingIntent intent) {
