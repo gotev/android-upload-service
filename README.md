@@ -3,9 +3,11 @@ Android Upload Service
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice)
 
+### Last version 3.5.0 with support for AndroidX and Android 9.0 Pie
+
 | :information_source: | [Get started!](https://github.com/gotev/android-upload-service/wiki/Setup) |
 |--|--|
-| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.4.2/uploadservice-demo-debug.apk)|
+| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.5.0/uploadservice-demo-debug.apk)|
 
 ![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
