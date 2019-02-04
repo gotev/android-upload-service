@@ -60,7 +60,7 @@ public class UploadItemUtils implements UploadItem.Delegate {
 
     public void add(UploadItem item) {
         mAdapter.addOrUpdate(item);
-        mAdapter.sort(true);
+        mAdapter.sort(true, null);
     }
 
     public void addHeader(String headerName, String headerValue) {

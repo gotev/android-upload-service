@@ -1,7 +1,6 @@
 package net.gotev.uploadservicedemo.adapteritems;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -11,6 +10,9 @@ import net.gotev.recycleradapter.RecyclerAdapterNotifier;
 import net.gotev.uploadservicedemo.R;
 import net.gotev.uploadservicedemo.views.ButterKnifeViewHolder;
 
+import org.jetbrains.annotations.NotNull;
+
+import androidx.annotation.NonNull;
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -55,7 +57,7 @@ public class UploadItem extends AdapterItem<UploadItem.Holder> {
     }
 
     @Override
-    protected void bind(Holder holder) {
+    public void bind(@NotNull Holder holder) {
         holder.image.setImageResource(icons[mType]);
         holder.title.setText(mTitle);
         holder.subtitle.setText(mSubtitle);

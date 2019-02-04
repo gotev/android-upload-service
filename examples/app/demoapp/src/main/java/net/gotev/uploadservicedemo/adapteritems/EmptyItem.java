@@ -1,7 +1,6 @@
 package net.gotev.uploadservicedemo.adapteritems;
 
 import android.content.Context;
-import androidx.annotation.StringRes;
 import android.view.View;
 import android.widget.TextView;
 
@@ -10,6 +9,9 @@ import net.gotev.recycleradapter.RecyclerAdapterNotifier;
 import net.gotev.uploadservicedemo.R;
 import net.gotev.uploadservicedemo.views.ButterKnifeViewHolder;
 
+import org.jetbrains.annotations.NotNull;
+
+import androidx.annotation.StringRes;
 import butterknife.BindView;
 
 /**
@@ -30,7 +32,7 @@ public class EmptyItem extends AdapterItem<EmptyItem.Holder> {
     }
 
     @Override
-    protected void bind(Holder holder) {
+    public void bind(@NotNull Holder holder) {
         Context ctx = holder.textView.getContext();
         holder.textView.setText(ctx.getString(text));
     }
