@@ -118,7 +118,7 @@ public final class UploadService extends Service {
      * If the upload Tasks report more frequently, we will throttle notifications.
      * We aim for 6 updates per second.
      */
-    protected static final long PROGRESS_REPORT_INTERVAL = 166;
+    public static long PROGRESS_REPORT_INTERVAL = 166;
 
     // constants used in the intent which starts this service
     private static final String ACTION_UPLOAD_SUFFIX = ".uploadservice.action.upload";
