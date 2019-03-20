@@ -122,7 +122,7 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
      * @return self instance
      */
     public B setMethod(final String method) {
-        httpParams.method = method;
+        httpParams.method = method.toUpperCase();
         return self();
     }
 
