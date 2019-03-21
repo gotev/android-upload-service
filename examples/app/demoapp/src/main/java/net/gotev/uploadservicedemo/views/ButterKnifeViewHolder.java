@@ -2,7 +2,6 @@ package net.gotev.uploadservicedemo.views;
 
 import android.view.View;
 
-import net.gotev.recycleradapter.RecyclerAdapterNotifier;
 import net.gotev.recycleradapter.RecyclerAdapterViewHolder;
 
 import butterknife.ButterKnife;
@@ -12,8 +11,8 @@ import butterknife.ButterKnife;
  */
 
 public abstract class ButterKnifeViewHolder extends RecyclerAdapterViewHolder {
-    public ButterKnifeViewHolder(View itemView, RecyclerAdapterNotifier adapter) {
-        super(itemView, adapter);
+    public ButterKnifeViewHolder(View itemView) {
+        super(itemView);
         ButterKnife.bind(this, itemView);
     }
 }
