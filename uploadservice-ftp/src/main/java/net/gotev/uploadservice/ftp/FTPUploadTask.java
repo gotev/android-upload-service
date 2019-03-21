@@ -51,7 +51,13 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
                 if (secureProtocol == null || secureProtocol.isEmpty())
                     secureProtocol = FTPUploadTaskParameters.DEFAULT_SECURE_SOCKET_PROTOCOL;
 
-                ftpClient = new FTPSClient(secureProtocol, ftpParams.implicitSecurity);
+                FTPSClient ftpsClient = new FTPSClient(secureProtocol, ftpParams.implicitSecurity);
+
+                // https://tools.ietf.org/html/rfc4217#page-17
+                ftpsClient.execPBSZ(0);
+                ftpsClient.execPROT("P");
+
+                ftpClient = ftpsClient;
 
                 Logger.debug(LOG_TAG, "Created FTP over SSL (FTPS) client with "
                         + secureProtocol + " protocol and "
