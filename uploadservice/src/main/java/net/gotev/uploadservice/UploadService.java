@@ -288,7 +288,7 @@ public final class UploadService extends Service {
         return START_STICKY;
     }
 
-    private void clearIdleTimer() {
+    synchronized private void clearIdleTimer() {
         if (idleTimer != null) {
             Logger.info(TAG, "Clearing idle timer");
             idleTimer.cancel();
@@ -296,7 +296,7 @@ public final class UploadService extends Service {
         }
     }
 
-    private int shutdownIfThereArentAnyActiveTasks() {
+    synchronized private int shutdownIfThereArentAnyActiveTasks() {
         if (uploadTasksMap.isEmpty()) {
             clearIdleTimer();
 
