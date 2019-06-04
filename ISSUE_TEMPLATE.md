@@ -23,7 +23,7 @@
 - [ ] Service
 - [ ] Other class (add additional info about it)
 
-### LogCat output (please [set log level to DEBUG](https://github.com/gotev/android-upload-service/wiki/Recipes#logging-) first)
+### LogCat output (please [set log level to DEBUG](https://github.com/gotev/android-upload-service/wiki/Recipes#logging) first)
 ```
 // your LogCat output here
 ```
