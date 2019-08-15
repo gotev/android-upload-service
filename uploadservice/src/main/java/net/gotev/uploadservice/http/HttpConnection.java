@@ -41,7 +41,8 @@ public interface HttpConnection {
      * Sets the total body bytes.
      * @param totalBodyBytes total number of bytes
      * @param isFixedLengthStreamingMode true if the fixed length streaming mode must be used. If
-     *                                   it's false, chunked streaming mode has to be used
+     *                                   it's false, chunked streaming mode has to be used.
+     *                                   https://gist.github.com/CMCDragonkai/6bfade6431e9ffb7fe88
      * @return instance
      */
     HttpConnection setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode);
