@@ -7,6 +7,8 @@ import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
+import okio.BufferedSink
 import java.io.IOException
 import java.net.URL
 import java.util.*
@@ -46,11 +48,25 @@ class OkHttpStackConnection(private val httpClient: OkHttpClient, private val ht
         return this
     }
 
-    private fun request(delegate: HttpConnection.RequestBodyDelegate) =
-            requestBuilder.method(
-                    method = httpMethod,
-                    body = body(httpMethod, bodyLength, contentType, delegate)
-            ).build()
+    private fun createBody(delegate: HttpConnection.RequestBodyDelegate): RequestBody? {
+        if (!httpMethod.hasBody()) return null
+
+        return object : RequestBody() {
+            override fun contentLength() = bodyLength
+
+            override fun contentType() = contentType
+
+            override fun writeTo(sink: BufferedSink) {
+                OkHttpBodyWriter(sink).use {
+                    delegate.onBodyReady(it)
+                }
+            }
+        }
+    }
+
+    private fun request(delegate: HttpConnection.RequestBodyDelegate) = requestBuilder
+            .method(httpMethod, createBody(delegate))
+            .build()
 
     @Throws(IOException::class)
     override fun getResponse(delegate: HttpConnection.RequestBodyDelegate) = httpClient

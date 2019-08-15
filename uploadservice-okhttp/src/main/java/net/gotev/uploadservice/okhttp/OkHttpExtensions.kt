@@ -1,11 +1,7 @@
 package net.gotev.uploadservice.okhttp
 
 import net.gotev.uploadservice.ServerResponse
-import net.gotev.uploadservice.http.HttpConnection
-import okhttp3.MediaType
-import okhttp3.RequestBody
 import okhttp3.Response
-import okio.BufferedSink
 
 /**
  * @author Aleksandar Gotev
@@ -14,23 +10,9 @@ private fun String.requiresRequestBody() = this == "POST" || this == "PUT" || th
 
 private fun String.permitsRequestBody() = !(this == "GET" || this == "HEAD")
 
-internal fun body(httpMethod: String, bodyLength: Long, contentType: MediaType?, delegate: HttpConnection.RequestBodyDelegate): RequestBody? {
-    val method = httpMethod.trim().toUpperCase()
-
-    if (!method.permitsRequestBody() && !method.requiresRequestBody()) return null
-
-    return object : RequestBody() {
-        override fun contentLength() = bodyLength
-
-        override fun contentType() = contentType
-
-        override fun writeTo(sink: BufferedSink) {
-            OkHttpBodyWriter(sink).apply {
-                delegate.onBodyReady(this)
-                flush()
-            }
-        }
-    }
+internal fun String.hasBody(): Boolean {
+    val method = trim().toUpperCase()
+    return method.permitsRequestBody() || method.requiresRequestBody()
 }
 
 private fun Response.headersHashMap() = LinkedHashMap(headers.toMap())
