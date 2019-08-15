@@ -1,13 +1,24 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.ben-manes.versions'
 
+Properties properties = new Properties()
+if (project.rootProject.file("local.properties").exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
+
 // start - do not modify this if your project is on github
-def siteUrl = "https://github.com/${github_username}/${github_repository_name}"
-def gitUrl = siteUrl + '.git'
-def bugTrackerUrl = siteUrl + '/issues/'
-def projectName = github_repository_name
+project.ext{
+    mavDevelopers = [(properties.getProperty("bintray.user")):(maintainer)]
+    mavSiteUrl = "https://github.com/${github_username}/${github_repository_name}"
+    mavGitUrl = mavSiteUrl + '.git'
+    bugTrackerUrl = mavSiteUrl + '/issues/'
+    mavProjectName = bintray_project_name
+    mavLibraryLicenses = ["Apache-2.0": 'http://www.apache.org/licenses/LICENSE-2.0.txt']
+    mavLibraryDescription = library_description
+    mavVersion = library_version
+}
 // end - do not modify this if your project is on github
 
 group = library_project_group
@@ -62,62 +73,20 @@ dependencies {
 
     // Support
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
-}
 
-// add the following information to the file: local.properties situated in the parent directory of
-// where this file is:
-//
-// bintray.user=gotev
-// bintray.apikey=api key got from the bintray profile
-//
-// be sure to add local.properties to the .gitignore!
-
-Properties properties = new Properties()
-if (project.rootProject.file("local.properties").exists()) {
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-}
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            name projectName
-            description library_description
-            packaging 'aar'
-            groupId library_project_group
-            version version
-            url siteUrl
-            licenses {
-                license {
-                    name library_licenses[0]
-                    url library_licenses_url
-                }
-            }
-            developers {
-                developer {
-                    id properties.getProperty("bintray.user")
-                    name maintainer
-                }
-            }
-            scm {
-                connection gitUrl
-                developerConnection gitUrl
-                url siteUrl
-
-            }
-        }
-    }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 bintray {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
-    configurations = ['archives']
+    publications = ['mavenPublish']
     pkg {
         repo = "maven"
-        name = projectName
+        name = mavProjectName
         desc = library_description
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
+        websiteUrl = mavSiteUrl
+        vcsUrl = mavGitUrl
         issueTrackerUrl = bugTrackerUrl
         licenses = library_licenses
         labels = library_keywords
@@ -126,37 +95,4 @@ bintray {
     }
 }
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
-
-    title = "$projectName $project.version API"
-    description "Generates Javadoc"
-    source = android.sourceSets.main.java.srcDirs
-    classpath += files(android.bootClasspath)
-    exclude '**/BuildConfig.java', '**/R.java'
-    options {
-        windowTitle("$projectName $project.version Reference")
-        locale = 'en_US'
-        encoding = 'UTF-8'
-        charSet = 'UTF-8'
-        links("http://docs.oracle.com/javase/7/docs/api/")
-        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
-        setMemberLevel(JavadocMemberLevel.PUBLIC)
-        addStringOption('Xdoclint:none', '-quiet')
-    }
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
+apply from: 'https://raw.githubusercontent.com/sky-uk/gradle-maven-plugin/master/gradle-mavenizer.gradle'

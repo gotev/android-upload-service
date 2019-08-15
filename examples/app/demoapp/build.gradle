@@ -62,7 +62,7 @@ dependencies {
     annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 
     implementation 'com.nononsenseapps:filepicker:4.0.0-beta1'
-    implementation 'net.gotev:recycleradapter:2.4.0'
+    implementation 'net.gotev:recycleradapter:2.8.1'
 
     /*implementation "net.gotev:uploadservice:${libraryVersion}"
     implementation "net.gotev:uploadservice-okhttp:${libraryVersion}"

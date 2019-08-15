@@ -1,4 +1,3 @@
-#!/bin/bash -e
-./gradlew :uploadservice:clean :uploadservice:bintrayUpload
-./gradlew :uploadservice-ftp:clean :uploadservice-ftp:bintrayUpload
-./gradlew :uploadservice-okhttp:clean :uploadservice-okhttp:bintrayUpload
+#!/bin/bash
+./gradlew clean publish bintrayUpload
+

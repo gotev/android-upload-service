@@ -1,19 +1,31 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.ben-manes.versions'
 
-// start - do not modify this if your project is on github
-def siteUrl = "https://github.com/${github_username}/${github_repository_name}"
-def gitUrl = siteUrl + '.git'
-def bugTrackerUrl = siteUrl + '/issues/'
-def projectName = "android-upload-service-okhttp"
-// end - do not modify this if your project is on github
+Properties properties = new Properties()
+if (project.rootProject.file("local.properties").exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
 
 // start - module specific overrides of default values written in manifest.gradle
+def bintray_project_name = "android-upload-service-okhttp"
 def library_description = "OkHttp stack implementation for Android Upload Service."
 def library_keywords = ['android', 'upload', 'service', 'okhttp', 'stack']
 // end - module specific overrides
+
+// start - do not modify this if your project is on github
+project.ext{
+    mavDevelopers = [(properties.getProperty("bintray.user")):(maintainer)]
+    mavSiteUrl = "https://github.com/${github_username}/${github_repository_name}"
+    mavGitUrl = mavSiteUrl + '.git'
+    bugTrackerUrl = mavSiteUrl + '/issues/'
+    mavProjectName = bintray_project_name
+    mavLibraryLicenses = ["Apache-2.0": 'http://www.apache.org/licenses/LICENSE-2.0.txt']
+    mavLibraryDescription = library_description
+    mavVersion = library_version
+}
+// end - do not modify this if your project is on github
 
 group = library_project_group
 version = library_version
@@ -65,58 +77,24 @@ dependencies {
     // Espresso dependencies
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidx_test_espresso_version"
 
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
     api 'com.squareup.okhttp3:okhttp:3.14.0'
     //api "net.gotev:uploadservice:${version}"
     //comment the previous line and uncomment the next line for development (it uses the local lib)
     api project(':uploadservice')
 }
 
-Properties properties = new Properties()
-if (project.rootProject.file("local.properties").exists()) {
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-}
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            name projectName
-            description library_description
-            packaging 'aar'
-            groupId library_project_group
-            version version
-            url siteUrl
-            licenses {
-                license {
-                    name library_licenses[0]
-                    url library_licenses_url
-                }
-            }
-            developers {
-                developer {
-                    id properties.getProperty("bintray.user")
-                    name maintainer
-                }
-            }
-            scm {
-                connection gitUrl
-                developerConnection gitUrl
-                url siteUrl
-
-            }
-        }
-    }
-}
-
 bintray {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
-    configurations = ['archives']
+    publications = ['mavenPublish']
     pkg {
         repo = "maven"
-        name = projectName
+        name = mavProjectName
         desc = library_description
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
+        websiteUrl = mavSiteUrl
+        vcsUrl = mavGitUrl
         issueTrackerUrl = bugTrackerUrl
         licenses = library_licenses
         labels = library_keywords
@@ -125,37 +103,4 @@ bintray {
     }
 }
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
-
-    title = "$projectName $project.version API"
-    description "Generates Javadoc"
-    source = android.sourceSets.main.java.srcDirs
-    classpath += files(android.bootClasspath)
-    exclude '**/BuildConfig.java', '**/R.java'
-    options {
-        windowTitle("$projectName $project.version Reference")
-        locale = 'en_US'
-        encoding = 'UTF-8'
-        charSet = 'UTF-8'
-        links("http://docs.oracle.com/javase/7/docs/api/")
-        linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
-        setMemberLevel(JavadocMemberLevel.PUBLIC)
-        addStringOption('Xdoclint:none', '-quiet')
-    }
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
+apply from: 'https://raw.githubusercontent.com/sky-uk/gradle-maven-plugin/master/gradle-mavenizer.gradle'
