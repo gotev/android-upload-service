@@ -1,10 +1,9 @@
-package net.gotev.uploadservice.http;
+package net.gotev.uploadservice.http
 
-import net.gotev.uploadservice.NameValue;
-import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.NameValue
+import net.gotev.uploadservice.ServerResponse
 
-import java.io.IOException;
-import java.util.List;
+import java.io.IOException
 
 /**
  * Defines the methods that has to be implemented by an HTTP connection.
@@ -14,7 +13,7 @@ import java.util.List;
  * from the server, which must not be large though.
  * @author gotev (Aleksandar Gotev)
  */
-public interface HttpConnection {
+interface HttpConnection {
 
     /**
      * Delegate called when the body is ready to be written.
@@ -26,7 +25,8 @@ public interface HttpConnection {
          * @param bodyWriter object with which to write on the body
          * @throws IOException if an error occurs while writing the body
          */
-        void onBodyReady(BodyWriter bodyWriter) throws IOException;
+        @Throws(IOException::class)
+        fun onBodyReady(bodyWriter: BodyWriter)
     }
 
     /**
@@ -35,17 +35,18 @@ public interface HttpConnection {
      * @throws IOException if an error occurs while setting request headers
      * @return instance
      */
-    HttpConnection setHeaders(List<NameValue> requestHeaders) throws IOException;
+    @Throws(IOException::class)
+    fun setHeaders(requestHeaders: List<NameValue>): HttpConnection
 
     /**
      * Sets the total body bytes.
      * @param totalBodyBytes total number of bytes
      * @param isFixedLengthStreamingMode true if the fixed length streaming mode must be used. If
-     *                                   it's false, chunked streaming mode has to be used.
-     *                                   https://gist.github.com/CMCDragonkai/6bfade6431e9ffb7fe88
+     * it's false, chunked streaming mode has to be used.
+     * https://gist.github.com/CMCDragonkai/6bfade6431e9ffb7fe88
      * @return instance
      */
-    HttpConnection setTotalBodyBytes(long totalBodyBytes, boolean isFixedLengthStreamingMode);
+    fun setTotalBodyBytes(totalBodyBytes: Long, isFixedLengthStreamingMode: Boolean): HttpConnection
 
     /**
      * Gets the server response.
@@ -54,10 +55,11 @@ public interface HttpConnection {
      * @throws IOException if an error occurs while getting the server response
      * @return response from server
      */
-    ServerResponse getResponse(RequestBodyDelegate delegate) throws IOException;
+    @Throws(IOException::class)
+    fun getResponse(delegate: RequestBodyDelegate): ServerResponse
 
     /**
      * Closes the connection and frees all the allocated resources.
      */
-    void close();
+    fun close()
 }

@@ -9,7 +9,6 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import net.gotev.uploadservice.Logger;
 import net.gotev.uploadservice.UploadService;
-import net.gotev.uploadservice.okhttp.OkHttpStack;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +49,7 @@ public class App extends Application {
 
         // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
         // used by default
-        UploadService.HTTP_STACK = new OkHttpStack(getOkHttpClient());
+        //UploadService.HTTP_STACK = new OkHttpStack(getOkHttpClient());
 
         // setup backoff multiplier
         UploadService.BACKOFF_MULTIPLIER = 2;

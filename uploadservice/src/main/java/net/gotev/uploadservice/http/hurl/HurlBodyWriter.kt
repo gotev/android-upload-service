@@ -1,31 +1,32 @@
-package net.gotev.uploadservice.okhttp
+package net.gotev.uploadservice.http.hurl
 
 import net.gotev.uploadservice.http.BodyWriter
-import okio.BufferedSink
+
 import java.io.IOException
+import java.io.OutputStream
 
 /**
  * @author Aleksandar Gotev
  */
 
-class OkHttpBodyWriter(private val sink: BufferedSink) : BodyWriter() {
+class HurlBodyWriter(private val stream: OutputStream) : BodyWriter() {
     @Throws(IOException::class)
     override fun write(bytes: ByteArray) {
-        sink.write(bytes)
+        stream.write(bytes)
     }
 
     @Throws(IOException::class)
     override fun write(bytes: ByteArray, lengthToWriteFromStart: Int) {
-        sink.write(bytes, 0, lengthToWriteFromStart)
+        stream.write(bytes, 0, lengthToWriteFromStart)
     }
 
     @Throws(IOException::class)
     override fun flush() {
-        sink.flush()
+        stream.flush()
     }
 
     @Throws(IOException::class)
     override fun close() {
-        sink.close()
+        stream.close()
     }
 }

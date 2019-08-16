@@ -9,7 +9,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 
 import net.gotev.uploadservice.http.HttpStack;
-import net.gotev.uploadservice.http.impl.HurlStack;
+import net.gotev.uploadservice.http.hurl.HurlStack;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

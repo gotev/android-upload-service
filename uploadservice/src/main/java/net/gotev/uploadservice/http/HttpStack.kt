@@ -1,12 +1,12 @@
-package net.gotev.uploadservice.http;
+package net.gotev.uploadservice.http
 
-import java.io.IOException;
+import java.io.IOException
 
 /**
  * Defines the methods that has to be implemented by an HTTP stack.
  * @author gotev (Aleksandar Gotev)
  */
-public interface HttpStack {
+interface HttpStack {
 
     /**
      * Creates a new connection for a given URL and HTTP Method.
@@ -15,5 +15,6 @@ public interface HttpStack {
      * @return new connection object
      * @throws IOException if an error occurs while creating the connection object
      */
-    HttpConnection createNewConnection(String method, String url) throws IOException;
+    @Throws(IOException::class)
+    fun createNewConnection(method: String, url: String): HttpConnection
 }
