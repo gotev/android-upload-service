@@ -11,8 +11,13 @@ android:
   components:
     - tools
     - platform-tools
+    - build-tools-28.0.3
     - build-tools-29.0.2
+    - android-28
     - android-29
     - extra-google-m2repository
     - extra-android-m2repository
 
+env:
+  global:
+    - API=29 # Android API default
