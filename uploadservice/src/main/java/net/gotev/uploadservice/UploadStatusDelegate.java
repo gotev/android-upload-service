@@ -2,6 +2,8 @@ package net.gotev.uploadservice;
 
 import android.content.Context;
 
+import net.gotev.uploadservice.network.ServerResponse;
+
 /**
  * Defines the methods that has to be implemented by a class who wants to listen for upload status
  * events.

@@ -10,6 +10,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 
+import androidx.core.app.NotificationCompat;
+
+import net.gotev.uploadservice.network.ServerResponse;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -17,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
-import androidx.core.app.NotificationCompat;
 
 /**
  * Base class to subclass when creating upload tasks. It contains the logic common to all the tasks,
@@ -271,7 +273,7 @@ public abstract class UploadTask implements Runnable {
      */
     protected final void broadcastCompleted(final ServerResponse response) {
 
-        final boolean successfulUpload = response.getHttpCode() >= 200 && response.getHttpCode() < 400;
+        final boolean successfulUpload = response.getCode() >= 200 && response.getCode() < 400;
 
         if (successfulUpload) {
             onSuccessfulUpload();

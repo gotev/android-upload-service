@@ -1,6 +1,8 @@
 package net.gotev.uploadservicedemo;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.os.StrictMode;
 import android.util.Log;
 
@@ -53,6 +55,10 @@ public class App extends Application {
 
         // setup backoff multiplier
         UploadService.BACKOFF_MULTIPLIER = 2;
+
+        IntentFilter filter = new IntentFilter(BuildConfig.APPLICATION_ID + ".uploadservice.broadcast.status");
+        BroadcastReceiver receiver = new GlobalBroadcastReceiver();
+        registerReceiver(receiver, filter);
     }
 
     private OkHttpClient getOkHttpClient() {

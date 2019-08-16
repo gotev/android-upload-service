@@ -2,7 +2,7 @@ package net.gotev.uploadservice.okhttp
 
 import net.gotev.uploadservice.Logger
 import net.gotev.uploadservice.NameValue
-import net.gotev.uploadservice.http.HttpConnection
+import net.gotev.uploadservice.network.HttpConnection
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient

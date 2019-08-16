@@ -2,6 +2,8 @@ package net.gotev.uploadservice;
 
 import android.content.Context;
 
+import net.gotev.uploadservice.network.ServerResponse;
+
 import java.lang.ref.WeakReference;
 
 /**

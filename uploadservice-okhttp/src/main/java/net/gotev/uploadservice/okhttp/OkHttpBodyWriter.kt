@@ -1,6 +1,6 @@
 package net.gotev.uploadservice.okhttp
 
-import net.gotev.uploadservice.http.BodyWriter
+import net.gotev.uploadservice.network.BodyWriter
 import okio.BufferedSink
 import java.io.IOException
 

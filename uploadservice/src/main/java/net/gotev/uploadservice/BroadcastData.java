@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import net.gotev.uploadservice.network.ServerResponse;
+
 /**
  * Class which contains all the data passed in broadcast intents to notify task progress, errors,
  * completion or cancellation.

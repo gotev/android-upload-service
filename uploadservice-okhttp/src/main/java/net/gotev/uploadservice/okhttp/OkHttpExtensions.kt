@@ -1,6 +1,6 @@
 package net.gotev.uploadservice.okhttp
 
-import net.gotev.uploadservice.ServerResponse
+import net.gotev.uploadservice.network.ServerResponse
 import okhttp3.Response
 
 /**

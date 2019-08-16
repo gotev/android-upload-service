@@ -1,7 +1,7 @@
-package net.gotev.uploadservice.http.hurl
+package net.gotev.uploadservice.network.hurl
 
-import net.gotev.uploadservice.http.HttpConnection
-import net.gotev.uploadservice.http.HttpStack
+import net.gotev.uploadservice.network.HttpConnection
+import net.gotev.uploadservice.network.HttpStack
 
 import java.io.IOException
 

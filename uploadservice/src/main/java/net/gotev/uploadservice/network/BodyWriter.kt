@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.http
+package net.gotev.uploadservice.network
 
 import net.gotev.uploadservice.UploadService
 import java.io.Closeable

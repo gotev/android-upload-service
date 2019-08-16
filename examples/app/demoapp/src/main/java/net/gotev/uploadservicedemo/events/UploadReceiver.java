@@ -2,7 +2,7 @@ package net.gotev.uploadservicedemo.events;
 
 import android.content.Context;
 
-import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.network.ServerResponse;
 import net.gotev.uploadservice.UploadInfo;
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 

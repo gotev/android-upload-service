@@ -1,6 +1,6 @@
 package net.gotev.uploadservice;
 
-import net.gotev.uploadservice.http.BodyWriter;
+import net.gotev.uploadservice.network.BodyWriter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

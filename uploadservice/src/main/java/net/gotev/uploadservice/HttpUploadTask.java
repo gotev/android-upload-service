@@ -3,8 +3,9 @@ package net.gotev.uploadservice;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 
-import net.gotev.uploadservice.http.BodyWriter;
-import net.gotev.uploadservice.http.HttpConnection;
+import net.gotev.uploadservice.network.BodyWriter;
+import net.gotev.uploadservice.network.HttpConnection;
+import net.gotev.uploadservice.network.ServerResponse;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -70,7 +71,8 @@ public abstract class HttpUploadTask extends UploadTask
                     .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode);
 
             final ServerResponse response = connection.getResponse(this);
-            Logger.debug(LOG_TAG, "Server responded with HTTP " + response.getHttpCode()
+            Logger.debug(LOG_TAG, "Server responded with code " + response.getCode()
+                            + " and body " + response.getBodyAsString()
                             + " to upload with ID: " + params.id);
 
             // Broadcast completion only if the user has not cancelled the operation.

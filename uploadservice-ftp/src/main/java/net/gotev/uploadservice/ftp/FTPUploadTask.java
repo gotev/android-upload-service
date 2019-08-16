@@ -3,7 +3,7 @@ package net.gotev.uploadservice.ftp;
 import android.content.Intent;
 
 import net.gotev.uploadservice.Logger;
-import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.network.ServerResponse;
 import net.gotev.uploadservice.UploadFile;
 import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.UploadTask;

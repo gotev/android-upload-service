@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import net.gotev.uploadservice.network.ServerResponse;
+
 /**
  * Broadcast receiver to subclass to create a receiver for {@link UploadService} events.
  *

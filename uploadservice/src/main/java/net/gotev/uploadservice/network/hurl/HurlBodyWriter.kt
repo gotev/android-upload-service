@@ -1,6 +1,6 @@
-package net.gotev.uploadservice.http.hurl
+package net.gotev.uploadservice.network.hurl
 
-import net.gotev.uploadservice.http.BodyWriter
+import net.gotev.uploadservice.network.BodyWriter
 
 import java.io.IOException
 import java.io.OutputStream
