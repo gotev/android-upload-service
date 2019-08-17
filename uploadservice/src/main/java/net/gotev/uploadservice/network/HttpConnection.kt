@@ -1,6 +1,6 @@
 package net.gotev.uploadservice.network
 
-import net.gotev.uploadservice.NameValue
+import net.gotev.uploadservice.data.NameValue
 
 import java.io.IOException
 

@@ -5,7 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import net.gotev.uploadservice.schemehandlers.SchemeHandler;
-import net.gotev.uploadservice.schemehandlers.SchemeHandlerFactory;
+import net.gotev.uploadservice.schemehandlers.UploadServiceSchemeHandlers;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -36,13 +36,10 @@ public class UploadFile implements Parcelable {
             throw new IllegalArgumentException("Please specify a file path!");
         }
 
-        if (!SchemeHandlerFactory.getInstance().isSupported(path))
-            throw new UnsupportedOperationException("Unsupported scheme: " + path);
-
         this.path = path;
 
         try {
-            this.handler = SchemeHandlerFactory.getInstance().get(path);
+            this.handler = UploadServiceSchemeHandlers.INSTANCE.get(path);
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
@@ -54,7 +51,7 @@ public class UploadFile implements Parcelable {
      * @return file length
      */
     public long length(Context context) {
-        return handler.getLength(context);
+        return handler.fileLength(context);
     }
 
     /**
@@ -65,7 +62,7 @@ public class UploadFile implements Parcelable {
      * constructor
      */
     public final InputStream getStream(Context context) throws FileNotFoundException {
-        return handler.getInputStream(context);
+        return handler.stream(context);
     }
 
     /**
@@ -74,7 +71,7 @@ public class UploadFile implements Parcelable {
      * @return content type
      */
     public final String getContentType(Context context) {
-        return handler.getContentType(context);
+        return handler.contentType(context);
     }
 
     /**
@@ -83,7 +80,7 @@ public class UploadFile implements Parcelable {
      * @return string
      */
     public final String getName(Context context) {
-        return handler.getName(context);
+        return handler.fileName(context);
     }
 
     /**
@@ -127,7 +124,7 @@ public class UploadFile implements Parcelable {
         this.properties = (LinkedHashMap<String, String>) in.readSerializable();
 
         try {
-            this.handler = SchemeHandlerFactory.getInstance().get(path);
+            this.handler = UploadServiceSchemeHandlers.INSTANCE.get(path);
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }

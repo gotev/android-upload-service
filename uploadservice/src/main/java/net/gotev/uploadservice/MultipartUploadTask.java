@@ -2,6 +2,7 @@ package net.gotev.uploadservice;
 
 import android.content.Intent;
 
+import net.gotev.uploadservice.data.NameValue;
 import net.gotev.uploadservice.network.BodyWriter;
 
 import java.io.IOException;

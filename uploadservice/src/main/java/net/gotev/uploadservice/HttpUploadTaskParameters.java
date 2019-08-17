@@ -3,6 +3,9 @@ package net.gotev.uploadservice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import net.gotev.uploadservice.data.NameValue;
+import net.gotev.uploadservice.extensions.StringExtensionsKt;
+
 import java.util.ArrayList;
 
 /**
@@ -66,7 +69,10 @@ public final class HttpUploadTaskParameters implements Parcelable {
     }
 
     public HttpUploadTaskParameters addHeader(String name, String value) {
-        requestHeaders.add(NameValue.header(name, value));
+        if (!StringExtensionsKt.isASCII(name) || !StringExtensionsKt.isASCII(value))
+            throw new IllegalArgumentException("Header " + name + " and its value " + value + " must be ASCII only! Read http://stackoverflow.com/a/4410331");
+
+        requestHeaders.add(new NameValue(name, value));
         return this;
     }
 

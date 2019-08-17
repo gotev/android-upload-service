@@ -1,7 +1,7 @@
 package net.gotev.uploadservice.network.hurl
 
 import net.gotev.uploadservice.logger.UploadServiceLogger
-import net.gotev.uploadservice.NameValue
+import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.network.HttpConnection
 import java.io.IOException

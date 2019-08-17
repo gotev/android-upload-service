@@ -12,6 +12,7 @@ import android.os.Handler;
 
 import androidx.core.app.NotificationCompat;
 
+import net.gotev.uploadservice.data.Status;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 
@@ -246,7 +247,7 @@ public abstract class UploadTask implements Runnable {
                 pathStringListFrom(params.files));
 
         BroadcastData data = new BroadcastData()
-                .setStatus(BroadcastData.Status.IN_PROGRESS)
+                .setStatus(Status.IN_PROGRESS)
                 .setUploadInfo(uploadInfo);
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
@@ -319,7 +320,7 @@ public abstract class UploadTask implements Runnable {
             });
         } else {
             BroadcastData data = new BroadcastData()
-                    .setStatus(successfulUpload ? BroadcastData.Status.COMPLETED : BroadcastData.Status.ERROR)
+                    .setStatus(successfulUpload ? Status.COMPLETED : Status.ERROR)
                     .setUploadInfo(uploadInfo)
                     .setServerResponse(response);
 
@@ -352,7 +353,7 @@ public abstract class UploadTask implements Runnable {
         }
 
         BroadcastData data = new BroadcastData()
-                .setStatus(BroadcastData.Status.CANCELLED)
+                .setStatus(Status.CANCELLED)
                 .setUploadInfo(uploadInfo);
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
@@ -435,7 +436,7 @@ public abstract class UploadTask implements Runnable {
         }
 
         BroadcastData data = new BroadcastData()
-                .setStatus(BroadcastData.Status.ERROR)
+                .setStatus(Status.ERROR)
                 .setUploadInfo(uploadInfo)
                 .setException(exception);
 

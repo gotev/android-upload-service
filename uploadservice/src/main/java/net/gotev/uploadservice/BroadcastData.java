@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import net.gotev.uploadservice.data.Status;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 
@@ -14,13 +15,6 @@ import net.gotev.uploadservice.network.ServerResponse;
  * @author gotev (Aleksandar Gotev)
  */
 class BroadcastData implements Parcelable {
-
-    public enum Status {
-        IN_PROGRESS,
-        ERROR,
-        COMPLETED,
-        CANCELLED
-    }
 
     private Status status;
     private Exception exception;
