@@ -58,7 +58,7 @@ class OkHttpStackConnection(private val httpClient: OkHttpClient, private val ht
 
             override fun writeTo(sink: BufferedSink) {
                 OkHttpBodyWriter(sink).use {
-                    delegate.onBodyReady(it)
+                    delegate.onWriteRequestBody(it)
                 }
             }
         }

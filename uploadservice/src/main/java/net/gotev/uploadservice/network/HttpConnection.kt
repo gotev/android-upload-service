@@ -25,7 +25,7 @@ interface HttpConnection {
          * @throws IOException if an error occurs while writing the body
          */
         @Throws(IOException::class)
-        fun onBodyReady(bodyWriter: BodyWriter)
+        fun onWriteRequestBody(bodyWriter: BodyWriter)
     }
 
     /**

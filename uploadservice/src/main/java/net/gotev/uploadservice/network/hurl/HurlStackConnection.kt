@@ -100,7 +100,7 @@ class HurlStackConnection(
     @Throws(IOException::class)
     override fun getResponse(delegate: HttpConnection.RequestBodyDelegate): ServerResponse {
         HurlBodyWriter(connection.outputStream).use {
-            delegate.onBodyReady(it)
+            delegate.onWriteRequestBody(it)
         }
 
         return ServerResponse(connection.responseCode, responseBody, responseHeaders)

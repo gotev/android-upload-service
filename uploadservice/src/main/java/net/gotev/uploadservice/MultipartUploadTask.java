@@ -58,7 +58,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     @Override
-    public void onBodyReady(BodyWriter bodyWriter) throws IOException {
+    public void onWriteRequestBody(BodyWriter bodyWriter) throws IOException {
         //reset uploaded bytes when the body is ready to be written
         //because sometimes this gets invoked when network changes
         uploadedBytes = 0;
