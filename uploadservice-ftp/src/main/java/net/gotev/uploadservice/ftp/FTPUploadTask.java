@@ -2,6 +2,7 @@ package net.gotev.uploadservice.ftp;
 
 import android.content.Intent;
 
+import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 import net.gotev.uploadservice.UploadFile;
@@ -67,7 +68,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
                 ftpClient = new FTPClient();
             }
 
-            ftpClient.setBufferSize(UploadService.BUFFER_SIZE);
+            ftpClient.setBufferSize(UploadServiceConfig.INSTANCE.getBufferSizeBytes());
             ftpClient.setCopyStreamListener(this);
             ftpClient.setDefaultTimeout(ftpParams.connectTimeout);
             ftpClient.setConnectTimeout(ftpParams.connectTimeout);

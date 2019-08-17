@@ -135,8 +135,8 @@ public abstract class UploadTask implements Runnable {
             String notificationChannelId = params.notificationConfig.getNotificationChannelId();
 
             if (notificationChannelId == null) {
-                params.notificationConfig.setNotificationChannelId(UploadService.NAMESPACE);
-                notificationChannelId = UploadService.NAMESPACE;
+                params.notificationConfig.setNotificationChannelId(UploadServiceConfig.INSTANCE.getNamespace());
+                notificationChannelId = UploadServiceConfig.INSTANCE.getNamespace();
             }
 
             if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
@@ -157,7 +157,7 @@ public abstract class UploadTask implements Runnable {
 
         attempts = 0;
 
-        int errorDelay = UploadService.INITIAL_RETRY_WAIT_TIME;
+        long errorDelay = UploadServiceConfig.INSTANCE.getRetryPolicy().getInitialWaitTimeSeconds();
 
         while (attempts <= params.getMaxRetries() && shouldContinue) {
             attempts++;
@@ -178,16 +178,16 @@ public abstract class UploadTask implements Runnable {
 
                     long beforeSleepTs = System.currentTimeMillis();
 
-                    while (shouldContinue && System.currentTimeMillis() < (beforeSleepTs + errorDelay)) {
+                    while (shouldContinue && System.currentTimeMillis() < (beforeSleepTs + errorDelay * 1000)) {
                         try {
                             Thread.sleep(2000);
                         } catch (Throwable ignored) {
                         }
                     }
 
-                    errorDelay *= UploadService.BACKOFF_MULTIPLIER;
-                    if (errorDelay > UploadService.MAX_RETRY_WAIT_TIME) {
-                        errorDelay = UploadService.MAX_RETRY_WAIT_TIME;
+                    errorDelay *= UploadServiceConfig.INSTANCE.getRetryPolicy().getMultiplier();
+                    if (errorDelay > UploadServiceConfig.INSTANCE.getRetryPolicy().getMaxWaitTimeSeconds()) {
+                        errorDelay = UploadServiceConfig.INSTANCE.getRetryPolicy().getMaxWaitTimeSeconds();
                     }
                 }
             }
@@ -232,7 +232,7 @@ public abstract class UploadTask implements Runnable {
     protected final void broadcastProgress(final long uploadedBytes, final long totalBytes) {
 
         long currentTime = System.currentTimeMillis();
-        if (uploadedBytes < totalBytes && currentTime < lastProgressNotificationTime + UploadService.PROGRESS_REPORT_INTERVAL) {
+        if (uploadedBytes < totalBytes && currentTime < lastProgressNotificationTime + UploadServiceConfig.INSTANCE.getUploadProgressNotificationIntervalMillis()) {
             return;
         }
 
@@ -476,7 +476,7 @@ public abstract class UploadTask implements Runnable {
                 .setSmallIcon(statusConfig.iconResourceID)
                 .setLargeIcon(statusConfig.largeIcon)
                 .setColor(statusConfig.iconColorResourceID)
-                .setGroup(UploadService.NAMESPACE)
+                .setGroup(UploadServiceConfig.INSTANCE.getNamespace())
                 .setProgress(100, 0, true)
                 .setOngoing(true);
 
@@ -511,7 +511,7 @@ public abstract class UploadTask implements Runnable {
                 .setSmallIcon(statusConfig.iconResourceID)
                 .setLargeIcon(statusConfig.largeIcon)
                 .setColor(statusConfig.iconColorResourceID)
-                .setGroup(UploadService.NAMESPACE)
+                .setGroup(UploadServiceConfig.INSTANCE.getNamespace())
                 .setProgress((int) uploadInfo.getTotalBytes(), (int) uploadInfo.getUploadedBytes(), false)
                 .setOngoing(true);
 
@@ -551,7 +551,7 @@ public abstract class UploadTask implements Runnable {
                     .setSmallIcon(statusConfig.iconResourceID)
                     .setLargeIcon(statusConfig.largeIcon)
                     .setColor(statusConfig.iconColorResourceID)
-                    .setGroup(UploadService.NAMESPACE)
+                    .setGroup(UploadServiceConfig.INSTANCE.getNamespace())
                     .setProgress(0, 0, false)
                     .setOngoing(false);
 

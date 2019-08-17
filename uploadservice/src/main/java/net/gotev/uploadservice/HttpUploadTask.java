@@ -66,7 +66,7 @@ public abstract class HttpUploadTask extends UploadTask
                 httpParams.addHeader("User-Agent", "AndroidUploadService/" + BuildConfig.VERSION_NAME);
             }
 
-            connection = UploadService.HTTP_STACK
+            connection = UploadServiceConfig.INSTANCE.getHttpStack()
                     .createNewConnection(httpParams.method, params.serverUrl)
                     .setHeaders(httpParams.getRequestHeaders())
                     .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode);

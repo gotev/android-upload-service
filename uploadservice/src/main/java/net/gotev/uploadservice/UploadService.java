@@ -4,19 +4,15 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 
 import net.gotev.uploadservice.logger.UploadServiceLogger;
-import net.gotev.uploadservice.network.HttpStack;
-import net.gotev.uploadservice.network.hurl.HurlStack;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,95 +35,13 @@ public final class UploadService extends Service {
 
     private static final String TAG = UploadService.class.getSimpleName();
 
-    // configurable values
-    /**
-     * Sets how many threads to use to handle concurrent uploads.
-     */
-    public static int UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
-
-    /**
-     * When the number of threads is greater than UPLOAD_POOL_SIZE, this is the maximum time that
-     * excess idle threads will wait for new tasks before terminating.
-     */
-    public static int KEEP_ALIVE_TIME_IN_SECONDS = 5;
-
-    /**
-     * How many time to wait in idle (in milliseconds) before shutting down the service.
-     * The service is idle when is running, but no tasks are running.
-     */
-    public static int IDLE_TIMEOUT = 10 * 1000;
-
-    /**
-     * If set to true, the service will go in foreground mode when doing uploads,
-     * lowering the probability of being killed by the system on low memory.
-     * This setting is used only when your uploads have a notification configuration.
-     * It's not possible to run in foreground without notifications, as per Android policy
-     * constraints, so if you set this to true, but you do upload tasks without a
-     * notification configuration, the service will simply run in background mode.
-     *
-     * NOTE: As of Android Oreo, this setting is ignored as it always has to be true,
-     * because the service must run in the foreground and expose a notification to the user.
-     * https://developer.android.com/reference/android/content/Context.html#startForegroundService(android.content.Intent)
-     */
-    public static boolean EXECUTE_IN_FOREGROUND = true;
-
-    /**
-     * Sets the namespace used to broadcast events. Set this to your app namespace to avoid
-     * conflicts and unexpected behaviours.
-     */
-    public static String NAMESPACE = "net.gotev";
-
-    /**
-     * Sets the HTTP Stack to use to perform HTTP based upload requests.
-     * By default {@link HurlStack} implementation is used.
-     */
-    public static HttpStack HTTP_STACK = new HurlStack();
-
-    /**
-     * Buffer size in bytes used for data transfer by the upload tasks.
-     */
-    public static int BUFFER_SIZE = 4096;
-
-    /**
-     * Sets the time to wait in milliseconds before the next attempt when an upload fails
-     * for the first time. From the second time onwards, this value will be multiplied by
-     * {@link UploadService#BACKOFF_MULTIPLIER} to get the time to wait before the next attempt.
-     */
-    public static int INITIAL_RETRY_WAIT_TIME = 1000;
-
-    /**
-     * Sets the backoff timer multiplier. By default is set to 2, so every time that an upload
-     * fails, the time to wait between retries will be multiplied by 2.
-     * E.g. if the first time the wait time is 1s, the second time it will be 2s and the third
-     * time it will be 4s.
-     */
-    public static int BACKOFF_MULTIPLIER = 2;
-
-    /**
-     * Sets the maximum time to wait in milliseconds between two upload attempts.
-     * This is useful because every time an upload fails, the wait time gets multiplied by
-     * {@link UploadService#BACKOFF_MULTIPLIER} and it's not convenient that the value grows
-     * indefinitely.
-     */
-    public static int MAX_RETRY_WAIT_TIME = 10 * 10 * 1000;
-    // end configurable values
-
     protected static final int UPLOAD_NOTIFICATION_BASE_ID = 1234; // Something unique
 
-    /**
-     * The minimum interval between progress reports in milliseconds.
-     * If the upload Tasks report more frequently, we will throttle notifications.
-     * We aim for 6 updates per second.
-     */
-    public static long PROGRESS_REPORT_INTERVAL = 166;
-
     // constants used in the intent which starts this service
-    private static final String ACTION_UPLOAD_SUFFIX = ".uploadservice.action.upload";
     protected static final String PARAM_TASK_PARAMETERS = "taskParameters";
     protected static final String PARAM_TASK_CLASS = "taskClass";
 
     // constants used in broadcast intents
-    private static final String BROADCAST_ACTION_SUFFIX = ".uploadservice.broadcast.status";
     protected static final String PARAM_BROADCAST_DATA = "broadcastData";
 
     // internal variables
@@ -139,14 +53,6 @@ public final class UploadService extends Service {
     private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
     private Timer idleTimer = null;
-
-    protected static String getActionUpload() {
-        return NAMESPACE + ACTION_UPLOAD_SUFFIX;
-    }
-
-    protected static String getActionBroadcast() {
-        return NAMESPACE + BROADCAST_ACTION_SUFFIX;
-    }
 
     /**
      * Stops the upload task with the given uploadId.
@@ -215,10 +121,6 @@ public final class UploadService extends Service {
         return uploadTasksMap.isEmpty() && context.stopService(new Intent(context, UploadService.class));
     }
 
-    private boolean isExecuteInForeground() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O || EXECUTE_IN_FOREGROUND;
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -230,15 +132,11 @@ public final class UploadService extends Service {
         if (!wakeLock.isHeld())
             wakeLock.acquire();
 
-        if (UPLOAD_POOL_SIZE <= 0) {
-            UPLOAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
-        }
-
         // Creates a thread pool manager
         uploadThreadPool = new ThreadPoolExecutor(
-                UPLOAD_POOL_SIZE,       // Initial pool size
-                UPLOAD_POOL_SIZE,       // Max pool size
-                KEEP_ALIVE_TIME_IN_SECONDS,
+                UploadServiceConfig.INSTANCE.getUploadPoolSize(),       // Initial pool size
+                UploadServiceConfig.INSTANCE.getUploadPoolSize(),       // Max pool size
+                UploadServiceConfig.INSTANCE.getKeepAliveTimeSeconds(),
                 TimeUnit.SECONDS,
                 uploadTasksQueue);
     }
@@ -250,18 +148,11 @@ public final class UploadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null || !getActionUpload().equals(intent.getAction())) {
+        if (intent == null || !UploadServiceConfig.INSTANCE.getUploadAction().equals(intent.getAction())) {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
-        if ("net.gotev".equals(NAMESPACE)) {
-            throw new IllegalArgumentException("Hey dude, please set the namespace for your app by following the setup instructions: https://github.com/gotev/android-upload-service/wiki/Setup");
-        }
-
-        UploadServiceLogger.INSTANCE.info(TAG, String.format(Locale.getDefault(), "Starting service with namespace: %s, " +
-                "upload pool size: %d, %ds idle thread keep alive time. Foreground execution is %s",
-                NAMESPACE, UPLOAD_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECONDS,
-                (isExecuteInForeground() ? "enabled" : "disabled")));
+        UploadServiceLogger.INSTANCE.debug(TAG, "Starting UploadService with config: " + UploadServiceConfig.INSTANCE);
 
         UploadTask currentTask = getTask(intent);
 
@@ -301,16 +192,16 @@ public final class UploadService extends Service {
         if (uploadTasksMap.isEmpty()) {
             clearIdleTimer();
 
-            UploadServiceLogger.INSTANCE.info(TAG, "Service will be shut down in " + IDLE_TIMEOUT + "ms if no new tasks are received");
+            UploadServiceLogger.INSTANCE.info(TAG, "Service will be shut down in " + UploadServiceConfig.INSTANCE.getIdleTimeoutSeconds() + "s if no new tasks are received");
             idleTimer = new Timer(TAG + "IdleTimer");
             idleTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     UploadServiceLogger.INSTANCE.info(TAG, "Service is about to be stopped because idle timeout of "
-                            + IDLE_TIMEOUT + "ms has been reached");
+                            + UploadServiceConfig.INSTANCE.getIdleTimeoutSeconds() + "s has been reached");
                     stopSelf();
                 }
-            }, IDLE_TIMEOUT);
+            }, UploadServiceConfig.INSTANCE.getIdleTimeoutSeconds() * 1000);
 
             return START_NOT_STICKY;
         }
@@ -325,7 +216,7 @@ public final class UploadService extends Service {
         stopAllUploads();
         uploadThreadPool.shutdown();
 
-        if (isExecuteInForeground()) {
+        if (UploadServiceConfig.INSTANCE.isForegroundService()) {
             UploadServiceLogger.INSTANCE.debug(TAG, "Stopping foreground execution");
             stopForeground(true);
         }
@@ -378,7 +269,7 @@ public final class UploadService extends Service {
      * @return true if the current upload task holds the foreground notification, otherwise false
      */
     protected synchronized boolean holdForegroundNotification(String uploadId, Notification notification) {
-        if (!isExecuteInForeground()) return false;
+        if (!UploadServiceConfig.INSTANCE.isForegroundService()) return false;
 
         if (foregroundUploadId == null) {
             foregroundUploadId = uploadId;
@@ -403,12 +294,12 @@ public final class UploadService extends Service {
         uploadDelegates.remove(uploadId);
 
         // un-hold foreground upload ID if it's been hold
-        if (isExecuteInForeground() && task != null && task.params.id.equals(foregroundUploadId)) {
+        if (UploadServiceConfig.INSTANCE.isForegroundService() && task != null && task.params.id.equals(foregroundUploadId)) {
             UploadServiceLogger.INSTANCE.debug(TAG, uploadId + " now un-holded the foreground notification");
             foregroundUploadId = null;
         }
 
-        if (isExecuteInForeground() && uploadTasksMap.isEmpty()) {
+        if (UploadServiceConfig.INSTANCE.isForegroundService() && uploadTasksMap.isEmpty()) {
             UploadServiceLogger.INSTANCE.debug(TAG, "All tasks completed, stopping foreground execution");
             stopForeground(true);
             shutdownIfThereArentAnyActiveTasks();

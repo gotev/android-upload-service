@@ -1,16 +1,16 @@
 package net.gotev.uploadservicedemo;
 
 import android.app.Application;
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
 import android.os.StrictMode;
 import android.util.Log;
 
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
+import net.gotev.uploadservice.data.RetryPolicyConfig;
+import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
-import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.okhttp.OkHttpStack;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -44,21 +44,20 @@ public class App extends Application {
 
         // Set your application namespace to avoid conflicts with other apps
         // using this library
-        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+        UploadServiceConfig.INSTANCE.setNamespace(BuildConfig.APPLICATION_ID);
+
+        // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
+        // used by default
+        UploadServiceConfig.INSTANCE.setHttpStack(new OkHttpStack(getOkHttpClient()));
+
+        // setup backoff multiplier
+        UploadServiceConfig.INSTANCE.setRetryPolicy(new RetryPolicyConfig(1, 10, 2));
 
         // Set upload service debug log messages level
         UploadServiceLogger.INSTANCE.setLogLevel(UploadServiceLogger.LogLevel.DEBUG);
 
-        // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
-        // used by default
-        //UploadService.HTTP_STACK = new OkHttpStack(getOkHttpClient());
-
-        // setup backoff multiplier
-        UploadService.BACKOFF_MULTIPLIER = 2;
-
-        IntentFilter filter = new IntentFilter(BuildConfig.APPLICATION_ID + ".uploadservice.broadcast.status");
-        BroadcastReceiver receiver = new GlobalBroadcastReceiver();
-        registerReceiver(receiver, filter);
+        GlobalBroadcastReceiver receiver = new GlobalBroadcastReceiver();
+        receiver.register(this);
     }
 
     private OkHttpClient getOkHttpClient() {

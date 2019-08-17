@@ -3,7 +3,6 @@ package net.gotev.uploadservice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
@@ -25,7 +24,7 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent == null || !UploadService.getActionBroadcast().equals(intent.getAction()))
+        if (intent == null || !UploadServiceConfig.INSTANCE.getBroadcastAction().equals(intent.getAction()))
             return;
 
         BroadcastData data = intent.getParcelableExtra(UploadService.PARAM_BROADCAST_DATA);
@@ -84,9 +83,7 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
      * @param context context in which to register this receiver
      */
     public void register(final Context context) {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(UploadService.getActionBroadcast());
-        context.registerReceiver(this, intentFilter);
+        context.registerReceiver(this, UploadServiceConfig.INSTANCE.getBroadcastIntentFilter());
     }
 
     /**

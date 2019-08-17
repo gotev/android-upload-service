@@ -67,7 +67,7 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
 
         final Intent intent = new Intent(context, UploadService.class);
         this.initializeIntent(intent);
-        intent.setAction(UploadService.getActionUpload());
+        intent.setAction(UploadServiceConfig.INSTANCE.getUploadAction());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (params.notificationConfig == null) {

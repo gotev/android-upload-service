@@ -1,6 +1,7 @@
 package net.gotev.uploadservice.network
 
 import net.gotev.uploadservice.UploadService
+import net.gotev.uploadservice.UploadServiceConfig
 import java.io.Closeable
 
 import java.io.IOException
@@ -42,7 +43,7 @@ abstract class BodyWriter : Closeable {
      */
     @Throws(IOException::class)
     fun writeStream(stream: InputStream, listener: OnStreamWriteListener) {
-        val buffer = ByteArray(UploadService.BUFFER_SIZE)
+        val buffer = ByteArray(UploadServiceConfig.bufferSizeBytes)
         var bytesRead: Int
 
         stream.use {
