@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 
 import net.gotev.uploadservice.ContentType;
-import net.gotev.uploadservice.Logger;
+import net.gotev.uploadservice.logger.UploadServiceLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,7 +53,7 @@ class ContentSchemeHandler implements SchemeHandler {
     private long getUriSize(Context context) {
         Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
         if (cursor == null) {
-            Logger.error(getClass().getSimpleName(), "null cursor for " + uri + ", returning size 0");
+            UploadServiceLogger.INSTANCE.error(getClass().getSimpleName(), "null cursor for " + uri + ", returning size 0");
             return 0;
         }
         int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);

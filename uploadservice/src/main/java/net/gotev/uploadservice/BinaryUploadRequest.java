@@ -2,6 +2,8 @@ package net.gotev.uploadservice;
 
 import android.content.Context;
 
+import net.gotev.uploadservice.logger.UploadServiceLogger;
+
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -95,7 +97,7 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
     }
 
     private void logDoesNotSupportParameters() {
-        Logger.error(getClass().getSimpleName(),
+        UploadServiceLogger.INSTANCE.error(getClass().getSimpleName(),
                      "This upload method does not support adding parameters");
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 
 /**
@@ -74,7 +75,7 @@ class BroadcastData implements Parcelable {
 
     public Status getStatus() {
         if (status == null) {
-            Logger.error(getClass().getSimpleName(), "Status not defined! Returning " + Status.CANCELLED);
+            UploadServiceLogger.INSTANCE.error(getClass().getSimpleName(), "Status not defined! Returning " + Status.CANCELLED);
             return Status.CANCELLED;
         }
 

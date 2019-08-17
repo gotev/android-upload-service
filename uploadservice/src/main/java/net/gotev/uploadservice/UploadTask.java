@@ -12,6 +12,7 @@ import android.os.Handler;
 
 import androidx.core.app.NotificationCompat;
 
+import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 
 import java.io.File;
@@ -170,7 +171,7 @@ public abstract class UploadTask implements Runnable {
                 } else if (attempts > params.getMaxRetries()) {
                     broadcastError(exc);
                 } else {
-                    Logger.error(LOG_TAG, "Error in uploadId " + params.id
+                    UploadServiceLogger.INSTANCE.error(LOG_TAG, "Error in uploadId " + params.id
                             + " on attempt " + attempts
                             + ". Waiting " + errorDelay / 1000 + "s before next attempt. ", exc);
 
@@ -236,7 +237,7 @@ public abstract class UploadTask implements Runnable {
 
         setLastProgressNotificationTime(currentTime);
 
-        Logger.debug(LOG_TAG, "Broadcasting upload progress for " + params.id
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload progress for " + params.id
                 + ": " + uploadedBytes + " bytes of " + totalBytes);
 
         final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
@@ -285,7 +286,7 @@ public abstract class UploadTask implements Runnable {
             }
         }
 
-        Logger.debug(LOG_TAG, "Broadcasting upload " + (successfulUpload ? "completed" : "error")
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload " + (successfulUpload ? "completed" : "error")
                 + " for " + params.id);
 
         final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
@@ -337,7 +338,7 @@ public abstract class UploadTask implements Runnable {
      */
     protected final void broadcastCancelled() {
 
-        Logger.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: " + params.id);
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: " + params.id);
 
         final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
@@ -419,7 +420,7 @@ public abstract class UploadTask implements Runnable {
      */
     private void broadcastError(final Exception exception) {
 
-        Logger.info(LOG_TAG, "Broadcasting error for upload with ID: "
+        UploadServiceLogger.INSTANCE.info(LOG_TAG, "Broadcasting error for upload with ID: "
                 + params.id + ". " + exception.getMessage());
 
         final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
@@ -578,15 +579,15 @@ public abstract class UploadTask implements Runnable {
             deleted = fileToDelete.delete();
 
             if (!deleted) {
-                Logger.error(LOG_TAG, "Unable to delete: "
+                UploadServiceLogger.INSTANCE.error(LOG_TAG, "Unable to delete: "
                         + fileToDelete.getAbsolutePath());
             } else {
-                Logger.info(LOG_TAG, "Successfully deleted: "
+                UploadServiceLogger.INSTANCE.info(LOG_TAG, "Successfully deleted: "
                         + fileToDelete.getAbsolutePath());
             }
 
         } catch (Exception exc) {
-            Logger.error(LOG_TAG,
+            UploadServiceLogger.INSTANCE.error(LOG_TAG,
                     "Error while deleting: " + fileToDelete.getAbsolutePath() +
                             " Check if you granted: android.permission.WRITE_EXTERNAL_STORAGE", exc);
         }

@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 
+import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.HttpStack;
 import net.gotev.uploadservice.network.hurl.HurlStack;
 
@@ -257,7 +258,7 @@ public final class UploadService extends Service {
             throw new IllegalArgumentException("Hey dude, please set the namespace for your app by following the setup instructions: https://github.com/gotev/android-upload-service/wiki/Setup");
         }
 
-        Logger.info(TAG, String.format(Locale.getDefault(), "Starting service with namespace: %s, " +
+        UploadServiceLogger.INSTANCE.info(TAG, String.format(Locale.getDefault(), "Starting service with namespace: %s, " +
                 "upload pool size: %d, %ds idle thread keep alive time. Foreground execution is %s",
                 NAMESPACE, UPLOAD_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECONDS,
                 (isExecuteInForeground() ? "enabled" : "disabled")));
@@ -269,7 +270,7 @@ public final class UploadService extends Service {
         }
 
         if (uploadTasksMap.containsKey(currentTask.params.id)) {
-            Logger.error(TAG, "Preventing upload with id: " + currentTask.params.id
+            UploadServiceLogger.INSTANCE.error(TAG, "Preventing upload with id: " + currentTask.params.id
                     + " to be uploaded twice! Please check your code and fix it!");
             return shutdownIfThereArentAnyActiveTasks();
         }
@@ -290,7 +291,7 @@ public final class UploadService extends Service {
 
     synchronized private void clearIdleTimer() {
         if (idleTimer != null) {
-            Logger.info(TAG, "Clearing idle timer");
+            UploadServiceLogger.INSTANCE.info(TAG, "Clearing idle timer");
             idleTimer.cancel();
             idleTimer = null;
         }
@@ -300,12 +301,12 @@ public final class UploadService extends Service {
         if (uploadTasksMap.isEmpty()) {
             clearIdleTimer();
 
-            Logger.info(TAG, "Service will be shut down in " + IDLE_TIMEOUT + "ms if no new tasks are received");
+            UploadServiceLogger.INSTANCE.info(TAG, "Service will be shut down in " + IDLE_TIMEOUT + "ms if no new tasks are received");
             idleTimer = new Timer(TAG + "IdleTimer");
             idleTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    Logger.info(TAG, "Service is about to be stopped because idle timeout of "
+                    UploadServiceLogger.INSTANCE.info(TAG, "Service is about to be stopped because idle timeout of "
                             + IDLE_TIMEOUT + "ms has been reached");
                     stopSelf();
                 }
@@ -325,7 +326,7 @@ public final class UploadService extends Service {
         uploadThreadPool.shutdown();
 
         if (isExecuteInForeground()) {
-            Logger.debug(TAG, "Stopping foreground execution");
+            UploadServiceLogger.INSTANCE.debug(TAG, "Stopping foreground execution");
             stopForeground(true);
         }
 
@@ -335,7 +336,7 @@ public final class UploadService extends Service {
         uploadTasksMap.clear();
         uploadDelegates.clear();
 
-        Logger.debug(TAG, "UploadService destroyed");
+        UploadServiceLogger.INSTANCE.debug(TAG, "UploadService destroyed");
     }
 
     /**
@@ -359,13 +360,13 @@ public final class UploadService extends Service {
                 uploadTask = UploadTask.class.cast(task.newInstance());
                 uploadTask.init(this, intent);
             } else {
-                Logger.error(TAG, taskClass + " does not extend UploadTask!");
+                UploadServiceLogger.INSTANCE.error(TAG, taskClass + " does not extend UploadTask!");
             }
 
-            Logger.debug(TAG, "Successfully created new task with class: " + taskClass);
+            UploadServiceLogger.INSTANCE.debug(TAG, "Successfully created new task with class: " + taskClass);
 
         } catch (Exception exc) {
-            Logger.error(TAG, "Error while instantiating new task", exc);
+            UploadServiceLogger.INSTANCE.error(TAG, "Error while instantiating new task", exc);
         }
 
         return uploadTask;
@@ -381,7 +382,7 @@ public final class UploadService extends Service {
 
         if (foregroundUploadId == null) {
             foregroundUploadId = uploadId;
-            Logger.debug(TAG, uploadId + " now holds the foreground notification");
+            UploadServiceLogger.INSTANCE.debug(TAG, uploadId + " now holds the foreground notification");
         }
 
         if (uploadId.equals(foregroundUploadId)) {
@@ -403,12 +404,12 @@ public final class UploadService extends Service {
 
         // un-hold foreground upload ID if it's been hold
         if (isExecuteInForeground() && task != null && task.params.id.equals(foregroundUploadId)) {
-            Logger.debug(TAG, uploadId + " now un-holded the foreground notification");
+            UploadServiceLogger.INSTANCE.debug(TAG, uploadId + " now un-holded the foreground notification");
             foregroundUploadId = null;
         }
 
         if (isExecuteInForeground() && uploadTasksMap.isEmpty()) {
-            Logger.debug(TAG, "All tasks completed, stopping foreground execution");
+            UploadServiceLogger.INSTANCE.debug(TAG, "All tasks completed, stopping foreground execution");
             stopForeground(true);
             shutdownIfThereArentAnyActiveTasks();
         }
@@ -443,7 +444,7 @@ public final class UploadService extends Service {
 
         if (delegate == null) {
             uploadDelegates.remove(uploadId);
-            Logger.info(TAG, "\n\n\nUpload delegate for upload with Id " + uploadId + " is gone!\n" +
+            UploadServiceLogger.INSTANCE.info(TAG, "\n\n\nUpload delegate for upload with Id " + uploadId + " is gone!\n" +
                     "Probably you have set it in an activity and the user navigated away from it\n" +
                     "before the upload was completed. From now on, the events will be dispatched\n" +
                     "with broadcast intents. If you see this message, consider switching to the\n" +

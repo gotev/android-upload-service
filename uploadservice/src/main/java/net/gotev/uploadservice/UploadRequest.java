@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import net.gotev.uploadservice.logger.UploadServiceLogger;
+
 import java.util.UUID;
 
 /**
@@ -42,15 +44,15 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
         this.context = context;
 
         if (uploadId == null || uploadId.isEmpty()) {
-            Logger.debug(LOG_TAG, "null or empty upload ID. Generating it");
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "null or empty upload ID. Generating it");
             params.id = UUID.randomUUID().toString();
         } else {
-            Logger.debug(LOG_TAG, "setting provided upload ID");
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "setting provided upload ID");
             params.id = uploadId;
         }
 
         params.serverUrl = serverUrl;
-        Logger.debug(LOG_TAG, "Created new upload request to "
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Created new upload request to "
                      + params.serverUrl + " with ID: " + params.id);
     }
 

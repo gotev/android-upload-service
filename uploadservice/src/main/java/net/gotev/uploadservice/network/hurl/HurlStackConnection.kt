@@ -1,6 +1,6 @@
 package net.gotev.uploadservice.network.hurl
 
-import net.gotev.uploadservice.Logger
+import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.NameValue
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.network.HttpConnection
@@ -37,7 +37,7 @@ class HurlStackConnection(
     }
 
     init {
-        Logger.debug(javaClass.simpleName, "creating new HttpURLConnection (uuid: $uuid)")
+        UploadServiceLogger.debug(javaClass.simpleName, "creating new HttpURLConnection (uuid: $uuid)")
 
         connection = url.createConnection().apply {
             doInput = true
@@ -107,7 +107,7 @@ class HurlStackConnection(
     }
 
     override fun close() {
-        Logger.debug(javaClass.simpleName, "closing HttpURLConnection (uuid: $uuid)")
+        UploadServiceLogger.debug(javaClass.simpleName, "closing HttpURLConnection (uuid: $uuid)")
 
         try {
             connection.inputStream.close()

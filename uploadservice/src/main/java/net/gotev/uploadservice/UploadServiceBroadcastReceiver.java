@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 
 /**
@@ -30,7 +31,7 @@ public class UploadServiceBroadcastReceiver extends BroadcastReceiver
         BroadcastData data = intent.getParcelableExtra(UploadService.PARAM_BROADCAST_DATA);
 
         if (data == null) {
-            Logger.error(getClass().getSimpleName(), "Missing intent parameter: " + UploadService.PARAM_BROADCAST_DATA);
+            UploadServiceLogger.INSTANCE.error(getClass().getSimpleName(), "Missing intent parameter: " + UploadService.PARAM_BROADCAST_DATA);
             return;
         }
 

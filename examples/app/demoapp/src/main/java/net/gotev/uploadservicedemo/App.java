@@ -9,7 +9,7 @@ import android.util.Log;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
-import net.gotev.uploadservice.Logger;
+import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.UploadService;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class App extends Application {
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
 
         // Set upload service debug log messages level
-        Logger.setLogLevel(Logger.LogLevel.DEBUG);
+        UploadServiceLogger.INSTANCE.setLogLevel(UploadServiceLogger.LogLevel.DEBUG);
 
         // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
         // used by default

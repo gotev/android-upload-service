@@ -3,6 +3,8 @@ package net.gotev.uploadservice;
 import android.content.Context;
 import android.content.Intent;
 
+import net.gotev.uploadservice.logger.UploadServiceLogger;
+
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 
@@ -98,10 +100,10 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
 
         if (contentType == null || contentType.isEmpty()) {
             contentType = file.getContentType(context);
-            Logger.debug(LOG_TAG, "Auto-detected MIME type for " + filePath
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Auto-detected MIME type for " + filePath
                     + " is: " + contentType);
         } else {
-            Logger.debug(LOG_TAG, "Content Type set for " + filePath
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Content Type set for " + filePath
                     + " is: " + contentType);
         }
 
@@ -109,9 +111,9 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
 
         if (fileName == null || "".equals(fileName)) {
             fileName = file.getName(context);
-            Logger.debug(LOG_TAG, "Using original file name: " + fileName);
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Using original file name: " + fileName);
         } else {
-            Logger.debug(LOG_TAG, "Using custom file name: " + fileName);
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Using custom file name: " + fileName);
         }
 
         file.setProperty(MultipartUploadTask.PROPERTY_REMOTE_FILE_NAME, fileName);

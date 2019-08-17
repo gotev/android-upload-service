@@ -2,7 +2,7 @@ package net.gotev.uploadservice.ftp;
 
 import android.content.Intent;
 
-import net.gotev.uploadservice.Logger;
+import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 import net.gotev.uploadservice.UploadFile;
 import net.gotev.uploadservice.UploadService;
@@ -59,7 +59,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
                 ftpClient = ftpsClient;
 
-                Logger.debug(LOG_TAG, "Created FTP over SSL (FTPS) client with "
+                UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Created FTP over SSL (FTPS) client with "
                         + secureProtocol + " protocol and "
                         + (ftpParams.implicitSecurity ? "implicit security" : "explicit security"));
 
@@ -73,9 +73,9 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             ftpClient.setConnectTimeout(ftpParams.connectTimeout);
             ftpClient.setAutodetectUTF8(true);
 
-            Logger.debug(LOG_TAG, "Connect timeout set to " + ftpParams.connectTimeout + "ms");
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Connect timeout set to " + ftpParams.connectTimeout + "ms");
 
-            Logger.debug(LOG_TAG, "Connecting to " + params.serverUrl
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Connecting to " + params.serverUrl
                                   + ":" + ftpParams.port + " as " + ftpParams.username);
             ftpClient.connect(params.serverUrl, ftpParams.port);
 
@@ -100,7 +100,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             ftpClient.setControlKeepAliveTimeout(controlKeepAliveTimeout);
             ftpClient.setControlKeepAliveReplyTimeout(controlKeepAliveTimeout * 1000);
 
-            Logger.debug(LOG_TAG, "Socket timeout set to " + ftpParams.socketTimeout
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Socket timeout set to " + ftpParams.socketTimeout
                          + "ms. Enabled control keep alive every " + controlKeepAliveTimeout + "s");
 
             ftpClient.enterLocalPassiveMode();
@@ -115,7 +115,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             calculateUploadedAndTotalBytes();
 
             String baseWorkingDir = ftpClient.printWorkingDirectory();
-            Logger.debug(LOG_TAG, "FTP default working directory is: " + baseWorkingDir);
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "FTP default working directory is: " + baseWorkingDir);
 
             Iterator<UploadFile> iterator = new ArrayList<>(params.files).iterator();
             while (iterator.hasNext()) {
@@ -138,12 +138,12 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         } finally {
             if (ftpClient.isConnected()) {
                 try {
-                    Logger.debug(LOG_TAG, "Logout and disconnect from FTP server: "
+                    UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Logout and disconnect from FTP server: "
                                           + params.serverUrl + ":" + ftpParams.port);
                     ftpClient.logout();
                     ftpClient.disconnect();
                 } catch (Exception exc) {
-                    Logger.error(LOG_TAG, "Error while closing FTP connection to: "
+                    UploadServiceLogger.INSTANCE.error(LOG_TAG, "Error while closing FTP connection to: "
                                           + params.serverUrl + ":" + ftpParams.port, exc);
                 }
             }
@@ -171,7 +171,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     }
 
     private void uploadFile(String baseWorkingDir, UploadFile file) throws IOException {
-        Logger.debug(LOG_TAG, "Starting FTP upload of: " + file.getName(service)
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting FTP upload of: " + file.getName(service)
                               + " to: " + file.getProperty(PARAM_REMOTE_PATH));
 
         String remoteDestination = file.getProperty(PARAM_REMOTE_PATH);
@@ -198,7 +198,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
         // get back to base working directory
         if (!ftpClient.changeWorkingDirectory(baseWorkingDir)) {
-            Logger.info(LOG_TAG, "Can't change working directory to: " + baseWorkingDir);
+            UploadServiceLogger.INSTANCE.info(LOG_TAG, "Can't change working directory to: " + baseWorkingDir);
         }
     }
 
@@ -209,14 +209,14 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         // http://stackoverflow.com/questions/12741938/how-can-i-change-permissions-of-a-file-on-a-ftp-server-using-apache-commons-net
         try {
             if (ftpClient.sendSiteCommand("chmod " + permissions + " " + remoteFileName)) {
-                Logger.error(LOG_TAG, "Error while setting permissions for: "
+                UploadServiceLogger.INSTANCE.error(LOG_TAG, "Error while setting permissions for: "
                         + remoteFileName + " to: " + permissions
                         + ". Check if your FTP user can set file permissions!");
             } else {
-                Logger.debug(LOG_TAG, "Permissions for: " + remoteFileName + " set to: " + permissions);
+                UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Permissions for: " + remoteFileName + " set to: " + permissions);
             }
         } catch (IOException exc) {
-            Logger.error(LOG_TAG, "Error while setting permissions for: "
+            UploadServiceLogger.INSTANCE.error(LOG_TAG, "Error while setting permissions for: "
                     + remoteFileName + " to: " + permissions
                     + ". Check if your FTP user can set file permissions!", exc);
         }
@@ -235,7 +235,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             try {
                 ftpClient.disconnect();
             } catch (Exception exc) {
-                Logger.error(LOG_TAG, "Failed to abort current file transfer", exc);
+                UploadServiceLogger.INSTANCE.error(LOG_TAG, "Failed to abort current file transfer", exc);
             }
         }
     }
@@ -266,7 +266,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
             if (!ftpClient.changeWorkingDirectory(singleDir)) {
                 if (ftpClient.makeDirectory(singleDir)) {
-                    Logger.debug(LOG_TAG, "Created remote directory: " + singleDir);
+                    UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Created remote directory: " + singleDir);
                     if (permissions != null) {
                         setPermission(singleDir, permissions);
                     }
