@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import net.gotev.uploadservice.UploadNotificationAction;
+import net.gotev.uploadservice.notifications.UploadNotificationAction;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservicedemo.events.NotificationActions;
 

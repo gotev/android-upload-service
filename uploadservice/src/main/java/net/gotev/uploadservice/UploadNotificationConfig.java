@@ -8,6 +8,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import net.gotev.uploadservice.notifications.Placeholders;
+import net.gotev.uploadservice.notifications.UploadNotificationAction;
 
 /**
  * Contains the configuration of the upload notification.

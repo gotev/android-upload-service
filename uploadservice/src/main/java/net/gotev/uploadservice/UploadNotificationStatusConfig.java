@@ -7,9 +7,11 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-
 import androidx.core.app.NotificationCompat;
+
+import net.gotev.uploadservice.notifications.UploadNotificationAction;
+
+import java.util.ArrayList;
 
 /**
  * @author Aleksandar Gotev
@@ -76,7 +78,7 @@ public class UploadNotificationStatusConfig implements Parcelable {
     final void addActionsToNotificationBuilder(NotificationCompat.Builder builder) {
         if (actions != null && !actions.isEmpty()) {
             for (UploadNotificationAction notificationAction : actions) {
-                builder.addAction(notificationAction.toAction());
+                builder.addAction(notificationAction.asAction());
             }
         }
     }
