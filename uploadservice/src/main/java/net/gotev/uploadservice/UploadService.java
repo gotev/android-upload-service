@@ -41,9 +41,6 @@ public final class UploadService extends Service {
     protected static final String PARAM_TASK_PARAMETERS = "taskParameters";
     protected static final String PARAM_TASK_CLASS = "taskClass";
 
-    // constants used in broadcast intents
-    protected static final String PARAM_BROADCAST_DATA = "broadcastData";
-
     // internal variables
     private PowerManager.WakeLock wakeLock;
     private static int notificationIncrementalId = 0;

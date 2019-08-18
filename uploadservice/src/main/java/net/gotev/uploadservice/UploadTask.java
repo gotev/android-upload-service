@@ -12,6 +12,7 @@ import android.os.Handler;
 
 import androidx.core.app.NotificationCompat;
 
+import net.gotev.uploadservice.data.BroadcastData;
 import net.gotev.uploadservice.data.UploadStatus;
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
@@ -248,9 +249,7 @@ public abstract class UploadTask implements Runnable {
                 successfullyUploadedFiles,
                 pathStringListFrom(params.files));
 
-        BroadcastData data = new BroadcastData()
-                .setStatus(UploadStatus.IN_PROGRESS)
-                .setUploadInfo(uploadInfo);
+        BroadcastData data = new BroadcastData(UploadStatus.IN_PROGRESS, uploadInfo);
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
         if (delegate != null) {
@@ -261,7 +260,7 @@ public abstract class UploadTask implements Runnable {
                 }
             });
         } else {
-            service.sendBroadcast(data.getIntent());
+            data.send(service);
         }
 
         updateNotificationProgress(uploadInfo);
@@ -321,12 +320,13 @@ public abstract class UploadTask implements Runnable {
                 }
             });
         } else {
-            BroadcastData data = new BroadcastData()
-                    .setStatus(successfulUpload ? UploadStatus.COMPLETED : UploadStatus.ERROR)
-                    .setUploadInfo(uploadInfo)
-                    .setServerResponse(response);
+            BroadcastData data = new BroadcastData(
+                    successfulUpload ? UploadStatus.COMPLETED : UploadStatus.ERROR,
+                    uploadInfo,
+                    response
+            );
 
-            service.sendBroadcast(data.getIntent());
+            data.send(service);
         }
 
         service.taskCompleted(params.id);
@@ -354,9 +354,7 @@ public abstract class UploadTask implements Runnable {
             updateNotification(uploadInfo, notificationConfig.getCancelled());
         }
 
-        BroadcastData data = new BroadcastData()
-                .setStatus(UploadStatus.CANCELLED)
-                .setUploadInfo(uploadInfo);
+        BroadcastData data = new BroadcastData(UploadStatus.CANCELLED, uploadInfo);
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
         if (delegate != null) {
@@ -367,7 +365,7 @@ public abstract class UploadTask implements Runnable {
                 }
             });
         } else {
-            service.sendBroadcast(data.getIntent());
+            data.send(service);
         }
 
         service.taskCompleted(params.id);
@@ -437,10 +435,7 @@ public abstract class UploadTask implements Runnable {
             updateNotification(uploadInfo, notificationConfig.getError());
         }
 
-        BroadcastData data = new BroadcastData()
-                .setStatus(UploadStatus.ERROR)
-                .setUploadInfo(uploadInfo)
-                .setException(exception);
+        BroadcastData data = new BroadcastData(UploadStatus.ERROR, uploadInfo, null, exception);
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
         if (delegate != null) {
@@ -451,7 +446,7 @@ public abstract class UploadTask implements Runnable {
                 }
             });
         } else {
-            service.sendBroadcast(data.getIntent());
+            data.send(service);
         }
 
         service.taskCompleted(params.id);
