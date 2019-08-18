@@ -3,8 +3,8 @@ package net.gotev.uploadservice.data
 import android.os.Parcelable
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
+import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.schemehandlers.SchemeHandler
-import net.gotev.uploadservice.schemehandlers.UploadServiceSchemeHandlers
 import java.util.*
 
 /**
@@ -20,6 +20,6 @@ data class UploadFile @JvmOverloads constructor(
 ) : Parcelable {
     @IgnoredOnParcel
     val handler: SchemeHandler by lazy {
-        UploadServiceSchemeHandlers[path]
+        UploadServiceConfig.getSchemeHandler(path)
     }
 }

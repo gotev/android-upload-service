@@ -5,6 +5,11 @@ import android.os.Build
 import net.gotev.uploadservice.data.RetryPolicyConfig
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
+import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
+import net.gotev.uploadservice.schemehandlers.FileSchemeHandler
+import net.gotev.uploadservice.schemehandlers.SchemeHandler
+import java.lang.reflect.InvocationTargetException
+import java.util.*
 
 /**
  * @author Aleksandar Gotev
@@ -13,6 +18,16 @@ object UploadServiceConfig {
 
     private const val uploadActionSuffix = ".uploadservice.action.upload"
     private const val broadcastActionSuffix = ".uploadservice.broadcast.status"
+
+    private const val fileScheme = "/"
+    private const val contentScheme = "content://"
+
+    private val schemeHandlers by lazy {
+        LinkedHashMap<String, Class<out SchemeHandler>>().apply {
+            this[fileScheme] = FileSchemeHandler::class.java
+            this[contentScheme] = ContentResolverSchemeHandler::class.java
+        }
+    }
 
     /**
      * Namespace with which Upload Service is going to operate. This must be set in application
@@ -112,6 +127,34 @@ object UploadServiceConfig {
     val broadcastIntentFilter: IntentFilter
         get() = IntentFilter(broadcastAction)
 
+    /**
+     * Register a custom scheme handler.
+     * You cannot override existing File and content:// schemes.
+     * @param scheme scheme to support (e.g. content:// , yourCustomScheme://)
+     * @param handler scheme handler implementation
+     */
+    fun addSchemeHandler(scheme: String, handler: Class<out SchemeHandler>) {
+        if (scheme == fileScheme || scheme == contentScheme)
+            throw IllegalArgumentException("Cannot override bundled scheme: $scheme! If you found a bug, please open an issue: https://github.com/gotev/android-upload-service")
+
+        schemeHandlers[scheme] = handler
+    }
+
+    @Throws(NoSuchMethodException::class, IllegalAccessException::class, InvocationTargetException::class, InstantiationException::class)
+    fun getSchemeHandler(path: String): SchemeHandler {
+        val trimmedPath = path.trim()
+
+        for ((scheme, handler) in schemeHandlers) {
+            if (trimmedPath.startsWith(scheme, ignoreCase = true)) {
+                return handler.newInstance().apply {
+                    init(trimmedPath)
+                }
+            }
+        }
+
+        throw UnsupportedOperationException("Unsupported scheme for $path. Currently supported schemes are ${schemeHandlers.keys}")
+    }
+
     override fun toString(): String {
         return """
             {
@@ -126,7 +169,8 @@ object UploadServiceConfig {
                 "httpStack": "${httpStack::class.java.name}",
                 "uploadProgressNotificationIntervalMillis": $uploadProgressNotificationIntervalMillis,
                 "retryPolicy": $retryPolicy,
-                "isForegroundService": $isForegroundService
+                "isForegroundService": $isForegroundService,
+                "schemeHandlers": [${schemeHandlers.entries.map { (key, value) -> "\"$key\": \"$value\"" }.joinToString()}]
             }
         """.trimIndent()
     }

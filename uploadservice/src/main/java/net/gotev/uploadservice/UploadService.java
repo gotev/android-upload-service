@@ -149,7 +149,7 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
-        UploadServiceLogger.INSTANCE.debug(TAG, "Starting UploadService with config: " + UploadServiceConfig.INSTANCE);
+        UploadServiceLogger.INSTANCE.debug(TAG, "Starting UploadService. Debug info: " + UploadServiceConfig.INSTANCE);
 
         UploadTask currentTask = getTask(intent);
 

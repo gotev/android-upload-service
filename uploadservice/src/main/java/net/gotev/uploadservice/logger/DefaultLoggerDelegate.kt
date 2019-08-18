@@ -18,7 +18,7 @@ class DefaultLoggerDelegate : UploadServiceLogger.Delegate {
     }
 
     override fun debug(tag: String, message: String) {
-        Log.d(TAG, "$tag - $message")
+        Log.i(TAG, "$tag - $message")
     }
 
     override fun info(tag: String, message: String) {
