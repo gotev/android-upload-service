@@ -1,6 +1,7 @@
 package net.gotev.uploadservice.network
 
 import android.os.Parcelable
+import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -40,6 +41,7 @@ data class ServerResponse(
      * (embedded in Android) or google's gson
      * @return string
      */
-    val bodyAsString: String
+    @IgnoredOnParcel
+    val bodyString: String
         get() = String(body)
 }

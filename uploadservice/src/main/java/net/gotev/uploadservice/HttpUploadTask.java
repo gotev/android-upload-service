@@ -73,7 +73,7 @@ public abstract class HttpUploadTask extends UploadTask
 
             final ServerResponse response = connection.getResponse(this);
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Server responded with code " + response.getCode()
-                            + " and body " + response.getBodyAsString()
+                            + " and body " + response.getBodyString()
                             + " to upload with ID: " + params.id);
 
             // Broadcast completion only if the user has not cancelled the operation.
