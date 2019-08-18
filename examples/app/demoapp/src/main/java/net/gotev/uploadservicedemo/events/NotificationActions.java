@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservicedemo.BuildConfig;
 
 /**
@@ -25,6 +26,7 @@ public class NotificationActions {
                                                       final int requestCode,
                                                       final String uploadID) {
         Intent intent = new Intent(INTENT_ACTION);
+        intent.setPackage(UploadServiceConfig.INSTANCE.getNamespace());
         intent.putExtra(PARAM_ACTION, ACTION_CANCEL_UPLOAD);
         intent.putExtra(PARAM_UPLOAD_ID, uploadID);
 
