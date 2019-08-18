@@ -3,7 +3,7 @@ package net.gotev.uploadservice.ftp;
 import android.content.Context;
 import android.content.Intent;
 
-import net.gotev.uploadservice.UploadFile;
+import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.UploadRequest;
 import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 import net.gotev.uploadservice.UploadTask;
@@ -146,10 +146,10 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
             throw new IllegalArgumentException("You have to specify a remote path");
         }
 
-        file.setProperty(FTPUploadTask.PARAM_REMOTE_PATH, remotePath);
+        file.getProperties().put(FTPUploadTask.PARAM_REMOTE_PATH, remotePath);
 
         if (permissions != null) {
-            file.setProperty(FTPUploadTask.PARAM_PERMISSIONS, permissions.toString());
+            file.getProperties().put(FTPUploadTask.PARAM_PERMISSIONS, permissions.toString());
         }
 
         params.files.add(file);
@@ -172,7 +172,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
     public FTPUploadRequest addFileToUpload(String filePath) throws FileNotFoundException {
         UploadFile file = new UploadFile(filePath);
 
-        file.setProperty(FTPUploadTask.PARAM_REMOTE_PATH, new File(filePath).getName());
+        file.getProperties().put(FTPUploadTask.PARAM_REMOTE_PATH, new File(filePath).getName());
 
         params.files.add(file);
         return this;

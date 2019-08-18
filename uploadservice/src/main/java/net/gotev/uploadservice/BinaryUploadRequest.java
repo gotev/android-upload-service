@@ -2,6 +2,7 @@ package net.gotev.uploadservice;
 
 import android.content.Context;
 
+import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 
 import java.io.FileNotFoundException;

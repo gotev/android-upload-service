@@ -1,26 +1,28 @@
-package net.gotev.uploadservice;
+package net.gotev.uploadservice.notifications
+
+import net.gotev.uploadservice.UploadInfo
 
 /**
  * Contains all the placeholders that is possible to use in the notification text strings.
  * @author Aleksandar Gotev
  */
-public class Placeholders {
+object Placeholders {
 
     /**
      * Placeholder to display the total elapsed upload time in minutes and seconds.
      * E.g.: 34s, 4m 33s, 45m 21s
      */
-    public static final String ELAPSED_TIME = "[[ELAPSED_TIME]]";
+    const val ELAPSED_TIME = "[[ELAPSED_TIME]]"
 
     /**
      * Placeholder to display the average upload rate. E.g.: 6 Mbit/s, 634 Kbit/s, 232 bit/s
      */
-    public static final String UPLOAD_RATE = "[[UPLOAD_RATE]]";
+    const val UPLOAD_RATE = "[[UPLOAD_RATE]]"
 
     /**
      * Placeholder to display the integer progress percent from 0 to 100. E.g.: 75%
      */
-    public static final String PROGRESS = "[[PROGRESS]]";
+    const val PROGRESS = "[[PROGRESS]]"
 
     /**
      * Placeholder to display the number of successfully uploaded files.
@@ -28,12 +30,12 @@ public class Placeholders {
      * resume, if the request gets restarted due to an error, the number of uploaded files will
      * be reset to zero.
      */
-    public static final String UPLOADED_FILES = "[[UPLOADED_FILES]]";
+    const val UPLOADED_FILES = "[[UPLOADED_FILES]]"
 
     /**
      * Placeholder to display the total number of files to upload.
      */
-    public static final String TOTAL_FILES = "[[TOTAL_FILES]]";
+    const val TOTAL_FILES = "[[TOTAL_FILES]]"
 
     /**
      * Replace placeholders in a string.
@@ -41,17 +43,11 @@ public class Placeholders {
      * @param uploadInfo upload information data
      * @return string with replaced placeholders
      */
-    public static String replace(String string, UploadInfo uploadInfo) {
-        if (string == null || string.isEmpty())
-            return "";
-
-        String tmp;
-        tmp = string.replace(ELAPSED_TIME, uploadInfo.getElapsedTimeString());
-        tmp = tmp.replace(PROGRESS, uploadInfo.getProgressPercent() + "%");
-        tmp = tmp.replace(UPLOAD_RATE, uploadInfo.getUploadRateString());
-        tmp = tmp.replace(UPLOADED_FILES, Integer.toString(uploadInfo.getSuccessfullyUploadedFiles().size()));
-        tmp = tmp.replace(TOTAL_FILES, Integer.toString(uploadInfo.getTotalFiles()));
-
-        return tmp;
+    fun replace(string: String, uploadInfo: UploadInfo): String {
+        return string.replace(ELAPSED_TIME, uploadInfo.elapsedTimeString)
+                .replace(PROGRESS, "${uploadInfo.progressPercent}%")
+                .replace(UPLOAD_RATE, uploadInfo.uploadRateString)
+                .replace(UPLOADED_FILES, uploadInfo.successfullyUploadedFiles.size.toString())
+                .replace(TOTAL_FILES, uploadInfo.totalFiles.toString())
     }
 }

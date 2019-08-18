@@ -1,7 +1,7 @@
 package net.gotev.uploadservice.schemehandlers
 
 import android.content.Context
-import net.gotev.uploadservice.ContentType
+import net.gotev.uploadservice.extensions.autoDetectMimeType
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -17,11 +17,11 @@ internal class FileSchemeHandler : SchemeHandler {
         file = File(path)
     }
 
-    override fun fileLength(context: Context) = file.length()
+    override fun size(context: Context) = file.length()
 
     override fun stream(context: Context) = FileInputStream(file)
 
-    override fun contentType(context: Context) = ContentType.autoDetect(file.absolutePath)
+    override fun contentType(context: Context) = file.absolutePath.autoDetectMimeType()
 
-    override fun fileName(context: Context) = file.name ?: throw IOException("Can't get file name for ${file.absolutePath}")
+    override fun name(context: Context) = file.name ?: throw IOException("Can't get file name for ${file.absolutePath}")
 }

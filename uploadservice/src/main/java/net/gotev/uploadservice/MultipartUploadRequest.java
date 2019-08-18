@@ -3,6 +3,7 @@ package net.gotev.uploadservice;
 import android.content.Context;
 import android.content.Intent;
 
+import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 
 import java.io.FileNotFoundException;
@@ -96,10 +97,10 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
                                                + filePath);
         }
 
-        file.setProperty(MultipartUploadTask.PROPERTY_PARAM_NAME, parameterName);
+        file.getProperties().put(MultipartUploadTask.PROPERTY_PARAM_NAME, parameterName);
 
         if (contentType == null || contentType.isEmpty()) {
-            contentType = file.getContentType(context);
+            contentType = file.getHandler().contentType(context);
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Auto-detected MIME type for " + filePath
                     + " is: " + contentType);
         } else {
@@ -107,16 +108,16 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
                     + " is: " + contentType);
         }
 
-        file.setProperty(MultipartUploadTask.PROPERTY_CONTENT_TYPE, contentType);
+        file.getProperties().put(MultipartUploadTask.PROPERTY_CONTENT_TYPE, contentType);
 
         if (fileName == null || "".equals(fileName)) {
-            fileName = file.getName(context);
+            fileName = file.getHandler().name(context);
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Using original file name: " + fileName);
         } else {
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Using custom file name: " + fileName);
         }
 
-        file.setProperty(MultipartUploadTask.PROPERTY_REMOTE_FILE_NAME, fileName);
+        file.getProperties().put(MultipartUploadTask.PROPERTY_REMOTE_FILE_NAME, fileName);
 
         params.files.add(file);
         return this;

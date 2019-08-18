@@ -3,6 +3,8 @@ package net.gotev.uploadservice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import net.gotev.uploadservice.data.UploadFile;
+
 import java.util.ArrayList;
 
 /**

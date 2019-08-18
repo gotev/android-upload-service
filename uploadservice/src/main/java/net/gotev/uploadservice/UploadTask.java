@@ -12,9 +12,11 @@ import android.os.Handler;
 
 import androidx.core.app.NotificationCompat;
 
-import net.gotev.uploadservice.data.Status;
+import net.gotev.uploadservice.data.UploadStatus;
+import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
+import net.gotev.uploadservice.notifications.Placeholders;
 
 import java.io.File;
 import java.io.IOException;
@@ -247,7 +249,7 @@ public abstract class UploadTask implements Runnable {
                 pathStringListFrom(params.files));
 
         BroadcastData data = new BroadcastData()
-                .setStatus(Status.IN_PROGRESS)
+                .setStatus(UploadStatus.IN_PROGRESS)
                 .setUploadInfo(uploadInfo);
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
@@ -320,7 +322,7 @@ public abstract class UploadTask implements Runnable {
             });
         } else {
             BroadcastData data = new BroadcastData()
-                    .setStatus(successfulUpload ? Status.COMPLETED : Status.ERROR)
+                    .setStatus(successfulUpload ? UploadStatus.COMPLETED : UploadStatus.ERROR)
                     .setUploadInfo(uploadInfo)
                     .setServerResponse(response);
 
@@ -353,7 +355,7 @@ public abstract class UploadTask implements Runnable {
         }
 
         BroadcastData data = new BroadcastData()
-                .setStatus(Status.CANCELLED)
+                .setStatus(UploadStatus.CANCELLED)
                 .setUploadInfo(uploadInfo);
 
         final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
@@ -377,8 +379,8 @@ public abstract class UploadTask implements Runnable {
      * @param file file on the device
      */
     protected final void addSuccessfullyUploadedFile(UploadFile file) {
-        if (!successfullyUploadedFiles.contains(file.path)) {
-            successfullyUploadedFiles.add(file.path);
+        if (!successfullyUploadedFiles.contains(file.getPath())) {
+            successfullyUploadedFiles.add(file.getPath());
             params.files.remove(file);
         }
     }
@@ -391,8 +393,8 @@ public abstract class UploadTask implements Runnable {
         for (Iterator<UploadFile> iterator = params.files.iterator(); iterator.hasNext(); ) {
             UploadFile file = iterator.next();
 
-            if (!successfullyUploadedFiles.contains(file.path)) {
-                successfullyUploadedFiles.add(file.path);
+            if (!successfullyUploadedFiles.contains(file.getPath())) {
+                successfullyUploadedFiles.add(file.getPath());
             }
             iterator.remove();
         }
@@ -436,7 +438,7 @@ public abstract class UploadTask implements Runnable {
         }
 
         BroadcastData data = new BroadcastData()
-                .setStatus(Status.ERROR)
+                .setStatus(UploadStatus.ERROR)
                 .setUploadInfo(uploadInfo)
                 .setException(exception);
 
@@ -470,8 +472,8 @@ public abstract class UploadTask implements Runnable {
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
                 .setWhen(notificationCreationTimeMillis)
-                .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
-                .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
+                .setContentTitle(Placeholders.INSTANCE.replace(statusConfig.title, uploadInfo))
+                .setContentText(Placeholders.INSTANCE.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
                 .setSmallIcon(statusConfig.iconResourceID)
                 .setLargeIcon(statusConfig.largeIcon)
@@ -505,8 +507,8 @@ public abstract class UploadTask implements Runnable {
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
                 .setWhen(notificationCreationTimeMillis)
-                .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
-                .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
+                .setContentTitle(Placeholders.INSTANCE.replace(statusConfig.title, uploadInfo))
+                .setContentText(Placeholders.INSTANCE.replace(statusConfig.message, uploadInfo))
                 .setContentIntent(statusConfig.getClickIntent(service))
                 .setSmallIcon(statusConfig.iconResourceID)
                 .setLargeIcon(statusConfig.largeIcon)
@@ -544,8 +546,8 @@ public abstract class UploadTask implements Runnable {
 
         if (!statusConfig.autoClear) {
             NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
-                    .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
-                    .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
+                    .setContentTitle(Placeholders.INSTANCE.replace(statusConfig.title, uploadInfo))
+                    .setContentText(Placeholders.INSTANCE.replace(statusConfig.message, uploadInfo))
                     .setContentIntent(statusConfig.getClickIntent(service))
                     .setAutoCancel(statusConfig.clearOnAction)
                     .setSmallIcon(statusConfig.iconResourceID)

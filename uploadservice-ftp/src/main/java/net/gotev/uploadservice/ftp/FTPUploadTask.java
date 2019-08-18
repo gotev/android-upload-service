@@ -5,7 +5,7 @@ import android.content.Intent;
 import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
-import net.gotev.uploadservice.UploadFile;
+import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.UploadTask;
 
@@ -167,15 +167,15 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         totalBytes = uploadedBytes;
 
         for (UploadFile file : params.files) {
-            totalBytes += file.length(service);
+            totalBytes += file.getHandler().size(service);
         }
     }
 
     private void uploadFile(String baseWorkingDir, UploadFile file) throws IOException {
-        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting FTP upload of: " + file.getName(service)
-                              + " to: " + file.getProperty(PARAM_REMOTE_PATH));
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting FTP upload of: " + file.getHandler().name(service)
+                              + " to: " + file.getProperties().get(PARAM_REMOTE_PATH));
 
-        String remoteDestination = file.getProperty(PARAM_REMOTE_PATH);
+        String remoteDestination = file.getProperties().get(PARAM_REMOTE_PATH);
 
         if (remoteDestination.startsWith(baseWorkingDir)) {
             remoteDestination = remoteDestination.substring(baseWorkingDir.length());
@@ -183,15 +183,15 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
         makeDirectories(remoteDestination, ftpParams.createdDirectoriesPermissions);
 
-        InputStream localStream = file.getStream(service);
+        InputStream localStream = file.getHandler().stream(service);
         try {
             String remoteFileName = getRemoteFileName(file);
             if (!ftpClient.storeFile(remoteFileName, localStream)) {
-                throw new IOException("Error while uploading: " + file.getName(service)
-                                      + " to: " + file.getProperty(PARAM_REMOTE_PATH));
+                throw new IOException("Error while uploading: " + file.getHandler().name(service)
+                                      + " to: " + file.getProperties().get(PARAM_REMOTE_PATH));
             }
 
-            setPermission(remoteFileName, file.getProperty(PARAM_PERMISSIONS));
+            setPermission(remoteFileName, file.getProperties().get(PARAM_PERMISSIONS));
 
         } finally {
             localStream.close();
@@ -290,20 +290,20 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         // if the remote path ends with /
         // it means that the remote path specifies only the directory structure, so
         // get the remote file name from the local file
-        if (file.getProperty(PARAM_REMOTE_PATH).endsWith("/")) {
-            return file.getName(service);
+        if (file.getProperties().get(PARAM_REMOTE_PATH).endsWith("/")) {
+            return file.getHandler().name(service);
         }
 
         // if the remote path contains /, but it's not the last character
         // it means that I have something like: /path/to/myfilename
         // so the remote file name is the last path element (myfilename in this example)
-        if (file.getProperty(PARAM_REMOTE_PATH).contains("/")) {
-            String[] tmp = file.getProperty(PARAM_REMOTE_PATH).split("/");
+        if (file.getProperties().get(PARAM_REMOTE_PATH).contains("/")) {
+            String[] tmp = file.getProperties().get(PARAM_REMOTE_PATH).split("/");
             return tmp[tmp.length - 1];
         }
 
         // if the remote path does not contain /, it means that it specifies only
         // the remote file name
-        return file.getProperty(PARAM_REMOTE_PATH);
+        return file.getProperties().get(PARAM_REMOTE_PATH);
     }
 }

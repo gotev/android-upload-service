@@ -3,6 +3,7 @@ package net.gotev.uploadservice;
 import android.content.Intent;
 
 import net.gotev.uploadservice.data.NameValue;
+import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.network.BodyWriter;
 
 import java.io.IOException;
@@ -102,9 +103,9 @@ public class MultipartUploadTask extends HttpUploadTask {
     private byte[] getMultipartHeader(UploadFile file)
             throws UnsupportedEncodingException {
         String header = "Content-Disposition: form-data; name=\"" +
-                file.getProperty(PROPERTY_PARAM_NAME) + "\"; filename=\"" +
-                file.getProperty(PROPERTY_REMOTE_FILE_NAME) + "\"" + NEW_LINE +
-                "Content-Type: " + file.getProperty(PROPERTY_CONTENT_TYPE) +
+                file.getProperties().get(PROPERTY_PARAM_NAME) + "\"; filename=\"" +
+                file.getProperties().get(PROPERTY_REMOTE_FILE_NAME) + "\"" + NEW_LINE +
+                "Content-Type: " + file.getProperties().get(PROPERTY_CONTENT_TYPE) +
                 NEW_LINE + NEW_LINE;
 
         return header.getBytes(charset);
@@ -112,7 +113,7 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private long getTotalMultipartBytes(UploadFile file)
             throws UnsupportedEncodingException {
-        return boundaryBytes.length + getMultipartHeader(file).length + file.length(service)
+        return boundaryBytes.length + getMultipartHeader(file).length + file.getHandler().size(service)
                 + NEW_LINE.getBytes(charset).length;
     }
 
@@ -141,7 +142,7 @@ public class MultipartUploadTask extends HttpUploadTask {
             uploadedBytes += boundaryBytes.length + headerBytes.length;
             broadcastProgress(uploadedBytes, totalBytes);
 
-            bodyWriter.writeStream(file.getStream(service), this);
+            bodyWriter.writeStream(file.getHandler().stream(service), this);
 
             byte[] newLineBytes = NEW_LINE.getBytes(charset);
             bodyWriter.write(newLineBytes);

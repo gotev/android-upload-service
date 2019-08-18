@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import net.gotev.uploadservice.data.Status;
+import net.gotev.uploadservice.data.UploadStatus;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 
@@ -16,7 +16,7 @@ import net.gotev.uploadservice.network.ServerResponse;
  */
 class BroadcastData implements Parcelable {
 
-    private Status status;
+    private UploadStatus status;
     private Exception exception;
     private UploadInfo uploadInfo;
     private ServerResponse serverResponse;
@@ -56,7 +56,7 @@ class BroadcastData implements Parcelable {
     }
 
     private BroadcastData(Parcel in) {
-        status = Status.values()[in.readInt()];
+        status = UploadStatus.values()[in.readInt()];
         exception = (Exception) in.readSerializable();
         uploadInfo = in.readParcelable(UploadInfo.class.getClassLoader());
         serverResponse = in.readParcelable(ServerResponse.class.getClassLoader());
@@ -67,16 +67,16 @@ class BroadcastData implements Parcelable {
         return 0;
     }
 
-    public Status getStatus() {
+    public UploadStatus getStatus() {
         if (status == null) {
-            UploadServiceLogger.INSTANCE.error(getClass().getSimpleName(), "Status not defined! Returning " + Status.CANCELLED);
-            return Status.CANCELLED;
+            UploadServiceLogger.INSTANCE.error(getClass().getSimpleName(), "Status not defined! Returning " + UploadStatus.CANCELLED);
+            return UploadStatus.CANCELLED;
         }
 
         return status;
     }
 
-    public BroadcastData setStatus(Status status) {
+    public BroadcastData setStatus(UploadStatus status) {
         this.status = status;
         return this;
     }

@@ -3,7 +3,7 @@ package net.gotev.uploadservice.schemehandlers
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import net.gotev.uploadservice.ContentType
+import net.gotev.uploadservice.extensions.APPLICATION_OCTET_STREAM
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import java.io.File
 import java.io.IOException
@@ -21,7 +21,7 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
         uri = Uri.parse(path)
     }
 
-    override fun fileLength(context: Context): Long {
+    override fun size(context: Context): Long {
         return context.contentResolver.query(uri, null, null, null, null)?.use {
             if (it.moveToFirst()) {
                 it.getLong(it.getColumnIndex(OpenableColumns.SIZE))
@@ -42,13 +42,13 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
         val type = context.contentResolver.getType(uri)
 
         return if (type.isNullOrBlank()) {
-            ContentType.APPLICATION_OCTET_STREAM
+            APPLICATION_OCTET_STREAM
         } else {
             type
         }
     }
 
-    override fun fileName(context: Context): String {
+    override fun name(context: Context): String {
         return context.contentResolver.query(uri, null, null, null, null)?.use {
             if (it.moveToFirst()) {
                 it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))

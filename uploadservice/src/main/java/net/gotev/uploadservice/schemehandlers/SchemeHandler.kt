@@ -10,9 +10,28 @@ import java.io.InputStream
  * @author gotev
  */
 interface SchemeHandler {
+    /**
+     * Initialize instance with file path.
+     */
     fun init(path: String)
-    fun fileLength(context: Context): Long
+
+    /**
+     * Gets file size in bytes.
+     */
+    fun size(context: Context): Long
+
+    /**
+     * Gets file input stream to read it.
+     */
     fun stream(context: Context): InputStream
+
+    /**
+     * Gets file content type.
+     */
     fun contentType(context: Context): String
-    fun fileName(context: Context): String
+
+    /**
+     * Gets file name.
+     */
+    fun name(context: Context): String
 }
