@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import net.gotev.uploadservice.data.BroadcastData;
+import net.gotev.uploadservice.data.UploadInfo;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 

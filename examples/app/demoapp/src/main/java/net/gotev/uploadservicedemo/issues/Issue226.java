@@ -6,7 +6,7 @@ import android.util.Log;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.network.ServerResponse;
-import net.gotev.uploadservice.UploadInfo;
+import net.gotev.uploadservice.data.UploadInfo;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadStatusDelegate;
 

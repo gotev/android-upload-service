@@ -13,6 +13,7 @@ import android.os.Handler;
 import androidx.core.app.NotificationCompat;
 
 import net.gotev.uploadservice.data.BroadcastData;
+import net.gotev.uploadservice.data.UploadInfo;
 import net.gotev.uploadservice.data.UploadStatus;
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
@@ -60,7 +61,7 @@ public abstract class UploadTask implements Runnable {
     /**
      * Contains the absolute local path of the successfully uploaded files.
      */
-    private final List<String> successfullyUploadedFiles = new ArrayList<>();
+    private final ArrayList<String> successfullyUploadedFiles = new ArrayList<>();
 
     /**
      * Flag indicating if the operation should continue or is cancelled. You should never
@@ -246,6 +247,7 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
+                null,
                 successfullyUploadedFiles,
                 pathStringListFrom(params.files));
 
@@ -293,6 +295,7 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
+                null,
                 successfullyUploadedFiles,
                 pathStringListFrom(params.files));
 
@@ -345,6 +348,7 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
+                null,
                 successfullyUploadedFiles,
                 pathStringListFrom(params.files));
 
@@ -426,6 +430,7 @@ public abstract class UploadTask implements Runnable {
 
         final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
+                null,
                 successfullyUploadedFiles,
                 pathStringListFrom(params.files));
 
@@ -593,8 +598,8 @@ public abstract class UploadTask implements Runnable {
         return deleted;
     }
 
-    private static List<String> pathStringListFrom(List<UploadFile> files) {
-        final List<String> filesLeft = new ArrayList<>(files.size());
+    private static ArrayList<String> pathStringListFrom(List<UploadFile> files) {
+        final ArrayList<String> filesLeft = new ArrayList<>(files.size());
         for (UploadFile f : files) {
             filesLeft.add(f.getPath());
         }
