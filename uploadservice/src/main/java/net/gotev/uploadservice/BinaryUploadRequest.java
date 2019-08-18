@@ -66,8 +66,8 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
      * @return {@link BinaryUploadRequest}
      */
     public BinaryUploadRequest setFileToUpload(String path) throws FileNotFoundException {
-        params.files.clear();
-        params.files.add(new UploadFile(path));
+        files.clear();
+        files.add(new UploadFile(path));
         return this;
     }
 
@@ -91,7 +91,7 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
 
     @Override
     public String startUpload() {
-        if (params.files.isEmpty())
+        if (files.isEmpty())
             throw new IllegalArgumentException("Set the file to be used in the request body first!");
 
         return super.startUpload();

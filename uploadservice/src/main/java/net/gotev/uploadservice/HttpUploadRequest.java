@@ -36,13 +36,13 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
         throws MalformedURLException, IllegalArgumentException{
         super(context, uploadId, serverUrl);
 
-        if (!params.serverUrl.startsWith("http://")
-                && !params.serverUrl.startsWith("https://")) {
+        if (!serverUrl.startsWith("http://")
+                && !serverUrl.startsWith("https://")) {
             throw new IllegalArgumentException("Specify either http:// or https:// as protocol");
         }
 
         // Check if the URL is valid
-        new URL(params.serverUrl);
+        new URL(serverUrl);
     }
 
     @Override

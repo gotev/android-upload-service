@@ -16,6 +16,7 @@ import net.gotev.uploadservice.data.BroadcastData;
 import net.gotev.uploadservice.data.UploadInfo;
 import net.gotev.uploadservice.data.UploadStatus;
 import net.gotev.uploadservice.data.UploadFile;
+import net.gotev.uploadservice.data.UploadTaskParameters;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
 import net.gotev.uploadservice.notifications.Placeholders;
@@ -135,17 +136,17 @@ public abstract class UploadTask implements Runnable {
         this.service = service;
         this.mainThreadHandler = new Handler(service.getMainLooper());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && params.notificationConfig != null) {
-            String notificationChannelId = params.notificationConfig.getNotificationChannelId();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && params.getNotificationConfig() != null) {
+            String notificationChannelId = params.getNotificationConfig().getNotificationChannelId();
 
             if (notificationChannelId == null) {
-                params.notificationConfig.setNotificationChannelId(UploadServiceConfig.INSTANCE.getNamespace());
+                params.getNotificationConfig().setNotificationChannelId(UploadServiceConfig.INSTANCE.getNamespace());
                 notificationChannelId = UploadServiceConfig.INSTANCE.getNamespace();
             }
 
             if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
                 NotificationChannel channel = new NotificationChannel(notificationChannelId, "Upload Service channel", NotificationManager.IMPORTANCE_LOW);
-                if (!params.notificationConfig.isRingToneEnabled()) {
+                if (!params.getNotificationConfig().isRingToneEnabled()) {
                     channel.setSound(null, null);
                 }
                 notificationManager.createNotificationChannel(channel);
@@ -157,7 +158,7 @@ public abstract class UploadTask implements Runnable {
     @Override
     public final void run() {
 
-        createNotification(new UploadInfo(params.id));
+        createNotification(new UploadInfo(params.getId()));
 
         attempts = 0;
 
@@ -176,7 +177,7 @@ public abstract class UploadTask implements Runnable {
                 } else if (attempts > params.getMaxRetries()) {
                     broadcastError(exc);
                 } else {
-                    UploadServiceLogger.INSTANCE.error(LOG_TAG, "Error in uploadId " + params.id
+                    UploadServiceLogger.INSTANCE.error(LOG_TAG, "Error in uploadId " + params.getId()
                             + " on attempt " + attempts
                             + ". Waiting " + errorDelay / 1000 + "s before next attempt. ", exc);
 
@@ -242,18 +243,18 @@ public abstract class UploadTask implements Runnable {
 
         setLastProgressNotificationTime(currentTime);
 
-        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload progress for " + params.id
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload progress for " + params.getId()
                 + ": " + uploadedBytes + " bytes of " + totalBytes);
 
-        final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
                 null,
                 successfullyUploadedFiles,
-                pathStringListFrom(params.files));
+                pathStringListFrom(params.getFiles()));
 
         BroadcastData data = new BroadcastData(UploadStatus.IN_PROGRESS, uploadInfo);
 
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
             mainThreadHandler.post(new Runnable() {
                 @Override
@@ -283,7 +284,7 @@ public abstract class UploadTask implements Runnable {
         if (successfulUpload) {
             onSuccessfulUpload();
 
-            if (params.autoDeleteSuccessfullyUploadedFiles && !successfullyUploadedFiles.isEmpty()) {
+            if (params.getAutoDeleteSuccessfullyUploadedFiles() && !successfullyUploadedFiles.isEmpty()) {
                 for (String filePath : successfullyUploadedFiles) {
                     deleteFile(new File(filePath));
                 }
@@ -291,15 +292,15 @@ public abstract class UploadTask implements Runnable {
         }
 
         UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload " + (successfulUpload ? "completed" : "error")
-                + " for " + params.id);
+                + " for " + params.getId());
 
-        final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
                 null,
                 successfullyUploadedFiles,
-                pathStringListFrom(params.files));
+                pathStringListFrom(params.getFiles()));
 
-        final UploadNotificationConfig notificationConfig = params.notificationConfig;
+        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
 
         if (notificationConfig != null) {
             if (successfulUpload && notificationConfig.getCompleted().message != null) {
@@ -310,7 +311,7 @@ public abstract class UploadTask implements Runnable {
             }
         }
 
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
             mainThreadHandler.post(new Runnable() {
                 @Override
@@ -332,7 +333,7 @@ public abstract class UploadTask implements Runnable {
             data.send(service);
         }
 
-        service.taskCompleted(params.id);
+        service.taskCompleted(params.getId());
     }
 
     /**
@@ -344,15 +345,15 @@ public abstract class UploadTask implements Runnable {
      */
     protected final void broadcastCancelled() {
 
-        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: " + params.id);
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: " + params.getId());
 
-        final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
                 null,
                 successfullyUploadedFiles,
-                pathStringListFrom(params.files));
+                pathStringListFrom(params.getFiles()));
 
-        final UploadNotificationConfig notificationConfig = params.notificationConfig;
+        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
 
         if (notificationConfig != null && notificationConfig.getCancelled().message != null) {
             updateNotification(uploadInfo, notificationConfig.getCancelled());
@@ -360,7 +361,7 @@ public abstract class UploadTask implements Runnable {
 
         BroadcastData data = new BroadcastData(UploadStatus.CANCELLED, uploadInfo);
 
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
             mainThreadHandler.post(new Runnable() {
                 @Override
@@ -372,7 +373,7 @@ public abstract class UploadTask implements Runnable {
             data.send(service);
         }
 
-        service.taskCompleted(params.id);
+        service.taskCompleted(params.getId());
     }
 
     /**
@@ -383,7 +384,7 @@ public abstract class UploadTask implements Runnable {
     protected final void addSuccessfullyUploadedFile(UploadFile file) {
         if (!successfullyUploadedFiles.contains(file.getPath())) {
             successfullyUploadedFiles.add(file.getPath());
-            params.files.remove(file);
+            params.getFiles().remove(file);
         }
     }
 
@@ -392,7 +393,7 @@ public abstract class UploadTask implements Runnable {
      * This will automatically remove them from the params.getFiles() list.
      */
     protected final void addAllFilesToSuccessfullyUploadedFiles() {
-        for (Iterator<UploadFile> iterator = params.files.iterator(); iterator.hasNext(); ) {
+        for (Iterator<UploadFile> iterator = params.getFiles().iterator(); iterator.hasNext(); ) {
             UploadFile file = iterator.next();
 
             if (!successfullyUploadedFiles.contains(file.getPath())) {
@@ -426,15 +427,15 @@ public abstract class UploadTask implements Runnable {
     private void broadcastError(final Exception exception) {
 
         UploadServiceLogger.INSTANCE.info(LOG_TAG, "Broadcasting error for upload with ID: "
-                + params.id + ". " + exception.getMessage());
+                + params.getId() + ". " + exception.getMessage());
 
-        final UploadInfo uploadInfo = new UploadInfo(params.id, startTime, uploadedBytes,
+        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
                 totalBytes, (attempts - 1),
                 null,
                 successfullyUploadedFiles,
-                pathStringListFrom(params.files));
+                pathStringListFrom(params.getFiles()));
 
-        final UploadNotificationConfig notificationConfig = params.notificationConfig;
+        final UploadNotificationConfig notificationConfig = params.getNotificationConfig();
 
         if (notificationConfig != null && notificationConfig.getError().message != null) {
             updateNotification(uploadInfo, notificationConfig.getError());
@@ -442,7 +443,7 @@ public abstract class UploadTask implements Runnable {
 
         BroadcastData data = new BroadcastData(UploadStatus.ERROR, uploadInfo, null, exception);
 
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.id);
+        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
         if (delegate != null) {
             mainThreadHandler.post(new Runnable() {
                 @Override
@@ -454,7 +455,7 @@ public abstract class UploadTask implements Runnable {
             data.send(service);
         }
 
-        service.taskCompleted(params.id);
+        service.taskCompleted(params.getId());
     }
 
     /**
@@ -464,13 +465,13 @@ public abstract class UploadTask implements Runnable {
      * @param uploadInfo upload information and statistics
      */
     private void createNotification(UploadInfo uploadInfo) {
-        if (params.notificationConfig == null || params.notificationConfig.getProgress().message == null)
+        if (params.getNotificationConfig() == null || params.getNotificationConfig().getProgress().message == null)
             return;
 
-        UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
+        UploadNotificationStatusConfig statusConfig = params.getNotificationConfig().getProgress();
         notificationCreationTimeMillis = System.currentTimeMillis();
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.getNotificationConfig().getNotificationChannelId())
                 .setWhen(notificationCreationTimeMillis)
                 .setContentTitle(Placeholders.INSTANCE.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.INSTANCE.replace(statusConfig.message, uploadInfo))
@@ -486,7 +487,7 @@ public abstract class UploadTask implements Runnable {
 
         Notification builtNotification = notification.build();
 
-        if (service.holdForegroundNotification(params.id, builtNotification)) {
+        if (service.holdForegroundNotification(params.getId(), builtNotification)) {
             notificationManager.cancel(notificationId);
         } else {
             notificationManager.notify(notificationId, builtNotification);
@@ -500,12 +501,12 @@ public abstract class UploadTask implements Runnable {
      * @param uploadInfo upload information and statistics
      */
     private void updateNotificationProgress(UploadInfo uploadInfo) {
-        if (params.notificationConfig == null || params.notificationConfig.getProgress().message == null)
+        if (params.getNotificationConfig() == null || params.getNotificationConfig().getProgress().message == null)
             return;
 
-        UploadNotificationStatusConfig statusConfig = params.notificationConfig.getProgress();
+        UploadNotificationStatusConfig statusConfig = params.getNotificationConfig().getProgress();
 
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.getNotificationConfig().getNotificationChannelId())
                 .setWhen(notificationCreationTimeMillis)
                 .setContentTitle(Placeholders.INSTANCE.replace(statusConfig.title, uploadInfo))
                 .setContentText(Placeholders.INSTANCE.replace(statusConfig.message, uploadInfo))
@@ -521,7 +522,7 @@ public abstract class UploadTask implements Runnable {
 
         Notification builtNotification = notification.build();
 
-        if (service.holdForegroundNotification(params.id, builtNotification)) {
+        if (service.holdForegroundNotification(params.getId(), builtNotification)) {
             notificationManager.cancel(notificationId);
         } else {
             notificationManager.notify(notificationId, builtNotification);
@@ -530,7 +531,7 @@ public abstract class UploadTask implements Runnable {
 
     private void setRingtone(NotificationCompat.Builder notification) {
 
-        if (params.notificationConfig.isRingToneEnabled() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        if (params.getNotificationConfig().isRingToneEnabled() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             Uri sound = RingtoneManager.getActualDefaultRingtoneUri(service, RingtoneManager.TYPE_NOTIFICATION);
             notification.setSound(sound);
         }
@@ -538,14 +539,14 @@ public abstract class UploadTask implements Runnable {
     }
 
     private void updateNotification(UploadInfo uploadInfo, UploadNotificationStatusConfig statusConfig) {
-        if (params.notificationConfig == null) return;
+        if (params.getNotificationConfig() == null) return;
 
         notificationManager.cancel(notificationId);
 
         if (statusConfig.message == null) return;
 
         if (!statusConfig.autoClear) {
-            NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.notificationConfig.getNotificationChannelId())
+            NotificationCompat.Builder notification = new NotificationCompat.Builder(service, params.getNotificationConfig().getNotificationChannelId())
                     .setContentTitle(Placeholders.INSTANCE.replace(statusConfig.title, uploadInfo))
                     .setContentText(Placeholders.INSTANCE.replace(statusConfig.message, uploadInfo))
                     .setContentIntent(statusConfig.getClickIntent(service))

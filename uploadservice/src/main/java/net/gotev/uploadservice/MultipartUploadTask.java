@@ -45,7 +45,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false) ?
                 Charset.forName("UTF-8") : US_ASCII;
 
-        if (params.files.size() <= 1) {
+        if (params.getFiles().size() <= 1) {
             httpParams.addHeader("Connection", "close");
         } else {
             httpParams.addHeader("Connection", "Keep-Alive");
@@ -74,7 +74,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     private long getFilesLength() throws UnsupportedEncodingException {
         long total = 0;
 
-        for (UploadFile file : params.files) {
+        for (UploadFile file : params.getFiles()) {
             total += getTotalMultipartBytes(file);
         }
 
@@ -131,7 +131,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     private void writeFiles(BodyWriter bodyWriter) throws IOException {
-        for (UploadFile file : params.files) {
+        for (UploadFile file : params.getFiles()) {
             if (!shouldContinue)
                 break;
 

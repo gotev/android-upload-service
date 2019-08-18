@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import net.gotev.uploadservice.data.UploadFile;
+import net.gotev.uploadservice.data.UploadTaskParameters;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -18,8 +21,13 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
     private static final String LOG_TAG = UploadRequest.class.getSimpleName();
 
     protected final Context context;
-    protected final UploadTaskParameters params = new UploadTaskParameters();
     protected UploadStatusDelegate delegate;
+    private String uploadId;
+    protected String serverUrl;
+    protected int maxRetries = 0;
+    protected boolean autoDeleteSuccessfullyUploadedFiles = false;
+    protected UploadNotificationConfig notificationConfig;
+    protected ArrayList<UploadFile> files = new ArrayList<>();
 
     /**
      * Creates a new upload request.
@@ -45,15 +53,15 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
 
         if (uploadId == null || uploadId.isEmpty()) {
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "null or empty upload ID. Generating it");
-            params.id = UUID.randomUUID().toString();
+            this.uploadId = UUID.randomUUID().toString();
         } else {
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "setting provided upload ID");
-            params.id = uploadId;
+            this.uploadId = uploadId;
         }
 
-        params.serverUrl = serverUrl;
+        this.serverUrl = serverUrl;
         UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Created new upload request to "
-                     + params.serverUrl + " with ID: " + params.id);
+                     + serverUrl + " with ID: " + this.uploadId);
     }
 
     /**
@@ -63,14 +71,14 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      *         generated uploadId
      */
     public String startUpload() {
-        UploadService.setUploadStatusDelegate(params.id, delegate);
+        UploadService.setUploadStatusDelegate(uploadId, delegate);
 
         final Intent intent = new Intent(context, UploadService.class);
         this.initializeIntent(intent);
         intent.setAction(UploadServiceConfig.INSTANCE.getUploadAction());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (params.notificationConfig == null) {
+            if (notificationConfig == null) {
                 throw new IllegalArgumentException("Android Oreo requires a notification configuration for the service to run. https://developer.android.com/reference/android/content/Context.html#startForegroundService(android.content.Intent)");
             }
             context.startForegroundService(intent);
@@ -78,7 +86,7 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
             context.startService(intent);
         }
 
-        return params.id;
+        return uploadId;
     }
 
     /**
@@ -88,6 +96,15 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * @param intent the intent used to start the upload service
      */
     protected void initializeIntent(Intent intent) {
+        UploadTaskParameters params = new UploadTaskParameters(
+                uploadId,
+                serverUrl,
+                maxRetries,
+                autoDeleteSuccessfullyUploadedFiles,
+                notificationConfig,
+                files
+        );
+
         intent.putExtra(UploadService.PARAM_TASK_PARAMETERS, params);
 
         Class taskClass = getTaskClass();
@@ -112,7 +129,7 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * @return self instance
      */
     public B setNotificationConfig(UploadNotificationConfig config) {
-        params.notificationConfig = config;
+        this.notificationConfig = config;
         return self();
     }
 
@@ -124,7 +141,7 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * @return self instance
      */
     public B setAutoDeleteFilesAfterSuccessfulUpload(boolean autoDeleteFiles) {
-        params.autoDeleteSuccessfullyUploadedFiles = autoDeleteFiles;
+        this.autoDeleteSuccessfullyUploadedFiles = autoDeleteFiles;
         return self();
     }
 
@@ -136,7 +153,7 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * @return self instance
      */
     public B setMaxRetries(int maxRetries) {
-        params.setMaxRetries(maxRetries);
+        this.maxRetries = maxRetries;
         return self();
     }
 

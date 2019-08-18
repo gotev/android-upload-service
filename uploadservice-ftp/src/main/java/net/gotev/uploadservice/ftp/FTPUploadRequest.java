@@ -152,7 +152,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
             file.getProperties().put(FTPUploadTask.PARAM_PERMISSIONS, permissions.toString());
         }
 
-        params.files.add(file);
+        files.add(file);
         return this;
     }
 
@@ -174,7 +174,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
 
         file.getProperties().put(FTPUploadTask.PARAM_REMOTE_PATH, new File(filePath).getName());
 
-        params.files.add(file);
+        files.add(file);
         return this;
     }
 
@@ -273,7 +273,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
 
     @Override
     public String startUpload() {
-        if (params.files.isEmpty())
+        if (files.isEmpty())
             throw new IllegalArgumentException("Add at least one file to start FTP upload!");
 
         return super.startUpload();

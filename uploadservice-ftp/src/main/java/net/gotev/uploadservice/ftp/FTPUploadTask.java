@@ -76,18 +76,18 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Connect timeout set to " + ftpParams.connectTimeout + "ms");
 
-            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Connecting to " + params.serverUrl
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Connecting to " + params.getServerUrl()
                                   + ":" + ftpParams.port + " as " + ftpParams.username);
-            ftpClient.connect(params.serverUrl, ftpParams.port);
+            ftpClient.connect(params.getServerUrl(), ftpParams.port);
 
             if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
-                throw new Exception("Can't connect to " + params.serverUrl
+                throw new Exception("Can't connect to " + params.getServerUrl()
                                     + ":" + ftpParams.port
                                     + ". The server response is: " + ftpClient.getReplyString());
             }
 
             if (!ftpClient.login(ftpParams.username, ftpParams.password)) {
-                throw new Exception("Error while performing login on " + params.serverUrl
+                throw new Exception("Error while performing login on " + params.getServerUrl()
                                     + ":" + ftpParams.port
                                     + " with username: " + ftpParams.username
                                     + ". Check your credentials and try again.");
@@ -118,7 +118,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             String baseWorkingDir = ftpClient.printWorkingDirectory();
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "FTP default working directory is: " + baseWorkingDir);
 
-            Iterator<UploadFile> iterator = new ArrayList<>(params.files).iterator();
+            Iterator<UploadFile> iterator = new ArrayList<>(params.getFiles()).iterator();
             while (iterator.hasNext()) {
                 UploadFile file = iterator.next();
 
@@ -140,12 +140,12 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             if (ftpClient.isConnected()) {
                 try {
                     UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Logout and disconnect from FTP server: "
-                                          + params.serverUrl + ":" + ftpParams.port);
+                                          + params.getServerUrl() + ":" + ftpParams.port);
                     ftpClient.logout();
                     ftpClient.disconnect();
                 } catch (Exception exc) {
                     UploadServiceLogger.INSTANCE.error(LOG_TAG, "Error while closing FTP connection to: "
-                                          + params.serverUrl + ":" + ftpParams.port, exc);
+                                          + params.getServerUrl() + ":" + ftpParams.port, exc);
                 }
             }
             ftpClient = null;
@@ -166,7 +166,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
         totalBytes = uploadedBytes;
 
-        for (UploadFile file : params.files) {
+        for (UploadFile file : params.getFiles()) {
             totalBytes += file.getHandler().size(service);
         }
     }

@@ -2,9 +2,10 @@ package net.gotev.uploadservicedemo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import net.gotev.recycleradapter.AdapterItem;
 import net.gotev.uploadservice.BinaryUploadRequest;
@@ -41,7 +42,8 @@ public class BinaryUploadActivity extends UploadActivity {
     @Override
     public void onAddFile() {
         fileParameterName = "file";
-        openFilePicker(false);
+        //openFilePicker(false);
+        performFileSearch();
     }
 
     @Override

@@ -157,8 +157,8 @@ public final class UploadService extends Service {
             return shutdownIfThereArentAnyActiveTasks();
         }
 
-        if (uploadTasksMap.containsKey(currentTask.params.id)) {
-            UploadServiceLogger.INSTANCE.error(TAG, "Preventing upload with id: " + currentTask.params.id
+        if (uploadTasksMap.containsKey(currentTask.params.getId())) {
+            UploadServiceLogger.INSTANCE.error(TAG, "Preventing upload with id: " + currentTask.params.getId()
                     + " to be uploaded twice! Please check your code and fix it!");
             return shutdownIfThereArentAnyActiveTasks();
         }
@@ -171,7 +171,7 @@ public final class UploadService extends Service {
         currentTask.setLastProgressNotificationTime(0)
                    .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
 
-        uploadTasksMap.put(currentTask.params.id, currentTask);
+        uploadTasksMap.put(currentTask.params.getId(), currentTask);
         uploadThreadPool.execute(currentTask);
 
         return START_STICKY;
@@ -291,7 +291,7 @@ public final class UploadService extends Service {
         uploadDelegates.remove(uploadId);
 
         // un-hold foreground upload ID if it's been hold
-        if (UploadServiceConfig.INSTANCE.isForegroundService() && task != null && task.params.id.equals(foregroundUploadId)) {
+        if (UploadServiceConfig.INSTANCE.isForegroundService() && task != null && task.params.getId().equals(foregroundUploadId)) {
             UploadServiceLogger.INSTANCE.debug(TAG, uploadId + " now un-holded the foreground notification");
             foregroundUploadId = null;
         }

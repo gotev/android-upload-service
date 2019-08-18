@@ -53,7 +53,7 @@ public abstract class HttpUploadTask extends UploadTask
     @SuppressLint("NewApi")
     protected void upload() throws Exception {
 
-        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting upload task with ID " + params.id);
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting upload task with ID " + params.getId());
 
         try {
             getSuccessfullyUploadedFiles().clear();
@@ -67,14 +67,14 @@ public abstract class HttpUploadTask extends UploadTask
             }
 
             connection = UploadServiceConfig.INSTANCE.getHttpStack()
-                    .createNewConnection(httpParams.method, params.serverUrl)
+                    .createNewConnection(httpParams.method, params.getServerUrl())
                     .setHeaders(httpParams.getRequestHeaders())
                     .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode);
 
             final ServerResponse response = connection.getResponse(this);
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Server responded with code " + response.getCode()
                             + " and body " + response.getBodyString()
-                            + " to upload with ID: " + params.id);
+                            + " to upload with ID: " + params.getId());
 
             // Broadcast completion only if the user has not cancelled the operation.
             // It may happen that when the body is not completely written and the client
