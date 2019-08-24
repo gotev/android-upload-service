@@ -33,16 +33,18 @@ object UploadServiceConfig {
      * Namespace with which Upload Service is going to operate. This must be set in application
      * subclass onCreate method before anything else.
      */
-    lateinit var namespace: String
+    var namespace: String? = null
+        get() = if (field == null)
+            throw IllegalArgumentException("You have to set namespace to BuildConfig.APPLICATION_ID in your Application subclass")
+        else
+            field
 
     /**
      * Sets how many threads to use to handle concurrent uploads.
      */
     var uploadPoolSize = Runtime.getRuntime().availableProcessors()
         set(value) {
-            if (value < 1) {
-                throw IllegalArgumentException("upload pool size min allowable value is 1. It cannot be $value")
-            }
+            require(value >= 1) { "Upload pool size min allowable value is 1. It cannot be $value" }
             field = value
         }
 
@@ -52,9 +54,7 @@ object UploadServiceConfig {
      */
     var keepAliveTimeSeconds = 5
         set(value) {
-            if (value < 1) {
-                throw IllegalArgumentException("keep alive time min allowable value is 1. It cannot be $value")
-            }
+            require(value >= 1) { "Keep alive time min allowable value is 1. It cannot be $value" }
             field = value
         }
 
@@ -64,9 +64,7 @@ object UploadServiceConfig {
      */
     var idleTimeoutSeconds = 10
         set(value) {
-            if (value < 1) {
-                throw IllegalArgumentException("idle timeout min allowable value is 1. It cannot be $value")
-            }
+            require(value >= 1) { "Idle timeout min allowable value is 1. It cannot be $value" }
             field = value
         }
 
@@ -75,9 +73,7 @@ object UploadServiceConfig {
      */
     var bufferSizeBytes = 4096
         set(value) {
-            if (value < 256) {
-                throw IllegalArgumentException("it's not allowed to set buffer size lower than 256 bytes")
-            }
+            require(value >= 256) { "You can't set buffer size lower than 256 bytes" }
             field = value
         }
 
@@ -134,9 +130,7 @@ object UploadServiceConfig {
      * @param handler scheme handler implementation
      */
     fun addSchemeHandler(scheme: String, handler: Class<out SchemeHandler>) {
-        if (scheme == fileScheme || scheme == contentScheme)
-            throw IllegalArgumentException("Cannot override bundled scheme: $scheme! If you found a bug, please open an issue: https://github.com/gotev/android-upload-service")
-
+        require(!(scheme == fileScheme || scheme == contentScheme)) { "Cannot override bundled scheme: $scheme! If you found a bug in a bundled scheme handler, please open an issue: https://github.com/gotev/android-upload-service" }
         schemeHandlers[scheme] = handler
     }
 
@@ -170,7 +164,7 @@ object UploadServiceConfig {
                 "uploadProgressNotificationIntervalMillis": $uploadProgressNotificationIntervalMillis,
                 "retryPolicy": $retryPolicy,
                 "isForegroundService": $isForegroundService,
-                "schemeHandlers": [${schemeHandlers.entries.map { (key, value) -> "\"$key\": \"$value\"" }.joinToString()}]
+                "schemeHandlers": [${schemeHandlers.entries.joinToString { (key, value) -> "\"$key\": \"$value\"" }}]
             }
         """.trimIndent()
     }
