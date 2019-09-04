@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.notifier
+package net.gotev.uploadservice.tasklistener
 
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.network.ServerResponse

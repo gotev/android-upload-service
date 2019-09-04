@@ -10,7 +10,7 @@ import net.gotev.uploadservice.data.UploadStatus;
 import net.gotev.uploadservice.data.UploadTaskParameters;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
-import net.gotev.uploadservice.notifier.NotificationHandler;
+import net.gotev.uploadservice.tasklistener.NotificationHandler;
 
 import java.io.File;
 import java.io.IOException;

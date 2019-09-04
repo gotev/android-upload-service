@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.notifier
+package net.gotev.uploadservice.tasklistener
 
 import android.app.NotificationManager
 import android.content.Context
