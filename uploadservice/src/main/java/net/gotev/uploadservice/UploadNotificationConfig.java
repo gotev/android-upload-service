@@ -192,6 +192,7 @@ public final class UploadNotificationConfig implements Parcelable {
         return this;
     }
 
+    //TODO: study how to apply this to notification channels
     public boolean isRingToneEnabled() {
         return ringToneEnabled;
     }

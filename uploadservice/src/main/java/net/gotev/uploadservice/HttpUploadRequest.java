@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Base64;
 
+import net.gotev.uploadservice.extensions.StringExtensionsKt;
+
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -36,13 +37,9 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
         throws MalformedURLException, IllegalArgumentException{
         super(context, uploadId, serverUrl);
 
-        if (!serverUrl.startsWith("http://")
-                && !serverUrl.startsWith("https://")) {
+        if (!StringExtensionsKt.isValidHttpUrl(serverUrl)) {
             throw new IllegalArgumentException("Specify either http:// or https:// as protocol");
         }
-
-        // Check if the URL is valid
-        new URL(serverUrl);
     }
 
     @Override

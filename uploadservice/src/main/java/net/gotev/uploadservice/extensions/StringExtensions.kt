@@ -1,6 +1,7 @@
 package net.gotev.uploadservice.extensions
 
 import android.webkit.MimeTypeMap
+import java.net.URL
 
 /**
  * @author Aleksandar Gotev
@@ -40,5 +41,16 @@ fun String.autoDetectMimeType(): String {
         }
     } else {
         APPLICATION_OCTET_STREAM
+    }
+}
+
+fun String.isValidHttpUrl(): Boolean {
+    if (!startsWith("http://") && !startsWith("https://")) return false
+
+    return try {
+        URL(this)
+        true
+    } catch (exc: Throwable) {
+        false
     }
 }
