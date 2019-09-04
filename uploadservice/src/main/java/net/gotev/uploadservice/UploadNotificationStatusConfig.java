@@ -67,7 +67,7 @@ public class UploadNotificationStatusConfig implements Parcelable {
      */
     public ArrayList<UploadNotificationAction> actions = new ArrayList<>(3);
 
-    final PendingIntent getClickIntent(Context context) {
+    public final PendingIntent getClickIntent(Context context) {
         if (clickIntent == null) {
             return PendingIntent.getBroadcast(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
         }
@@ -75,7 +75,7 @@ public class UploadNotificationStatusConfig implements Parcelable {
         return clickIntent;
     }
 
-    final void addActionsToNotificationBuilder(NotificationCompat.Builder builder) {
+    public final void addActionsToNotificationBuilder(NotificationCompat.Builder builder) {
         if (actions != null && !actions.isEmpty()) {
             for (UploadNotificationAction notificationAction : actions) {
                 builder.addAction(notificationAction.asAction());

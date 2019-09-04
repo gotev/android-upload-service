@@ -5,14 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import net.gotev.uploadservice.notifications.UploadNotificationAction;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AppCompatActivity;
+
 import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.notifications.UploadNotificationAction;
 import net.gotev.uploadservicedemo.events.NotificationActions;
 
 import butterknife.ButterKnife;
@@ -50,7 +51,8 @@ public class BaseActivity extends AppCompatActivity {
         config.setTitleForAllStatuses(getString(title))
                 .setRingToneEnabled(true)
                 .setClickIntentForAllStatuses(clickIntent)
-                .setClearOnActionForAllStatuses(true);
+                .setClearOnActionForAllStatuses(true)
+                .setNotificationChannelId(App.CHANNEL);
 
         config.getProgress().message = getString(R.string.uploading);
         config.getProgress().iconResourceID = R.drawable.ic_upload;

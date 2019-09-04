@@ -1,14 +1,18 @@
 package net.gotev.uploadservicedemo;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
 import android.os.StrictMode;
 import android.util.Log;
 
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
-import net.gotev.uploadservice.data.RetryPolicyConfig;
 import net.gotev.uploadservice.UploadServiceConfig;
+import net.gotev.uploadservice.data.RetryPolicyConfig;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 
@@ -27,6 +31,8 @@ import static com.facebook.stetho.Stetho.newInitializerBuilder;
  * @author gotev (Aleksandar Gotev)
  */
 public class App extends Application {
+
+    public static String CHANNEL = "UploadServiceDemoChannel";
 
     @Override
     public void onCreate() {
@@ -56,8 +62,18 @@ public class App extends Application {
         // Set upload service debug log messages level
         UploadServiceLogger.INSTANCE.setLogLevel(UploadServiceLogger.LogLevel.DEBUG);
 
+        createNotificationChannel();
+
         GlobalBroadcastReceiver receiver = new GlobalBroadcastReceiver();
         receiver.register(this);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel channel = new NotificationChannel(CHANNEL, "Upload Service Demo", NotificationManager.IMPORTANCE_LOW);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private OkHttpClient getOkHttpClient() {

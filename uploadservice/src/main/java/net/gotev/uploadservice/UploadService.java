@@ -265,7 +265,7 @@ public final class UploadService extends Service {
      * @param uploadId ID of the upload
      * @return true if the current upload task holds the foreground notification, otherwise false
      */
-    protected synchronized boolean holdForegroundNotification(String uploadId, Notification notification) {
+    public synchronized boolean holdForegroundNotification(String uploadId, Notification notification) {
         if (!UploadServiceConfig.INSTANCE.isForegroundService()) return false;
 
         if (foregroundUploadId == null) {

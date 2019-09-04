@@ -44,4 +44,8 @@ data class ServerResponse(
     @IgnoredOnParcel
     val bodyString: String
         get() = String(body)
+
+    @IgnoredOnParcel
+    val isSuccessful: Boolean
+        get() = code in 200..399
 }
