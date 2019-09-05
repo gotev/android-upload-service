@@ -11,7 +11,6 @@ import net.gotev.uploadservice.tasklistener.BroadcastHandler;
 import net.gotev.uploadservice.tasklistener.NotificationHandler;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -26,16 +25,6 @@ import java.util.List;
 public abstract class UploadTask implements Runnable {
 
     private static final String LOG_TAG = UploadTask.class.getSimpleName();
-
-    /**
-     * Constant which indicates that the upload task has been completed successfully.
-     */
-    protected static final int TASK_COMPLETED_SUCCESSFULLY = 200;
-
-    /**
-     * Constant which indicates an empty response from the server.
-     */
-    protected static final byte[] EMPTY_RESPONSE = "".getBytes(Charset.forName("UTF-8"));
 
     /**
      * Reference to the upload service instance.

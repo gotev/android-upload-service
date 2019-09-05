@@ -131,8 +131,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
             // Broadcast completion only if the user has not cancelled the operation.
             if (shouldContinue) {
-                broadcastCompleted(new ServerResponse(UploadTask.TASK_COMPLETED_SUCCESSFULLY,
-                                   UploadTask.EMPTY_RESPONSE, null));
+                broadcastCompleted(ServerResponse.Companion.successfulEmpty());
             }
 
         } finally {
