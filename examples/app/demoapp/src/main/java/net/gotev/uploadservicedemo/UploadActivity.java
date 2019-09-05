@@ -233,6 +233,8 @@ public abstract class UploadActivity extends FilesPickerActivity {
                 data.add(uri.toString());
                 onPickedFiles(data);
             }
+        } else {
+            super.onActivityResult(requestCode, resultCode, resultData);
         }
     }
 }

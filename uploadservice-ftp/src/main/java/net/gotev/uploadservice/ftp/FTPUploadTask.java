@@ -2,12 +2,12 @@ package net.gotev.uploadservice.ftp;
 
 import android.content.Intent;
 
+import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.UploadServiceConfig;
+import net.gotev.uploadservice.UploadTask;
+import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
-import net.gotev.uploadservice.data.UploadFile;
-import net.gotev.uploadservice.UploadService;
-import net.gotev.uploadservice.UploadTask;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -16,7 +16,6 @@ import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.io.CopyStreamEvent;
 import org.apache.commons.net.io.CopyStreamListener;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -160,8 +159,8 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     private void calculateUploadedAndTotalBytes() {
         uploadedBytes = 0;
 
-        for (String filePath : getSuccessfullyUploadedFiles()) {
-            uploadedBytes += new File(filePath).length();
+        for (UploadFile file : getSuccessfullyUploadedFiles()) {
+            uploadedBytes += file.getHandler().size(service);
         }
 
         totalBytes = uploadedBytes;

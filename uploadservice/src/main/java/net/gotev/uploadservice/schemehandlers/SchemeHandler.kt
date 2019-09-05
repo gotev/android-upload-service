@@ -34,4 +34,9 @@ interface SchemeHandler {
      * Gets file name.
      */
     fun name(context: Context): String
+
+    /**
+     * Deletes the file.
+     */
+    fun delete(context: Context): Boolean
 }

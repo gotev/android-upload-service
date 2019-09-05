@@ -45,12 +45,12 @@ data class UploadInfo @JvmOverloads constructor(
         /**
          * List of all the files left to be uploaded.
          */
-        val remainingFiles: ArrayList<String> = ArrayList(),
+        val remainingFiles: ArrayList<UploadFile> = ArrayList(),
 
         /**
          * List of the successfully uploaded files.
          */
-        val successfullyUploadedFiles: ArrayList<String> = ArrayList()
+        val successfullyUploadedFiles: ArrayList<UploadFile> = ArrayList()
 
 ) : Parcelable {
 

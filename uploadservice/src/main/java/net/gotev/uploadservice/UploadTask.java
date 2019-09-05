@@ -10,7 +10,6 @@ import net.gotev.uploadservice.network.ServerResponse;
 import net.gotev.uploadservice.tasklistener.BroadcastHandler;
 import net.gotev.uploadservice.tasklistener.NotificationHandler;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public abstract class UploadTask implements Runnable {
     /**
      * Contains the absolute local path of the successfully uploaded files.
      */
-    private final ArrayList<String> successfullyUploadedFiles = new ArrayList<>();
+    private final ArrayList<UploadFile> successfullyUploadedFiles = new ArrayList<>();
 
     /**
      * Flag indicating if the operation should continue or is cancelled. You should never
@@ -235,8 +234,14 @@ public abstract class UploadTask implements Runnable {
             onSuccessfulUpload();
 
             if (params.getAutoDeleteSuccessfullyUploadedFiles() && !successfullyUploadedFiles.isEmpty()) {
-                for (String filePath : successfullyUploadedFiles) {
-                    deleteFile(new File(filePath));
+                for (UploadFile file : successfullyUploadedFiles) {
+                    if (file.getHandler().delete(service)) {
+                        UploadServiceLogger.INSTANCE.info(LOG_TAG, "Successfully deleted: "
+                                + file.getPath());
+                    } else {
+                        UploadServiceLogger.INSTANCE.error(LOG_TAG, "Unable to delete: "
+                                + file.getPath());
+                    }
                 }
             }
         }
@@ -305,8 +310,8 @@ public abstract class UploadTask implements Runnable {
      * @param file file on the device
      */
     protected final void addSuccessfullyUploadedFile(UploadFile file) {
-        if (!successfullyUploadedFiles.contains(file.getPath())) {
-            successfullyUploadedFiles.add(file.getPath());
+        if (!successfullyUploadedFiles.contains(file)) {
+            successfullyUploadedFiles.add(file);
             params.getFiles().remove(file);
         }
     }
@@ -319,8 +324,8 @@ public abstract class UploadTask implements Runnable {
         for (Iterator<UploadFile> iterator = params.getFiles().iterator(); iterator.hasNext(); ) {
             UploadFile file = iterator.next();
 
-            if (!successfullyUploadedFiles.contains(file.getPath())) {
-                successfullyUploadedFiles.add(file.getPath());
+            if (!successfullyUploadedFiles.contains(file)) {
+                successfullyUploadedFiles.add(file);
             }
             iterator.remove();
         }
@@ -334,38 +339,8 @@ public abstract class UploadTask implements Runnable {
      *
      * @return list of strings
      */
-    protected final List<String> getSuccessfullyUploadedFiles() {
+    protected final List<UploadFile> getSuccessfullyUploadedFiles() {
         return successfullyUploadedFiles;
-    }
-
-    /**
-     * Tries to delete a file from the device.
-     * If it fails, the error will be printed in the LogCat.
-     *
-     * @param fileToDelete file to delete
-     * @return true if the file has been deleted, otherwise false.
-     */
-    private boolean deleteFile(File fileToDelete) {
-        boolean deleted = false;
-
-        try {
-            deleted = fileToDelete.delete();
-
-            if (!deleted) {
-                UploadServiceLogger.INSTANCE.error(LOG_TAG, "Unable to delete: "
-                        + fileToDelete.getAbsolutePath());
-            } else {
-                UploadServiceLogger.INSTANCE.info(LOG_TAG, "Successfully deleted: "
-                        + fileToDelete.getAbsolutePath());
-            }
-
-        } catch (Exception exc) {
-            UploadServiceLogger.INSTANCE.error(LOG_TAG,
-                    "Error while deleting: " + fileToDelete.getAbsolutePath() +
-                            " Check if you granted: android.permission.WRITE_EXTERNAL_STORAGE", exc);
-        }
-
-        return deleted;
     }
 
     private UploadInfo getUploadInfo() {
@@ -373,16 +348,8 @@ public abstract class UploadTask implements Runnable {
                 totalBytes, (attempts - 1),
                 null,
                 successfullyUploadedFiles,
-                pathStringListFrom(params.getFiles())
+                params.getFiles()
         );
-    }
-
-    private static ArrayList<String> pathStringListFrom(List<UploadFile> files) {
-        final ArrayList<String> filesLeft = new ArrayList<>(files.size());
-        for (UploadFile f : files) {
-            filesLeft.add(f.getPath());
-        }
-        return filesLeft;
     }
 
     public final void cancel() {

@@ -58,4 +58,10 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
         } ?: uri.toString().split(File.separator).last()
     }
 
+    override fun delete(context: Context) = try {
+        context.contentResolver.delete(uri, null, null) > 0
+    } catch (exc: Throwable) {
+        UploadServiceLogger.error(javaClass.simpleName, "File deletion error", exc)
+        false
+    }
 }
