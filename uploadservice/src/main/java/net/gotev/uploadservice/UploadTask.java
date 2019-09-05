@@ -132,6 +132,8 @@ public abstract class UploadTask implements Runnable {
         while (attempts <= params.getMaxRetries() && shouldContinue) {
             attempts++;
 
+            uploadedBytes = 0;
+
             try {
                 upload();
                 break;
@@ -168,6 +170,17 @@ public abstract class UploadTask implements Runnable {
         }
     }
 
+    private boolean shouldThrottle(final long uploadedBytes, final long totalBytes) {
+        long currentTime = System.currentTimeMillis();
+
+        if (uploadedBytes < totalBytes && currentTime < lastProgressNotificationTime + UploadServiceConfig.INSTANCE.getUploadProgressNotificationIntervalMillis()) {
+            return true;
+        }
+
+        lastProgressNotificationTime = currentTime;
+        return false;
+    }
+
     /**
      * Broadcasts a progress update.
      *
@@ -176,12 +189,7 @@ public abstract class UploadTask implements Runnable {
      */
     protected final void broadcastProgress(final long uploadedBytes, final long totalBytes) {
 
-        long currentTime = System.currentTimeMillis();
-        if (uploadedBytes < totalBytes && currentTime < lastProgressNotificationTime + UploadServiceConfig.INSTANCE.getUploadProgressNotificationIntervalMillis()) {
-            return;
-        }
-
-        lastProgressNotificationTime = currentTime;
+        if (shouldThrottle(uploadedBytes, totalBytes)) return;
 
         UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload progress for " + params.getId()
                 + ": " + uploadedBytes + " bytes of " + totalBytes);

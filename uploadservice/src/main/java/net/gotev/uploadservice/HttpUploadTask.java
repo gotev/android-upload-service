@@ -57,7 +57,6 @@ public abstract class HttpUploadTask extends UploadTask
 
         try {
             getSuccessfullyUploadedFiles().clear();
-            uploadedBytes = 0;
             totalBytes = getBodyLength();
 
             if (httpParams.isCustomUserAgentDefined()) {
