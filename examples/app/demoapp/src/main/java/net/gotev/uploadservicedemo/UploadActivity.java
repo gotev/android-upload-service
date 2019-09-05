@@ -35,7 +35,7 @@ import butterknife.OnClick;
 
 public abstract class UploadActivity extends FilesPickerActivity {
 
-    public static final int MAX_RETRIES = 3;
+    public static final int MAX_RETRIES = 4;
     public static final boolean FIXED_LENGTH_STREAMING_MODE = true;
     private static final int READ_REQUEST_CODE = 42;
 

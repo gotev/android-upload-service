@@ -37,7 +37,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     private FTPClient ftpClient = null;
 
     @Override
-    protected void init(UploadService service, int notificationID, Intent intent) throws IOException {
+    public void init(UploadService service, int notificationID, Intent intent) throws IOException {
         super.init(service, notificationID, intent);
         this.ftpParams = intent.getParcelableExtra(FTPUploadTaskParameters.PARAM_FTP_TASK_PARAMETERS);
     }
@@ -121,7 +121,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             while (iterator.hasNext()) {
                 UploadFile file = iterator.next();
 
-                if (!shouldContinue)
+                if (!getShouldContinue())
                     break;
 
                 uploadFile(baseWorkingDir, file);
@@ -130,7 +130,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             }
 
             // Broadcast completion only if the user has not cancelled the operation.
-            if (shouldContinue) {
+            if (getShouldContinue()) {
                 broadcastCompleted(ServerResponse.Companion.successfulEmpty());
             }
 
@@ -156,16 +156,16 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
      * ones.
      */
     private void calculateUploadedAndTotalBytes() {
-        uploadedBytes = 0;
+        setUploadedBytes(0);
 
         for (UploadFile file : getSuccessfullyUploadedFiles()) {
-            uploadedBytes += file.getHandler().size(service);
+            setUploadedBytes(getUploadedBytes() + file.getHandler().size(service));
         }
 
-        totalBytes = uploadedBytes;
+        setTotalBytes(getUploadedBytes());
 
         for (UploadFile file : params.getFiles()) {
-            totalBytes += file.getHandler().size(service);
+            setTotalBytes(getTotalBytes() + file.getHandler().size(service));
         }
     }
 
@@ -227,10 +227,10 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
     @Override
     public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-        uploadedBytes += bytesTransferred;
-        broadcastProgress(uploadedBytes, totalBytes);
+        setUploadedBytes(getUploadedBytes() + bytesTransferred);
+        broadcastProgress(getUploadedBytes(), getTotalBytes());
 
-        if (!shouldContinue) {
+        if (!getShouldContinue()) {
             try {
                 ftpClient.disconnect();
             } catch (Exception exc) {

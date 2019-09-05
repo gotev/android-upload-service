@@ -36,7 +36,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     private Charset charset;
 
     @Override
-    protected void init(UploadService service, int notificationID, Intent intent) throws IOException {
+    public void init(UploadService service, int notificationID, Intent intent) throws IOException {
         super.init(service, notificationID, intent);
 
         String boundary = BOUNDARY_SIGNATURE + System.nanoTime();
@@ -63,12 +63,12 @@ public class MultipartUploadTask extends HttpUploadTask {
     public void onWriteRequestBody(BodyWriter bodyWriter) throws IOException {
         //reset uploaded bytes when the body is ready to be written
         //because sometimes this gets invoked when network changes
-        uploadedBytes = 0;
+        setUploadedBytes(0);
         writeRequestParameters(bodyWriter);
         writeFiles(bodyWriter);
         bodyWriter.write(trailerBytes);
-        uploadedBytes += trailerBytes.length;
-        broadcastProgress(uploadedBytes, totalBytes);
+        setUploadedBytes(getUploadedBytes() + trailerBytes.length);
+        broadcastProgress(getUploadedBytes(), getTotalBytes());
     }
 
     private long getFilesLength() throws UnsupportedEncodingException {
@@ -124,29 +124,29 @@ public class MultipartUploadTask extends HttpUploadTask {
                 byte[] formItemBytes = getMultipartBytes(parameter);
                 bodyWriter.write(formItemBytes);
 
-                uploadedBytes += boundaryBytes.length + formItemBytes.length;
-                broadcastProgress(uploadedBytes, totalBytes);
+                setUploadedBytes(getUploadedBytes() + boundaryBytes.length + formItemBytes.length);
+                broadcastProgress(getUploadedBytes(), getTotalBytes());
             }
         }
     }
 
     private void writeFiles(BodyWriter bodyWriter) throws IOException {
         for (UploadFile file : params.getFiles()) {
-            if (!shouldContinue)
+            if (!getShouldContinue())
                 break;
 
             bodyWriter.write(boundaryBytes);
             byte[] headerBytes = getMultipartHeader(file);
             bodyWriter.write(headerBytes);
 
-            uploadedBytes += boundaryBytes.length + headerBytes.length;
-            broadcastProgress(uploadedBytes, totalBytes);
+            setUploadedBytes(getUploadedBytes() + boundaryBytes.length + headerBytes.length);
+            broadcastProgress(getUploadedBytes(), getTotalBytes());
 
             bodyWriter.writeStream(file.getHandler().stream(service), this);
 
             byte[] newLineBytes = NEW_LINE.getBytes(charset);
             bodyWriter.write(newLineBytes);
-            uploadedBytes += newLineBytes.length;
+            setUploadedBytes(getUploadedBytes() + newLineBytes.length);
         }
     }
 

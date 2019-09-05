@@ -35,7 +35,7 @@ public abstract class HttpUploadTask extends UploadTask
     private HttpConnection connection;
 
     @Override
-    protected void init(UploadService service, int notificationID, Intent intent) throws IOException {
+    public void init(UploadService service, int notificationID, Intent intent) throws IOException {
         super.init(service, notificationID, intent);
         this.httpParams = intent.getParcelableExtra(HttpUploadTaskParameters.PARAM_HTTP_TASK_PARAMETERS);
     }
@@ -57,7 +57,8 @@ public abstract class HttpUploadTask extends UploadTask
 
         try {
             getSuccessfullyUploadedFiles().clear();
-            totalBytes = getBodyLength();
+            setUploadedBytes(0);
+            setTotalBytes(getBodyLength());
 
             if (httpParams.isCustomUserAgentDefined()) {
                 httpParams.addHeader("User-Agent", httpParams.customUserAgent);
@@ -68,7 +69,7 @@ public abstract class HttpUploadTask extends UploadTask
             connection = UploadServiceConfig.INSTANCE.getHttpStack()
                     .createNewConnection(httpParams.method, params.getServerUrl())
                     .setHeaders(httpParams.getRequestHeaders())
-                    .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode);
+                    .setTotalBodyBytes(getTotalBytes(), httpParams.usesFixedLengthStreamingMode);
 
             final ServerResponse response = connection.getResponse(this);
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Server responded with code " + response.getCode()
@@ -81,7 +82,7 @@ public abstract class HttpUploadTask extends UploadTask
             // with an HTTP status code. Without this, what happened was that completion was
             // broadcasted and then the cancellation. That behaviour was not desirable as the
             // library user couldn't execute code on user cancellation.
-            if (shouldContinue) {
+            if (getShouldContinue()) {
                 broadcastCompleted(response);
             }
 
@@ -102,13 +103,13 @@ public abstract class HttpUploadTask extends UploadTask
 
     @Override
     public boolean shouldContinueWriting() {
-        return shouldContinue;
+        return getShouldContinue();
     }
 
     @Override
     public void onBytesWritten(int bytesWritten) {
-        uploadedBytes += bytesWritten;
-        broadcastProgress(uploadedBytes, totalBytes);
+        setUploadedBytes(getUploadedBytes() + bytesWritten);
+        broadcastProgress(getUploadedBytes(), getTotalBytes());
     }
 
 }

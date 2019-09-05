@@ -38,7 +38,7 @@ public class MultipartUploadActivity extends UploadActivity {
                             .setUtf8Charset()
                             .setNotificationConfig(getNotificationConfig(uploadId, R.string.multipart_upload))
                             .setMaxRetries(MAX_RETRIES)
-                            .setAutoDeleteFilesAfterSuccessfulUpload(true)
+                            //.setAutoDeleteFilesAfterSuccessfulUpload(true)
                             //.setCustomUserAgent(getUserAgent())
                             .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
 
