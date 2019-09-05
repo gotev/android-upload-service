@@ -105,10 +105,17 @@ public abstract class UploadTask implements Runnable {
      * @param intent  intent sent to the service to start the upload
      * @throws IOException if an I/O exception occurs while initializing
      */
-    protected void init(UploadService service, Intent intent) throws IOException {
+    protected void init(UploadService service, int notificationID, Intent intent) throws IOException {
         this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS);
         this.service = service;
         broadcastHandler = new BroadcastHandler(service, params.getId());
+
+        UploadNotificationConfig config = params.getNotificationConfig();
+        if (config != null) {
+            notificationHandler = new NotificationHandler(service, notificationID, params.getId(), config);
+        } else {
+            notificationHandler = null;
+        }
     }
 
     @Override
@@ -159,24 +166,6 @@ public abstract class UploadTask implements Runnable {
         if (!shouldContinue) {
             broadcastCancelled();
         }
-    }
-
-    /**
-     * Sets the upload notification ID for this task.
-     * This gets called by {@link UploadService} when the task is initialized.
-     * You should never call this method.
-     *
-     * @param notificationId notification ID
-     * @return {@link UploadTask}
-     */
-    protected final UploadTask setNotificationId(int notificationId) {
-        UploadNotificationConfig config = params.getNotificationConfig();
-        if (config != null) {
-            notificationHandler = new NotificationHandler(service, notificationId, params.getId(), config);
-        } else {
-            notificationHandler = null;
-        }
-        return this;
     }
 
     /**

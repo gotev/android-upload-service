@@ -165,11 +165,6 @@ public final class UploadService extends Service {
 
         clearIdleTimer();
 
-        // increment by 2 because the notificationIncrementalId + 1 is used internally
-        // in each UploadTask. Check its sources for more info about this.
-        notificationIncrementalId += 2;
-        currentTask.setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
-
         uploadTasksMap.put(currentTask.params.getId(), currentTask);
         uploadThreadPool.execute(currentTask);
 
@@ -245,7 +240,12 @@ public final class UploadService extends Service {
 
             if (UploadTask.class.isAssignableFrom(task)) {
                 uploadTask = UploadTask.class.cast(task.newInstance());
-                uploadTask.init(this, intent);
+
+                // increment by 2 because the notificationIncrementalId + 1 is used internally
+                // in each UploadTask. Check its sources for more info about this.
+                notificationIncrementalId += 2;
+
+                uploadTask.init(this, UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId, intent);
             } else {
                 UploadServiceLogger.INSTANCE.error(TAG, taskClass + " does not extend UploadTask!");
             }

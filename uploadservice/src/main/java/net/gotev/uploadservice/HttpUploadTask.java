@@ -35,8 +35,8 @@ public abstract class HttpUploadTask extends UploadTask
     private HttpConnection connection;
 
     @Override
-    protected void init(UploadService service, Intent intent) throws IOException {
-        super.init(service, intent);
+    protected void init(UploadService service, int notificationID, Intent intent) throws IOException {
+        super.init(service, notificationID, intent);
         this.httpParams = intent.getParcelableExtra(HttpUploadTaskParameters.PARAM_HTTP_TASK_PARAMETERS);
     }
 

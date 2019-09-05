@@ -37,8 +37,8 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     private FTPClient ftpClient = null;
 
     @Override
-    protected void init(UploadService service, Intent intent) throws IOException {
-        super.init(service, intent);
+    protected void init(UploadService service, int notificationID, Intent intent) throws IOException {
+        super.init(service, notificationID, intent);
         this.ftpParams = intent.getParcelableExtra(FTPUploadTaskParameters.PARAM_FTP_TASK_PARAMETERS);
     }
 

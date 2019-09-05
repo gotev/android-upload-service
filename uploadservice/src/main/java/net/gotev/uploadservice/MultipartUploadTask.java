@@ -36,8 +36,8 @@ public class MultipartUploadTask extends HttpUploadTask {
     private Charset charset;
 
     @Override
-    protected void init(UploadService service, Intent intent) throws IOException {
-        super.init(service, intent);
+    protected void init(UploadService service, int notificationID, Intent intent) throws IOException {
+        super.init(service, notificationID, intent);
 
         String boundary = BOUNDARY_SIGNATURE + System.nanoTime();
         boundaryBytes = (TWO_HYPHENS + boundary + NEW_LINE).getBytes(US_ASCII);
