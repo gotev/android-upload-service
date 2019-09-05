@@ -30,8 +30,11 @@ class NotificationHandler(private val service: UploadService,
     override fun initialize(info: UploadInfo) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannelId = config.notificationChannelId ?: throw IllegalArgumentException("Notification Channel ID is required to be set on Android 8+.")
-            notificationManager.getNotificationChannel(notificationChannelId) ?: throw java.lang.IllegalArgumentException("The provided notification channel ID $notificationChannelId does not exist! You must create it at app startup and before Upload Service!")
+            val notificationChannelId = config.notificationChannelId
+                    ?: throw IllegalArgumentException("Notification Channel ID is required to be set on Android 8+.")
+
+            notificationManager.getNotificationChannel(notificationChannelId)
+                    ?: throw IllegalArgumentException("The provided notification channel ID $notificationChannelId does not exist! You must create it at app startup and before Upload Service!")
         }
 
         //create notification

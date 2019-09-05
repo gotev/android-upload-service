@@ -32,7 +32,7 @@ public interface UploadStatusDelegate {
      *                  reached the server, but it responded with a 4xx or 5xx status code.
      */
     void onError(final Context context, final UploadInfo uploadInfo,
-                 final ServerResponse serverResponse, final Exception exception);
+                 final ServerResponse serverResponse, final Throwable exception);
 
     /**
      * Called when the upload is completed successfully. Override this method to add your own logic.

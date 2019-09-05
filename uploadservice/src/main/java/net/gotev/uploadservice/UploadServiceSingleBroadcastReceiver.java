@@ -38,7 +38,7 @@ public class UploadServiceSingleBroadcastReceiver extends UploadServiceBroadcast
     }
 
     @Override
-    public final void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+    public final void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Throwable exception) {
         if (mDelegate != null && mDelegate.get() != null) {
             mDelegate.get().onError(context, uploadInfo, serverResponse, exception);
         }

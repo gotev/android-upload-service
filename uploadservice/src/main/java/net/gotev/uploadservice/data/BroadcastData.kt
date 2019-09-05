@@ -18,7 +18,7 @@ internal data class BroadcastData @JvmOverloads constructor(
         val status: UploadStatus,
         val uploadInfo: UploadInfo,
         val serverResponse: ServerResponse? = null,
-        val exception: Exception? = null
+        val exception: Throwable? = null
 ) : Parcelable {
     companion object {
         private const val paramName = "broadcastData"

@@ -1,15 +1,13 @@
 package net.gotev.uploadservice;
 
 import android.content.Intent;
-import android.os.Handler;
 
-import net.gotev.uploadservice.data.BroadcastData;
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.data.UploadInfo;
-import net.gotev.uploadservice.data.UploadStatus;
 import net.gotev.uploadservice.data.UploadTaskParameters;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.ServerResponse;
+import net.gotev.uploadservice.tasklistener.BroadcastHandler;
 import net.gotev.uploadservice.tasklistener.NotificationHandler;
 
 import java.io.File;
@@ -66,8 +64,8 @@ public abstract class UploadTask implements Runnable {
      */
     protected boolean shouldContinue = true;
 
-    private long lastProgressNotificationTime;
-    private Handler mainThreadHandler;
+    private long lastProgressNotificationTime = 0;
+    private BroadcastHandler broadcastHandler;
     private NotificationHandler notificationHandler;
 
     /**
@@ -122,7 +120,7 @@ public abstract class UploadTask implements Runnable {
     protected void init(UploadService service, Intent intent) throws IOException {
         this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS);
         this.service = service;
-        this.mainThreadHandler = new Handler(service.getMainLooper());
+        broadcastHandler = new BroadcastHandler(service, params.getId());
     }
 
     @Override
@@ -176,18 +174,6 @@ public abstract class UploadTask implements Runnable {
     }
 
     /**
-     * Sets the last time the notification was updated.
-     * This is handled automatically and you should never call this method.
-     *
-     * @param lastProgressNotificationTime time in milliseconds
-     * @return {@link UploadTask}
-     */
-    protected final UploadTask setLastProgressNotificationTime(long lastProgressNotificationTime) {
-        this.lastProgressNotificationTime = lastProgressNotificationTime;
-        return this;
-    }
-
-    /**
      * Sets the upload notification ID for this task.
      * This gets called by {@link UploadService} when the task is initialized.
      * You should never call this method.
@@ -218,30 +204,14 @@ public abstract class UploadTask implements Runnable {
             return;
         }
 
-        setLastProgressNotificationTime(currentTime);
+        lastProgressNotificationTime = currentTime;
 
         UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload progress for " + params.getId()
                 + ": " + uploadedBytes + " bytes of " + totalBytes);
 
-        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
-                totalBytes, (attempts - 1),
-                null,
-                successfullyUploadedFiles,
-                pathStringListFrom(params.getFiles()));
+        final UploadInfo uploadInfo = getUploadInfo();
 
-        BroadcastData data = new BroadcastData(UploadStatus.IN_PROGRESS, uploadInfo);
-
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
-        if (delegate != null) {
-            mainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    delegate.onProgress(service, uploadInfo);
-                }
-            });
-        } else {
-            data.send(service);
-        }
+        broadcastHandler.onProgress(uploadInfo);
 
         if (notificationHandler != null) {
             notificationHandler.onProgress(uploadInfo);
@@ -258,9 +228,10 @@ public abstract class UploadTask implements Runnable {
      */
     protected final void broadcastCompleted(final ServerResponse response) {
 
-        final boolean successfulUpload = response.getCode() >= 200 && response.getCode() < 400;
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload " + (response.isSuccessful() ? "completed" : "error")
+                + " for " + params.getId());
 
-        if (successfulUpload) {
+        if (response.isSuccessful()) {
             onSuccessfulUpload();
 
             if (params.getAutoDeleteSuccessfullyUploadedFiles() && !successfullyUploadedFiles.isEmpty()) {
@@ -270,39 +241,12 @@ public abstract class UploadTask implements Runnable {
             }
         }
 
-        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting upload " + (successfulUpload ? "completed" : "error")
-                + " for " + params.getId());
+        final UploadInfo uploadInfo = getUploadInfo();
 
-        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
-                totalBytes, (attempts - 1),
-                null,
-                successfullyUploadedFiles,
-                pathStringListFrom(params.getFiles()));
+        broadcastHandler.onCompleted(uploadInfo, response);
 
         if (notificationHandler != null) {
             notificationHandler.onCompleted(uploadInfo, response);
-        }
-
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
-        if (delegate != null) {
-            mainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (successfulUpload) {
-                        delegate.onCompleted(service, uploadInfo, response);
-                    } else {
-                        delegate.onError(service, uploadInfo, response, null);
-                    }
-                }
-            });
-        } else {
-            BroadcastData data = new BroadcastData(
-                    successfulUpload ? UploadStatus.COMPLETED : UploadStatus.ERROR,
-                    uploadInfo,
-                    response
-            );
-
-            data.send(service);
         }
 
         service.taskCompleted(params.getId());
@@ -319,28 +263,37 @@ public abstract class UploadTask implements Runnable {
 
         UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: " + params.getId());
 
-        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
-                totalBytes, (attempts - 1),
-                null,
-                successfullyUploadedFiles,
-                pathStringListFrom(params.getFiles()));
+        final UploadInfo uploadInfo = getUploadInfo();
+
+        broadcastHandler.onCancelled(uploadInfo);
 
         if (notificationHandler != null) {
             notificationHandler.onCancelled(uploadInfo);
         }
 
-        BroadcastData data = new BroadcastData(UploadStatus.CANCELLED, uploadInfo);
+        service.taskCompleted(params.getId());
+    }
 
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
-        if (delegate != null) {
-            mainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    delegate.onCancelled(service, uploadInfo);
-                }
-            });
-        } else {
-            data.send(service);
+    /**
+     * Broadcasts an error.
+     * This called automatically by {@link UploadTask} when the specific implementation of
+     * {@link UploadTask#upload()} throws an exception and there aren't any left retries.
+     * You should never call this method explicitly in your implementation.
+     *
+     * @param exception exception to broadcast. It's the one thrown by the specific implementation
+     *                  of {@link UploadTask#upload()}
+     */
+    private void broadcastError(final Exception exception) {
+
+        UploadServiceLogger.INSTANCE.info(LOG_TAG, "Broadcasting error for upload with ID: "
+                + params.getId() + ". " + exception.getMessage());
+
+        final UploadInfo uploadInfo = getUploadInfo();
+
+        broadcastHandler.onError(uploadInfo, exception);
+
+        if (notificationHandler != null) {
+            notificationHandler.onError(uploadInfo, exception);
         }
 
         service.taskCompleted(params.getId());
@@ -386,47 +339,6 @@ public abstract class UploadTask implements Runnable {
     }
 
     /**
-     * Broadcasts an error.
-     * This called automatically by {@link UploadTask} when the specific implementation of
-     * {@link UploadTask#upload()} throws an exception and there aren't any left retries.
-     * You should never call this method explicitly in your implementation.
-     *
-     * @param exception exception to broadcast. It's the one thrown by the specific implementation
-     *                  of {@link UploadTask#upload()}
-     */
-    private void broadcastError(final Exception exception) {
-
-        UploadServiceLogger.INSTANCE.info(LOG_TAG, "Broadcasting error for upload with ID: "
-                + params.getId() + ". " + exception.getMessage());
-
-        final UploadInfo uploadInfo = new UploadInfo(params.getId(), startTime, uploadedBytes,
-                totalBytes, (attempts - 1),
-                null,
-                successfullyUploadedFiles,
-                pathStringListFrom(params.getFiles()));
-
-        if (notificationHandler != null) {
-            notificationHandler.onError(uploadInfo, exception);
-        }
-
-        BroadcastData data = new BroadcastData(UploadStatus.ERROR, uploadInfo, null, exception);
-
-        final UploadStatusDelegate delegate = UploadService.getUploadStatusDelegate(params.getId());
-        if (delegate != null) {
-            mainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    delegate.onError(service, uploadInfo, null, exception);
-                }
-            });
-        } else {
-            data.send(service);
-        }
-
-        service.taskCompleted(params.getId());
-    }
-
-    /**
      * Tries to delete a file from the device.
      * If it fails, the error will be printed in the LogCat.
      *
@@ -454,6 +366,15 @@ public abstract class UploadTask implements Runnable {
         }
 
         return deleted;
+    }
+
+    private UploadInfo getUploadInfo() {
+        return new UploadInfo(params.getId(), startTime, uploadedBytes,
+                totalBytes, (attempts - 1),
+                null,
+                successfullyUploadedFiles,
+                pathStringListFrom(params.getFiles())
+        );
     }
 
     private static ArrayList<String> pathStringListFrom(List<UploadFile> files) {

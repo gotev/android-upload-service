@@ -20,7 +20,7 @@ public class UploadReceiver extends UploadServiceBroadcastReceiver {
     }
 
     @Override
-    public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+    public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Throwable exception) {
         super.onError(context, uploadInfo, serverResponse, exception);
     }
 

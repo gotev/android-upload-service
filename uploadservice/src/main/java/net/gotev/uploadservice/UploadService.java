@@ -168,8 +168,7 @@ public final class UploadService extends Service {
         // increment by 2 because the notificationIncrementalId + 1 is used internally
         // in each UploadTask. Check its sources for more info about this.
         notificationIncrementalId += 2;
-        currentTask.setLastProgressNotificationTime(0)
-                   .setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
+        currentTask.setNotificationId(UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId);
 
         uploadTasksMap.put(currentTask.params.getId(), currentTask);
         uploadThreadPool.execute(currentTask);
@@ -322,7 +321,7 @@ public final class UploadService extends Service {
      * @return {@link UploadStatusDelegate} or null if no delegate has been set for the given
      * uploadId
      */
-    protected static UploadStatusDelegate getUploadStatusDelegate(String uploadId) {
+    public static UploadStatusDelegate getUploadStatusDelegate(String uploadId) {
         WeakReference<UploadStatusDelegate> reference = uploadDelegates.get(uploadId);
 
         if (reference == null)
