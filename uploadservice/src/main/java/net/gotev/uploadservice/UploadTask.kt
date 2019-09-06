@@ -118,7 +118,7 @@ abstract class UploadTask : Runnable {
         this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS) ?: throw IOException("Missing task parameters")
         this.service = service
 
-        listeners.add(BroadcastHandler(service, params.id))
+        listeners.add(BroadcastHandler(service))
 
         params.notificationConfig?.let { config ->
             listeners.add(NotificationHandler(service, notificationID, params.id, config))
@@ -243,7 +243,7 @@ abstract class UploadTask : Runnable {
      * returns or throws an exception. You should never call this method explicitly in your
      * implementation.
      */
-    protected fun broadcastCancelled() {
+    private fun broadcastCancelled() {
         UploadServiceLogger.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: ${params.id}")
 
         val uploadInfo = uploadInfo

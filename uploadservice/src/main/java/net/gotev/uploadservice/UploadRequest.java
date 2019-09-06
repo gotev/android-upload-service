@@ -21,10 +21,9 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
     private static final String LOG_TAG = UploadRequest.class.getSimpleName();
 
     protected final Context context;
-    protected UploadStatusDelegate delegate;
     private String uploadId;
     protected String serverUrl;
-    protected int maxRetries = 0;
+    protected int maxRetries = UploadServiceConfig.INSTANCE.getRetryPolicy().getDefaultMaxRetries();
     protected boolean autoDeleteSuccessfullyUploadedFiles = false;
     protected UploadNotificationConfig notificationConfig;
     protected ArrayList<UploadFile> files = new ArrayList<>();
@@ -71,8 +70,6 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      *         generated uploadId
      */
     public String startUpload() {
-        UploadService.setUploadStatusDelegate(uploadId, delegate);
-
         final Intent intent = new Intent(context, UploadService.class);
         this.initializeIntent(intent);
         intent.setAction(UploadServiceConfig.INSTANCE.getUploadAction());
@@ -154,20 +151,6 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      */
     public B setMaxRetries(int maxRetries) {
         this.maxRetries = maxRetries;
-        return self();
-    }
-
-    /**
-     * Sets the delegate which will receive the events for this upload request.
-     * The events will be sent only to the delegate and not in broadcast. Delegate methods will
-     * be called on your main thread, so you can safely update your UI from them. If you want to
-     * send events for this upload in broadcast, and handle them in the
-     * {@link UploadServiceBroadcastReceiver}, do not set the delegate or set it to null.
-     * @param delegate instance of the delegate which will receive the events
-     * @return self instance
-     */
-    public B setDelegate(UploadStatusDelegate delegate) {
-        this.delegate = delegate;
         return self();
     }
 

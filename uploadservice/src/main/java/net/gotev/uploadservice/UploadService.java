@@ -9,7 +9,6 @@ import android.os.PowerManager;
 
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +44,6 @@ public final class UploadService extends Service {
     private PowerManager.WakeLock wakeLock;
     private static int notificationIncrementalId = 0;
     private static final Map<String, UploadTask> uploadTasksMap = new ConcurrentHashMap<>();
-    private static final Map<String, WeakReference<UploadStatusDelegate>> uploadDelegates = new ConcurrentHashMap<>();
     private final BlockingQueue<Runnable> uploadTasksQueue = new LinkedBlockingQueue<>();
     private static volatile String foregroundUploadId = null;
     private ThreadPoolExecutor uploadThreadPool;
@@ -216,7 +214,6 @@ public final class UploadService extends Service {
             wakeLock.release();
 
         uploadTasksMap.clear();
-        uploadDelegates.clear();
 
         UploadServiceLogger.INSTANCE.debug(TAG, "UploadService destroyed");
     }
@@ -287,7 +284,6 @@ public final class UploadService extends Service {
      */
     protected synchronized void taskCompleted(String uploadId) {
         UploadTask task = uploadTasksMap.remove(uploadId);
-        uploadDelegates.remove(uploadId);
 
         // un-hold foreground upload ID if it's been hold
         if (UploadServiceConfig.INSTANCE.isForegroundService() && task != null && task.params.getId().equals(foregroundUploadId)) {
@@ -300,46 +296,5 @@ public final class UploadService extends Service {
             stopForeground(true);
             shutdownIfThereArentAnyActiveTasks();
         }
-    }
-
-    /**
-     * Sets the delegate which will receive the events for the given upload request.
-     * Those events will not be sent in broadcast, but only to the delegate.
-     * @param uploadId uploadID of the upload request
-     * @param delegate the delegate instance
-     */
-    protected static void setUploadStatusDelegate(String uploadId, UploadStatusDelegate delegate) {
-        if (delegate == null)
-            return;
-
-        uploadDelegates.put(uploadId, new WeakReference<>(delegate));
-    }
-
-    /**
-     * Gets the delegate for an upload request.
-     * @param uploadId uploadID of the upload request
-     * @return {@link UploadStatusDelegate} or null if no delegate has been set for the given
-     * uploadId
-     */
-    public static UploadStatusDelegate getUploadStatusDelegate(String uploadId) {
-        WeakReference<UploadStatusDelegate> reference = uploadDelegates.get(uploadId);
-
-        if (reference == null)
-            return null;
-
-        UploadStatusDelegate delegate = reference.get();
-
-        if (delegate == null) {
-            uploadDelegates.remove(uploadId);
-            UploadServiceLogger.INSTANCE.info(TAG, "\n\n\nUpload delegate for upload with Id " + uploadId + " is gone!\n" +
-                    "Probably you have set it in an activity and the user navigated away from it\n" +
-                    "before the upload was completed. From now on, the events will be dispatched\n" +
-                    "with broadcast intents. If you see this message, consider switching to the\n" +
-                    "UploadServiceBroadcastReceiver registered globally in your manifest.\n" +
-                    "Read this:\n" +
-                    "https://github.com/gotev/android-upload-service/wiki/Monitoring-upload-status\n");
-        }
-
-        return delegate;
     }
 }

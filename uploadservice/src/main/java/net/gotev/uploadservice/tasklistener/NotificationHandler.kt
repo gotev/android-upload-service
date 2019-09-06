@@ -133,10 +133,9 @@ class NotificationHandler(private val service: UploadService,
                     .setGroup(UploadServiceConfig.namespace)
                     .setProgress(0, 0, false)
                     .setOngoing(false)
+                    .setRingtone()
 
             statusConfig.addActionsToNotificationBuilder(notification)
-
-            setRingtone(notification)
 
             // this is needed because the main notification used to show progress is ongoing
             // and a new one has to be created to allow the user to dismiss it
@@ -145,10 +144,12 @@ class NotificationHandler(private val service: UploadService,
         }
     }
 
-    private fun setRingtone(notification: NotificationCompat.Builder) {
-        if (config.isRingToneEnabled && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+    private fun NotificationCompat.Builder.setRingtone(): NotificationCompat.Builder {
+        if (config.isRingToneEnabled && Build.VERSION.SDK_INT < 26) {
             val sound = RingtoneManager.getActualDefaultRingtoneUri(service, RingtoneManager.TYPE_NOTIFICATION)
-            notification.setSound(sound)
+            setSound(sound)
         }
+
+        return this
     }
 }

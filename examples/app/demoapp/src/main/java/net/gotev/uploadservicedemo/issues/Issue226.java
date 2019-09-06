@@ -5,10 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
-import net.gotev.uploadservice.network.ServerResponse;
-import net.gotev.uploadservice.data.UploadInfo;
 import net.gotev.uploadservice.UploadNotificationConfig;
-import net.gotev.uploadservice.UploadStatusDelegate;
 
 /**
  * https://github.com/gotev/android-upload-service/issues/226
@@ -58,7 +55,7 @@ public class Issue226 implements Runnable {
                     .setNotificationConfig(notificationConfig.setTitleForAllStatuses(fatherId))
                     .addParameter("color", "#ffffff")
                     .setMaxRetries(maxRetries)
-                    .setDelegate(new UploadStatusDelegate() {
+                    /*.setDelegate(new UploadStatusDelegate() {
                         @Override
                         public void onProgress(Context context, UploadInfo uploadInfo) {
 
@@ -78,7 +75,7 @@ public class Issue226 implements Runnable {
                         public void onCancelled(Context context, UploadInfo uploadInfo) {
 
                         }
-                    })
+                    })*/
                     .startUpload();
         } catch (Exception exc) {
             Log.e(getClass().getSimpleName(), "multipleRequests Error", exc);
@@ -99,7 +96,7 @@ public class Issue226 implements Runnable {
                     .addParameter("test", "value")
                     .addParameter("new", "parameter")
                     .setMaxRetries(maxRetries)
-                    .setDelegate(new UploadStatusDelegate() {
+                    /*.setDelegate(new UploadStatusDelegate() {
                         @Override
                         public void onProgress(Context context, UploadInfo uploadInfo) {
 
@@ -119,7 +116,7 @@ public class Issue226 implements Runnable {
                         public void onCancelled(Context context, UploadInfo uploadInfo) {
                             Log.e(uploadInfo.getUploadId(), "Cancelled");
                         }
-                    })
+                    })*/
                     .startUpload();
         } catch (Exception exc) {
             Log.e(getClass().getSimpleName(), "second request error", exc);

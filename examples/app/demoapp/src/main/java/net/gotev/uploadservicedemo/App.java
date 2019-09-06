@@ -57,7 +57,7 @@ public class App extends Application {
         UploadServiceConfig.INSTANCE.setHttpStack(new OkHttpStack(getOkHttpClient()));
 
         // setup backoff multiplier
-        UploadServiceConfig.INSTANCE.setRetryPolicy(new RetryPolicyConfig(1, 10, 2));
+        UploadServiceConfig.INSTANCE.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
 
         // Set upload service debug log messages level
         UploadServiceLogger.INSTANCE.setLogLevel(UploadServiceLogger.LogLevel.DEBUG);

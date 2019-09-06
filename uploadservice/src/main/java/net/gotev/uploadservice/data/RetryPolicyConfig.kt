@@ -25,9 +25,14 @@ data class RetryPolicyConfig(
          * E.g. if the first time the wait time is 1s, the second time it will be 2s and the third
          * time it will be 4s.
          */
-        val multiplier: Int = 2
+        val multiplier: Int = 2,
+
+        /**
+         * Sets the default number of retries for each request.
+         */
+        val defaultMaxRetries: Int = 3
 ) {
     override fun toString(): String {
-        return """{"initialWaitTimeSeconds": $initialWaitTimeSeconds, "maxWaitTimeSeconds": $maxWaitTimeSeconds, "multiplier": $multiplier}"""
+        return """{"initialWaitTimeSeconds": $initialWaitTimeSeconds, "maxWaitTimeSeconds": $maxWaitTimeSeconds, "multiplier": $multiplier, "defaultMaxRetries": $defaultMaxRetries}"""
     }
 }
