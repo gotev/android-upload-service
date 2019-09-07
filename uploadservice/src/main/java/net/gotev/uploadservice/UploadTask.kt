@@ -6,9 +6,9 @@ import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.ServerResponse
-import net.gotev.uploadservice.tasklistener.BroadcastHandler
-import net.gotev.uploadservice.tasklistener.NotificationHandler
-import net.gotev.uploadservice.tasklistener.UploadTaskListener
+import net.gotev.uploadservice.observer.task.BroadcastEmitter
+import net.gotev.uploadservice.observer.task.NotificationHandler
+import net.gotev.uploadservice.observer.task.UploadTaskObserver
 import java.io.IOException
 import java.util.*
 
@@ -52,7 +52,7 @@ abstract class UploadTask : Runnable {
 
     private var lastProgressNotificationTime: Long = 0
 
-    private val listeners = ArrayList<UploadTaskListener>(2)
+    private val observers = ArrayList<UploadTaskObserver>(2)
 
     /**
      * Total bytes to transfer. You should initialize this value in the
@@ -104,6 +104,16 @@ abstract class UploadTask : Runnable {
      */
     protected open fun onSuccessfulUpload() {}
 
+    private inline fun doForEachObserver(action: UploadTaskObserver.() -> Unit) {
+        observers.forEach {
+            try {
+                action(it)
+            } catch (exc: Throwable) {
+                UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error while dispatching event to observer", exc)
+            }
+        }
+    }
+
     /**
      * Initializes the [UploadTask].<br></br>
      * Override this method in subclasses to perform custom task initialization and to get the
@@ -118,10 +128,10 @@ abstract class UploadTask : Runnable {
         this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS) ?: throw IOException("Missing task parameters")
         this.service = service
 
-        listeners.add(BroadcastHandler(service))
+        observers.add(BroadcastEmitter(service))
 
         params.notificationConfig?.let { config ->
-            listeners.add(NotificationHandler(service, notificationID, params.id, config))
+            observers.add(NotificationHandler(service, notificationID, params.id, config))
         }
     }
 
@@ -131,7 +141,7 @@ abstract class UploadTask : Runnable {
     }
 
     override fun run() {
-        listeners.forEach { it.initialize(UploadInfo(params.id)) }
+        doForEachObserver { initialize(UploadInfo(params.id)) }
 
         resetAttempts()
 
@@ -146,7 +156,7 @@ abstract class UploadTask : Runnable {
                 } else if (attempts >= params.maxRetries) {
                     broadcastError(exc)
                 } else {
-                    UploadServiceLogger.error(LOG_TAG, "Error in uploadId ${params.id} on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. ", exc)
+                    UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. ", exc)
 
                     val beforeSleepTs = System.currentTimeMillis()
 
@@ -199,9 +209,9 @@ abstract class UploadTask : Runnable {
 
         if (shouldThrottle(uploadedBytes, totalBytes)) return
 
-        UploadServiceLogger.debug(LOG_TAG, "Broadcasting upload progress for ${params.id}: $uploadedBytes bytes of $totalBytes")
+        UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes")
         val uploadInfo = uploadInfo
-        listeners.forEach { it.onProgress(uploadInfo) }
+        doForEachObserver { onProgress(uploadInfo) }
     }
 
     /**
@@ -213,7 +223,7 @@ abstract class UploadTask : Runnable {
      * @param response response got from the server
      */
     protected fun broadcastCompleted(response: ServerResponse) {
-        UploadServiceLogger.debug(LOG_TAG, "Broadcasting upload ${if (response.isSuccessful) "completed" else "error"} for ${params.id}")
+        UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) upload ${if (response.isSuccessful) "completed" else "error"}")
 
         if (response.isSuccessful) {
             onSuccessfulUpload()
@@ -221,9 +231,9 @@ abstract class UploadTask : Runnable {
             if (params.autoDeleteSuccessfullyUploadedFiles && successfullyUploadedFiles.isNotEmpty()) {
                 for (file in successfullyUploadedFiles) {
                     if (file.handler.delete(service)) {
-                        UploadServiceLogger.info(LOG_TAG, "Successfully deleted: " + file.path)
+                        UploadServiceLogger.info(LOG_TAG, "(uploadID: ${params.id}) successfully deleted: ${file.path}")
                     } else {
-                        UploadServiceLogger.error(LOG_TAG, "Unable to delete: " + file.path)
+                        UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error while deleting: ${file.path}")
                     }
                 }
             }
@@ -231,7 +241,7 @@ abstract class UploadTask : Runnable {
 
         val uploadInfo = uploadInfo
 
-        listeners.forEach { it.onCompleted(uploadInfo, response) }
+        doForEachObserver { onCompleted(uploadInfo, response) }
 
         service.taskCompleted(params.id)
     }
@@ -244,10 +254,10 @@ abstract class UploadTask : Runnable {
      * implementation.
      */
     private fun broadcastCancelled() {
-        UploadServiceLogger.debug(LOG_TAG, "Broadcasting cancellation for upload with ID: ${params.id}")
+        UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) upload cancelled")
 
         val uploadInfo = uploadInfo
-        listeners.forEach { it.onCancelled(uploadInfo) }
+        doForEachObserver { onCancelled(uploadInfo) }
 
         service.taskCompleted(params.id)
     }
@@ -262,11 +272,11 @@ abstract class UploadTask : Runnable {
      * of [UploadTask.upload]
      */
     private fun broadcastError(exception: Throwable) {
-        UploadServiceLogger.info(LOG_TAG, "Broadcasting error for upload with ID ${params.id}. ${exception.message}")
+        UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error", exception)
 
         val uploadInfo = uploadInfo
 
-        listeners.forEach { it.onError(uploadInfo, exception) }
+        doForEachObserver { onError(uploadInfo, exception) }
 
         service.taskCompleted(params.id)
     }

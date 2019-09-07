@@ -4,6 +4,7 @@ import android.content.Context;
 
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
+import net.gotev.uploadservice.observer.request.RequestObserver;
 
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
@@ -26,7 +27,7 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
      *                 It can be whatever string you want, as long as it's unique.
      *                 If you set it to null or an empty string, an UUID will be automatically
      *                 generated.<br> It's advised to keep a reference to it in your code,
-     *                 so when you receive status updates in {@link UploadServiceBroadcastReceiver},
+     *                 so when you receive status updates in {@link RequestObserver},
      *                 you know to which upload they refer to.
      * @param serverUrl URL of the server side script that will handle the multipart form upload.
      *                  E.g.: http://www.yourcompany.com/your/script

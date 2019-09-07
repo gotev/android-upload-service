@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.tasklistener
+package net.gotev.uploadservice.observer.task
 
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.data.BroadcastData
@@ -9,7 +9,7 @@ import net.gotev.uploadservice.network.ServerResponse
 /**
  * @author Aleksandar Gotev
  */
-class BroadcastHandler(private val service: UploadService) : UploadTaskListener {
+class BroadcastEmitter(private val service: UploadService) : UploadTaskObserver {
 
     private fun ServerResponse.status() = if (isSuccessful)
         UploadStatus.COMPLETED

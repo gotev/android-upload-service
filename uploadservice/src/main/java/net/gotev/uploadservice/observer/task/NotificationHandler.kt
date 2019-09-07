@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.tasklistener
+package net.gotev.uploadservice.observer.task
 
 import android.app.NotificationManager
 import android.content.Context
@@ -19,7 +19,7 @@ import net.gotev.uploadservice.notifications.Placeholders
 class NotificationHandler(private val service: UploadService,
                           private val notificationId: Int,
                           private val uploadId: String,
-                          private val config: UploadNotificationConfig) : UploadTaskListener {
+                          private val config: UploadNotificationConfig) : UploadTaskObserver {
 
     private val notificationCreationTimeMillis by lazy {
         System.currentTimeMillis()

@@ -7,6 +7,7 @@ import android.os.Build;
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.data.UploadTaskParameters;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
+import net.gotev.uploadservice.observer.request.SingleRequestObserver;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -84,6 +85,14 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
         }
 
         return uploadId;
+    }
+
+    /**
+     * Subscribe to events of this upload request
+     * @param observer observer to listen for events.
+     */
+    public void subscribe(SingleRequestObserver observer) {
+        observer.subscribe(this);
     }
 
     /**

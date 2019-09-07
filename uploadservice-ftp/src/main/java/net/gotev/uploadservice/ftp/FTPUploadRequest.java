@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.UploadRequest;
-import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
+import net.gotev.uploadservice.observer.request.RequestObserver;
 import net.gotev.uploadservice.UploadTask;
 
 import java.io.File;
@@ -32,7 +32,7 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
      *                 It can be whatever string you want, as long as it's unique.
      *                 If you set it to null or an empty string, an UUID will be automatically
      *                 generated.<br> It's advised to keep a reference to it in your code,
-     *                 so when you receive status updates in {@link UploadServiceBroadcastReceiver},
+     *                 so when you receive status updates in {@link RequestObserver},
      *                 you know to which upload they refer to.
      * @param serverUrl server IP address or hostname
      * @param port FTP port

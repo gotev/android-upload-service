@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.tasklistener
+package net.gotev.uploadservice.observer.task
 
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.network.ServerResponse
@@ -6,8 +6,7 @@ import net.gotev.uploadservice.network.ServerResponse
 /**
  * @author Aleksandar Gotev
  */
-// TODO: broadcast only implementation
-interface UploadTaskListener {
+interface UploadTaskObserver {
     fun initialize(info: UploadInfo)
     fun onProgress(info: UploadInfo)
     fun onCompleted(info: UploadInfo, response: ServerResponse)

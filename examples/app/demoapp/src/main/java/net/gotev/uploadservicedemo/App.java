@@ -60,7 +60,7 @@ public class App extends Application {
         UploadServiceConfig.INSTANCE.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
 
         // Set upload service debug log messages level
-        UploadServiceLogger.INSTANCE.setLogLevel(UploadServiceLogger.LogLevel.DEBUG);
+        UploadServiceLogger.INSTANCE.setDevelopmentMode(BuildConfig.DEBUG);
 
         createNotificationChannel();
 
