@@ -210,7 +210,6 @@ abstract class UploadTask : Runnable {
         if (shouldThrottle(uploadedBytes, totalBytes)) return
 
         UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes")
-        val uploadInfo = uploadInfo
         doForEachObserver { onProgress(uploadInfo) }
     }
 
@@ -239,8 +238,6 @@ abstract class UploadTask : Runnable {
             }
         }
 
-        val uploadInfo = uploadInfo
-
         doForEachObserver { onCompleted(uploadInfo, response) }
 
         service.taskCompleted(params.id)
@@ -255,10 +252,7 @@ abstract class UploadTask : Runnable {
      */
     private fun broadcastCancelled() {
         UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) upload cancelled")
-
-        val uploadInfo = uploadInfo
         doForEachObserver { onCancelled(uploadInfo) }
-
         service.taskCompleted(params.id)
     }
 
@@ -273,11 +267,7 @@ abstract class UploadTask : Runnable {
      */
     private fun broadcastError(exception: Throwable) {
         UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error", exception)
-
-        val uploadInfo = uploadInfo
-
         doForEachObserver { onError(uploadInfo, exception) }
-
         service.taskCompleted(params.id)
     }
 
