@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.data.UploadTaskParameters;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
@@ -72,14 +74,25 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      *         generated uploadId
      */
     public String startUpload() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationConfig == null) {
+            throw new IllegalArgumentException("Android Oreo requires a notification configuration for the service to run. https://developer.android.com/reference/android/content/Context.html#startForegroundService(android.content.Intent)");
+        }
+
         final Intent intent = new Intent(context, UploadService.class);
-        this.initializeIntent(intent);
+
+        UploadServiceKt.setupTask(intent, getTaskClass().getName(), new UploadTaskParameters(
+                uploadId,
+                serverUrl,
+                maxRetries,
+                autoDeleteSuccessfullyUploadedFiles,
+                notificationConfig,
+                files,
+                createAdditionalParameters()
+        ));
+
         intent.setAction(UploadServiceConfig.INSTANCE.getUploadAction());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (notificationConfig == null) {
-                throw new IllegalArgumentException("Android Oreo requires a notification configuration for the service to run. https://developer.android.com/reference/android/content/Context.html#startForegroundService(android.content.Intent)");
-            }
             context.startForegroundService(intent);
         } else {
             context.startService(intent);
@@ -94,30 +107,6 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      */
     public void subscribe(SingleRequestObserver observer) {
         observer.subscribe(this);
-    }
-
-    /**
-     * Write any upload request data to the intent used to start the upload service.<br>
-     * Override this method in subclasses to add your own custom parameters to the upload task.
-     *
-     * @param intent the intent used to start the upload service
-     */
-    final void initializeIntent(Intent intent) {
-        Class taskClass = getTaskClass();
-        if (taskClass == null)
-            throw new RuntimeException("The request must specify a task class!");
-
-        UploadTaskParameters params = new UploadTaskParameters(
-                uploadId,
-                serverUrl,
-                maxRetries,
-                autoDeleteSuccessfullyUploadedFiles,
-                notificationConfig,
-                files,
-                createAdditionalParameters()
-        );
-
-        UploadServiceKt.setupTask(intent, taskClass.getName(), params);
     }
 
     protected abstract Parcelable createAdditionalParameters();
@@ -170,5 +159,5 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      * The class must be a subclass of {@link UploadTask}.
      * @return class
      */
-    protected abstract Class<? extends UploadTask> getTaskClass();
+    protected abstract @NonNull Class<? extends UploadTask> getTaskClass();
 }

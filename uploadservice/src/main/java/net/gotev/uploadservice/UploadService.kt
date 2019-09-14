@@ -10,7 +10,6 @@ import net.gotev.uploadservice.UploadService.Companion.taskClass
 import net.gotev.uploadservice.UploadService.Companion.taskParameters
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.logger.UploadServiceLogger
-import java.io.IOException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingQueue
@@ -49,8 +48,7 @@ class UploadService : Service() {
          */
         @Synchronized
         fun stopUpload(uploadId: String) {
-            val removedTask = uploadTasksMap[uploadId]
-            removedTask?.cancel()
+            uploadTasksMap[uploadId]?.cancel()
         }
 
         /**
@@ -58,17 +56,10 @@ class UploadService : Service() {
          * @return list of uploadIDs or an empty list if no tasks are currently running
          */
         val taskList: List<String>
-            @Synchronized get() {
-                val tasks: MutableList<String>
-
-                if (uploadTasksMap.isEmpty()) {
-                    tasks = ArrayList(1)
-                } else {
-                    tasks = ArrayList(uploadTasksMap.size)
-                    tasks.addAll(uploadTasksMap.keys)
-                }
-
-                return tasks
+            @Synchronized get() = if (uploadTasksMap.isEmpty()) {
+                emptyList()
+            } else {
+                uploadTasksMap.keys().toList()
             }
 
         /**
@@ -76,9 +67,6 @@ class UploadService : Service() {
          */
         @Synchronized
         fun stopAllUploads() {
-            if (uploadTasksMap.isEmpty()) return
-
-            // using iterator instead for each loop, because it's faster on Android
             val iterator = uploadTasksMap.keys.iterator()
 
             while (iterator.hasNext()) {
@@ -92,9 +80,7 @@ class UploadService : Service() {
          * @return true if the service is getting stopped, false otherwise
          */
         @Synchronized
-        fun stop(context: Context): Boolean {
-            return stop(context, false)
-        }
+        fun stop(context: Context) = stop(context, false)
 
         /**
          * Stops the service.
@@ -103,10 +89,10 @@ class UploadService : Service() {
          * @return true if the service is getting stopped, false otherwise
          */
         @Synchronized
-        fun stop(context: Context, forceStop: Boolean): Boolean {
-            return if (forceStop) {
-                context.stopService(Intent(context, UploadService::class.java))
-            } else uploadTasksMap.isEmpty() && context.stopService(Intent(context, UploadService::class.java))
+        fun stop(context: Context, forceStop: Boolean) = if (forceStop) {
+            context.stopService(Intent(context, UploadService::class.java))
+        } else {
+            uploadTasksMap.isEmpty() && context.stopService(Intent(context, UploadService::class.java))
         }
     }
 
@@ -223,6 +209,11 @@ class UploadService : Service() {
             return null
         }
 
+        val params: UploadTaskParameters = intent.getParcelableExtra(taskParameters) ?: run {
+            UploadServiceLogger.error(TAG, "Missing task parameters")
+            return null
+        }
+
         return try {
             val task = Class.forName(taskClassString)
 
@@ -232,8 +223,6 @@ class UploadService : Service() {
             }
 
             val uploadTask = UploadTask::class.java.cast(task.newInstance()) ?: return null
-            val params: UploadTaskParameters = intent.getParcelableExtra(taskParameters)
-                    ?: throw IOException("Missing task parameters")
 
             // increment by 2 because the notificationIncrementalId + 1 is used internally
             // in each UploadTask. Check its sources for more info about this.
