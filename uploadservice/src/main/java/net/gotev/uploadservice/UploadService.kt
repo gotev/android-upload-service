@@ -205,12 +205,12 @@ class UploadService : Service() {
      */
     fun getTask(intent: Intent): UploadTask? {
         val taskClassString = intent.getStringExtra(taskClass) ?: run {
-            UploadServiceLogger.error(TAG, "No task class defined in Intent")
+            UploadServiceLogger.error(TAG, "Error while instantiating new task. No task class defined in Intent.")
             return null
         }
 
         val params: UploadTaskParameters = intent.getParcelableExtra(taskParameters) ?: run {
-            UploadServiceLogger.error(TAG, "Missing task parameters")
+            UploadServiceLogger.error(TAG, "Error while instantiating new task. Missing task parameters.")
             return null
         }
 
