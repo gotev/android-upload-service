@@ -18,11 +18,11 @@ class BinaryUploadTask : HttpUploadTask() {
     }
 
     @Throws(UnsupportedEncodingException::class)
-    override fun getBodyLength() = file.size(service)
+    override fun getBodyLength() = file.size(context)
 
     @Throws(IOException::class)
     override fun onWriteRequestBody(bodyWriter: BodyWriter) {
-        bodyWriter.writeStream(file.stream(service), this)
+        bodyWriter.writeStream(file.stream(context), this)
     }
 
     override fun onSuccessfulUpload() {

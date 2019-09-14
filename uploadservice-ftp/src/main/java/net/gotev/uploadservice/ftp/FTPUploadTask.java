@@ -156,18 +156,18 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         setUploadedBytes(0);
 
         for (UploadFile file : getSuccessfullyUploadedFiles()) {
-            setUploadedBytes(getUploadedBytes() + file.getHandler().size(service));
+            setUploadedBytes(getUploadedBytes() + file.getHandler().size(context));
         }
 
         setTotalBytes(getUploadedBytes());
 
         for (UploadFile file : params.getFiles()) {
-            setTotalBytes(getTotalBytes() + file.getHandler().size(service));
+            setTotalBytes(getTotalBytes() + file.getHandler().size(context));
         }
     }
 
     private void uploadFile(String baseWorkingDir, UploadFile file) throws IOException {
-        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting FTP upload of: " + file.getHandler().name(service)
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting FTP upload of: " + file.getHandler().name(context)
                               + " to: " + file.getProperties().get(PARAM_REMOTE_PATH));
 
         String remoteDestination = file.getProperties().get(PARAM_REMOTE_PATH);
@@ -178,11 +178,11 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
         makeDirectories(remoteDestination, getFTPParams().createdDirectoriesPermissions);
 
-        InputStream localStream = file.getHandler().stream(service);
+        InputStream localStream = file.getHandler().stream(context);
         try {
             String remoteFileName = getRemoteFileName(file);
             if (!ftpClient.storeFile(remoteFileName, localStream)) {
-                throw new IOException("Error while uploading: " + file.getHandler().name(service)
+                throw new IOException("Error while uploading: " + file.getHandler().name(context)
                                       + " to: " + file.getProperties().get(PARAM_REMOTE_PATH));
             }
 
@@ -286,7 +286,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         // it means that the remote path specifies only the directory structure, so
         // get the remote file name from the local file
         if (file.getProperties().get(PARAM_REMOTE_PATH).endsWith("/")) {
-            return file.getHandler().name(service);
+            return file.getHandler().name(context);
         }
 
         // if the remote path contains /, but it's not the last character

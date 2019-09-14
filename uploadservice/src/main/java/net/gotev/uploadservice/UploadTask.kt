@@ -1,12 +1,11 @@
 package net.gotev.uploadservice
 
+import android.content.Context
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.ServerResponse
-import net.gotev.uploadservice.observer.task.BroadcastEmitter
-import net.gotev.uploadservice.observer.task.NotificationHandler
 import net.gotev.uploadservice.observer.task.UploadTaskObserver
 import java.io.IOException
 import java.util.*
@@ -23,14 +22,7 @@ abstract class UploadTask : Runnable {
         private val LOG_TAG = UploadTask::class.java.simpleName
     }
 
-    /**
-     * Reference to the upload service instance.
-     */
-    protected lateinit var service: UploadService
-
-    /**
-     * Contains all the parameters set in [UploadRequest].
-     */
+    protected lateinit var context: Context
     lateinit var params: UploadTaskParameters
 
     /**
@@ -118,23 +110,15 @@ abstract class UploadTask : Runnable {
      * Override this method in subclasses to perform custom task initialization and to get the
      * custom parameters set in [UploadRequest.initializeIntent] method.
      *
-     * @param service Upload Service instance. You should use this reference as your context.
-     * @param intent  intent sent to the service to start the upload
+     * @param context Upload Service instance. You should use this reference as your context.
+     * @param intent  intent sent to the context to start the upload
      * @throws IOException if an I/O exception occurs while initializing
      */
     @Throws(IOException::class)
-    fun init(service: UploadService, notificationID: Int, taskParams: UploadTaskParameters) {
+    fun init(context: Context, taskParams: UploadTaskParameters, vararg taskObservers: UploadTaskObserver) {
+        this.context = context
         this.params = taskParams
-        this.service = service
-
-        observers.apply {
-            add(BroadcastEmitter(service))
-
-            params.notificationConfig?.let { config ->
-                add(NotificationHandler(service, notificationID, params.id, config))
-            }
-        }
-
+        taskObservers.forEach { observers.add(it) }
         performInitialization()
     }
 
@@ -234,7 +218,7 @@ abstract class UploadTask : Runnable {
 
             if (params.autoDeleteSuccessfullyUploadedFiles && successfullyUploadedFiles.isNotEmpty()) {
                 for (file in successfullyUploadedFiles) {
-                    if (file.handler.delete(service)) {
+                    if (file.handler.delete(context)) {
                         UploadServiceLogger.info(LOG_TAG, "(uploadID: ${params.id}) successfully deleted: ${file.path}")
                     } else {
                         UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error while deleting: ${file.path}")
@@ -244,8 +228,6 @@ abstract class UploadTask : Runnable {
         }
 
         doForEachObserver { onCompleted(uploadInfo, response) }
-
-        service.taskCompleted(params.id)
     }
 
     /**
@@ -258,7 +240,6 @@ abstract class UploadTask : Runnable {
     private fun broadcastCancelled() {
         UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) upload cancelled")
         doForEachObserver { onCancelled(uploadInfo) }
-        service.taskCompleted(params.id)
     }
 
     /**
@@ -273,7 +254,6 @@ abstract class UploadTask : Runnable {
     private fun broadcastError(exception: Throwable) {
         UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error", exception)
         doForEachObserver { onError(uploadInfo, exception) }
-        service.taskCompleted(params.id)
     }
 
     /**

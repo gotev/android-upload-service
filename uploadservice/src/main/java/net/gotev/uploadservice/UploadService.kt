@@ -10,6 +10,9 @@ import net.gotev.uploadservice.UploadService.Companion.taskClass
 import net.gotev.uploadservice.UploadService.Companion.taskParameters
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.observer.task.BroadcastEmitter
+import net.gotev.uploadservice.observer.task.NotificationHandler
+import net.gotev.uploadservice.observer.task.TaskCompletionNotifier
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingQueue
@@ -228,7 +231,15 @@ class UploadService : Service() {
             // in each UploadTask. Check its sources for more info about this.
             notificationIncrementalId += 2
 
-            uploadTask.init(this, UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId, params)
+            val observers = listOfNotNull(
+                    BroadcastEmitter(this),
+                    params.notificationConfig?.let {
+                        NotificationHandler(this, UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId, params.id, it)
+                    },
+                    TaskCompletionNotifier(this)
+            ).toTypedArray()
+
+            uploadTask.init(this, params, *observers)
 
             UploadServiceLogger.debug(TAG, "Successfully created new task with class: $taskClassString")
             uploadTask

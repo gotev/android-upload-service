@@ -109,7 +109,7 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private long getTotalMultipartBytes(UploadFile file)
             throws UnsupportedEncodingException {
-        return boundaryBytes.length + getMultipartHeader(file).length + file.getHandler().size(service)
+        return boundaryBytes.length + getMultipartHeader(file).length + file.getHandler().size(context)
                 + NEW_LINE.getBytes(charset).length;
     }
 
@@ -140,7 +140,7 @@ public class MultipartUploadTask extends HttpUploadTask {
             setUploadedBytes(getUploadedBytes() + boundaryBytes.length + headerBytes.length);
             broadcastProgress(getUploadedBytes(), getTotalBytes());
 
-            bodyWriter.writeStream(file.getHandler().stream(service), this);
+            bodyWriter.writeStream(file.getHandler().stream(context), this);
 
             byte[] newLineBytes = NEW_LINE.getBytes(charset);
             bodyWriter.write(newLineBytes);
