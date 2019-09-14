@@ -1,12 +1,12 @@
 package net.gotev.uploadservice.ftp;
 
 import android.content.Context;
-import android.content.Intent;
+import android.os.Parcelable;
 
-import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.UploadRequest;
-import net.gotev.uploadservice.observer.request.RequestObserver;
 import net.gotev.uploadservice.UploadTask;
+import net.gotev.uploadservice.data.UploadFile;
+import net.gotev.uploadservice.observer.request.RequestObserver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,9 +60,8 @@ public class FTPUploadRequest extends UploadRequest<FTPUploadRequest> {
     }
 
     @Override
-    protected void initializeIntent(Intent intent) {
-        super.initializeIntent(intent);
-        intent.putExtra(FTPUploadTaskParameters.PARAM_FTP_TASK_PARAMETERS, ftpParams);
+    protected Parcelable createAdditionalParameters() {
+        return ftpParams;
     }
 
     /**

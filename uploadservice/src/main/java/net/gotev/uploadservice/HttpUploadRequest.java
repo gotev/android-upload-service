@@ -1,7 +1,7 @@
 package net.gotev.uploadservice;
 
 import android.content.Context;
-import android.content.Intent;
+import android.os.Parcelable;
 import android.util.Base64;
 
 import net.gotev.uploadservice.extensions.StringExtensionsKt;
@@ -43,9 +43,8 @@ public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
     }
 
     @Override
-    protected void initializeIntent(Intent intent) {
-        super.initializeIntent(intent);
-        intent.putExtra(HttpUploadTaskParameters.PARAM_HTTP_TASK_PARAMETERS, httpParams);
+    protected Parcelable createAdditionalParameters() {
+        return httpParams;
     }
 
     /**

@@ -1,7 +1,5 @@
 package net.gotev.uploadservice;
 
-import android.content.Intent;
-
 import net.gotev.uploadservice.data.NameValue;
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.network.BodyWriter;
@@ -19,8 +17,6 @@ import java.nio.charset.Charset;
  */
 public class MultipartUploadTask extends HttpUploadTask {
 
-    protected static final String PARAM_UTF8_CHARSET = "multipartUtf8Charset";
-
     private static final String BOUNDARY_SIGNATURE = "-------AndroidUploadService";
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
     private static final String NEW_LINE = "\r\n";
@@ -33,17 +29,16 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private byte[] boundaryBytes;
     private byte[] trailerBytes;
-    private Charset charset;
+    private Charset charset = Charset.forName("UTF-8");
 
     @Override
-    public void init(UploadService service, int notificationID, Intent intent) throws IOException {
-        super.init(service, notificationID, intent);
+    public void performInitialization() {
 
         String boundary = BOUNDARY_SIGNATURE + System.nanoTime();
         boundaryBytes = (TWO_HYPHENS + boundary + NEW_LINE).getBytes(US_ASCII);
         trailerBytes = (TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).getBytes(US_ASCII);
-        charset = intent.getBooleanExtra(PARAM_UTF8_CHARSET, false) ?
-                Charset.forName("UTF-8") : US_ASCII;
+
+        HttpUploadTaskParameters httpParams = getHttpParams();
 
         if (params.getFiles().size() <= 1) {
             httpParams.addHeader("Connection", "close");
@@ -83,9 +78,10 @@ public class MultipartUploadTask extends HttpUploadTask {
 
     private long getRequestParametersLength() throws UnsupportedEncodingException {
         long parametersBytes = 0;
+        HttpUploadTaskParameters params = getHttpParams();
 
-        if (!httpParams.getRequestParameters().isEmpty()) {
-            for (final NameValue parameter : httpParams.getRequestParameters()) {
+        if (!params.getRequestParameters().isEmpty()) {
+            for (final NameValue parameter : params.getRequestParameters()) {
                 // the bytes needed for every parameter are the sum of the boundary bytes
                 // and the bytes occupied by the parameter
                 parametersBytes += boundaryBytes.length + getMultipartBytes(parameter).length;
@@ -118,8 +114,10 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     private void writeRequestParameters(BodyWriter bodyWriter) throws IOException {
-        if (!httpParams.getRequestParameters().isEmpty()) {
-            for (final NameValue parameter : httpParams.getRequestParameters()) {
+        HttpUploadTaskParameters params = getHttpParams();
+
+        if (!params.getRequestParameters().isEmpty()) {
+            for (final NameValue parameter : params.getRequestParameters()) {
                 bodyWriter.write(boundaryBytes);
                 byte[] formItemBytes = getMultipartBytes(parameter);
                 bodyWriter.write(formItemBytes);

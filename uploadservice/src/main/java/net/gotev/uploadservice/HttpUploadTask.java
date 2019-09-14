@@ -1,14 +1,12 @@
 package net.gotev.uploadservice;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.BodyWriter;
 import net.gotev.uploadservice.network.HttpConnection;
 import net.gotev.uploadservice.network.ServerResponse;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -25,19 +23,12 @@ public abstract class HttpUploadTask extends UploadTask
     private static final String LOG_TAG = HttpUploadTask.class.getSimpleName();
 
     /**
-     * Contains all the parameters set in {@link HttpUploadRequest}.
-     */
-    protected HttpUploadTaskParameters httpParams = null;
-
-    /**
      * {@link HttpConnection} used to perform the upload task.
      */
     private HttpConnection connection;
 
-    @Override
-    public void init(UploadService service, int notificationID, Intent intent) throws IOException {
-        super.init(service, notificationID, intent);
-        this.httpParams = intent.getParcelableExtra(HttpUploadTaskParameters.PARAM_HTTP_TASK_PARAMETERS);
+    protected HttpUploadTaskParameters getHttpParams() {
+        return (HttpUploadTaskParameters) getParams().getAdditionalParams();
     }
 
     /**
@@ -56,6 +47,8 @@ public abstract class HttpUploadTask extends UploadTask
         UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting upload task with ID " + params.getId());
 
         try {
+            HttpUploadTaskParameters httpParams = getHttpParams();
+
             getSuccessfullyUploadedFiles().clear();
             setUploadedBytes(0);
             setTotalBytes(getBodyLength());

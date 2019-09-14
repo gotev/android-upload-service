@@ -35,7 +35,6 @@ public class MultipartUploadActivity extends UploadActivity {
             final MultipartUploadRequest request =
                     new MultipartUploadRequest(this, uploadId, serverUrl)
                             .setMethod(httpMethod)
-                            .setUtf8Charset()
                             .setNotificationConfig(getNotificationConfig(uploadId, R.string.multipart_upload))
                             .setMaxRetries(MAX_RETRIES)
                             //.setAutoDeleteFilesAfterSuccessfulUpload(true)

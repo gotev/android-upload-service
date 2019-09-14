@@ -3,6 +3,7 @@ package net.gotev.uploadservice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Parcelable;
 
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.data.UploadTaskParameters;
@@ -101,24 +102,25 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
      *
      * @param intent the intent used to start the upload service
      */
-    protected void initializeIntent(Intent intent) {
+    final void initializeIntent(Intent intent) {
+        Class taskClass = getTaskClass();
+        if (taskClass == null)
+            throw new RuntimeException("The request must specify a task class!");
+
         UploadTaskParameters params = new UploadTaskParameters(
                 uploadId,
                 serverUrl,
                 maxRetries,
                 autoDeleteSuccessfullyUploadedFiles,
                 notificationConfig,
-                files
+                files,
+                createAdditionalParameters()
         );
 
-        intent.putExtra(UploadService.PARAM_TASK_PARAMETERS, params);
-
-        Class taskClass = getTaskClass();
-        if (taskClass == null)
-            throw new RuntimeException("The request must specify a task class!");
-
-        intent.putExtra(UploadService.PARAM_TASK_CLASS, taskClass.getName());
+        UploadServiceKt.setupTask(intent, taskClass.getName(), params);
     }
+
+    protected abstract Parcelable createAdditionalParameters();
 
     @SuppressWarnings("unchecked")
     protected final B self() {

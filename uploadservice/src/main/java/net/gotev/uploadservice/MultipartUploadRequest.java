@@ -1,7 +1,6 @@
 package net.gotev.uploadservice;
 
 import android.content.Context;
-import android.content.Intent;
 
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
@@ -22,7 +21,6 @@ import java.net.MalformedURLException;
 public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadRequest> {
 
     private static final String LOG_TAG = MultipartUploadRequest.class.getSimpleName();
-    private boolean isUtf8Charset = false;
 
     /**
      * Creates a new multipart upload request.
@@ -57,12 +55,6 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
     public MultipartUploadRequest(final Context context, final String serverUrl)
         throws MalformedURLException, IllegalArgumentException {
         this(context, null, serverUrl);
-    }
-
-    @Override
-    protected void initializeIntent(Intent intent) {
-        super.initializeIntent(intent);
-        intent.putExtra(MultipartUploadTask.PARAM_UTF8_CHARSET, isUtf8Charset);
     }
 
     @Override
@@ -157,15 +149,5 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
     public MultipartUploadRequest addFileToUpload(final String path, final String parameterName)
             throws FileNotFoundException, IllegalArgumentException {
         return addFileToUpload(path, parameterName, null, null);
-    }
-
-    /**
-     * Sets the charset for this multipart request to UTF-8. If not set, the standard US-ASCII
-     * charset will be used.
-     * @return request instance
-     */
-    public MultipartUploadRequest setUtf8Charset() {
-        isUtf8Charset = true;
-        return this;
     }
 }

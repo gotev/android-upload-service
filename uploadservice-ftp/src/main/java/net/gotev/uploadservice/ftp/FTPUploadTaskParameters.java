@@ -9,8 +9,6 @@ import android.os.Parcelable;
  */
 public class FTPUploadTaskParameters implements Parcelable {
 
-    protected static final String PARAM_FTP_TASK_PARAMETERS = "ftpTaskParameters";
-
     /**
      * The default FTP connection timeout in milliseconds.
      */

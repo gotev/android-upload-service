@@ -1,6 +1,5 @@
 package net.gotev.uploadservice
 
-import android.content.Intent
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadTaskParameters
@@ -124,16 +123,22 @@ abstract class UploadTask : Runnable {
      * @throws IOException if an I/O exception occurs while initializing
      */
     @Throws(IOException::class)
-    open fun init(service: UploadService, notificationID: Int, intent: Intent) {
-        this.params = intent.getParcelableExtra(UploadService.PARAM_TASK_PARAMETERS) ?: throw IOException("Missing task parameters")
+    fun init(service: UploadService, notificationID: Int, taskParams: UploadTaskParameters) {
+        this.params = taskParams
         this.service = service
 
-        observers.add(BroadcastEmitter(service))
+        observers.apply {
+            add(BroadcastEmitter(service))
 
-        params.notificationConfig?.let { config ->
-            observers.add(NotificationHandler(service, notificationID, params.id, config))
+            params.notificationConfig?.let { config ->
+                add(NotificationHandler(service, notificationID, params.id, config))
+            }
         }
+
+        performInitialization()
     }
+
+    open fun performInitialization() {}
 
     private fun resetAttempts() {
         attempts = 0

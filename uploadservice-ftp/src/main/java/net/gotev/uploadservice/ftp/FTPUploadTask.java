@@ -1,8 +1,5 @@
 package net.gotev.uploadservice.ftp;
 
-import android.content.Intent;
-
-import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.UploadTask;
 import net.gotev.uploadservice.data.UploadFile;
@@ -33,17 +30,17 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     protected static final String PARAM_REMOTE_PATH = "ftpRemotePath";
     protected static final String PARAM_PERMISSIONS = "ftpPermissions";
 
-    private FTPUploadTaskParameters ftpParams = null;
     private FTPClient ftpClient = null;
 
-    @Override
-    public void init(UploadService service, int notificationID, Intent intent) throws IOException {
-        super.init(service, notificationID, intent);
-        this.ftpParams = intent.getParcelableExtra(FTPUploadTaskParameters.PARAM_FTP_TASK_PARAMETERS);
+    private FTPUploadTaskParameters getFTPParams() {
+        return (FTPUploadTaskParameters) getParams().getAdditionalParams();
     }
 
     @Override
     protected void upload() throws Exception {
+
+        FTPUploadTaskParameters ftpParams = getFTPParams();
+
         try {
             if (ftpParams.useSSL) {
                 String secureProtocol = ftpParams.secureSocketProtocol;
@@ -179,7 +176,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
             remoteDestination = remoteDestination.substring(baseWorkingDir.length());
         }
 
-        makeDirectories(remoteDestination, ftpParams.createdDirectoriesPermissions);
+        makeDirectories(remoteDestination, getFTPParams().createdDirectoriesPermissions);
 
         InputStream localStream = file.getHandler().stream(service);
         try {
