@@ -1,6 +1,7 @@
 package net.gotev.uploadservice.network
 
 import net.gotev.uploadservice.data.NameValue
+import java.io.Closeable
 
 import java.io.IOException
 
@@ -12,7 +13,7 @@ import java.io.IOException
  * from the server, which must not be large though.
  * @author gotev (Aleksandar Gotev)
  */
-interface HttpRequest {
+interface HttpRequest: Closeable {
 
     /**
      * Delegate called when the body is ready to be written.
@@ -56,9 +57,4 @@ interface HttpRequest {
      */
     @Throws(IOException::class)
     fun getResponse(delegate: RequestBodyDelegate): ServerResponse
-
-    /**
-     * Closes the connection and frees all the allocated resources.
-     */
-    fun close()
 }
