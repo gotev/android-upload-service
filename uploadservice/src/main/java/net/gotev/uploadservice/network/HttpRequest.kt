@@ -12,7 +12,7 @@ import java.io.IOException
  * from the server, which must not be large though.
  * @author gotev (Aleksandar Gotev)
  */
-interface HttpConnection {
+interface HttpRequest {
 
     /**
      * Delegate called when the body is ready to be written.
@@ -35,7 +35,7 @@ interface HttpConnection {
      * @return instance
      */
     @Throws(IOException::class)
-    fun setHeaders(requestHeaders: List<NameValue>): HttpConnection
+    fun setHeaders(requestHeaders: List<NameValue>): HttpRequest
 
     /**
      * Sets the total body bytes.
@@ -45,7 +45,7 @@ interface HttpConnection {
      * https://gist.github.com/CMCDragonkai/6bfade6431e9ffb7fe88
      * @return instance
      */
-    fun setTotalBodyBytes(totalBodyBytes: Long, isFixedLengthStreamingMode: Boolean): HttpConnection
+    fun setTotalBodyBytes(totalBodyBytes: Long, isFixedLengthStreamingMode: Boolean): HttpRequest
 
     /**
      * Gets the server response.

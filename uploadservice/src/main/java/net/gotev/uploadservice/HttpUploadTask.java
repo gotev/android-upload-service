@@ -2,9 +2,12 @@ package net.gotev.uploadservice;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.NonNull;
+
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.network.BodyWriter;
-import net.gotev.uploadservice.network.HttpConnection;
+import net.gotev.uploadservice.network.HttpRequest;
+import net.gotev.uploadservice.network.HttpStack;
 import net.gotev.uploadservice.network.ServerResponse;
 
 import java.io.UnsupportedEncodingException;
@@ -18,14 +21,14 @@ import java.io.UnsupportedEncodingException;
  * @author mabdurrahman
  */
 public abstract class HttpUploadTask extends UploadTask
-        implements HttpConnection.RequestBodyDelegate, BodyWriter.OnStreamWriteListener {
+        implements HttpRequest.RequestBodyDelegate, BodyWriter.OnStreamWriteListener {
 
     private static final String LOG_TAG = HttpUploadTask.class.getSimpleName();
 
     /**
-     * {@link HttpConnection} used to perform the upload task.
+     * {@link HttpRequest} used to perform the upload task.
      */
-    private HttpConnection connection;
+    private HttpRequest request;
 
     protected HttpUploadTaskParameters getHttpParams() {
         return (HttpUploadTaskParameters) getParams().getAdditionalParams();
@@ -42,7 +45,7 @@ public abstract class HttpUploadTask extends UploadTask
      * @throws Exception if an error occurs
      */
     @SuppressLint("NewApi")
-    protected void upload() throws Exception {
+    protected void upload(@NonNull HttpStack httpStack) throws Exception {
 
         UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Starting upload task with ID " + params.getId());
 
@@ -58,12 +61,11 @@ public abstract class HttpUploadTask extends UploadTask
                 httpParams.addHeader("User-Agent", "AndroidUploadService/" + BuildConfig.VERSION_NAME);
             }
 
-            connection = UploadServiceConfig.INSTANCE.getHttpStack()
-                    .createNewConnection(httpParams.method, params.getServerUrl())
+            request = httpStack.newRequest(httpParams.method, params.getServerUrl())
                     .setHeaders(httpParams.getRequestHeaders())
                     .setTotalBodyBytes(getTotalBytes(), httpParams.usesFixedLengthStreamingMode);
 
-            final ServerResponse response = connection.getResponse(this);
+            final ServerResponse response = request.getResponse(this);
             UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Server responded with code " + response.getCode()
                             + " and body " + response.getBodyString()
                             + " to upload with ID: " + params.getId());
@@ -79,8 +81,8 @@ public abstract class HttpUploadTask extends UploadTask
             }
 
         } finally {
-            if (connection != null)
-                connection.close();
+            if (request != null)
+                request.close();
         }
     }
 

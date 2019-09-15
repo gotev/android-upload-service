@@ -1,6 +1,6 @@
 package net.gotev.uploadservice.network.hurl
 
-import net.gotev.uploadservice.network.HttpConnection
+import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.HttpStack
 
 import java.io.IOException
@@ -15,8 +15,8 @@ class HurlStack(private val followRedirects: Boolean = true,
                 private val readTimeout: Int = 30000) : HttpStack {
 
     @Throws(IOException::class)
-    override fun createNewConnection(method: String, url: String): HttpConnection {
-        return HurlStackConnection(method, url, followRedirects, useCaches,
+    override fun newRequest(method: String, url: String): HttpRequest {
+        return HurlStackRequest(method, url, followRedirects, useCaches,
                 connectTimeout, readTimeout)
     }
 

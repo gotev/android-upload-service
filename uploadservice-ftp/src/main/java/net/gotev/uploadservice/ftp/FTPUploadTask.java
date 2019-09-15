@@ -4,6 +4,7 @@ import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.UploadTask;
 import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
+import net.gotev.uploadservice.network.HttpStack;
 import net.gotev.uploadservice.network.ServerResponse;
 
 import org.apache.commons.net.ftp.FTP;
@@ -37,7 +38,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     }
 
     @Override
-    protected void upload() throws Exception {
+    protected void upload(HttpStack httpStack) throws Exception {
 
         FTPUploadTaskParameters ftpParams = getFTPParams();
 

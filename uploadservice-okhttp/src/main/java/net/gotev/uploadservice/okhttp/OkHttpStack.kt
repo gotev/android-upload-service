@@ -1,6 +1,6 @@
 package net.gotev.uploadservice.okhttp
 
-import net.gotev.uploadservice.network.HttpConnection
+import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.HttpStack
 import okhttp3.OkHttpClient
 import java.io.IOException
@@ -11,7 +11,7 @@ import java.io.IOException
  */
 class OkHttpStack(private val client: OkHttpClient = OkHttpClient()) : HttpStack {
     @Throws(IOException::class)
-    override fun createNewConnection(method: String, url: String): HttpConnection {
-        return OkHttpStackConnection(client, method, url)
+    override fun newRequest(method: String, url: String): HttpRequest {
+        return OkHttpStackRequest(client, method, url)
     }
 }

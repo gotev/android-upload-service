@@ -3,7 +3,7 @@ package net.gotev.uploadservice.network.hurl
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.network.ServerResponse
-import net.gotev.uploadservice.network.HttpConnection
+import net.gotev.uploadservice.network.HttpRequest
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -12,16 +12,16 @@ import javax.net.ssl.HttpsURLConnection
 import kotlin.collections.LinkedHashMap
 
 /**
- * [HttpConnection] implementation using [HttpURLConnection].
+ * [HttpRequest] implementation using [HttpURLConnection].
  * @author gotev (Aleksandar Gotev)
  */
-class HurlStackConnection(
+class HurlStackRequest(
         method: String,
         url: String,
         followRedirects: Boolean,
         useCaches: Boolean,
         connectTimeout: Int,
-        readTimeout: Int) : HttpConnection {
+        readTimeout: Int) : HttpRequest {
 
     private val connection: HttpURLConnection
     private val uuid = UUID.randomUUID().toString()
@@ -77,7 +77,7 @@ class HurlStackConnection(
         }
 
     @Throws(IOException::class)
-    override fun setHeaders(requestHeaders: List<NameValue>): HttpConnection {
+    override fun setHeaders(requestHeaders: List<NameValue>): HttpRequest {
         for (param in requestHeaders) {
             connection.setRequestProperty(param.name.trim(), param.value.trim())
         }
@@ -85,7 +85,7 @@ class HurlStackConnection(
         return this
     }
 
-    override fun setTotalBodyBytes(totalBodyBytes: Long, isFixedLengthStreamingMode: Boolean): HttpConnection {
+    override fun setTotalBodyBytes(totalBodyBytes: Long, isFixedLengthStreamingMode: Boolean): HttpRequest {
         connection.apply {
             if (isFixedLengthStreamingMode) {
                 setFixedLengthStreamingMode(totalBodyBytes)
@@ -98,7 +98,7 @@ class HurlStackConnection(
     }
 
     @Throws(IOException::class)
-    override fun getResponse(delegate: HttpConnection.RequestBodyDelegate): ServerResponse {
+    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate): ServerResponse {
         HurlBodyWriter(connection.outputStream).use {
             delegate.onWriteRequestBody(it)
         }

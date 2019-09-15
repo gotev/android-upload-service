@@ -16,5 +16,5 @@ interface HttpStack {
      * @throws IOException if an error occurs while creating the connection object
      */
     @Throws(IOException::class)
-    fun createNewConnection(method: String, url: String): HttpConnection
+    fun newRequest(method: String, url: String): HttpRequest
 }

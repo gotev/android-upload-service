@@ -5,6 +5,7 @@ import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.observer.task.UploadTaskObserver
 import java.io.IOException
@@ -88,7 +89,7 @@ abstract class UploadTask : Runnable {
      * @throws Exception if an error occurs
      */
     @Throws(Exception::class)
-    protected abstract fun upload()
+    protected abstract fun upload(httpStack: HttpStack)
 
     /**
      * Implement in subclasses to be able to do something when the upload is successful.
@@ -136,7 +137,7 @@ abstract class UploadTask : Runnable {
         while (attempts <= params.maxRetries && shouldContinue) {
             try {
                 resetUploadedBytes()
-                upload()
+                upload(UploadServiceConfig.httpStack)
                 break
             } catch (exc: Throwable) {
                 if (!shouldContinue) {
