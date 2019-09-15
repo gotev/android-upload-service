@@ -1,9 +1,9 @@
 package net.gotev.uploadservice.network.hurl
 
-import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.data.NameValue
-import net.gotev.uploadservice.network.ServerResponse
+import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.HttpRequest
+import net.gotev.uploadservice.network.ServerResponse
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -29,7 +29,7 @@ class HurlStackRequest(
     private fun String.createConnection(): HttpURLConnection {
         val url = URL(trim())
 
-        return if (url.protocol.toLowerCase() == "https") {
+        return if ("https".equals(url.protocol, ignoreCase = true)) {
             url.openConnection() as HttpsURLConnection
         } else {
             url.openConnection() as HttpURLConnection
