@@ -147,9 +147,9 @@ abstract class UploadTask : Runnable {
                 } else {
                     UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. ", exc)
 
-                    val beforeSleepTs = System.currentTimeMillis()
+                    val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
 
-                    sleepWhile { shouldContinue && System.currentTimeMillis() < beforeSleepTs + errorDelay * 1000 }
+                    sleepWhile { shouldContinue && System.currentTimeMillis() < sleepDeadline }
 
                     errorDelay *= UploadServiceConfig.retryPolicy.multiplier.toLong()
 
