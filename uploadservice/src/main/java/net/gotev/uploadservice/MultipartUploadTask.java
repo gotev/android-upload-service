@@ -58,12 +58,11 @@ public class MultipartUploadTask extends HttpUploadTask {
     public void onWriteRequestBody(BodyWriter bodyWriter) throws IOException {
         //reset uploaded bytes when the body is ready to be written
         //because sometimes this gets invoked when network changes
-        setUploadedBytes(0);
+        resetUploadedBytes();
         writeRequestParameters(bodyWriter);
         writeFiles(bodyWriter);
         bodyWriter.write(trailerBytes);
-        setUploadedBytes(getUploadedBytes() + trailerBytes.length);
-        broadcastProgress(getUploadedBytes(), getTotalBytes());
+        broadcastProgress(trailerBytes.length);
     }
 
     private long getFilesLength() throws UnsupportedEncodingException {
@@ -122,8 +121,7 @@ public class MultipartUploadTask extends HttpUploadTask {
                 byte[] formItemBytes = getMultipartBytes(parameter);
                 bodyWriter.write(formItemBytes);
 
-                setUploadedBytes(getUploadedBytes() + boundaryBytes.length + formItemBytes.length);
-                broadcastProgress(getUploadedBytes(), getTotalBytes());
+                broadcastProgress(boundaryBytes.length + formItemBytes.length);
             }
         }
     }
@@ -137,14 +135,14 @@ public class MultipartUploadTask extends HttpUploadTask {
             byte[] headerBytes = getMultipartHeader(file);
             bodyWriter.write(headerBytes);
 
-            setUploadedBytes(getUploadedBytes() + boundaryBytes.length + headerBytes.length);
-            broadcastProgress(getUploadedBytes(), getTotalBytes());
+            broadcastProgress(boundaryBytes.length + headerBytes.length);
 
             bodyWriter.writeStream(file.getHandler().stream(context), this);
 
             byte[] newLineBytes = NEW_LINE.getBytes(charset);
             bodyWriter.write(newLineBytes);
-            setUploadedBytes(getUploadedBytes() + newLineBytes.length);
+
+            broadcastProgress(newLineBytes.length);
         }
     }
 

@@ -50,7 +50,6 @@ public abstract class HttpUploadTask extends UploadTask
             HttpUploadTaskParameters httpParams = getHttpParams();
 
             getSuccessfullyUploadedFiles().clear();
-            setUploadedBytes(0);
             setTotalBytes(getBodyLength());
 
             if (httpParams.isCustomUserAgentDefined()) {
@@ -101,8 +100,7 @@ public abstract class HttpUploadTask extends UploadTask
 
     @Override
     public void onBytesWritten(int bytesWritten) {
-        setUploadedBytes(getUploadedBytes() + bytesWritten);
-        broadcastProgress(getUploadedBytes(), getTotalBytes());
+        broadcastProgress(bytesWritten);
     }
 
 }

@@ -153,17 +153,22 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
      * ones.
      */
     private void calculateUploadedAndTotalBytes() {
-        setUploadedBytes(0);
+        resetUploadedBytes();
+
+        long totalUploaded = 0;
 
         for (UploadFile file : getSuccessfullyUploadedFiles()) {
-            setUploadedBytes(getUploadedBytes() + file.getHandler().size(context));
+            totalUploaded += file.getHandler().size(context);
         }
 
-        setTotalBytes(getUploadedBytes());
+        long totalBytes = totalUploaded;
 
         for (UploadFile file : params.getFiles()) {
-            setTotalBytes(getTotalBytes() + file.getHandler().size(context));
+            totalBytes += file.getHandler().size(context);
         }
+
+        setTotalBytes(totalBytes);
+        broadcastProgress(totalUploaded);
     }
 
     private void uploadFile(String baseWorkingDir, UploadFile file) throws IOException {
@@ -224,8 +229,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
     @Override
     public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-        setUploadedBytes(getUploadedBytes() + bytesTransferred);
-        broadcastProgress(getUploadedBytes(), getTotalBytes());
+        broadcastProgress(bytesTransferred);
 
         if (!getShouldContinue()) {
             try {

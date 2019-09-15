@@ -56,7 +56,7 @@ abstract class UploadTask : Runnable {
      * Total transferred bytes. You should update this value in your subclasses when you upload
      * some data, and before calling [UploadTask.broadcastProgress]
      */
-    protected var uploadedBytes: Long = 0
+    private var uploadedBytes: Long = 0
 
     /**
      * Start timestamp of this upload task.
@@ -135,6 +135,7 @@ abstract class UploadTask : Runnable {
 
         while (attempts <= params.maxRetries && shouldContinue) {
             try {
+                resetUploadedBytes()
                 upload()
                 break
             } catch (exc: Throwable) {
@@ -179,12 +180,17 @@ abstract class UploadTask : Runnable {
      * @param uploadedBytes number of bytes which has been uploaded to the server
      * @param totalBytes    total bytes of the request
      */
-    protected fun broadcastProgress(uploadedBytes: Long, totalBytes: Long) {
+    protected fun broadcastProgress(bytesSent: Long) {
+        uploadedBytes += bytesSent
         // reset retry attempts on progress. This way only a single while cycle is needed
         resetAttempts()
         if (shouldThrottle(uploadedBytes, totalBytes)) return
         UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes")
         doForEachObserver { onProgress(uploadInfo) }
+    }
+
+    protected fun resetUploadedBytes() {
+        uploadedBytes = 0
     }
 
     /**
