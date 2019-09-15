@@ -69,13 +69,14 @@ class OkHttpStackRequest(private val httpClient: OkHttpClient, private val httpM
             .build()
 
     @Throws(IOException::class)
-    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate) = httpClient
-            .newCall(request(delegate))
-            .execute()
-            .use { it.asServerResponse() }
+    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate) = use {
+        httpClient.newCall(request(delegate))
+                .execute()
+                .use { it.asServerResponse() }
+    }
 
-    // Resources are automatically freed after usage. Log only.
     override fun close() {
+        // Resources are automatically freed after usage. Log only.
         UploadServiceLogger.debug(javaClass.simpleName) { "closing OkHttp connection (uuid: $uuid)" }
     }
 }

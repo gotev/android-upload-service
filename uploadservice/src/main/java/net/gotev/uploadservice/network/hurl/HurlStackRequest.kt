@@ -98,12 +98,12 @@ class HurlStackRequest(
     }
 
     @Throws(IOException::class)
-    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate): ServerResponse {
+    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate) = use {
         HurlBodyWriter(connection.outputStream).use {
             delegate.onWriteRequestBody(it)
         }
 
-        return ServerResponse(connection.responseCode, responseBody, responseHeaders)
+        ServerResponse(connection.responseCode, responseBody, responseHeaders)
     }
 
     override fun close() {

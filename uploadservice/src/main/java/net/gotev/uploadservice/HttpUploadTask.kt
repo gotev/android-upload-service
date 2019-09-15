@@ -17,11 +17,6 @@ import java.io.UnsupportedEncodingException
  */
 abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, BodyWriter.OnStreamWriteListener {
 
-    /**
-     * [HttpRequest] used to perform the upload task.
-     */
-    private var request: HttpRequest? = null
-
     protected val httpParams: HttpUploadTaskParameters
         get() = params.additionalParams as HttpUploadTaskParameters
 
@@ -45,48 +40,40 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
     @SuppressLint("NewApi")
     @Throws(Exception::class)
     override fun upload(httpStack: HttpStack) {
-
         UploadServiceLogger.debug(javaClass.simpleName) { "Starting upload task with ID ${params.id}" }
 
-        try {
-            val httpParams = httpParams
-
-            //TODO: clear successfully uploaded files
-            totalBytes = bodyLength
-
-            if (httpParams.isCustomUserAgentDefined) {
-                httpParams.addHeader("User-Agent", httpParams.customUserAgent)
+        val httpParams = httpParams.apply {
+            addHeader("User-Agent", if (httpParams.isCustomUserAgentDefined) {
+                httpParams.customUserAgent
             } else {
-                httpParams.addHeader("User-Agent", "AndroidUploadService/" + BuildConfig.VERSION_NAME)
-            }
+                "AndroidUploadService/" + BuildConfig.VERSION_NAME
+            })
+        }
 
-            request = httpStack.newRequest(httpParams.method, params.serverUrl)
-                    .setHeaders(httpParams.requestHeaders)
-                    .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode)
+        //TODO: clear successfully uploaded files
+        totalBytes = bodyLength
 
-            val response = request!!.getResponse(this)
-            UploadServiceLogger.debug(javaClass.simpleName) {
-                "Server responded with code ${response.code} and body ${response.bodyString} " +
-                        "to upload with ID: ${params.id}"
-            }
+        val response = httpStack.newRequest(httpParams.method, params.serverUrl)
+                .setHeaders(httpParams.requestHeaders)
+                .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode)
+                .getResponse(this)
 
-            // Broadcast completion only if the user has not cancelled the operation.
-            // It may happen that when the body is not completely written and the client
-            // closes the connection, no exception is thrown here, and the server responds
-            // with an HTTP status code. Without this, what happened was that completion was
-            // broadcasted and then the cancellation. That behaviour was not desirable as the
-            // library user couldn't execute code on user cancellation.
-            if (shouldContinue) {
-                broadcastCompleted(response)
-            }
+        UploadServiceLogger.debug(javaClass.simpleName) {
+            "Server responded with code ${response.code} " +
+                    "and body ${response.bodyString} to upload with ID: ${params.id}"
+        }
 
-        } finally {
-            if (request != null)
-                request!!.close()
+        // Broadcast completion only if the user has not cancelled the operation.
+        // It may happen that when the body is not completely written and the client
+        // closes the connection, no exception is thrown here, and the server responds
+        // with an HTTP status code. Without this, what happened was that completion was
+        // broadcasted and then the cancellation. That behaviour was not desirable as the
+        // library user couldn't execute code on user cancellation.
+        if (shouldContinue) {
+            broadcastCompleted(response)
         }
     }
 
-    // BodyWriter.OnStreamWriteListener methods implementation
     override fun shouldContinueWriting() = shouldContinue
 
     override fun onBytesWritten(bytesWritten: Int) {

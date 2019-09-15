@@ -12,7 +12,7 @@ import java.io.IOException
 class BinaryUploadTask : HttpUploadTask() {
 
     private val file by lazy {
-        params.files[0].handler
+        params.files.first().handler
     }
 
     override val bodyLength: Long
@@ -24,6 +24,6 @@ class BinaryUploadTask : HttpUploadTask() {
     }
 
     override fun onSuccessfulUpload() {
-        addSuccessfullyUploadedFile(params.files[0])
+        addSuccessfullyUploadedFile(params.files.first())
     }
 }
