@@ -22,6 +22,8 @@ abstract class UploadTask : Runnable {
         private val LOG_TAG = UploadTask::class.java.simpleName
     }
 
+    private var lastProgressNotificationTime: Long = 0
+
     protected lateinit var context: Context
     lateinit var params: UploadTaskParameters
 
@@ -40,8 +42,6 @@ abstract class UploadTask : Runnable {
      * of data that has been successfully transferred.
      */
     var shouldContinue = true
-
-    private var lastProgressNotificationTime: Long = 0
 
     private val observers = ArrayList<UploadTaskObserver>(2)
 
@@ -131,14 +131,12 @@ abstract class UploadTask : Runnable {
 
     override fun run() {
         doForEachObserver { initialize(UploadInfo(params.id)) }
-
         resetAttempts()
 
         while (attempts <= params.maxRetries && shouldContinue) {
             try {
                 upload()
                 break
-
             } catch (exc: Throwable) {
                 if (!shouldContinue) {
                     break
@@ -149,9 +147,7 @@ abstract class UploadTask : Runnable {
 
                     val beforeSleepTs = System.currentTimeMillis()
 
-                    while (shouldContinue && System.currentTimeMillis() < beforeSleepTs + errorDelay * 1000) {
-                        safeSleep(2000)
-                    }
+                    sleepWhile { shouldContinue && System.currentTimeMillis() < beforeSleepTs + errorDelay * 1000 }
 
                     errorDelay *= UploadServiceConfig.retryPolicy.multiplier.toLong()
 
@@ -169,21 +165,12 @@ abstract class UploadTask : Runnable {
         }
     }
 
-    private fun safeSleep(millis: Long) {
-        try {
-            Thread.sleep(millis)
-        } catch (exc: Throwable) { }
-    }
-
-    private fun shouldThrottle(uploadedBytes: Long, totalBytes: Long): Boolean {
-        val currentTime = System.currentTimeMillis()
-
-        if (uploadedBytes < totalBytes && currentTime < lastProgressNotificationTime + UploadServiceConfig.uploadProgressNotificationIntervalMillis) {
-            return true
+    private inline fun sleepWhile(millis: Long = 1000, condition: () -> Boolean) {
+        while (condition()) {
+            try {
+                Thread.sleep(millis)
+            } catch (exc: Throwable) { }
         }
-
-        lastProgressNotificationTime = currentTime
-        return false
     }
 
     /**
@@ -195,9 +182,7 @@ abstract class UploadTask : Runnable {
     protected fun broadcastProgress(uploadedBytes: Long, totalBytes: Long) {
         // reset retry attempts on progress. This way only a single while cycle is needed
         resetAttempts()
-
         if (shouldThrottle(uploadedBytes, totalBytes)) return
-
         UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes")
         doForEachObserver { onProgress(uploadInfo) }
     }
@@ -298,6 +283,17 @@ abstract class UploadTask : Runnable {
 
     fun cancel() {
         shouldContinue = false
+    }
+
+    private fun shouldThrottle(uploadedBytes: Long, totalBytes: Long): Boolean {
+        val currentTime = System.currentTimeMillis()
+
+        if (uploadedBytes < totalBytes && currentTime < lastProgressNotificationTime + UploadServiceConfig.uploadProgressNotificationIntervalMillis) {
+            return true
+        }
+
+        lastProgressNotificationTime = currentTime
+        return false
     }
 
 }

@@ -37,7 +37,6 @@ class NotificationHandler(private val service: UploadService,
                     ?: throw IllegalArgumentException("The provided notification channel ID $notificationChannelId does not exist! You must create it at app startup and before Upload Service!")
         }
 
-        //create notification
         if (config.progress.message == null)
             return
 
