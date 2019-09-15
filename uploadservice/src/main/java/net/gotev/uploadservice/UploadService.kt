@@ -133,13 +133,15 @@ class UploadService : Service() {
             return shutdownIfThereArentAnyActiveTasks()
         }
 
-        UploadServiceLogger.debug(TAG, "Starting UploadService. Debug info: $UploadServiceConfig")
+        UploadServiceLogger.debug(TAG) { "Starting UploadService. Debug info: $UploadServiceConfig" }
 
         val currentTask = getTask(intent) ?: return shutdownIfThereArentAnyActiveTasks()
 
         if (uploadTasksMap.containsKey(currentTask.params.id)) {
-            UploadServiceLogger.error(TAG, "Preventing upload with id: " + currentTask.params.id
-                    + " to be uploaded twice! Please check your code and fix it!")
+            UploadServiceLogger.error(TAG) {
+                "Preventing upload with id: ${currentTask.params.id} to be uploaded twice! " +
+                        "Please check your code and fix it!"
+            }
             return shutdownIfThereArentAnyActiveTasks()
         }
 
@@ -154,7 +156,7 @@ class UploadService : Service() {
     @Synchronized
     private fun clearIdleTimer() {
         idleTimer?.apply {
-            UploadServiceLogger.info(TAG, "Clearing idle timer")
+            UploadServiceLogger.info(TAG) { "Clearing idle timer" }
             cancel()
         }
         idleTimer = null
@@ -165,13 +167,18 @@ class UploadService : Service() {
         if (uploadTasksMap.isEmpty()) {
             clearIdleTimer()
 
-            UploadServiceLogger.info(TAG, "Service will be shut down in " + UploadServiceConfig.idleTimeoutSeconds + "s if no new tasks are received")
+            UploadServiceLogger.info(TAG) {
+                "Service will be shut down in ${UploadServiceConfig.idleTimeoutSeconds}s " +
+                        "if no new tasks are received"
+            }
 
             idleTimer = Timer(TAG + "IdleTimer").apply {
                 schedule(object : TimerTask() {
                     override fun run() {
-                        UploadServiceLogger.info(TAG, "Service is about to be stopped because idle timeout of "
-                                + UploadServiceConfig.idleTimeoutSeconds + "s has been reached")
+                        UploadServiceLogger.info(TAG) {
+                            "Service is about to be stopped because idle timeout of " +
+                                    "${UploadServiceConfig.idleTimeoutSeconds}s has been reached"
+                        }
                         stopSelf()
                     }
                 }, (UploadServiceConfig.idleTimeoutSeconds * 1000).toLong())
@@ -190,7 +197,7 @@ class UploadService : Service() {
         uploadThreadPool.shutdown()
 
         if (UploadServiceConfig.isForegroundService) {
-            UploadServiceLogger.debug(TAG, "Stopping foreground execution")
+            UploadServiceLogger.debug(TAG) { "Stopping foreground execution" }
             stopForeground(true)
         }
 
@@ -198,7 +205,7 @@ class UploadService : Service() {
 
         uploadTasksMap.clear()
 
-        UploadServiceLogger.debug(TAG, "UploadService destroyed")
+        UploadServiceLogger.debug(TAG) { "UploadService destroyed" }
     }
 
     /**
@@ -208,12 +215,12 @@ class UploadService : Service() {
      */
     fun getTask(intent: Intent): UploadTask? {
         val taskClassString = intent.getStringExtra(taskClass) ?: run {
-            UploadServiceLogger.error(TAG, "Error while instantiating new task. No task class defined in Intent.")
+            UploadServiceLogger.error(TAG) { "Error while instantiating new task. No task class defined in Intent." }
             return null
         }
 
         val params: UploadTaskParameters = intent.getParcelableExtra(taskParameters) ?: run {
-            UploadServiceLogger.error(TAG, "Error while instantiating new task. Missing task parameters.")
+            UploadServiceLogger.error(TAG) { "Error while instantiating new task. Missing task parameters." }
             return null
         }
 
@@ -221,7 +228,7 @@ class UploadService : Service() {
             val task = Class.forName(taskClassString)
 
             if (!UploadTask::class.java.isAssignableFrom(task)) {
-                UploadServiceLogger.error(TAG, "$taskClassString does not extend UploadTask!")
+                UploadServiceLogger.error(TAG) { "$taskClassString does not extend UploadTask!" }
                 return null
             }
 
@@ -241,11 +248,11 @@ class UploadService : Service() {
 
             uploadTask.init(this, params, *observers)
 
-            UploadServiceLogger.debug(TAG, "Successfully created new task with class: $taskClassString")
+            UploadServiceLogger.debug(TAG) { "Successfully created new task with class: $taskClassString" }
             uploadTask
 
         } catch (exc: Throwable) {
-            UploadServiceLogger.error(TAG, "Error while instantiating new task", exc)
+            UploadServiceLogger.error(TAG, exc) { "Error while instantiating new task" }
             null
         }
     }
@@ -261,7 +268,7 @@ class UploadService : Service() {
 
         if (foregroundUploadId == null) {
             foregroundUploadId = uploadId
-            UploadServiceLogger.debug(TAG, "$uploadId now holds the foreground notification")
+            UploadServiceLogger.debug(TAG) { "$uploadId now holds the foreground notification" }
         }
 
         if (uploadId == foregroundUploadId) {
@@ -283,12 +290,12 @@ class UploadService : Service() {
 
         // un-hold foreground upload ID if it's been hold
         if (UploadServiceConfig.isForegroundService && task != null && task.params.id == foregroundUploadId) {
-            UploadServiceLogger.debug(TAG, "$uploadId now un-holded the foreground notification")
+            UploadServiceLogger.debug(TAG) { "$uploadId now un-holded the foreground notification" }
             foregroundUploadId = null
         }
 
         if (UploadServiceConfig.isForegroundService && uploadTasksMap.isEmpty()) {
-            UploadServiceLogger.debug(TAG, "All tasks completed, stopping foreground execution")
+            UploadServiceLogger.debug(TAG) { "All tasks completed, stopping foreground execution" }
             stopForeground(true)
             shutdownIfThereArentAnyActiveTasks()
         }

@@ -100,6 +100,6 @@ public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> 
 
     private void logDoesNotSupportParameters() {
         UploadServiceLogger.INSTANCE.error(getClass().getSimpleName(),
-                     "This upload method does not support adding parameters");
+                () -> "This upload method does not support adding parameters");
     }
 }

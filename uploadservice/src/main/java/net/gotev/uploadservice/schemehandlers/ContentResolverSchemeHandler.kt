@@ -29,7 +29,7 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
                 null
             }
         } ?: run {
-            UploadServiceLogger.error(javaClass.simpleName, "no cursor data for $uri, returning size 0")
+            UploadServiceLogger.error(javaClass.simpleName) { "no cursor data for $uri, returning size 0" }
             //TODO: investigate what happens when size is 0
             0L
         }
@@ -61,7 +61,7 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
     override fun delete(context: Context) = try {
         context.contentResolver.delete(uri, null, null) > 0
     } catch (exc: Throwable) {
-        UploadServiceLogger.error(javaClass.simpleName, "File deletion error", exc)
+        UploadServiceLogger.error(javaClass.simpleName, exc) { "File deletion error" }
         false
     }
 }

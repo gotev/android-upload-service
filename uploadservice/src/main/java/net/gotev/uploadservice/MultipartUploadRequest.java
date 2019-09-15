@@ -79,11 +79,12 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
      */
     public MultipartUploadRequest addFileToUpload(String filePath,
                                                   String parameterName,
-                                                  String fileName, String contentType)
+                                                  String fileName,
+                                                  String contentType)
             throws FileNotFoundException, IllegalArgumentException {
 
         UploadFile file = new UploadFile(filePath);
-        filePath = file.getPath();
+        final String fileAbsolutePath = file.getPath();
 
         if (parameterName == null || "".equals(parameterName)) {
             throw new IllegalArgumentException("Please specify parameterName value for file: "
@@ -92,25 +93,31 @@ public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadReq
 
         file.getProperties().put(MultipartUploadTask.PROPERTY_PARAM_NAME, parameterName);
 
+        final String finalContentType;
+
         if (contentType == null || contentType.isEmpty()) {
-            contentType = file.getHandler().contentType(context);
-            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Auto-detected MIME type for " + filePath
-                    + " is: " + contentType);
+            finalContentType = file.getHandler().contentType(context);
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, () -> "Auto-detected MIME type for " + fileAbsolutePath
+                    + " is: " + finalContentType);
         } else {
-            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Content Type set for " + filePath
-                    + " is: " + contentType);
+            finalContentType = contentType;
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, () -> "Content Type set for " + fileAbsolutePath
+                    + " is: " + finalContentType);
         }
 
-        file.getProperties().put(MultipartUploadTask.PROPERTY_CONTENT_TYPE, contentType);
+        file.getProperties().put(MultipartUploadTask.PROPERTY_CONTENT_TYPE, finalContentType);
+
+        final String finalFileName;
 
         if (fileName == null || "".equals(fileName)) {
-            fileName = file.getHandler().name(context);
-            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Using original file name: " + fileName);
+            finalFileName = file.getHandler().name(context);
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, () -> "Using original file name: " + finalFileName);
         } else {
-            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Using custom file name: " + fileName);
+            finalFileName = fileName;
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, () -> "Using custom file name: " + finalFileName);
         }
 
-        file.getProperties().put(MultipartUploadTask.PROPERTY_REMOTE_FILE_NAME, fileName);
+        file.getProperties().put(MultipartUploadTask.PROPERTY_REMOTE_FILE_NAME, finalFileName);
 
         files.add(file);
         return this;

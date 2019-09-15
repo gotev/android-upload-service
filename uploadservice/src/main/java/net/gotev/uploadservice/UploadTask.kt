@@ -20,7 +20,7 @@ import java.util.*
 abstract class UploadTask : Runnable {
 
     companion object {
-        private val LOG_TAG = UploadTask::class.java.simpleName
+        private val TAG = UploadTask::class.java.simpleName
     }
 
     private var lastProgressNotificationTime: Long = 0
@@ -101,7 +101,7 @@ abstract class UploadTask : Runnable {
             try {
                 action(it)
             } catch (exc: Throwable) {
-                UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error while dispatching event to observer", exc)
+                UploadServiceLogger.error(TAG, exc) { "(uploadID: ${params.id}) error while dispatching event to observer" }
             }
         }
     }
@@ -145,7 +145,7 @@ abstract class UploadTask : Runnable {
                 } else if (attempts >= params.maxRetries) {
                     broadcastError(exc)
                 } else {
-                    UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. ", exc)
+                    UploadServiceLogger.error(TAG) { "(uploadID: ${params.id}) error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. " }
 
                     val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
 
@@ -186,7 +186,7 @@ abstract class UploadTask : Runnable {
         // reset retry attempts on progress. This way only a single while cycle is needed
         resetAttempts()
         if (shouldThrottle(uploadedBytes, totalBytes)) return
-        UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes")
+        UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes" }
         doForEachObserver { onProgress(uploadInfo) }
     }
 
@@ -203,7 +203,7 @@ abstract class UploadTask : Runnable {
      * @param response response got from the server
      */
     protected fun broadcastCompleted(response: ServerResponse) {
-        UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) upload ${if (response.isSuccessful) "completed" else "error"}")
+        UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) upload ${if (response.isSuccessful) "completed" else "error"}" }
 
         if (response.isSuccessful) {
             onSuccessfulUpload()
@@ -211,9 +211,9 @@ abstract class UploadTask : Runnable {
             if (params.autoDeleteSuccessfullyUploadedFiles && successfullyUploadedFiles.isNotEmpty()) {
                 for (file in successfullyUploadedFiles) {
                     if (file.handler.delete(context)) {
-                        UploadServiceLogger.info(LOG_TAG, "(uploadID: ${params.id}) successfully deleted: ${file.path}")
+                        UploadServiceLogger.info(TAG) { "(uploadID: ${params.id}) successfully deleted: ${file.path}" }
                     } else {
-                        UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error while deleting: ${file.path}")
+                        UploadServiceLogger.error(TAG) { "(uploadID: ${params.id}) error while deleting: ${file.path}" }
                     }
                 }
             }
@@ -230,7 +230,7 @@ abstract class UploadTask : Runnable {
      * implementation.
      */
     private fun broadcastCancelled() {
-        UploadServiceLogger.debug(LOG_TAG, "(uploadID: ${params.id}) upload cancelled")
+        UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) upload cancelled" }
         doForEachObserver { onCancelled(uploadInfo) }
     }
 
@@ -244,7 +244,7 @@ abstract class UploadTask : Runnable {
      * of [UploadTask.upload]
      */
     private fun broadcastError(exception: Throwable) {
-        UploadServiceLogger.error(LOG_TAG, "(uploadID: ${params.id}) error", exception)
+        UploadServiceLogger.error(TAG, exception) { "(uploadID: ${params.id}) error" }
         doForEachObserver { onError(uploadInfo, exception) }
     }
 

@@ -5,7 +5,6 @@ import net.gotev.uploadservice.data.UploadFile;
 import net.gotev.uploadservice.network.BodyWriter;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 /**
@@ -50,7 +49,7 @@ public class MultipartUploadTask extends HttpUploadTask {
     }
 
     @Override
-    protected long getBodyLength() throws UnsupportedEncodingException {
+    public long getBodyLength() {
         return (getRequestParametersLength() + getFilesLength() + trailerBytes.length);
     }
 
@@ -65,7 +64,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         broadcastProgress(trailerBytes.length);
     }
 
-    private long getFilesLength() throws UnsupportedEncodingException {
+    private long getFilesLength() {
         long total = 0;
 
         for (UploadFile file : params.getFiles()) {
@@ -75,7 +74,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         return total;
     }
 
-    private long getRequestParametersLength() throws UnsupportedEncodingException {
+    private long getRequestParametersLength() {
         long parametersBytes = 0;
         HttpUploadTaskParameters params = getHttpParams();
 
@@ -90,13 +89,12 @@ public class MultipartUploadTask extends HttpUploadTask {
         return parametersBytes;
     }
 
-    private byte[] getMultipartBytes(NameValue parameter) throws UnsupportedEncodingException {
+    private byte[] getMultipartBytes(NameValue parameter) {
         return ("Content-Disposition: form-data; name=\"" + parameter.getName() + "\""
                 + NEW_LINE + NEW_LINE + parameter.getValue() + NEW_LINE).getBytes(charset);
     }
 
-    private byte[] getMultipartHeader(UploadFile file)
-            throws UnsupportedEncodingException {
+    private byte[] getMultipartHeader(UploadFile file) {
         String header = "Content-Disposition: form-data; name=\"" +
                 file.getProperties().get(PROPERTY_PARAM_NAME) + "\"; filename=\"" +
                 file.getProperties().get(PROPERTY_REMOTE_FILE_NAME) + "\"" + NEW_LINE +
@@ -106,8 +104,7 @@ public class MultipartUploadTask extends HttpUploadTask {
         return header.getBytes(charset);
     }
 
-    private long getTotalMultipartBytes(UploadFile file)
-            throws UnsupportedEncodingException {
+    private long getTotalMultipartBytes(UploadFile file) {
         return boundaryBytes.length + getMultipartHeader(file).length + file.getHandler().size(context)
                 + NEW_LINE.getBytes(charset).length;
     }

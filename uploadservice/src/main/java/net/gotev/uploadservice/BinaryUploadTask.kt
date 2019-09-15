@@ -1,9 +1,7 @@
 package net.gotev.uploadservice
 
 import net.gotev.uploadservice.network.BodyWriter
-
 import java.io.IOException
-import java.io.UnsupportedEncodingException
 
 /**
  * Implements a binary file upload task.
@@ -17,8 +15,8 @@ class BinaryUploadTask : HttpUploadTask() {
         params.files[0].handler
     }
 
-    @Throws(UnsupportedEncodingException::class)
-    override fun getBodyLength() = file.size(context)
+    override val bodyLength: Long
+        get() = file.size(context)
 
     @Throws(IOException::class)
     override fun onWriteRequestBody(bodyWriter: BodyWriter) {

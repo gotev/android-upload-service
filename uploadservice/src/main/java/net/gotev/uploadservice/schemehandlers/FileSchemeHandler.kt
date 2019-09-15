@@ -30,7 +30,7 @@ internal class FileSchemeHandler : SchemeHandler {
     override fun delete(context: Context) = try {
         file.delete()
     } catch (exc: Throwable) {
-        UploadServiceLogger.error(javaClass.simpleName, "File deletion error", exc)
+        UploadServiceLogger.error(javaClass.simpleName, exc) { "File deletion error" }
         false
     }
 }

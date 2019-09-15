@@ -55,15 +55,15 @@ public abstract class UploadRequest<B extends UploadRequest<B>> {
         this.context = context;
 
         if (uploadId == null || uploadId.isEmpty()) {
-            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "null or empty upload ID. Generating it");
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, () -> "null or empty upload ID. Generating it");
             this.uploadId = UUID.randomUUID().toString();
         } else {
-            UploadServiceLogger.INSTANCE.debug(LOG_TAG, "setting provided upload ID");
+            UploadServiceLogger.INSTANCE.debug(LOG_TAG, () -> "setting provided upload ID");
             this.uploadId = uploadId;
         }
 
         this.serverUrl = serverUrl;
-        UploadServiceLogger.INSTANCE.debug(LOG_TAG, "Created new upload request to "
+        UploadServiceLogger.INSTANCE.debug(LOG_TAG, () -> "Created new upload request to "
                      + serverUrl + " with ID: " + this.uploadId);
     }
 

@@ -9,8 +9,6 @@ import java.lang.ref.WeakReference
  * The default loggerDelegate implementation logs in Android's LogCat.
  * @author gotev (Aleksandar Gotev)
  */
-//TODO: pass lambda to logger which will be evalutaed only when the corresponding level is ON
-//This enhances performance
 object UploadServiceLogger {
     private var logLevel = LogLevel.OFF
     private val defaultLogger = DefaultLoggerDelegate()
@@ -48,15 +46,15 @@ object UploadServiceLogger {
             if (logLevel > minLevel || logLevel == LogLevel.OFF) null else loggerDelegate.get()
 
     @JvmOverloads
-    fun error(tag: String, message: String, exception: Throwable? = null) {
-        loggerWithLevel(LogLevel.ERROR)?.error(tag, message, exception)
+    fun error(tag: String, exception: Throwable? = null, message: () -> String) {
+        loggerWithLevel(LogLevel.ERROR)?.error(tag, message(), exception)
     }
 
-    fun info(tag: String, message: String) {
-        loggerWithLevel(LogLevel.INFO)?.info(tag, message)
+    fun info(tag: String, message: () -> String) {
+        loggerWithLevel(LogLevel.INFO)?.info(tag, message())
     }
 
-    fun debug(tag: String, message: String) {
-        loggerWithLevel(LogLevel.DEBUG)?.debug(tag, message)
+    fun debug(tag: String, message: () -> String) {
+        loggerWithLevel(LogLevel.DEBUG)?.debug(tag, message())
     }
 }
