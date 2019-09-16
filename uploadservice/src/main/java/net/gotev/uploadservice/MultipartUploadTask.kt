@@ -43,12 +43,6 @@ class MultipartUploadTask : HttpUploadTask() {
         NEW_LINE.toByteArray(charset)
     }
 
-    override val bodyLength: Long
-        get() = requestParametersLength + filesLength + trailerBytes.size
-
-    private val filesLength: Long
-        get() = params.files.map { it.getTotalMultipartBytes() }.sum()
-
     // the bytes needed for every parameter are the sum of the boundary bytes
     // and the bytes occupied by the parameter
     private val requestParametersLength: Long
@@ -64,6 +58,12 @@ class MultipartUploadTask : HttpUploadTask() {
 
             return parametersBytes
         }
+
+    private val filesLength: Long
+        get() = params.files.map { it.getTotalMultipartBytes() }.sum()
+
+    override val bodyLength: Long
+        get() = requestParametersLength + filesLength + trailerBytes.size
 
     private fun NameValue.getMultipartBytes(): ByteArray {
         return ("Content-Disposition: form-data; name=\"" + name + "\""
