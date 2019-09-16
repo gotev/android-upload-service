@@ -1,7 +1,6 @@
 package net.gotev.uploadservice
 
 import net.gotev.uploadservice.network.BodyWriter
-import java.io.IOException
 
 /**
  * Implements a binary file upload task.
@@ -18,7 +17,6 @@ class BinaryUploadTask : HttpUploadTask() {
     override val bodyLength: Long
         get() = file.size(context)
 
-    @Throws(IOException::class)
     override fun onWriteRequestBody(bodyWriter: BodyWriter) {
         bodyWriter.writeStream(file.stream(context), this)
     }
