@@ -15,8 +15,6 @@ import java.util.ArrayList;
  */
 public final class HttpUploadTaskParameters implements Parcelable {
 
-    protected static final String PARAM_HTTP_TASK_PARAMETERS = "httpTaskParameters";
-
     public String customUserAgent;
     public String method = "POST";
     public boolean usesFixedLengthStreamingMode = true;

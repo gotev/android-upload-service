@@ -2,6 +2,7 @@ package net.gotev.uploadservice.network.hurl
 
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.network.BodyWriter
 import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.ServerResponse
 import java.io.IOException
@@ -98,8 +99,8 @@ class HurlStackRequest(
     }
 
     @Throws(IOException::class)
-    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate) = use {
-        HurlBodyWriter(connection.outputStream).use {
+    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate, listener: BodyWriter.OnStreamWriteListener) = use {
+        HurlBodyWriter(connection.outputStream, listener).use {
             delegate.onWriteRequestBody(it)
         }
 

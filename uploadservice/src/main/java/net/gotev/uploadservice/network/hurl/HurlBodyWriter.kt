@@ -9,14 +9,14 @@ import java.io.OutputStream
  * @author Aleksandar Gotev
  */
 
-class HurlBodyWriter(private val stream: OutputStream) : BodyWriter() {
+class HurlBodyWriter(private val stream: OutputStream, listener: OnStreamWriteListener) : BodyWriter(listener) {
     @Throws(IOException::class)
-    override fun write(bytes: ByteArray) {
+    override fun internalWrite(bytes: ByteArray) {
         stream.write(bytes)
     }
 
     @Throws(IOException::class)
-    override fun write(bytes: ByteArray, lengthToWriteFromStart: Int) {
+    override fun internalWrite(bytes: ByteArray, lengthToWriteFromStart: Int) {
         stream.write(bytes, 0, lengthToWriteFromStart)
     }
 

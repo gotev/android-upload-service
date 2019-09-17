@@ -8,14 +8,14 @@ import java.io.IOException
  * @author Aleksandar Gotev
  */
 
-class OkHttpBodyWriter(private val sink: BufferedSink) : BodyWriter() {
+class OkHttpBodyWriter(private val sink: BufferedSink, listener: OnStreamWriteListener) : BodyWriter(listener) {
     @Throws(IOException::class)
-    override fun write(bytes: ByteArray) {
+    override fun internalWrite(bytes: ByteArray) {
         sink.write(bytes)
     }
 
     @Throws(IOException::class)
-    override fun write(bytes: ByteArray, lengthToWriteFromStart: Int) {
+    override fun internalWrite(bytes: ByteArray, lengthToWriteFromStart: Int) {
         sink.write(bytes, 0, lengthToWriteFromStart)
     }
 

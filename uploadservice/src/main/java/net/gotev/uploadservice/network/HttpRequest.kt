@@ -52,9 +52,11 @@ interface HttpRequest: Closeable {
      * Gets the server response.
      * @return object containing the server response status, headers and body.
      * @param delegate delegate which handles the writing of the request body
+     * @param listener listener which gets notified when bytes are written and which controls if
+     * the transfer should continue
      * @throws IOException if an error occurs while getting the server response
      * @return response from server
      */
     @Throws(IOException::class)
-    fun getResponse(delegate: RequestBodyDelegate): ServerResponse
+    fun getResponse(delegate: RequestBodyDelegate, listener: BodyWriter.OnStreamWriteListener): ServerResponse
 }

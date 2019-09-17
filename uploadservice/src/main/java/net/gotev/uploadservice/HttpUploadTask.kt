@@ -56,7 +56,7 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
         val response = httpStack.newRequest(httpParams.method, params.serverUrl)
                 .setHeaders(httpParams.requestHeaders)
                 .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode)
-                .getResponse(this)
+                .getResponse(this, this)
 
         UploadServiceLogger.debug(javaClass.simpleName) {
             "Server responded with code ${response.code} " +
@@ -76,8 +76,7 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
 
     override fun shouldContinueWriting() = shouldContinue
 
-    override fun onBytesWritten(bytesWritten: Int) {
+    final override fun onBytesWritten(bytesWritten: Int) {
         broadcastProgress(bytesWritten.toLong())
     }
-
 }

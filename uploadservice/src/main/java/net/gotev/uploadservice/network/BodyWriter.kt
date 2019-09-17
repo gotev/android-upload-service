@@ -11,10 +11,12 @@ import java.io.InputStream
  * Exposes the methods to be implemented to write the request body.
  * If you want to use an internal cache or buffer, remember to always get its size value from
  * [UploadService.BUFFER_SIZE] and to clear everything when not needed to prevent memory leaks
+ * @param listener listener which gets notified when bytes are written and which controls if
+ * the transfer should continue
  * @author Aleksandar Gotev
  */
 
-abstract class BodyWriter : Closeable {
+abstract class BodyWriter(private val listener: OnStreamWriteListener) : Closeable {
 
     /**
      * Receives the stream write progress and has the ability to cancel it.
@@ -37,23 +39,18 @@ abstract class BodyWriter : Closeable {
      * Writes an input stream to the request body.
      * The stream will be automatically closed after successful write or if an exception is thrown.
      * @param stream input stream from which to read
-     * @param listener listener which gets notified when bytes are written and which controls if
-     * the transfer should continue
      * @throws IOException if an I/O error occurs
      */
     @Throws(IOException::class)
-    fun writeStream(stream: InputStream, listener: OnStreamWriteListener) {
+    fun writeStream(stream: InputStream) {
         val buffer = ByteArray(UploadServiceConfig.bufferSizeBytes)
-        var bytesRead: Int
 
         stream.use {
             while (listener.shouldContinueWriting()) {
-                bytesRead = it.read(buffer, 0, buffer.size)
+                val bytesRead = it.read(buffer, 0, buffer.size)
                 if (bytesRead <= 0) break
 
                 write(buffer, bytesRead)
-                flush()
-                listener.onBytesWritten(bytesRead)
             }
         }
     }
@@ -63,8 +60,11 @@ abstract class BodyWriter : Closeable {
      * @param bytes array with the bytes to write
      * @throws IOException if an error occurs while writing
      */
-    @Throws(IOException::class)
-    abstract fun write(bytes: ByteArray)
+    fun write(bytes: ByteArray) {
+        internalWrite(bytes)
+        flush()
+        listener.onBytesWritten(bytes.size)
+    }
 
     /**
      * Write a portion of a byte array into the request body.
@@ -73,8 +73,17 @@ abstract class BodyWriter : Closeable {
      * the array
      * @throws IOException if an error occurs while writing
      */
+    fun write(bytes: ByteArray, lengthToWriteFromStart: Int) {
+        internalWrite(bytes, lengthToWriteFromStart)
+        flush()
+        listener.onBytesWritten(lengthToWriteFromStart)
+    }
+
     @Throws(IOException::class)
-    abstract fun write(bytes: ByteArray, lengthToWriteFromStart: Int)
+    abstract fun internalWrite(bytes: ByteArray)
+
+    @Throws(IOException::class)
+    abstract fun internalWrite(bytes: ByteArray, lengthToWriteFromStart: Int)
 
     /**
      * Ensures the bytes written to the body are all transmitted to the server and clears

@@ -54,3 +54,12 @@ fun String.isValidHttpUrl(): Boolean {
         false
     }
 }
+
+private val usAscii by lazy { Charsets.US_ASCII }
+private val utf8 by lazy { Charsets.UTF_8 }
+
+val String.asciiByes: ByteArray
+    get() = toByteArray(usAscii)
+
+val String.utf8Bytes: ByteArray
+    get() = toByteArray(utf8)

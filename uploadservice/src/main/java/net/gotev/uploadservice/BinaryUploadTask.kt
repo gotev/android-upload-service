@@ -18,7 +18,7 @@ class BinaryUploadTask : HttpUploadTask() {
         get() = file.size(context)
 
     override fun onWriteRequestBody(bodyWriter: BodyWriter) {
-        bodyWriter.writeStream(file.stream(context), this)
+        bodyWriter.writeStream(file.stream(context))
     }
 
     override fun onSuccessfulUpload() {

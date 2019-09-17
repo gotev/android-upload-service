@@ -2,6 +2,7 @@ package net.gotev.uploadservice.okhttp
 
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.network.BodyWriter
 import net.gotev.uploadservice.network.HttpRequest
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -48,7 +49,7 @@ class OkHttpStackRequest(private val httpClient: OkHttpClient, private val httpM
         return this
     }
 
-    private fun createBody(delegate: HttpRequest.RequestBodyDelegate): RequestBody? {
+    private fun createBody(delegate: HttpRequest.RequestBodyDelegate, listener: BodyWriter.OnStreamWriteListener): RequestBody? {
         if (!httpMethod.hasBody()) return null
 
         return object : RequestBody() {
@@ -57,20 +58,20 @@ class OkHttpStackRequest(private val httpClient: OkHttpClient, private val httpM
             override fun contentType() = contentType
 
             override fun writeTo(sink: BufferedSink) {
-                OkHttpBodyWriter(sink).use {
+                OkHttpBodyWriter(sink, listener).use {
                     delegate.onWriteRequestBody(it)
                 }
             }
         }
     }
 
-    private fun request(delegate: HttpRequest.RequestBodyDelegate) = requestBuilder
-            .method(httpMethod, createBody(delegate))
+    private fun request(delegate: HttpRequest.RequestBodyDelegate, listener: BodyWriter.OnStreamWriteListener) = requestBuilder
+            .method(httpMethod, createBody(delegate, listener))
             .build()
 
     @Throws(IOException::class)
-    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate) = use {
-        httpClient.newCall(request(delegate))
+    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate, listener: BodyWriter.OnStreamWriteListener) = use {
+        httpClient.newCall(request(delegate, listener))
                 .execute()
                 .use { it.asServerResponse() }
     }

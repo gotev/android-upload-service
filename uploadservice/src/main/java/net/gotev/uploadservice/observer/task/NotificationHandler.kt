@@ -21,14 +21,70 @@ class NotificationHandler(private val service: UploadService,
                           private val uploadId: String,
                           private val config: UploadNotificationConfig) : UploadTaskObserver {
 
-    private val notificationCreationTimeMillis by lazy {
-        System.currentTimeMillis()
-    }
-
+    private val notificationCreationTimeMillis by lazy { System.currentTimeMillis() }
     private val notificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    override fun initialize(info: UploadInfo) {
+    private fun NotificationCompat.Builder.setRingtoneCompat(): NotificationCompat.Builder {
+        if (config.isRingToneEnabled && Build.VERSION.SDK_INT < 26) {
+            val sound = RingtoneManager.getActualDefaultRingtoneUri(service, RingtoneManager.TYPE_NOTIFICATION)
+            setSound(sound)
+        }
 
+        return this
+    }
+
+    private fun NotificationCompat.Builder.notify() {
+        build().apply {
+            if (service.holdForegroundNotification(uploadId, this)) {
+                notificationManager.cancel(notificationId)
+            } else {
+                notificationManager.notify(notificationId, this)
+            }
+        }
+    }
+
+    private fun NotificationCompat.Builder.setCommonParameters(statusConfig: UploadNotificationStatusConfig, info: UploadInfo): NotificationCompat.Builder {
+        return setGroup(UploadServiceConfig.namespace)
+                .setContentTitle(Placeholders.replace(statusConfig.title, info))
+                .setContentText(Placeholders.replace(statusConfig.message, info))
+                .setContentIntent(statusConfig.getClickIntent(service))
+                .setSmallIcon(statusConfig.iconResourceID)
+                .setLargeIcon(statusConfig.largeIcon)
+                .setColor(statusConfig.iconColorResourceID)
+                .apply {
+                    statusConfig.addActionsToNotificationBuilder(this)
+                }
+    }
+
+    private fun ongoingNotification(info: UploadInfo, statusConfig: UploadNotificationStatusConfig): NotificationCompat.Builder {
+        return NotificationCompat.Builder(service, config.notificationChannelId)
+                .setWhen(notificationCreationTimeMillis)
+                .setCommonParameters(statusConfig, info)
+                .setOngoing(true)
+    }
+
+    private fun updateNotification(info: UploadInfo, statusConfig: UploadNotificationStatusConfig) {
+        notificationManager.cancel(notificationId)
+
+        if (statusConfig.message == null) return
+
+        if (!statusConfig.autoClear) {
+            val notification = NotificationCompat.Builder(service, config.notificationChannelId)
+                    .setCommonParameters(statusConfig, info)
+                    .setProgress(0, 0, false)
+                    .setOngoing(false)
+                    .setAutoCancel(statusConfig.clearOnAction)
+                    .setRingtoneCompat()
+                    .build()
+
+            // this is needed because the main notification used to show progress is ongoing
+            // and a new one has to be created to allow the user to dismiss it
+            info.notificationID = notificationId + 1
+            notificationManager.notify(notificationId + 1, notification)
+        }
+    }
+
+    override fun initialize(info: UploadInfo) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannelId = config.notificationChannelId
                     ?: throw IllegalArgumentException("Notification Channel ID is required to be set on Android 8+.")
@@ -37,67 +93,24 @@ class NotificationHandler(private val service: UploadService,
                     ?: throw IllegalArgumentException("The provided notification channel ID $notificationChannelId does not exist! You must create it at app startup and before Upload Service!")
         }
 
-        if (config.progress.message == null)
-            return
+        if (config.progress.message == null) return
 
-        val statusConfig = config.progress
-
-        val notification = NotificationCompat.Builder(service, config.notificationChannelId)
-                .setWhen(notificationCreationTimeMillis)
-                .setContentTitle(Placeholders.replace(statusConfig.title, info))
-                .setContentText(Placeholders.replace(statusConfig.message, info))
-                .setContentIntent(statusConfig.getClickIntent(service))
-                .setSmallIcon(statusConfig.iconResourceID)
-                .setLargeIcon(statusConfig.largeIcon)
-                .setColor(statusConfig.iconColorResourceID)
-                .setGroup(UploadServiceConfig.namespace)
+        ongoingNotification(info, config.progress)
                 .setProgress(100, 0, true)
-                .setOngoing(true)
-
-        statusConfig.addActionsToNotificationBuilder(notification)
-
-        val builtNotification = notification.build()
-
-        if (service.holdForegroundNotification(uploadId, builtNotification)) {
-            notificationManager.cancel(notificationId)
-        } else {
-            notificationManager.notify(notificationId, builtNotification)
-        }
+                .notify()
     }
 
     override fun onProgress(info: UploadInfo) {
-        if (config.progress.message == null)
-            return
+        if (config.progress.message == null) return
 
-        val statusConfig = config.progress
-
-        val notification = NotificationCompat.Builder(service, config.notificationChannelId)
-                .setWhen(notificationCreationTimeMillis)
-                .setContentTitle(Placeholders.replace(statusConfig.title, info))
-                .setContentText(Placeholders.replace(statusConfig.message, info))
-                .setContentIntent(statusConfig.getClickIntent(service))
-                .setSmallIcon(statusConfig.iconResourceID)
-                .setLargeIcon(statusConfig.largeIcon)
-                .setColor(statusConfig.iconColorResourceID)
-                .setGroup(UploadServiceConfig.namespace)
-                .setProgress(info.totalBytes.toInt(), info.uploadedBytes.toInt(), false)
-                .setOngoing(true)
-
-        statusConfig.addActionsToNotificationBuilder(notification)
-
-        val builtNotification = notification.build()
-
-        if (service.holdForegroundNotification(uploadId, builtNotification)) {
-            notificationManager.cancel(notificationId)
-        } else {
-            notificationManager.notify(notificationId, builtNotification)
-        }
+        ongoingNotification(info, config.progress)
+                .setProgress(100, info.progressPercent, false)
+                .notify()
     }
 
     override fun onCompleted(info: UploadInfo, response: ServerResponse) {
         if (response.isSuccessful && config.completed.message != null) {
             updateNotification(info, config.completed)
-
         } else if (config.error.message != null) {
             updateNotification(info, config.error)
         }
@@ -113,42 +126,5 @@ class NotificationHandler(private val service: UploadService,
         if (config.error.message != null) {
             updateNotification(info, config.error)
         }
-    }
-
-    private fun updateNotification(uploadInfo: UploadInfo, statusConfig: UploadNotificationStatusConfig) {
-        notificationManager.cancel(notificationId)
-
-        if (statusConfig.message == null) return
-
-        if (!statusConfig.autoClear) {
-            val notification = NotificationCompat.Builder(service, config.notificationChannelId)
-                    .setContentTitle(Placeholders.replace(statusConfig.title, uploadInfo))
-                    .setContentText(Placeholders.replace(statusConfig.message, uploadInfo))
-                    .setContentIntent(statusConfig.getClickIntent(service))
-                    .setAutoCancel(statusConfig.clearOnAction)
-                    .setSmallIcon(statusConfig.iconResourceID)
-                    .setLargeIcon(statusConfig.largeIcon)
-                    .setColor(statusConfig.iconColorResourceID)
-                    .setGroup(UploadServiceConfig.namespace)
-                    .setProgress(0, 0, false)
-                    .setOngoing(false)
-                    .setRingtone()
-
-            statusConfig.addActionsToNotificationBuilder(notification)
-
-            // this is needed because the main notification used to show progress is ongoing
-            // and a new one has to be created to allow the user to dismiss it
-            uploadInfo.notificationID = notificationId + 1
-            notificationManager.notify(notificationId + 1, notification.build())
-        }
-    }
-
-    private fun NotificationCompat.Builder.setRingtone(): NotificationCompat.Builder {
-        if (config.isRingToneEnabled && Build.VERSION.SDK_INT < 26) {
-            val sound = RingtoneManager.getActualDefaultRingtoneUri(service, RingtoneManager.TYPE_NOTIFICATION)
-            setSound(sound)
-        }
-
-        return this
     }
 }
