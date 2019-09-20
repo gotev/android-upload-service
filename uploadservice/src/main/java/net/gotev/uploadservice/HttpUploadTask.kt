@@ -70,7 +70,7 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
         // broadcasted and then the cancellation. That behaviour was not desirable as the
         // library user couldn't execute code on user cancellation.
         if (shouldContinue) {
-            broadcastCompleted(response)
+            onResponseReceived(response)
         }
     }
 

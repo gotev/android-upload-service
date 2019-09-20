@@ -3,6 +3,7 @@ package net.gotev.uploadservice.network
 import android.os.Parcelable
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
 /**
  * Contains the server response.
@@ -32,7 +33,7 @@ data class ServerResponse(
          * server response headers
          */
         val headers: LinkedHashMap<String, String>
-) : Parcelable {
+) : Parcelable, Serializable {
 
     /**
      * Gets server response body as string.

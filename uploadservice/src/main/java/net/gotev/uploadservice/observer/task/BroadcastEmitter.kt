@@ -11,23 +11,18 @@ import net.gotev.uploadservice.network.ServerResponse
  */
 class BroadcastEmitter(private val context: Context) : UploadTaskObserver {
 
-    private fun ServerResponse.status() = if (isSuccessful)
-        UploadStatus.COMPLETED
-    else
-        UploadStatus.ERROR
-
     override fun initialize(info: UploadInfo) {}
 
     override fun onProgress(info: UploadInfo) {
         BroadcastData(UploadStatus.IN_PROGRESS, info).send(context)
     }
 
-    override fun onCompleted(info: UploadInfo, response: ServerResponse) {
-        BroadcastData(response.status(), info, response).send(context)
+    override fun onSuccess(info: UploadInfo, response: ServerResponse) {
+        BroadcastData(UploadStatus.SUCCESS, info, response).send(context)
     }
 
-    override fun onCancelled(info: UploadInfo) {
-        BroadcastData(UploadStatus.CANCELLED, info).send(context)
+    override fun onCompleted(info: UploadInfo) {
+        BroadcastData(UploadStatus.COMPLETED, info).send(context)
     }
 
     override fun onError(info: UploadInfo, exception: Throwable) {

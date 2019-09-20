@@ -9,7 +9,7 @@ import net.gotev.uploadservice.network.ServerResponse
 interface UploadTaskObserver {
     fun initialize(info: UploadInfo)
     fun onProgress(info: UploadInfo)
-    fun onCompleted(info: UploadInfo, response: ServerResponse)
-    fun onCancelled(info: UploadInfo)
+    fun onSuccess(info: UploadInfo, response: ServerResponse)
     fun onError(info: UploadInfo, exception: Throwable)
+    fun onCompleted(info: UploadInfo)
 }

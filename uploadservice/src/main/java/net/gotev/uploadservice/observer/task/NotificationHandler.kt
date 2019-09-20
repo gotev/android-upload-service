@@ -10,6 +10,7 @@ import net.gotev.uploadservice.UploadNotificationStatusConfig
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.UploadInfo
+import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.notifications.Placeholders
 
@@ -56,7 +57,9 @@ class NotificationHandler(private val service: UploadService,
                 }
     }
 
-    private fun ongoingNotification(info: UploadInfo, statusConfig: UploadNotificationStatusConfig): NotificationCompat.Builder {
+    private fun ongoingNotification(info: UploadInfo, statusConfig: UploadNotificationStatusConfig): NotificationCompat.Builder? {
+        if (statusConfig.message == null) return null
+
         return NotificationCompat.Builder(service, config.notificationChannelId)
                 .setWhen(notificationCreationTimeMillis)
                 .setCommonParameters(statusConfig, info)
@@ -66,22 +69,19 @@ class NotificationHandler(private val service: UploadService,
     private fun updateNotification(info: UploadInfo, statusConfig: UploadNotificationStatusConfig) {
         notificationManager.cancel(notificationId)
 
-        if (statusConfig.message == null) return
+        if (statusConfig.message == null || statusConfig.autoClear) return
 
-        if (!statusConfig.autoClear) {
-            val notification = NotificationCompat.Builder(service, config.notificationChannelId)
-                    .setCommonParameters(statusConfig, info)
-                    .setProgress(0, 0, false)
-                    .setOngoing(false)
-                    .setAutoCancel(statusConfig.clearOnAction)
-                    .setRingtoneCompat()
-                    .build()
+        val notification = NotificationCompat.Builder(service, config.notificationChannelId)
+                .setCommonParameters(statusConfig, info)
+                .setProgress(0, 0, false)
+                .setOngoing(false)
+                .setAutoCancel(statusConfig.clearOnAction)
+                .setRingtoneCompat()
+                .build()
 
-            // this is needed because the main notification used to show progress is ongoing
-            // and a new one has to be created to allow the user to dismiss it
-            info.notificationID = notificationId + 1
-            notificationManager.notify(notificationId + 1, notification)
-        }
+        // this is needed because the main notification used to show progress is ongoing
+        // and a new one has to be created to allow the user to dismiss it
+        notificationManager.notify(notificationId + 1, notification)
     }
 
     override fun initialize(info: UploadInfo) {
@@ -93,38 +93,30 @@ class NotificationHandler(private val service: UploadService,
                     ?: throw IllegalArgumentException("The provided notification channel ID $notificationChannelId does not exist! You must create it at app startup and before Upload Service!")
         }
 
-        if (config.progress.message == null) return
-
         ongoingNotification(info, config.progress)
-                .setProgress(100, 0, true)
-                .notify()
+                ?.setProgress(100, 0, true)
+                ?.notify()
     }
 
     override fun onProgress(info: UploadInfo) {
-        if (config.progress.message == null) return
-
         ongoingNotification(info, config.progress)
-                .setProgress(100, info.progressPercent, false)
-                .notify()
+                ?.setProgress(100, info.progressPercent, false)
+                ?.notify()
     }
 
-    override fun onCompleted(info: UploadInfo, response: ServerResponse) {
-        if (response.isSuccessful && config.completed.message != null) {
-            updateNotification(info, config.completed)
-        } else if (config.error.message != null) {
-            updateNotification(info, config.error)
-        }
-    }
-
-    override fun onCancelled(info: UploadInfo) {
-        if (config.cancelled.message != null) {
-            updateNotification(info, config.cancelled)
-        }
+    override fun onSuccess(info: UploadInfo, response: ServerResponse) {
+        updateNotification(info, config.completed)
     }
 
     override fun onError(info: UploadInfo, exception: Throwable) {
-        if (config.error.message != null) {
-            updateNotification(info, config.error)
+        val statusConfig = if (exception is UserCancelledUploadException) {
+            config.cancelled
+        } else {
+            config.error
         }
+
+        updateNotification(info, statusConfig)
     }
+
+    override fun onCompleted(info: UploadInfo) {}
 }

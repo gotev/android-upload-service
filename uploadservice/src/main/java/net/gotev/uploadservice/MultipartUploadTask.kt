@@ -96,9 +96,4 @@ class MultipartUploadTask : HttpUploadTask() {
             write(trailerBytes)
         }
     }
-
-    override fun onSuccessfulUpload() {
-        addAllFilesToSuccessfullyUploadedFiles()
-    }
-
 }

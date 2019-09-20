@@ -4,6 +4,8 @@ import android.content.Context
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadTaskParameters
+import net.gotev.uploadservice.exceptions.UploadError
+import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.ServerResponse
@@ -78,7 +80,6 @@ abstract class UploadTask : Runnable {
                 uploadedBytes = uploadedBytes,
                 totalBytes = totalBytes,
                 numberOfRetries = attempts - 1,
-                notificationID = null,
                 successfullyUploadedFiles = successfullyUploadedFiles,
                 remainingFiles = params.files
         )
@@ -90,11 +91,6 @@ abstract class UploadTask : Runnable {
      */
     @Throws(Exception::class)
     protected abstract fun upload(httpStack: HttpStack)
-
-    /**
-     * Implement in subclasses to be able to do something when the upload is successful.
-     */
-    protected open fun onSuccessfulUpload() {}
 
     private inline fun doForEachObserver(action: UploadTaskObserver.() -> Unit) {
         observers.forEach {
@@ -143,7 +139,7 @@ abstract class UploadTask : Runnable {
                 if (!shouldContinue) {
                     break
                 } else if (attempts >= params.maxRetries) {
-                    broadcastError(exc)
+                    onError(exc)
                 } else {
                     UploadServiceLogger.error(TAG) { "(uploadID: ${params.id}) error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. " }
 
@@ -163,7 +159,7 @@ abstract class UploadTask : Runnable {
         }
 
         if (!shouldContinue) {
-            broadcastCancelled()
+            onUserCancelledUpload()
         }
     }
 
@@ -183,8 +179,6 @@ abstract class UploadTask : Runnable {
      */
     protected fun broadcastProgress(bytesSent: Long) {
         uploadedBytes += bytesSent
-        // reset retry attempts on progress. This way only a single while cycle is needed
-        resetAttempts()
         if (shouldThrottle(uploadedBytes, totalBytes)) return
         UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes" }
         doForEachObserver { onProgress(uploadInfo) }
@@ -202,11 +196,13 @@ abstract class UploadTask : Runnable {
      *
      * @param response response got from the server
      */
-    protected fun broadcastCompleted(response: ServerResponse) {
+    protected fun onResponseReceived(response: ServerResponse) {
         UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) upload ${if (response.isSuccessful) "completed" else "error"}" }
 
+        val info = uploadInfo
+
         if (response.isSuccessful) {
-            onSuccessfulUpload()
+            addAllFilesToSuccessfullyUploadedFiles()
 
             if (params.autoDeleteSuccessfullyUploadedFiles && successfullyUploadedFiles.isNotEmpty()) {
                 for (file in successfullyUploadedFiles) {
@@ -217,9 +213,13 @@ abstract class UploadTask : Runnable {
                     }
                 }
             }
+
+            doForEachObserver { onSuccess(info, response) }
+        } else {
+            doForEachObserver { onError(info, UploadError(response)) }
         }
 
-        doForEachObserver { onCompleted(uploadInfo, response) }
+        doForEachObserver { onCompleted(info) }
     }
 
     /**
@@ -229,9 +229,9 @@ abstract class UploadTask : Runnable {
      * returns or throws an exception. You should never call this method explicitly in your
      * implementation.
      */
-    private fun broadcastCancelled() {
+    private fun onUserCancelledUpload() {
         UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) upload cancelled" }
-        doForEachObserver { onCancelled(uploadInfo) }
+        onError(UserCancelledUploadException())
     }
 
     /**
@@ -243,9 +243,12 @@ abstract class UploadTask : Runnable {
      * @param exception exception to broadcast. It's the one thrown by the specific implementation
      * of [UploadTask.upload]
      */
-    private fun broadcastError(exception: Throwable) {
+    private fun onError(exception: Throwable) {
         UploadServiceLogger.error(TAG, exception) { "(uploadID: ${params.id}) error" }
-        doForEachObserver { onError(uploadInfo, exception) }
+        uploadInfo.let {
+            doForEachObserver { onError(it, exception) }
+            doForEachObserver { onCompleted(it) }
+        }
     }
 
     /**

@@ -38,11 +38,6 @@ data class UploadInfo @JvmOverloads constructor(
         val numberOfRetries: Int = 0,
 
         /**
-         * ID of the notification associated to this task.
-         */
-        var notificationID: Int? = null, //TODO: setting null here is not good
-
-        /**
          * List of all the files left to be uploaded.
          */
         val remainingFiles: ArrayList<UploadFile> = ArrayList(),

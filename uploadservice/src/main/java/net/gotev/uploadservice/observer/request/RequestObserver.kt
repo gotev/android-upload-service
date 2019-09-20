@@ -34,10 +34,10 @@ abstract class RequestObserver : BroadcastReceiver() {
         }
 
         when (data.status) {
-            UploadStatus.ERROR -> onError(context, uploadInfo, data.serverResponse, data.exception)
-            UploadStatus.COMPLETED -> data.serverResponse?.let { onCompleted(context, uploadInfo, it) }
             UploadStatus.IN_PROGRESS -> onProgress(context, uploadInfo)
-            UploadStatus.CANCELLED -> onCancelled(context, uploadInfo)
+            UploadStatus.ERROR -> onError(context, uploadInfo, data.exception!!)
+            UploadStatus.SUCCESS -> onSuccess(context, uploadInfo, data.serverResponse!!)
+            UploadStatus.COMPLETED -> onCompleted(context, uploadInfo)
         }
     }
 
@@ -87,33 +87,28 @@ abstract class RequestObserver : BroadcastReceiver() {
     abstract fun onProgress(context: Context, uploadInfo: UploadInfo)
 
     /**
-     * Called when an error happens during the upload.
-     *
-     * @param context        context
-     * @param uploadInfo     upload status information
-     * @param serverResponse response got from the server. It can be null if the server has not
-     * responded or if the request has not reached the server due to a
-     * networking problem.
-     * @param exception      exception that caused the error. It can be null if the request successfully
-     * reached the server, but it responded with a 4xx or 5xx status code.
-     */
-    abstract fun onError(context: Context, uploadInfo: UploadInfo,
-                         serverResponse: ServerResponse?, exception: Throwable?)
-
-    /**
      * Called when the upload is completed successfully.
      *
      * @param context        context
      * @param uploadInfo     upload status information
      * @param serverResponse response got from the server
      */
-    abstract fun onCompleted(context: Context, uploadInfo: UploadInfo, serverResponse: ServerResponse)
+    abstract fun onSuccess(context: Context, uploadInfo: UploadInfo, serverResponse: ServerResponse)
 
     /**
-     * Called when the upload is cancelled.
+     * Called when an error happens during the upload.
      *
-     * @param context    context
+     * @param context context
+     * @param uploadInfo upload status information
+     * @param exception exception that caused the error
+     */
+    abstract fun onError(context: Context, uploadInfo: UploadInfo, exception: Throwable)
+
+    /**
+     * Called when the upload is completed wither with success or error.
+     *
+     * @param context context
      * @param uploadInfo upload status information
      */
-    abstract fun onCancelled(context: Context, uploadInfo: UploadInfo)
+    abstract fun onCompleted(context: Context, uploadInfo: UploadInfo)
 }

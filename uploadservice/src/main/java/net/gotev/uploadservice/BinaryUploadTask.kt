@@ -9,7 +9,6 @@ import net.gotev.uploadservice.network.BodyWriter
  * @author gotev (Aleksandar Gotev)
  */
 class BinaryUploadTask : HttpUploadTask() {
-
     private val file by lazy {
         params.files.first().handler
     }
@@ -19,9 +18,5 @@ class BinaryUploadTask : HttpUploadTask() {
 
     override fun onWriteRequestBody(bodyWriter: BodyWriter) {
         bodyWriter.writeStream(file.stream(context))
-    }
-
-    override fun onSuccessfulUpload() {
-        addSuccessfullyUploadedFile(params.files.first())
     }
 }

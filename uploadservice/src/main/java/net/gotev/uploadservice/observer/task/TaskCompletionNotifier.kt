@@ -14,15 +14,13 @@ class TaskCompletionNotifier(private val service: UploadService): UploadTaskObse
     override fun onProgress(info: UploadInfo) {
     }
 
-    override fun onCompleted(info: UploadInfo, response: ServerResponse) {
-        service.taskCompleted(info.uploadId)
-    }
-
-    override fun onCancelled(info: UploadInfo) {
-        service.taskCompleted(info.uploadId)
+    override fun onSuccess(info: UploadInfo, response: ServerResponse) {
     }
 
     override fun onError(info: UploadInfo, exception: Throwable) {
+    }
+
+    override fun onCompleted(info: UploadInfo) {
         service.taskCompleted(info.uploadId)
     }
 }
