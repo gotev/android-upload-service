@@ -171,7 +171,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
         }
 
         setTotalBytes(totalBytes);
-        broadcastProgress(totalUploaded);
+        onProgress(totalUploaded);
     }
 
     private void uploadFile(String baseWorkingDir, UploadFile file) throws IOException {
@@ -232,7 +232,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
 
     @Override
     public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-        broadcastProgress(bytesTransferred);
+        onProgress(bytesTransferred);
 
         if (!getShouldContinue()) {
             try {

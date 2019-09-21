@@ -11,7 +11,7 @@ import java.io.IOException
  */
 class OkHttpStack(private val client: OkHttpClient = OkHttpClient()) : HttpStack {
     @Throws(IOException::class)
-    override fun newRequest(method: String, url: String): HttpRequest {
-        return OkHttpStackRequest(client, method, url)
+    override fun newRequest(uploadId: String, method: String, url: String): HttpRequest {
+        return OkHttpStackRequest(uploadId, client, method, url)
     }
 }

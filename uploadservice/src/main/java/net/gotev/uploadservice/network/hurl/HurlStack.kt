@@ -15,8 +15,8 @@ class HurlStack(private val followRedirects: Boolean = true,
                 private val readTimeout: Int = 30000) : HttpStack {
 
     @Throws(IOException::class)
-    override fun newRequest(method: String, url: String): HttpRequest {
-        return HurlStackRequest(method, url, followRedirects, useCaches,
+    override fun newRequest(uploadId: String, method: String, url: String): HttpRequest {
+        return HurlStackRequest(uploadId, method, url, followRedirects, useCaches,
                 connectTimeout, readTimeout)
     }
 

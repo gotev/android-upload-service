@@ -17,6 +17,7 @@ import kotlin.collections.LinkedHashMap
  * @author gotev (Aleksandar Gotev)
  */
 class HurlStackRequest(
+        private val uploadId: String,
         method: String,
         url: String,
         followRedirects: Boolean,
@@ -38,7 +39,9 @@ class HurlStackRequest(
     }
 
     init {
-        UploadServiceLogger.debug(javaClass.simpleName) { "creating new HttpURLConnection (uuid: $uuid)" }
+        UploadServiceLogger.debug(javaClass.simpleName) {
+            "(uploadID: $uploadId) creating new HttpURLConnection"
+        }
 
         connection = url.createConnection().apply {
             doInput = true
@@ -108,7 +111,9 @@ class HurlStackRequest(
     }
 
     override fun close() {
-        UploadServiceLogger.debug(javaClass.simpleName) { "closing HttpURLConnection (uuid: $uuid)" }
+        UploadServiceLogger.debug(javaClass.simpleName) {
+            "(uploadID: $uploadId) closing HttpURLConnection (uuid: $uuid)"
+        }
 
         try {
             connection.inputStream.close()

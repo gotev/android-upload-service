@@ -57,7 +57,7 @@ abstract class UploadTask : Runnable {
 
     /**
      * Total transferred bytes. You should update this value in your subclasses when you upload
-     * some data, and before calling [UploadTask.broadcastProgress]
+     * some data, and before calling [UploadTask.onProgress]
      */
     private var uploadedBytes: Long = 0
 
@@ -171,21 +171,21 @@ abstract class UploadTask : Runnable {
         }
     }
 
+    protected fun resetUploadedBytes() {
+        uploadedBytes = 0
+    }
+
     /**
      * Broadcasts a progress update.
      *
      * @param uploadedBytes number of bytes which has been uploaded to the server
      * @param totalBytes    total bytes of the request
      */
-    protected fun broadcastProgress(bytesSent: Long) {
+    protected fun onProgress(bytesSent: Long) {
         uploadedBytes += bytesSent
         if (shouldThrottle(uploadedBytes, totalBytes)) return
         UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes" }
         doForEachObserver { onProgress(uploadInfo) }
-    }
-
-    protected fun resetUploadedBytes() {
-        uploadedBytes = 0
     }
 
     /**
@@ -198,8 +198,6 @@ abstract class UploadTask : Runnable {
      */
     protected fun onResponseReceived(response: ServerResponse) {
         UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) upload ${if (response.isSuccessful) "completed" else "error"}" }
-
-        val info = uploadInfo
 
         if (response.isSuccessful) {
             addAllFilesToSuccessfullyUploadedFiles()
@@ -214,12 +212,12 @@ abstract class UploadTask : Runnable {
                 }
             }
 
-            doForEachObserver { onSuccess(info, response) }
+            doForEachObserver { onSuccess(uploadInfo, response) }
         } else {
-            doForEachObserver { onError(info, UploadError(response)) }
+            doForEachObserver { onError(uploadInfo, UploadError(response)) }
         }
 
-        doForEachObserver { onCompleted(info) }
+        doForEachObserver { onCompleted(uploadInfo) }
     }
 
     /**

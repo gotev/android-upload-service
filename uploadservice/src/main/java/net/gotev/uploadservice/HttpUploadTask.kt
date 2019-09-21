@@ -53,7 +53,7 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
         //TODO: clear successfully uploaded files
         totalBytes = bodyLength
 
-        val response = httpStack.newRequest(httpParams.method, params.serverUrl)
+        val response = httpStack.newRequest(params.id, httpParams.method, params.serverUrl)
                 .setHeaders(httpParams.requestHeaders)
                 .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode)
                 .getResponse(this, this)
@@ -77,6 +77,6 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
     override fun shouldContinueWriting() = shouldContinue
 
     final override fun onBytesWritten(bytesWritten: Int) {
-        broadcastProgress(bytesWritten.toLong())
+        onProgress(bytesWritten.toLong())
     }
 }

@@ -19,7 +19,11 @@ import java.util.*
  *
  * @author Aleksandar Gotev
  */
-class OkHttpStackRequest(private val httpClient: OkHttpClient, private val httpMethod: String, url: String) : HttpRequest {
+class OkHttpStackRequest(
+        private val uploadId: String,
+        private val httpClient: OkHttpClient,
+        private val httpMethod: String, url: String
+) : HttpRequest {
 
     private val requestBuilder = Request.Builder().url(URL(url))
     private var bodyLength = 0L
@@ -27,7 +31,9 @@ class OkHttpStackRequest(private val httpClient: OkHttpClient, private val httpM
     private val uuid = UUID.randomUUID().toString()
 
     init {
-        UploadServiceLogger.debug(javaClass.simpleName) { "creating new OkHttp connection (uuid: $uuid)" }
+        UploadServiceLogger.debug(javaClass.simpleName) {
+            "(uploadID: $uploadId) creating new OkHttp connection (uuid: $uuid)"
+        }
     }
 
     @Throws(IOException::class)
@@ -78,6 +84,8 @@ class OkHttpStackRequest(private val httpClient: OkHttpClient, private val httpM
 
     override fun close() {
         // Resources are automatically freed after usage. Log only.
-        UploadServiceLogger.debug(javaClass.simpleName) { "closing OkHttp connection (uuid: $uuid)" }
+        UploadServiceLogger.debug(javaClass.simpleName) {
+            "(uploadID: $uploadId) closing OkHttp connection (uuid: $uuid)"
+        }
     }
 }
