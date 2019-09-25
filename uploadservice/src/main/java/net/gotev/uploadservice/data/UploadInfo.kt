@@ -38,15 +38,9 @@ data class UploadInfo @JvmOverloads constructor(
         val numberOfRetries: Int = 0,
 
         /**
-         * List of all the files left to be uploaded.
+         * List of all the files present in this upload.
          */
-        val remainingFiles: ArrayList<UploadFile> = ArrayList(),
-
-        /**
-         * List of the successfully uploaded files.
-         */
-        val successfullyUploadedFiles: ArrayList<UploadFile> = ArrayList()
-
+        val files: ArrayList<UploadFile> = ArrayList()
 ) : Parcelable {
 
     @IgnoredOnParcel
@@ -123,11 +117,7 @@ data class UploadInfo @JvmOverloads constructor(
     val progressPercent: Int
         get() = if (totalBytes == 0L) 0 else (uploadedBytes * 100 / totalBytes).toInt()
 
-    /**
-     * Gets the total number of files added to the upload request.
-     * @return total number of files to upload
-     */
     @IgnoredOnParcel
-    val totalFiles: Int
-        get() = successfullyUploadedFiles.size + remainingFiles.size
+    val successfullyUploadedFiles: Int
+        get() = files.count { it.successfullyUploaded }
 }

@@ -125,7 +125,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
                     break;
 
                 uploadFile(baseWorkingDir, file);
-                addSuccessfullyUploadedFile(file);
+                file.setSuccessfullyUploaded(true);
                 iterator.remove();
             }
 

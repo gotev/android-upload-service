@@ -9,6 +9,8 @@ import android.os.PowerManager
 import net.gotev.uploadservice.UploadService.Companion.taskClass
 import net.gotev.uploadservice.UploadService.Companion.taskParameters
 import net.gotev.uploadservice.data.UploadTaskParameters
+import net.gotev.uploadservice.extensions.acquirePartialWakeLock
+import net.gotev.uploadservice.extensions.safeRelease
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.observer.task.BroadcastEmitter
 import net.gotev.uploadservice.observer.task.NotificationHandler
@@ -112,16 +114,10 @@ class UploadService : Service() {
     }
     private var idleTimer: Timer? = null
 
-    private val powerManager: PowerManager
-        get() = getSystemService(Context.POWER_SERVICE) as PowerManager
-
     override fun onCreate() {
         super.onCreate()
 
-        this.wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG).apply {
-            setReferenceCounted(false)
-            if (!isHeld) acquire()
-        }
+        wakeLock = acquirePartialWakeLock(wakeLock, TAG)
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -201,7 +197,7 @@ class UploadService : Service() {
             stopForeground(true)
         }
 
-        wakeLock?.apply { if (isHeld) release() }
+        wakeLock.safeRelease()
 
         uploadTasksMap.clear()
 

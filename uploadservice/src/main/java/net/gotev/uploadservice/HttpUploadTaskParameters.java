@@ -22,7 +22,6 @@ public final class HttpUploadTaskParameters implements Parcelable {
     private ArrayList<NameValue> requestParameters = new ArrayList<>(10);
 
     public HttpUploadTaskParameters() {
-
     }
 
     // This is used to regenerate the object.

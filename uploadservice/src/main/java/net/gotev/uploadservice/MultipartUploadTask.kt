@@ -89,6 +89,7 @@ class MultipartUploadTask : HttpUploadTask() {
         //reset uploaded bytes when the body is ready to be written
         //because sometimes this gets invoked when network changes
         resetUploadedBytes()
+        setAllFilesHaveBeenSuccessfullyUploaded(false)
 
         bodyWriter.apply {
             writeRequestParameters()

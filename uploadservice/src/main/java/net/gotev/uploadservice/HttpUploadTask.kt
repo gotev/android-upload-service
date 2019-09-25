@@ -50,7 +50,7 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
             })
         }
 
-        //TODO: clear successfully uploaded files
+        setAllFilesHaveBeenSuccessfullyUploaded(false)
         totalBytes = bodyLength
 
         val response = httpStack.newRequest(params.id, httpParams.method, params.serverUrl)
@@ -70,6 +70,9 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
         // broadcasted and then the cancellation. That behaviour was not desirable as the
         // library user couldn't execute code on user cancellation.
         if (shouldContinue) {
+            if (response.isSuccessful) {
+                setAllFilesHaveBeenSuccessfullyUploaded()
+            }
             onResponseReceived(response)
         }
     }

@@ -47,7 +47,7 @@ object Placeholders {
         return string.replace(ELAPSED_TIME, uploadInfo.elapsedTimeString)
                 .replace(PROGRESS, "${uploadInfo.progressPercent}%")
                 .replace(UPLOAD_RATE, uploadInfo.uploadRateString)
-                .replace(UPLOADED_FILES, uploadInfo.successfullyUploadedFiles.size.toString())
-                .replace(TOTAL_FILES, uploadInfo.totalFiles.toString())
+                .replace(UPLOADED_FILES, uploadInfo.successfullyUploadedFiles.toString())
+                .replace(TOTAL_FILES, uploadInfo.files.size.toString())
     }
 }

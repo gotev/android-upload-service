@@ -31,11 +31,6 @@ abstract class UploadTask : Runnable {
     lateinit var params: UploadTaskParameters
 
     /**
-     * Contains the absolute local path of the successfully uploaded files.
-     */
-    private val successfullyUploadedFiles = ArrayList<UploadFile>()
-
-    /**
      * Flag indicating if the operation should continue or is cancelled. You should never
      * explicitly set this value in your subclasses, as it's written by the Upload Service
      * when you call [UploadService.stopUpload]. If this value is false, you should
@@ -80,8 +75,7 @@ abstract class UploadTask : Runnable {
                 uploadedBytes = uploadedBytes,
                 totalBytes = totalBytes,
                 numberOfRetries = attempts - 1,
-                successfullyUploadedFiles = successfullyUploadedFiles,
-                remainingFiles = params.files
+                files = params.files
         )
 
     /**
@@ -200,9 +194,7 @@ abstract class UploadTask : Runnable {
         UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) upload ${if (response.isSuccessful) "completed" else "error"}" }
 
         if (response.isSuccessful) {
-            addAllFilesToSuccessfullyUploadedFiles()
-
-            if (params.autoDeleteSuccessfullyUploadedFiles && successfullyUploadedFiles.isNotEmpty()) {
+            if (params.autoDeleteSuccessfullyUploadedFiles) {
                 for (file in successfullyUploadedFiles) {
                     if (file.handler.delete(context)) {
                         UploadServiceLogger.info(TAG) { "(uploadID: ${params.id}) successfully deleted: ${file.path}" }
@@ -250,31 +242,11 @@ abstract class UploadTask : Runnable {
     }
 
     /**
-     * Add a file to the list of the successfully uploaded files and remove it from the file list
-     *
-     * @param file file on the device
-     */
-    protected fun addSuccessfullyUploadedFile(file: UploadFile) {
-        if (!successfullyUploadedFiles.contains(file)) {
-            successfullyUploadedFiles.add(file)
-            params.files.remove(file)
-        }
-    }
-
-    /**
      * Adds all the files to the list of successfully uploaded files.
      * This will automatically remove them from the params.getFiles() list.
      */
-    protected fun addAllFilesToSuccessfullyUploadedFiles() {
-        val iterator = params.files.iterator()
-        while (iterator.hasNext()) {
-            val file = iterator.next()
-
-            if (!successfullyUploadedFiles.contains(file)) {
-                successfullyUploadedFiles.add(file)
-            }
-            iterator.remove()
-        }
+    protected fun setAllFilesHaveBeenSuccessfullyUploaded(value: Boolean = true) {
+        params.files.forEach { it.successfullyUploaded = value }
     }
 
     /**
@@ -285,9 +257,8 @@ abstract class UploadTask : Runnable {
      *
      * @return list of strings
      */
-    protected fun getSuccessfullyUploadedFiles(): List<UploadFile> {
-        return successfullyUploadedFiles
-    }
+    protected val successfullyUploadedFiles: List<UploadFile>
+        get() = params.files.filter { it.successfullyUploaded }
 
     fun cancel() {
         shouldContinue = false
