@@ -12,10 +12,6 @@ import java.util.List;
 /**
  * Represents a generic HTTP upload request.<br>
  * Subclass to create your own custom HTTP upload request.
- *
- * @author gotev (Aleksandar Gotev)
- * @author eliasnaur
- * @author cankov
  */
 public abstract class HttpUploadRequest<B extends HttpUploadRequest<B>>
         extends UploadRequest<B> {

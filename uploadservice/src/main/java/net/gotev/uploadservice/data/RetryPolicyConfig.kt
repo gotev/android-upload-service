@@ -1,8 +1,5 @@
 package net.gotev.uploadservice.data
 
-/**
- * @author Aleksandar Gotev
- */
 data class RetryPolicyConfig(
         /**
          * Sets the time to wait in seconds before the next attempt when an upload fails

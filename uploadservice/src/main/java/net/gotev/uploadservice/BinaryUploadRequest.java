@@ -13,9 +13,6 @@ import java.util.List;
 /**
  * Binary file upload request. The binary upload uses a single file as the raw body of the
  * upload request.
- *
- * @author cankov
- * @author gotev (Aleksandar Gotev)
  */
 public class BinaryUploadRequest extends HttpUploadRequest<BinaryUploadRequest> {
 

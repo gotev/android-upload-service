@@ -5,14 +5,6 @@ import java.io.Closeable
 
 import java.io.IOException
 
-/**
- * Defines the methods that has to be implemented by an HTTP connection.
- * If you're implementing your custom HTTP connection, remember to never cache anything,
- * especially in BodyWriter methods, as this will surely cause memory issues when uploading
- * large files. The only things which you are allowed to cache are the response code and body
- * from the server, which must not be large though.
- * @author gotev (Aleksandar Gotev)
- */
 interface HttpRequest: Closeable {
 
     /**

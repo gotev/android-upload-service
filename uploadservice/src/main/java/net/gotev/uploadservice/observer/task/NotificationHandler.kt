@@ -14,9 +14,6 @@ import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.notifications.Placeholders
 
-/**
- * @author Aleksandar Gotev
- */
 class NotificationHandler(private val service: UploadService,
                           private val notificationId: Int,
                           private val uploadId: String,

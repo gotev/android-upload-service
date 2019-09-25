@@ -5,10 +5,6 @@ import net.gotev.uploadservice.network.HttpStack
 
 import java.io.IOException
 
-/**
- * HttpUrlConnection stack implementation.
- * @author gotev (Aleksandar Gotev)
- */
 class HurlStack(private val followRedirects: Boolean = true,
                 private val useCaches: Boolean = false,
                 private val connectTimeout: Int = 15000,

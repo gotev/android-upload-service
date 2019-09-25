@@ -7,12 +7,6 @@ import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.schemehandlers.SchemeHandler
 import java.util.*
 
-/**
- * Represents a file to upload.
- *
- * @author cankov
- * @author gotev (Aleksandar Gotev)
- */
 @Parcelize
 data class UploadFile @JvmOverloads constructor(
         val path: String,

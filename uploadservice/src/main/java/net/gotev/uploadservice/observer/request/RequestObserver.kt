@@ -9,17 +9,6 @@ import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadStatus
 import net.gotev.uploadservice.network.ServerResponse
 
-/**
- * Broadcast receiver to subclass to create a receiver for [UploadService] events.
- *
- * It provides the boilerplate code to properly handle broadcast messages coming from the
- * upload service and dispatch them to the proper handler method.
- *
- * @author gotev (Aleksandar Gotev)
- * @author eliasnaur
- * @author cankov
- * @author mabdurrahman
- */
 abstract class RequestObserver : BroadcastReceiver() {
 
     final override fun onReceive(context: Context, intent: Intent?) {

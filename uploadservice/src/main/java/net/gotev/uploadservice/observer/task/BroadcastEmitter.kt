@@ -6,9 +6,6 @@ import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadStatus
 import net.gotev.uploadservice.network.ServerResponse
 
-/**
- * @author Aleksandar Gotev
- */
 class BroadcastEmitter(private val context: Context) : UploadTaskObserver {
 
     override fun initialize(info: UploadInfo) {}

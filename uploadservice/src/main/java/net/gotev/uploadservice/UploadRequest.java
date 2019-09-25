@@ -18,8 +18,6 @@ import java.util.UUID;
 /**
  * Base class to extend to create an upload request. If you are implementing an HTTP based upload,
  * extend {@link HttpUploadRequest} instead.
- *
- * @author Aleksandar Gotev
  */
 public abstract class UploadRequest<B extends UploadRequest<B>> {
     private static final String LOG_TAG = UploadRequest.class.getSimpleName();

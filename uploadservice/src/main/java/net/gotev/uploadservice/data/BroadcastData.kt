@@ -7,12 +7,6 @@ import kotlinx.android.parcel.Parcelize
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.network.ServerResponse
 
-/**
- * Class which contains all the data passed in broadcast intents to notify task progress, errors,
- * completion or cancellation.
- *
- * @author gotev (Aleksandar Gotev)
- */
 @Parcelize
 internal data class BroadcastData @JvmOverloads constructor(
         val status: UploadStatus,

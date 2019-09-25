@@ -11,9 +11,6 @@ import net.gotev.uploadservice.schemehandlers.SchemeHandler
 import java.lang.reflect.InvocationTargetException
 import java.util.*
 
-/**
- * @author Aleksandar Gotev
- */
 object UploadServiceConfig {
 
     private const val uploadActionSuffix = ".uploadservice.action.upload"

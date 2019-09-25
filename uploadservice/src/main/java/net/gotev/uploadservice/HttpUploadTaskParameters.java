@@ -10,8 +10,6 @@ import java.util.ArrayList;
 
 /**
  * Class which contains specific parameters for HTTP uploads.
- *
- * @author gotev (Aleksandar Gotev)
  */
 public final class HttpUploadTaskParameters implements Parcelable {
 

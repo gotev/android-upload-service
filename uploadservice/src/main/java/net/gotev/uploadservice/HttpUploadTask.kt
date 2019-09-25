@@ -8,12 +8,8 @@ import net.gotev.uploadservice.network.HttpStack
 import java.io.UnsupportedEncodingException
 
 /**
- * Generic HTTP Upload Task.<br></br>
+ * Generic HTTP Upload Task.
  * Subclass to create your custom upload task.
- *
- * @author cankov
- * @author gotev (Aleksandar Gotev)
- * @author mabdurrahman
  */
 abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, BodyWriter.OnStreamWriteListener {
 

@@ -21,15 +21,6 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
-/**
- * Service to upload files in background using HTTP POST with notification center progress
- * display.
- *
- * @author gotev (Aleksandar Gotev)
- * @author eliasnaur
- * @author cankov
- * @author mabdurrahman
- */
 class UploadService : Service() {
 
     companion object {
@@ -298,6 +289,7 @@ class UploadService : Service() {
     }
 }
 
+// TODO: move in extension
 fun Intent.setupTask(taskClassString: String, params: UploadTaskParameters): Intent {
     putExtra(taskClass, taskClassString)
     putExtra(taskParameters, params)

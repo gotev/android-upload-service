@@ -8,11 +8,6 @@ import net.gotev.uploadservice.logger.UploadServiceLogger
 import java.io.File
 import java.io.IOException
 
-/**
- * Handles Android content uris, wraps android.content.Uri
- * @author stephentuso
- * @author gotev
- */
 internal class ContentResolverSchemeHandler : SchemeHandler {
 
     private lateinit var uri: Uri

@@ -5,10 +5,6 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
-/**
- * Contains upload information and statistics.
- * @author Aleksandar Gotev
- */
 @Parcelize
 data class UploadInfo @JvmOverloads constructor(
         /**

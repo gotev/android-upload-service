@@ -7,10 +7,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 
-/**
- * Handler for normal file paths, wraps java.io.File
- * @author stephentuso
- */
 internal class FileSchemeHandler : SchemeHandler {
     private lateinit var file: File
 

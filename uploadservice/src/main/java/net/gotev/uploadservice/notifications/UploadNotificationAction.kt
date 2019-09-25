@@ -9,8 +9,6 @@ import kotlinx.android.parcel.Parcelize
  * Class which represents a notification action.
  * It is necessary because NotificationCompat.Action is not serializable or Parcelable, thus it's
  * not possible to pass it directly in the intents.
- *
- * @author Aleksandar Gotev
  */
 @Parcelize
 data class UploadNotificationAction(

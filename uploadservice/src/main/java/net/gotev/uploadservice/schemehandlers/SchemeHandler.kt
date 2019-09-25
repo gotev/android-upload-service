@@ -3,12 +3,6 @@ package net.gotev.uploadservice.schemehandlers
 import android.content.Context
 import java.io.InputStream
 
-/**
- * Scheme handlers allows to get files from different sources (e.g. file system, content resolver)
- * by decoupling common characteristics from their implementations
- * @author stephentuso
- * @author gotev
- */
 interface SchemeHandler {
     /**
      * Initialize instance with file path.

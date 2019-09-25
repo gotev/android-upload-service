@@ -13,12 +13,6 @@ import net.gotev.uploadservice.observer.task.UploadTaskObserver
 import java.io.IOException
 import java.util.*
 
-/**
- * Base class to subclass when creating upload tasks. It contains the logic common to all the tasks,
- * such as notification management, status broadcast, retry logic and some utility methods.
- *
- * @author Aleksandar Gotev
- */
 abstract class UploadTask : Runnable {
 
     companion object {

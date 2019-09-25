@@ -3,9 +3,6 @@ package net.gotev.uploadservice.extensions
 import android.webkit.MimeTypeMap
 import java.net.URL
 
-/**
- * @author Aleksandar Gotev
- */
 internal fun String?.isASCII(): Boolean {
     if (this.isNullOrBlank())
         return false

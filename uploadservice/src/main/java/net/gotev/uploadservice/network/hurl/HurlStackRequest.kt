@@ -12,10 +12,6 @@ import java.util.*
 import javax.net.ssl.HttpsURLConnection
 import kotlin.collections.LinkedHashMap
 
-/**
- * [HttpRequest] implementation using [HttpURLConnection].
- * @author gotev (Aleksandar Gotev)
- */
 class HurlStackRequest(
         private val uploadId: String,
         method: String,

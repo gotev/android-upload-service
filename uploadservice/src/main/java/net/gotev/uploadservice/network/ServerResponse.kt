@@ -5,10 +5,6 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 
-/**
- * Contains the server response.
- * @author Aleksandar Gotev
- */
 @Parcelize
 data class ServerResponse(
         /**

@@ -8,10 +8,6 @@ import net.gotev.uploadservice.network.BodyWriter
 
 /**
  * Implements an HTTP Multipart upload task.
- *
- * @author gotev (Aleksandar Gotev)
- * @author eliasnaur
- * @author cankov
  */
 class MultipartUploadTask : HttpUploadTask() {
 

@@ -13,10 +13,6 @@ import net.gotev.uploadservice.notifications.UploadNotificationAction;
 
 import java.util.ArrayList;
 
-/**
- * @author Aleksandar Gotev
- */
-
 public class UploadNotificationStatusConfig implements Parcelable {
 
     /**

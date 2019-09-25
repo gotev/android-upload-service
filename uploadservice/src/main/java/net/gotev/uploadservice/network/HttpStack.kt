@@ -2,12 +2,7 @@ package net.gotev.uploadservice.network
 
 import java.io.IOException
 
-/**
- * Defines the methods that has to be implemented by an HTTP stack.
- * @author gotev (Aleksandar Gotev)
- */
 interface HttpStack {
-
     /**
      * Creates a new connection for a given URL and HTTP Method.
      * @param uploadId ID of the upload which requested this connection

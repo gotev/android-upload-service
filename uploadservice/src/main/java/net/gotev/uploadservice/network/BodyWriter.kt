@@ -7,15 +7,6 @@ import java.io.Closeable
 import java.io.IOException
 import java.io.InputStream
 
-/**
- * Exposes the methods to be implemented to write the request body.
- * If you want to use an internal cache or buffer, remember to always get its size value from
- * [UploadService.BUFFER_SIZE] and to clear everything when not needed to prevent memory leaks
- * @param listener listener which gets notified when bytes are written and which controls if
- * the transfer should continue
- * @author Aleksandar Gotev
- */
-
 abstract class BodyWriter(private val listener: OnStreamWriteListener) : Closeable {
 
     /**

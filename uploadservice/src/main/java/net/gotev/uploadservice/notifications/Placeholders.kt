@@ -2,10 +2,6 @@ package net.gotev.uploadservice.notifications
 
 import net.gotev.uploadservice.data.UploadInfo
 
-/**
- * Contains all the placeholders that is possible to use in the notification text strings.
- * @author Aleksandar Gotev
- */
 object Placeholders {
 
     /**

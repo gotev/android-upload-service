@@ -12,11 +12,6 @@ import java.net.MalformedURLException;
 /**
  * HTTP/Multipart upload request. This is the most common way to upload files on a server.
  * It's the same kind of request that browsers do when you use the &lt;form&gt; tag
- * with one or more files.
- *
- * @author gotev (Aleksandar Gotev)
- * @author eliasnaur
- *
  */
 public class MultipartUploadRequest extends HttpUploadRequest<MultipartUploadRequest> {
 
