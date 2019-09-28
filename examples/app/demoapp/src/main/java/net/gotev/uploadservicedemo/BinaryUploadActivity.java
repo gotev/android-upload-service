@@ -8,7 +8,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import net.gotev.recycleradapter.AdapterItem;
-import net.gotev.uploadservice.BinaryUploadRequest;
+import net.gotev.uploadservice.protocols.binary.BinaryUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.utils.UploadItemUtils;

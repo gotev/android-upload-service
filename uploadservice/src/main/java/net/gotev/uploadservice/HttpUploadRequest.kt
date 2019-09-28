@@ -3,6 +3,9 @@ package net.gotev.uploadservice
 import android.content.Context
 import android.os.Parcelable
 import android.util.Base64
+import net.gotev.uploadservice.data.HttpUploadTaskParameters
+import net.gotev.uploadservice.data.NameValue
+import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.extensions.isValidHttpUrl
 import java.util.*
 
@@ -32,7 +35,7 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
      * @return self instance
      */
     fun addHeader(headerName: String, headerValue: String): B {
-        httpParams.addHeader(headerName, headerValue)
+        httpParams.requestHeaders.addHeader(headerName, headerValue)
         return self()
     }
 
@@ -44,8 +47,16 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
      */
     fun setBasicAuth(username: String, password: String): B {
         val auth = Base64.encodeToString("$username:$password".toByteArray(), Base64.NO_WRAP)
-        httpParams.addHeader("Authorization", "Basic $auth")
-        return self()
+        return addHeader("Authorization", "Basic $auth")
+    }
+
+    /**
+     * Sets HTTP Bearer authentication with a token.
+     * @param bearerToken bearer authorization token
+     * @return self instance
+     */
+    fun setBearerAuth(bearerToken: String): B {
+        return addHeader("Authorization", "Bearer $bearerToken")
     }
 
     /**
@@ -56,7 +67,7 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
      * @return self instance
      */
     open fun addParameter(paramName: String, paramValue: String): B {
-        httpParams.addParameter(paramName, paramValue)
+        httpParams.requestParameters.add(NameValue(paramName, paramValue))
         return self()
     }
 
@@ -69,7 +80,7 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
      */
     open fun addArrayParameter(paramName: String, vararg array: String): B {
         for (value in array) {
-            httpParams.addParameter(paramName, value)
+            httpParams.requestParameters.add(NameValue(paramName, value))
         }
         return self()
     }
@@ -83,7 +94,7 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
      */
     open fun addArrayParameter(paramName: String, list: List<String>): B {
         for (value in list) {
-            httpParams.addParameter(paramName, value)
+            httpParams.requestParameters.add(NameValue(paramName, value))
         }
         return self()
     }

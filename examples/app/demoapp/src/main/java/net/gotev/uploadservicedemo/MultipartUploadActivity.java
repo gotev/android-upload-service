@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import net.gotev.recycleradapter.AdapterItem;
-import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.utils.UploadItemUtils;

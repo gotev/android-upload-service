@@ -26,7 +26,7 @@ public class NotificationActions {
                                                       final int requestCode,
                                                       final String uploadID) {
         Intent intent = new Intent(INTENT_ACTION);
-        intent.setPackage(UploadServiceConfig.INSTANCE.getNamespace());
+        intent.setPackage(UploadServiceConfig.getNamespace());
         intent.putExtra(PARAM_ACTION, ACTION_CANCEL_UPLOAD);
         intent.putExtra(PARAM_UPLOAD_ID, uploadID);
 

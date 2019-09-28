@@ -1,7 +1,10 @@
-package net.gotev.uploadservice
+package net.gotev.uploadservice.protocols.multipart
 
+import net.gotev.uploadservice.BuildConfig
+import net.gotev.uploadservice.HttpUploadTask
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.data.UploadFile
+import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.extensions.asciiByes
 import net.gotev.uploadservice.extensions.utf8Bytes
 import net.gotev.uploadservice.network.BodyWriter
@@ -12,14 +15,9 @@ import net.gotev.uploadservice.network.BodyWriter
 class MultipartUploadTask : HttpUploadTask() {
 
     companion object {
-        private const val BOUNDARY_SIGNATURE = "-------AndroidUploadService"
+        private const val BOUNDARY_SIGNATURE = "-------UploadService${BuildConfig.VERSION_NAME}-"
         private const val NEW_LINE = "\r\n"
         private const val TWO_HYPHENS = "--"
-
-        // properties associated to each file
-        const val PROPERTY_PARAM_NAME = "httpParamName"
-        const val PROPERTY_REMOTE_FILE_NAME = "httpRemoteFileName"
-        const val PROPERTY_CONTENT_TYPE = "httpContentType"
     }
 
     private val boundary = BOUNDARY_SIGNATURE + System.nanoTime()
@@ -30,15 +28,6 @@ class MultipartUploadTask : HttpUploadTask() {
     private val NameValue.multipartHeader: ByteArray
         get() = boundaryBytes + ("Content-Disposition: form-data; " +
                 "name=\"$name\"$NEW_LINE$NEW_LINE$value$NEW_LINE").utf8Bytes
-
-    private val UploadFile.parameterName: String?
-        get() = properties[PROPERTY_PARAM_NAME]
-
-    private val UploadFile.remoteFileName: String?
-        get() = properties[PROPERTY_REMOTE_FILE_NAME]
-
-    private val UploadFile.contentType: String?
-        get() = properties[PROPERTY_CONTENT_TYPE]
 
     private val UploadFile.multipartHeader: ByteArray
         get() = boundaryBytes + ("Content-Disposition: form-data; " +
@@ -75,7 +64,7 @@ class MultipartUploadTask : HttpUploadTask() {
         get() = requestParametersLength + filesLength + trailerBytes.size
 
     override fun performInitialization() {
-        httpParams.apply {
+        httpParams.requestHeaders.apply {
             addHeader("Content-Type", "multipart/form-data; boundary=$boundary")
             addHeader("Connection", if (params.files.size <= 1) "close" else "Keep-Alive")
         }

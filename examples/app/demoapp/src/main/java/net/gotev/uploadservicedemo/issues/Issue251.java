@@ -3,7 +3,7 @@ package net.gotev.uploadservicedemo.issues;
 import android.content.Context;
 import android.util.Log;
 
-import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
 
 /**
  * https://github.com/gotev/android-upload-service/issues/251

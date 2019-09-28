@@ -1,6 +1,8 @@
 package net.gotev.uploadservice
 
 import android.annotation.SuppressLint
+import net.gotev.uploadservice.data.HttpUploadTaskParameters
+import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.BodyWriter
 import net.gotev.uploadservice.network.HttpRequest
@@ -39,18 +41,23 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
         UploadServiceLogger.debug(javaClass.simpleName) { "Starting upload task with ID ${params.id}" }
 
         val httpParams = httpParams.apply {
-            addHeader("User-Agent", if (httpParams.isCustomUserAgentDefined) {
-                httpParams.customUserAgent
-            } else {
-                "AndroidUploadService/" + BuildConfig.VERSION_NAME
-            })
+            val userAgent = httpParams.customUserAgent
+
+            requestHeaders.addHeader(
+                    name = "User-Agent",
+                    value = if (userAgent.isNullOrBlank()) {
+                        "AndroidUploadService/" + BuildConfig.VERSION_NAME
+                    } else {
+                        userAgent
+                    }
+            )
         }
 
         setAllFilesHaveBeenSuccessfullyUploaded(false)
         totalBytes = bodyLength
 
         val response = httpStack.newRequest(params.id, httpParams.method, params.serverUrl)
-                .setHeaders(httpParams.requestHeaders)
+                .setHeaders(httpParams.requestHeaders.map { it.validateAsHeader() })
                 .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode)
                 .getResponse(this, this)
 

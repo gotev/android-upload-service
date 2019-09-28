@@ -1,6 +1,8 @@
-package net.gotev.uploadservice
+package net.gotev.uploadservice.protocols.binary
 
 import android.content.Context
+import net.gotev.uploadservice.HttpUploadRequest
+import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import java.io.FileNotFoundException

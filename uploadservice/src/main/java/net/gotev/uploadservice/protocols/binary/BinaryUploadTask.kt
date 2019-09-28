@@ -1,5 +1,6 @@
-package net.gotev.uploadservice
+package net.gotev.uploadservice.protocols.binary
 
+import net.gotev.uploadservice.HttpUploadTask
 import net.gotev.uploadservice.network.BodyWriter
 
 /**

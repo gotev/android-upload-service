@@ -41,6 +41,7 @@ class UploadService : Service() {
          * @param uploadId The unique upload id
          */
         @Synchronized
+        @JvmStatic
         fun stopUpload(uploadId: String) {
             uploadTasksMap[uploadId]?.cancel()
         }
@@ -49,6 +50,7 @@ class UploadService : Service() {
          * Gets the list of the currently active upload tasks.
          * @return list of uploadIDs or an empty list if no tasks are currently running
          */
+        @JvmStatic
         val taskList: List<String>
             @Synchronized get() = if (uploadTasksMap.isEmpty()) {
                 emptyList()
@@ -60,6 +62,7 @@ class UploadService : Service() {
          * Stop all the active uploads.
          */
         @Synchronized
+        @JvmStatic
         fun stopAllUploads() {
             val iterator = uploadTasksMap.keys.iterator()
 
@@ -69,21 +72,17 @@ class UploadService : Service() {
         }
 
         /**
-         * Stops the service if no upload tasks are currently running
-         * @param context application context
-         * @return true if the service is getting stopped, false otherwise
-         */
-        @Synchronized
-        fun stop(context: Context) = stop(context, false)
-
-        /**
          * Stops the service.
          * @param context application context
-         * @param forceStop stops the service no matter if some tasks are running
+         * @param forceStop if true stops the service no matter if some tasks are running, else
+         * stops only if there aren't any active tasks
          * @return true if the service is getting stopped, false otherwise
          */
         @Synchronized
-        fun stop(context: Context, forceStop: Boolean) = if (forceStop) {
+        @JvmOverloads
+        @JvmStatic
+        fun stop(context: Context, forceStop: Boolean = false) = if (forceStop) {
+            stopAllUploads()
             context.stopService(Intent(context, UploadService::class.java))
         } else {
             uploadTasksMap.isEmpty() && context.stopService(Intent(context, UploadService::class.java))

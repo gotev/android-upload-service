@@ -30,6 +30,7 @@ object UploadServiceConfig {
      * Namespace with which Upload Service is going to operate. This must be set in application
      * subclass onCreate method before anything else.
      */
+    @JvmStatic
     var namespace: String? = null
         get() = if (field == null)
             throw IllegalArgumentException("You have to set namespace to BuildConfig.APPLICATION_ID in your Application subclass")
@@ -39,6 +40,7 @@ object UploadServiceConfig {
     /**
      * Sets how many threads to use to handle concurrent uploads.
      */
+    @JvmStatic
     var uploadPoolSize = Runtime.getRuntime().availableProcessors()
         set(value) {
             require(value >= 1) { "Upload pool size min allowable value is 1. It cannot be $value" }
@@ -49,6 +51,7 @@ object UploadServiceConfig {
      * When the number of threads is greater than [uploadPoolSize], this is the maximum time that
      * excess idle threads will wait for new tasks before terminating.
      */
+    @JvmStatic
     var keepAliveTimeSeconds = 5
         set(value) {
             require(value >= 1) { "Keep alive time min allowable value is 1. It cannot be $value" }
@@ -59,6 +62,7 @@ object UploadServiceConfig {
      * How many time to wait in idle before shutting down the service.
      * The service is idle when is running, but no tasks are running.
      */
+    @JvmStatic
     var idleTimeoutSeconds = 10
         set(value) {
             require(value >= 1) { "Idle timeout min allowable value is 1. It cannot be $value" }
@@ -68,6 +72,7 @@ object UploadServiceConfig {
     /**
      * Buffer size in bytes used for data transfer by the upload tasks.
      */
+    @JvmStatic
     var bufferSizeBytes = 4096
         set(value) {
             require(value >= 256) { "You can't set buffer size lower than 256 bytes" }
@@ -78,6 +83,7 @@ object UploadServiceConfig {
      * Sets the HTTP Stack to use to perform HTTP based upload requests.
      * By default [HurlStack] implementation is used.
      */
+    @JvmStatic
     var httpStack: HttpStack = HurlStack()
 
     /**
@@ -85,12 +91,14 @@ object UploadServiceConfig {
      * If the upload tasks report more frequently than this value, upload service will automatically apply throttling.
      * Default is 6 updates per second
      */
+    @JvmStatic
     var uploadProgressNotificationIntervalMillis: Long = 1000 / 6
 
     /**
      * Sets the Upload Service Retry Policy. Refer to [RetryPolicyConfig] docs for detailed
      * explanation of each parameter.
      */
+    @JvmStatic
     var retryPolicy = RetryPolicyConfig()
 
     /**
@@ -105,18 +113,22 @@ object UploadServiceConfig {
      * because the service must run in the foreground and expose a notification to the user.
      * https://developer.android.com/reference/android/content/Context.html#startForegroundService(android.content.Intent)
      */
+    @JvmStatic
     var isForegroundService = true
         get() = Build.VERSION.SDK_INT >= 26 || field
 
+    @JvmStatic
     val uploadAction: String
         get() = "$namespace$uploadActionSuffix"
 
+    @JvmStatic
     val broadcastAction: String
         get() = "$namespace$broadcastActionSuffix"
 
     /**
      * Get the intent filter for Upload Service broadcast events
      */
+    @JvmStatic
     val broadcastIntentFilter: IntentFilter
         get() = IntentFilter(broadcastAction)
 
@@ -126,12 +138,14 @@ object UploadServiceConfig {
      * @param scheme scheme to support (e.g. content:// , yourCustomScheme://)
      * @param handler scheme handler implementation
      */
+    @JvmStatic
     fun addSchemeHandler(scheme: String, handler: Class<out SchemeHandler>) {
         require(!(scheme == fileScheme || scheme == contentScheme)) { "Cannot override bundled scheme: $scheme! If you found a bug in a bundled scheme handler, please open an issue: https://github.com/gotev/android-upload-service" }
         schemeHandlers[scheme] = handler
     }
 
     @Throws(NoSuchMethodException::class, IllegalAccessException::class, InvocationTargetException::class, InstantiationException::class)
+    @JvmStatic
     fun getSchemeHandler(path: String): SchemeHandler {
         val trimmedPath = path.trim()
 

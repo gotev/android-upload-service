@@ -1,6 +1,8 @@
-package net.gotev.uploadservice
+package net.gotev.uploadservice.protocols.multipart
 
 import android.content.Context
+import net.gotev.uploadservice.HttpUploadRequest
+import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.data.UploadFile
 import java.io.FileNotFoundException
 
@@ -38,23 +40,20 @@ class MultipartUploadRequest(context: Context, serverUrl: String) : HttpUploadRe
             "Please specify valid filePath and parameterName. They cannot be blank."
         }
 
-        // TODO consider unifying this with what is present in Multipart Upload Task
         files.add(UploadFile(filePath).apply {
-            properties[MultipartUploadTask.PROPERTY_PARAM_NAME] = parameterName
+            this.parameterName = parameterName
 
-            properties[MultipartUploadTask.PROPERTY_CONTENT_TYPE] =
-                    if (contentType.isNullOrBlank()) {
-                        handler.contentType(context)
-                    } else {
-                        contentType
-                    }
+            this.contentType = if (contentType.isNullOrBlank()) {
+                handler.contentType(context)
+            } else {
+                contentType
+            }
 
-            properties[MultipartUploadTask.PROPERTY_REMOTE_FILE_NAME] =
-                    if (fileName.isNullOrBlank()) {
-                        handler.name(context)
-                    } else {
-                        fileName
-                    }
+            remoteFileName = if (fileName.isNullOrBlank()) {
+                handler.name(context)
+            } else {
+                fileName
+            }
         })
 
         return this

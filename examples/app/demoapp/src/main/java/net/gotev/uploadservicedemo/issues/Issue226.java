@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
-import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
 import net.gotev.uploadservice.data.UploadNotificationConfig;
 import net.gotev.uploadservicedemo.App;
 

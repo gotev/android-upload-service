@@ -50,17 +50,17 @@ public class App extends Application {
 
         // Set your application namespace to avoid conflicts with other apps
         // using this library
-        UploadServiceConfig.INSTANCE.setNamespace(BuildConfig.APPLICATION_ID);
+        UploadServiceConfig.setNamespace(BuildConfig.APPLICATION_ID);
 
         // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
         // used by default
-        UploadServiceConfig.INSTANCE.setHttpStack(new OkHttpStack(getOkHttpClient()));
+        UploadServiceConfig.setHttpStack(new OkHttpStack(getOkHttpClient()));
 
         // setup backoff multiplier
-        UploadServiceConfig.INSTANCE.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
+        UploadServiceConfig.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
 
         // Set upload service debug log messages level
-        UploadServiceLogger.INSTANCE.setDevelopmentMode(BuildConfig.DEBUG);
+        UploadServiceLogger.setDevelopmentMode(BuildConfig.DEBUG);
 
         createNotificationChannel();
 
