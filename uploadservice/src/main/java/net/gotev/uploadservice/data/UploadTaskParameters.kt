@@ -2,7 +2,6 @@ package net.gotev.uploadservice.data
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
-import net.gotev.uploadservice.UploadNotificationConfig
 
 @Parcelize
 data class UploadTaskParameters(

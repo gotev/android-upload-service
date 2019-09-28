@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.notifications
+package net.gotev.uploadservice.data
 
 import android.app.PendingIntent
 import android.os.Parcelable

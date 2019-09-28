@@ -12,8 +12,8 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-import net.gotev.uploadservice.UploadNotificationConfig;
-import net.gotev.uploadservice.notifications.UploadNotificationAction;
+import net.gotev.uploadservice.data.UploadNotificationConfig;
+import net.gotev.uploadservice.data.UploadNotificationAction;
 import net.gotev.uploadservicedemo.events.NotificationActions;
 
 import butterknife.ButterKnife;
@@ -43,36 +43,35 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected UploadNotificationConfig getNotificationConfig(final String uploadId, @StringRes int title) {
-        UploadNotificationConfig config = new UploadNotificationConfig();
+        UploadNotificationConfig config = new UploadNotificationConfig(App.CHANNEL);
 
         PendingIntent clickIntent = PendingIntent.getActivity(
                 this, 1, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         config.setTitleForAllStatuses(getString(title))
-                .setRingToneEnabled(true)
                 .setClickIntentForAllStatuses(clickIntent)
                 .setClearOnActionForAllStatuses(true)
-                .setNotificationChannelId(App.CHANNEL);
+                .setRingToneEnabled(true);
 
-        config.getProgress().message = getString(R.string.uploading);
-        config.getProgress().iconResourceID = R.drawable.ic_upload;
-        config.getProgress().iconColorResourceID = Color.BLUE;
-        config.getProgress().actions.add(new UploadNotificationAction(
+        config.getProgress().setMessage(getString(R.string.uploading));
+        config.getProgress().setIconResourceID(R.drawable.ic_upload);
+        config.getProgress().setIconColorResourceID(Color.BLUE);
+        config.getProgress().getActions().add(new UploadNotificationAction(
                 R.drawable.ic_cancelled,
                 getString(R.string.cancel_upload),
                 NotificationActions.getCancelUploadAction(this, 1, uploadId)));
 
-        config.getCompleted().message = getString(R.string.upload_success);
-        config.getCompleted().iconResourceID = R.drawable.ic_upload_success;
-        config.getCompleted().iconColorResourceID = Color.GREEN;
+        config.getCompleted().setMessage(getString(R.string.upload_success));
+        config.getCompleted().setIconResourceID(R.drawable.ic_upload_success);
+        config.getCompleted().setIconColorResourceID(Color.GREEN);
 
-        config.getError().message = getString(R.string.upload_error);
-        config.getError().iconResourceID = R.drawable.ic_upload_error;
-        config.getError().iconColorResourceID = Color.RED;
+        config.getError().setMessage(getString(R.string.upload_error));
+        config.getError().setIconResourceID(R.drawable.ic_upload_error);
+        config.getError().setIconColorResourceID(Color.RED);
 
-        config.getCancelled().message = getString(R.string.upload_cancelled);
-        config.getCancelled().iconResourceID = R.drawable.ic_cancelled;
-        config.getCancelled().iconColorResourceID = Color.YELLOW;
+        config.getCancelled().setMessage(getString(R.string.upload_cancelled));
+        config.getCancelled().setIconResourceID(R.drawable.ic_cancelled);
+        config.getCancelled().setIconColorResourceID(Color.YELLOW);
 
         return config;
     }

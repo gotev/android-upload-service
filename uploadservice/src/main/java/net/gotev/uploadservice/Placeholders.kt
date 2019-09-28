@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.notifications
+package net.gotev.uploadservice
 
 import net.gotev.uploadservice.data.UploadInfo
 
@@ -39,8 +39,10 @@ object Placeholders {
      * @param uploadInfo upload information data
      * @return string with replaced placeholders
      */
-    fun replace(string: String, uploadInfo: UploadInfo): String {
-        return string.replace(ELAPSED_TIME, uploadInfo.elapsedTimeString)
+    fun replace(string: String?, uploadInfo: UploadInfo): String {
+        val safeString = string ?: return ""
+
+        return safeString.replace(ELAPSED_TIME, uploadInfo.elapsedTimeString)
                 .replace(PROGRESS, "${uploadInfo.progressPercent}%")
                 .replace(UPLOAD_RATE, uploadInfo.uploadRateString)
                 .replace(UPLOADED_FILES, uploadInfo.successfullyUploadedFiles.toString())

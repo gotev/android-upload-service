@@ -5,7 +5,8 @@ import android.os.Handler;
 import android.util.Log;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
-import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.data.UploadNotificationConfig;
+import net.gotev.uploadservicedemo.App;
 
 /**
  * https://github.com/gotev/android-upload-service/issues/226
@@ -43,10 +44,10 @@ public class Issue226 implements Runnable {
         final String endpoint = "http://posttestserver.com/post.php";
         final int maxRetries = 2;
 
-        final UploadNotificationConfig notificationConfig = new UploadNotificationConfig();
+        final UploadNotificationConfig notificationConfig = new UploadNotificationConfig(App.CHANNEL);
 
-        notificationConfig.getCancelled().autoClear = false;
-        notificationConfig.getCompleted().autoClear = true;
+        notificationConfig.getCancelled().setAutoClear(false);
+        notificationConfig.getCompleted().setAutoClear(true);
 
         try {
             final String fatherId = "father " + requestNumber + "/" + totalRequests + "-" + Long.toString(System.nanoTime());

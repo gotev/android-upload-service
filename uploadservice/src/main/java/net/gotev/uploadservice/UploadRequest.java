@@ -8,6 +8,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import net.gotev.uploadservice.data.UploadFile;
+import net.gotev.uploadservice.data.UploadNotificationConfig;
 import net.gotev.uploadservice.data.UploadTaskParameters;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.observer.request.SingleRequestObserver;

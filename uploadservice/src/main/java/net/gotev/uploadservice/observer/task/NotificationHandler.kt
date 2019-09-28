@@ -5,14 +5,14 @@ import android.content.Context
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import net.gotev.uploadservice.UploadNotificationConfig
-import net.gotev.uploadservice.UploadNotificationStatusConfig
+import net.gotev.uploadservice.data.UploadNotificationConfig
+import net.gotev.uploadservice.data.UploadNotificationStatusConfig
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
-import net.gotev.uploadservice.notifications.Placeholders
+import net.gotev.uploadservice.Placeholders
 
 class NotificationHandler(private val service: UploadService,
                           private val notificationId: Int,
@@ -83,11 +83,8 @@ class NotificationHandler(private val service: UploadService,
 
     override fun initialize(info: UploadInfo) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannelId = config.notificationChannelId
-                    ?: throw IllegalArgumentException("Notification Channel ID is required to be set on Android 8+.")
-
-            notificationManager.getNotificationChannel(notificationChannelId)
-                    ?: throw IllegalArgumentException("The provided notification channel ID $notificationChannelId does not exist! You must create it at app startup and before Upload Service!")
+            notificationManager.getNotificationChannel(config.notificationChannelId)
+                    ?: throw IllegalArgumentException("The provided notification channel ID ${config.notificationChannelId} does not exist! You must create it at app startup and before Upload Service!")
         }
 
         ongoingNotification(info, config.progress)
