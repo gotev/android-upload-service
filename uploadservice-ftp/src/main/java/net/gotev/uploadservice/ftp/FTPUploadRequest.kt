@@ -15,14 +15,13 @@ import java.io.FileNotFoundException
  * @param port FTP port
  */
 class FTPUploadRequest(context: Context, serverUrl: String, port: Int) : UploadRequest<FTPUploadRequest>(context, serverUrl) {
-    protected val ftpParams = FTPUploadTaskParameters()
+    protected val ftpParams = FTPUploadTaskParameters(port)
 
     override val taskClass: Class<out UploadTask>
         get() = FTPUploadTask::class.java
 
     init {
         require(port > 0) { "Specify valid FTP port!" }
-        ftpParams.port = port
     }
 
     override fun getAdditionalParameters(): Parcelable {
