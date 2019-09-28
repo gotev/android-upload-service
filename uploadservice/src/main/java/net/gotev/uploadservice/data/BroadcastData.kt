@@ -1,6 +1,5 @@
 package net.gotev.uploadservice.data
 
-import android.content.Context
 import android.content.Intent
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
@@ -22,10 +21,8 @@ internal data class BroadcastData @JvmOverloads constructor(
         }
     }
 
-    fun send(context: Context) {
-        context.sendBroadcast(Intent(UploadServiceConfig.broadcastAction).apply {
-            setPackage(UploadServiceConfig.namespace)
-            putExtra(paramName, this@BroadcastData)
-        })
+    fun toIntent() = Intent(UploadServiceConfig.broadcastAction).apply {
+        setPackage(UploadServiceConfig.namespace)
+        putExtra(paramName, this@BroadcastData)
     }
 }
