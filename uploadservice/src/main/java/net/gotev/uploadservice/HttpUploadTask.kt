@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException
 abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, BodyWriter.OnStreamWriteListener {
 
     protected val httpParams: HttpUploadTaskParameters
-        get() = params.additionalParams as HttpUploadTaskParameters
+        get() = params.additionalParameters as HttpUploadTaskParameters
 
     /**
      * Implement in subclasses to provide the expected upload in the progress notifications.

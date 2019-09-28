@@ -51,7 +51,8 @@ public class Issue226 implements Runnable {
 
         try {
             final String fatherId = "father " + requestNumber + "/" + totalRequests + "-" + Long.toString(System.nanoTime());
-            new MultipartUploadRequest(ctx, fatherId, endpoint)
+            new MultipartUploadRequest(ctx, endpoint)
+                    .setUploadID(fatherId)
                     .setMethod("POST")
                     .setNotificationConfig(notificationConfig.setTitleForAllStatuses(fatherId))
                     .addParameter("color", "#ffffff")
@@ -90,7 +91,8 @@ public class Issue226 implements Runnable {
                                    final int maxRetries) {
         try {
             String childId = fatherId + " -> child" + Long.toString(System.nanoTime());
-            new MultipartUploadRequest(context, childId, endpoint)
+            new MultipartUploadRequest(context, endpoint)
+                    .setUploadID(childId)
                     .setMethod("POST")
                     .setNotificationConfig(notificationConfig.setTitleForAllStatuses(childId))
                     .addParameter("color", "#ffffff")

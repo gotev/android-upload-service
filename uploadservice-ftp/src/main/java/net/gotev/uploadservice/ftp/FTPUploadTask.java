@@ -34,7 +34,7 @@ public class FTPUploadTask extends UploadTask implements CopyStreamListener {
     private FTPClient ftpClient = null;
 
     private FTPUploadTaskParameters getFTPParams() {
-        return (FTPUploadTaskParameters) getParams().getAdditionalParams();
+        return (FTPUploadTaskParameters) getParams().getAdditionalParameters();
     }
 
     @Override

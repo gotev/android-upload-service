@@ -52,7 +52,8 @@ public class BinaryUploadActivity extends UploadActivity {
         try {
             final String uploadId = UUID.randomUUID().toString();
 
-            final BinaryUploadRequest request = new BinaryUploadRequest(this, uploadId, serverUrl)
+            final BinaryUploadRequest request = new BinaryUploadRequest(this, serverUrl)
+                    .setUploadID(uploadId)
                     .setMethod(httpMethod)
                     .setNotificationConfig(getNotificationConfig(uploadId, R.string.binary_upload))
                     //.setCustomUserAgent(getUserAgent())

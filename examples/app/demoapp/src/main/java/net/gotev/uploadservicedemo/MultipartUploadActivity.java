@@ -33,7 +33,8 @@ public class MultipartUploadActivity extends UploadActivity {
             final String uploadId = UUID.randomUUID().toString();
 
             final MultipartUploadRequest request =
-                    new MultipartUploadRequest(this, uploadId, serverUrl)
+                    new MultipartUploadRequest(this, serverUrl)
+                            .setUploadID(uploadId)
                             .setMethod(httpMethod)
                             .setNotificationConfig(getNotificationConfig(uploadId, R.string.multipart_upload))
                             .setMaxRetries(MAX_RETRIES)

@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.PowerManager
-import net.gotev.uploadservice.UploadService.Companion.taskClass
-import net.gotev.uploadservice.UploadService.Companion.taskParameters
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.acquirePartialWakeLock
 import net.gotev.uploadservice.extensions.safeRelease
@@ -287,11 +285,4 @@ class UploadService : Service() {
             shutdownIfThereArentAnyActiveTasks()
         }
     }
-}
-
-// TODO: move in extension
-fun Intent.setupTask(taskClassString: String, params: UploadTaskParameters): Intent {
-    putExtra(taskClass, taskClassString)
-    putExtra(taskParameters, params)
-    return this
 }
