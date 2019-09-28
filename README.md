@@ -3,7 +3,7 @@ Android Upload Service
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice)
 
-Upload Service 4, 100% Kotlin with Android 10 support and many improvements is in progress: https://github.com/gotev/android-upload-service/issues/450
+Upload Service 4, 100% Kotlin with Android 10 support and many improvements is approaching: https://github.com/gotev/android-upload-service/issues/450
 
 | :information_source: | [Get started!](https://github.com/gotev/android-upload-service/wiki/Setup) |
 |--|--|
