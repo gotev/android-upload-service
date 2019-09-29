@@ -4,11 +4,9 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
-import net.gotev.uploadservice.MultipartUploadRequest;
-import net.gotev.uploadservice.ServerResponse;
-import net.gotev.uploadservice.UploadInfo;
-import net.gotev.uploadservice.UploadNotificationConfig;
-import net.gotev.uploadservice.UploadStatusDelegate;
+import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
+import net.gotev.uploadservice.data.UploadNotificationConfig;
+import net.gotev.uploadservicedemo.App;
 
 /**
  * https://github.com/gotev/android-upload-service/issues/226
@@ -46,26 +44,27 @@ public class Issue226 implements Runnable {
         final String endpoint = "http://posttestserver.com/post.php";
         final int maxRetries = 2;
 
-        final UploadNotificationConfig notificationConfig = new UploadNotificationConfig();
+        final UploadNotificationConfig notificationConfig = new UploadNotificationConfig(App.CHANNEL);
 
-        notificationConfig.getCancelled().autoClear = false;
-        notificationConfig.getCompleted().autoClear = true;
+        notificationConfig.getCancelled().setAutoClear(false);
+        notificationConfig.getCompleted().setAutoClear(true);
 
         try {
             final String fatherId = "father " + requestNumber + "/" + totalRequests + "-" + Long.toString(System.nanoTime());
-            new MultipartUploadRequest(ctx, fatherId, endpoint)
+            new MultipartUploadRequest(ctx, endpoint)
+                    .setUploadID(fatherId)
                     .setMethod("POST")
                     .setNotificationConfig(notificationConfig.setTitleForAllStatuses(fatherId))
                     .addParameter("color", "#ffffff")
                     .setMaxRetries(maxRetries)
-                    .setDelegate(new UploadStatusDelegate() {
+                    /*.setDelegate(new UploadStatusDelegate() {
                         @Override
                         public void onProgress(Context context, UploadInfo uploadInfo) {
 
                         }
 
                         @Override
-                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Throwable exception) {
 
                         }
 
@@ -78,7 +77,7 @@ public class Issue226 implements Runnable {
                         public void onCancelled(Context context, UploadInfo uploadInfo) {
 
                         }
-                    })
+                    })*/
                     .startUpload();
         } catch (Exception exc) {
             Log.e(getClass().getSimpleName(), "multipleRequests Error", exc);
@@ -92,21 +91,22 @@ public class Issue226 implements Runnable {
                                    final int maxRetries) {
         try {
             String childId = fatherId + " -> child" + Long.toString(System.nanoTime());
-            new MultipartUploadRequest(context, childId, endpoint)
+            new MultipartUploadRequest(context, endpoint)
+                    .setUploadID(childId)
                     .setMethod("POST")
                     .setNotificationConfig(notificationConfig.setTitleForAllStatuses(childId))
                     .addParameter("color", "#ffffff")
                     .addParameter("test", "value")
                     .addParameter("new", "parameter")
                     .setMaxRetries(maxRetries)
-                    .setDelegate(new UploadStatusDelegate() {
+                    /*.setDelegate(new UploadStatusDelegate() {
                         @Override
                         public void onProgress(Context context, UploadInfo uploadInfo) {
 
                         }
 
                         @Override
-                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Throwable exception) {
 
                         }
 
@@ -119,7 +119,7 @@ public class Issue226 implements Runnable {
                         public void onCancelled(Context context, UploadInfo uploadInfo) {
                             Log.e(uploadInfo.getUploadId(), "Cancelled");
                         }
-                    })
+                    })*/
                     .startUpload();
         } catch (Exception exc) {
             Log.e(getClass().getSimpleName(), "second request error", exc);

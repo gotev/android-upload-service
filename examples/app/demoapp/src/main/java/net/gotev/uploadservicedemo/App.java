@@ -1,14 +1,19 @@
 package net.gotev.uploadservicedemo;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
 import android.os.StrictMode;
 import android.util.Log;
 
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
-import net.gotev.uploadservice.Logger;
-import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.UploadServiceConfig;
+import net.gotev.uploadservice.data.RetryPolicyConfig;
+import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 
 import java.io.IOException;
@@ -27,6 +32,8 @@ import static com.facebook.stetho.Stetho.newInitializerBuilder;
  */
 public class App extends Application {
 
+    public static String CHANNEL = "UploadServiceDemoChannel";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -43,17 +50,30 @@ public class App extends Application {
 
         // Set your application namespace to avoid conflicts with other apps
         // using this library
-        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
-
-        // Set upload service debug log messages level
-        Logger.setLogLevel(Logger.LogLevel.DEBUG);
+        UploadServiceConfig.setNamespace(BuildConfig.APPLICATION_ID);
 
         // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
         // used by default
-        UploadService.HTTP_STACK = new OkHttpStack(getOkHttpClient());
+        UploadServiceConfig.setHttpStack(new OkHttpStack(getOkHttpClient()));
 
         // setup backoff multiplier
-        UploadService.BACKOFF_MULTIPLIER = 2;
+        UploadServiceConfig.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
+
+        // Set upload service debug log messages level
+        UploadServiceLogger.setDevelopmentMode(BuildConfig.DEBUG);
+
+        createNotificationChannel();
+
+        GlobalBroadcastReceiver receiver = new GlobalBroadcastReceiver();
+        receiver.register(this);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel channel = new NotificationChannel(CHANNEL, "Upload Service Demo", NotificationManager.IMPORTANCE_LOW);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private OkHttpClient getOkHttpClient() {

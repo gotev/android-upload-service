@@ -3,11 +3,7 @@ package net.gotev.uploadservicedemo.issues;
 import android.content.Context;
 import android.util.Log;
 
-import net.gotev.uploadservice.MultipartUploadRequest;
-import net.gotev.uploadservice.ServerResponse;
-import net.gotev.uploadservice.UploadInfo;
-import net.gotev.uploadservice.UploadService;
-import net.gotev.uploadservice.UploadStatusDelegate;
+import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
 
 /**
  * https://github.com/gotev/android-upload-service/issues/251
@@ -28,14 +24,14 @@ public class Issue251 implements Runnable {
             new MultipartUploadRequest(context, "http://posttestserver.com/post.php")
                     .setMethod("POST")
                     .setNotificationConfig(null)
-                    .setDelegate(new UploadStatusDelegate() {
+                    /*.setDelegate(new UploadStatusDelegate() {
                         @Override
                         public void onProgress(Context context, UploadInfo uploadInfo) {
                             UploadService.stopUpload(uploadInfo.getUploadId());
                         }
 
                         @Override
-                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+                        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Throwable exception) {
                         }
 
                         @Override
@@ -47,7 +43,7 @@ public class Issue251 implements Runnable {
                         public void onCancelled(Context context, UploadInfo uploadInfo) {
 
                         }
-                    })
+                    })*/
                     .setAutoDeleteFilesAfterSuccessfulUpload(true)
                     .addParameter("color", "#ffffff")
                     .setMaxRetries(2)

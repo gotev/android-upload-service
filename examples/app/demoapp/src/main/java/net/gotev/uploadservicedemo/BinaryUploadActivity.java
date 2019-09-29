@@ -2,12 +2,13 @@ package net.gotev.uploadservicedemo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+
 import net.gotev.recycleradapter.AdapterItem;
-import net.gotev.uploadservice.BinaryUploadRequest;
+import net.gotev.uploadservice.protocols.binary.BinaryUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.utils.UploadItemUtils;
@@ -41,7 +42,8 @@ public class BinaryUploadActivity extends UploadActivity {
     @Override
     public void onAddFile() {
         fileParameterName = "file";
-        openFilePicker(false);
+        //openFilePicker(false);
+        performFileSearch();
     }
 
     @Override
@@ -50,7 +52,8 @@ public class BinaryUploadActivity extends UploadActivity {
         try {
             final String uploadId = UUID.randomUUID().toString();
 
-            final BinaryUploadRequest request = new BinaryUploadRequest(this, uploadId, serverUrl)
+            final BinaryUploadRequest request = new BinaryUploadRequest(this, serverUrl)
+                    .setUploadID(uploadId)
                     .setMethod(httpMethod)
                     .setNotificationConfig(getNotificationConfig(uploadId, R.string.binary_upload))
                     //.setCustomUserAgent(getUserAgent())

@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import net.gotev.recycleradapter.AdapterItem;
-import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.utils.UploadItemUtils;
@@ -33,13 +33,14 @@ public class MultipartUploadActivity extends UploadActivity {
             final String uploadId = UUID.randomUUID().toString();
 
             final MultipartUploadRequest request =
-                    new MultipartUploadRequest(this, uploadId, serverUrl)
-                    .setMethod(httpMethod)
-                    .setUtf8Charset()
-                    .setNotificationConfig(getNotificationConfig(uploadId, R.string.multipart_upload))
-                    .setMaxRetries(MAX_RETRIES)
-                    //.setCustomUserAgent(getUserAgent())
-                    .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
+                    new MultipartUploadRequest(this, serverUrl)
+                            .setUploadID(uploadId)
+                            .setMethod(httpMethod)
+                            .setNotificationConfig(getNotificationConfig(uploadId, R.string.multipart_upload))
+                            .setMaxRetries(MAX_RETRIES)
+                            //.setAutoDeleteFilesAfterSuccessfulUpload(true)
+                            //.setCustomUserAgent(getUserAgent())
+                            .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
 
             uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 

@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion target_sdk
@@ -52,6 +54,8 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
     implementation 'com.google.android.material:material:1.0.0'
 
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
     // Debugging
     implementation "com.facebook.stetho:stetho:${stethoVersion}"
     implementation "com.facebook.stetho:stetho-okhttp3:${stethoVersion}"
@@ -62,7 +66,7 @@ dependencies {
     annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 
     implementation 'com.nononsenseapps:filepicker:4.0.0-beta1'
-    implementation 'net.gotev:recycleradapter:2.4.0'
+    implementation 'net.gotev:recycleradapter:2.8.1'
 
     /*implementation "net.gotev:uploadservice:${libraryVersion}"
     implementation "net.gotev:uploadservice-okhttp:${libraryVersion}"

@@ -1,0 +1,5 @@
+#!/bin/bash
+export LOCAL_MAVEN_URL="file://$(pwd)/releases/"
+mkdir -p releases
+./gradlew clean build publish -PmavPublishToInternalRepo=true
+

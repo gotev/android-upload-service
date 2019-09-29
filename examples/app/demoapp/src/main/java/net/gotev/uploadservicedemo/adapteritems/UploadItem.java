@@ -4,13 +4,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import net.gotev.recycleradapter.AdapterItem;
 import net.gotev.uploadservicedemo.R;
 import net.gotev.uploadservicedemo.views.ButterKnifeViewHolder;
 
-import org.jetbrains.annotations.NotNull;
-
-import androidx.annotation.NonNull;
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -52,7 +51,7 @@ public class UploadItem extends AdapterItem<UploadItem.Holder> {
     }
 
     @Override
-    public void bind(@NotNull Holder holder) {
+    public void bind(boolean firstTime, @NonNull UploadItem.Holder holder) {
         holder.image.setImageResource(icons[mType]);
         holder.title.setText(mTitle);
         holder.subtitle.setText(mSubtitle);
@@ -99,7 +98,6 @@ public class UploadItem extends AdapterItem<UploadItem.Holder> {
         return mTitle.compareTo(other.mTitle);
     }
 
-    @NotNull
     @Override
     public String diffingId() {
         return UploadItem.class.getName() + mTitle + mSubtitle;

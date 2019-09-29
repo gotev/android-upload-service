@@ -4,13 +4,13 @@ import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+
 import net.gotev.recycleradapter.AdapterItem;
 import net.gotev.uploadservicedemo.R;
 import net.gotev.uploadservicedemo.views.ButterKnifeViewHolder;
 
-import org.jetbrains.annotations.NotNull;
-
-import androidx.annotation.StringRes;
 import butterknife.BindView;
 
 /**
@@ -26,7 +26,7 @@ public class EmptyItem extends AdapterItem<EmptyItem.Holder> {
         text = textResource;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String diffingId() {
         return EmptyItem.class.getName();
@@ -38,7 +38,7 @@ public class EmptyItem extends AdapterItem<EmptyItem.Holder> {
     }
 
     @Override
-    public void bind(@NotNull Holder holder) {
+    public void bind(boolean firstTime, @NonNull Holder holder) {
         Context ctx = holder.textView.getContext();
         holder.textView.setText(ctx.getString(text));
     }

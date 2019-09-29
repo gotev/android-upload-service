@@ -1,6 +1,0 @@
-#!/bin/bash
-sudo -s launchctl load -w /System/Library/LaunchDaemons/ftp.plist
-echo -e "Now type:\n\nftp localhost\n\nto check that the FTP server is running."
-echo "You can login with your system's user credentials"
-echo "FTP server is listening on the following IP addresses:"
-ifconfig | grep "inet " | awk '{print $2":21"}'
