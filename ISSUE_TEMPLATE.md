@@ -1,6 +1,12 @@
+<!--- Before opening this issue, be sure to have read https://github.com/gotev/android-upload-service/wiki/Usage -->
+<!--- While developing, enable the DEBUG log: https://github.com/gotev/android-upload-service/wiki/Recipes#logging -->
+<!--- Many questions and issues already have an answer in https://github.com/gotev/android-upload-service/wiki/Troubleshooting -->
+
 ### What did you expect?
+<!--- Descibe what you wanted to achieve and how -->
 
 ### What happened instead?
+<!--- Describe the error you got -->
 
 ### Version info
 * Android Upload Service version:
@@ -8,6 +14,7 @@
 * HTTP stack (e.g. HurlStack or OkHttpStack):
 
 ### Steps to reproduce (if applicable):
+<!--- Describe what another person reading this needs to do to replicate your propblem -->
 
 ### Library initialization code:
 ```java

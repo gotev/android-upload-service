@@ -3,6 +3,8 @@ Android Upload Service
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice)
 
+Upload Service 4, 100% Kotlin with Android 10 support and many improvements is approaching: https://github.com/gotev/android-upload-service/issues/450
+
 | :information_source: | [Get started!](https://github.com/gotev/android-upload-service/wiki/Setup) |
 |--|--|
 | :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.5.0/uploadservice-demo-debug.apk)|
@@ -36,6 +38,7 @@ Apps and libraries powered by this library. To be included in the following list
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
 - [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
 - [Samajbook](https://play.google.com/store/apps/details?id=com.marothiatechs.samaj)
+- [Codeaty](https://play.google.com/store/apps/details?id=com.saifraheem.BagoLearn)
 
 ## Contributing <a name="contribute"></a>
 * Do you have a new feature in mind?
