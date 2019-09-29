@@ -39,7 +39,7 @@ cd android-upload-service/uploadservice-ftp/test-server
 ### OS X
 I'm assuming you've followed the instructions in the previous paragraph and you are already in a terminal in `android-upload-service/uploadservice-ftp/test-server` directory.
 ```
-alex@mbp:~$ cd osx; ./vsftpd-osx
+alex@mbp:~$ ./vsftpd-osx
 ```
 #### Access Credentials
 * IP: Your local IP address
