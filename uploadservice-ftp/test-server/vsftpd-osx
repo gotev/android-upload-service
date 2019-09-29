@@ -1,0 +1,13 @@
+#!/bin/bash
+docker pull fauria/vsftpd
+
+IPADDR=$(ifconfig en0 | grep "inet " | awk '{print $2}')
+PORT=21
+
+echo "Starting vsftpd on ${IPADDR}:${PORT}"
+
+docker run -t -i -v $(pwd):/home/vsftpd \
+        -p 20:20 -p 21:21 -p 21100-21110:21100-21110 \
+        -e FTP_USER=myuser -e FTP_PASS=mypass -e LOG_STDOUT=yes \
+        -e PASV_ADDRESS=$IPADDR -e PASV_MIN_PORT=21100 -e PASV_MAX_PORT=21110 \
+        fauria/vsftpd

@@ -4,10 +4,8 @@ package net.gotev.uploadservice.ftp
  * Utility class to work with UNIX permissions.
  *
  * The default permissions set are 644 (Owner can read and write. Group and World can only read)
- *
- * @author Aleksandar Gotev
  */
-class UnixPermissions(value: String = "644") {
+class UnixPermissions @JvmOverloads constructor(value: String = "644") {
 
     data class RolePermissions(
             var read: Boolean = false,

@@ -76,15 +76,13 @@ class FTPUploadRequest(context: Context, serverUrl: String, port: Int) : UploadR
     @JvmOverloads
     fun addFileToUpload(filePath: String, remotePath: String? = null, permissions: UnixPermissions? = null): FTPUploadRequest {
         files.add(UploadFile(filePath).apply {
-            properties[FTPUploadTask.PARAM_REMOTE_PATH] = if (remotePath.isNullOrBlank()) {
+            this.remotePath = if (remotePath.isNullOrBlank()) {
                 File(filePath).name
             } else {
                 remotePath
             }
 
-            permissions?.let {
-                properties[FTPUploadTask.PARAM_PERMISSIONS] = it.toString()
-            }
+            this.permissions = permissions?.toString()
         })
         return this
     }

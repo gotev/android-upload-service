@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.gotev.recycleradapter.RecyclerAdapter;
 import net.gotev.uploadservice.ftp.FTPUploadRequest;
-import net.gotev.uploadservice.ftp.UnixPermissions;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.dialogs.AddFileParameterNameDialog;
@@ -84,7 +83,8 @@ public class FTPUploadActivity extends FilesPickerActivity {
                     @Override
                     public void onValue(String value) {
                         remotePath = value;
-                        openFilePicker(false);
+                        //openFilePicker(false);
+                        performFileSearch();
                     }
                 });
     }
@@ -160,7 +160,7 @@ public class FTPUploadActivity extends FilesPickerActivity {
                     .setMaxRetries(UploadActivity.MAX_RETRIES)
                     .setNotificationConfig(getNotificationConfig(uploadId, R.string.ftp_upload))
                     .setUsernameAndPassword(ftpUsername.getText().toString(), ftpPassword.getText().toString())
-                    .setCreatedDirectoriesPermissions(new UnixPermissions("777"))
+                    //.setCreatedDirectoriesPermissions(new UnixPermissions("777"))
                     .setSocketTimeout(5000)
                     .setConnectTimeout(5000);
 

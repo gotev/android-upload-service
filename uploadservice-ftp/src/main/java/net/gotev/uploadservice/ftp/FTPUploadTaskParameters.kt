@@ -10,8 +10,8 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class FTPUploadTaskParameters(
         var port: Int,
-        var username: String? = null,
-        var password: String? = null,
+        var username: String = "anonymous",
+        var password: String = "",
         var connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT,
         var socketTimeout: Int = DEFAULT_SOCKET_TIMEOUT,
         @get:JvmName("isCompressedFileTransfer")

@@ -1,19 +1,12 @@
 package net.gotev.uploadservice.protocols.multipart
 
 import net.gotev.uploadservice.data.UploadFile
+import net.gotev.uploadservice.extensions.setOrRemove
 
 // properties associated to each file
 private const val PROPERTY_PARAM_NAME = "multipartParamName"
 private const val PROPERTY_REMOTE_FILE_NAME = "multipartRemoteFileName"
 private const val PROPERTY_CONTENT_TYPE = "multipartContentType"
-
-private fun LinkedHashMap<String, String>.setOrRemove(key: String, value: String?) {
-    if (value == null) {
-        remove(key)
-    } else {
-        this[key] = value
-    }
-}
 
 internal var UploadFile.parameterName: String?
     get() = properties[PROPERTY_PARAM_NAME]
