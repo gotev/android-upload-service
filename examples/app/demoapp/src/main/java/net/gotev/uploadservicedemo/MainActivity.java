@@ -39,7 +39,7 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.cancelAllUploadsButton)
     public void onCancelAllUploadsButtonClick() {
-        UploadService.Companion.stopAllUploads();
+        UploadService.stopAllUploads();
     }
 
     @OnClick(R.id.run_issue)

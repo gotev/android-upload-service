@@ -23,6 +23,6 @@ public class NotificationActionsReceiver extends BroadcastReceiver {
 
     private void onUserRequestedUploadCancellation(Context context, String uploadId) {
         Log.e("CANCEL_UPLOAD", "User requested cancellation of upload with ID: " + uploadId);
-        UploadService.Companion.stopUpload(uploadId);
+        UploadService.stopUpload(uploadId);
     }
 }
