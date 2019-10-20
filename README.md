@@ -5,7 +5,7 @@ Android Upload Service
 
 Upload Service 4.0.0 Alpha 02, 100% Kotlin with:
 - Android 10 support
-- New *delegates* using AndroidX stock lifecycle aware request observer
+- New *delegates* using AndroidX lifecycle
 
 is here for developer preview! [Check this issue for more information](https://github.com/gotev/android-upload-service/issues/463). For production grade and battle tested version, use 3.5.2.
 
