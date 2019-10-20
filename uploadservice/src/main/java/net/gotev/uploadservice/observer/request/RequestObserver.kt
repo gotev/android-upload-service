@@ -3,15 +3,29 @@ package net.gotev.uploadservice.observer.request
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
+import net.gotev.uploadservice.UploadRequest
+import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.BroadcastData
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadStatus
-import net.gotev.uploadservice.network.ServerResponse
 
-abstract class RequestObserver : BroadcastReceiver() {
+class RequestObserver(
+        private val context: Context,
+        private val delegate: RequestObserverDelegate
+) : BroadcastReceiver(), LifecycleObserver {
 
-    final override fun onReceive(context: Context, intent: Intent?) {
+    private var subscribedUploadID: String? = null
+
+    init {
+        (context as? LifecycleOwner)?.lifecycle?.addObserver(this)
+    }
+
+    override fun onReceive(context: Context, intent: Intent?) {
         val safeIntent = intent ?: return
         if (safeIntent.action != UploadServiceConfig.broadcastAction) return
         val data = BroadcastData.fromIntent(safeIntent) ?: return
@@ -23,81 +37,53 @@ abstract class RequestObserver : BroadcastReceiver() {
         }
 
         when (data.status) {
-            UploadStatus.IN_PROGRESS -> onProgress(context, uploadInfo)
-            UploadStatus.ERROR -> onError(context, uploadInfo, data.exception!!)
-            UploadStatus.SUCCESS -> onSuccess(context, uploadInfo, data.serverResponse!!)
-            UploadStatus.COMPLETED -> onCompleted(context, uploadInfo)
+            UploadStatus.IN_PROGRESS -> delegate.onProgress(context, uploadInfo)
+            UploadStatus.ERROR -> delegate.onError(context, uploadInfo, data.exception!!)
+            UploadStatus.SUCCESS -> delegate.onSuccess(context, uploadInfo, data.serverResponse!!)
+            UploadStatus.COMPLETED -> delegate.onCompleted(context, uploadInfo)
         }
     }
 
     /**
      * Method called every time a new event arrives from an upload task, to decide whether or not
-     * to process it. This is useful if you want to filter events based on custom business logic.
+     * to process it. If this request observer subscribed a particular upload task, it will listen
+     * only to it
      *
      * @param uploadInfo upload info to
      * @return true to accept the event, false to discard it
      */
-    open fun shouldAcceptEventFrom(uploadInfo: UploadInfo): Boolean {
-        return true
+    private fun shouldAcceptEventFrom(uploadInfo: UploadInfo): Boolean {
+        val uploadId = subscribedUploadID ?: return true
+        return uploadId == uploadInfo.uploadId
     }
 
     /**
-     * Register this upload receiver.<br></br>
-     * If you use this receiver in an [android.app.Activity], you have to call this method inside
-     * [android.app.Activity.onResume], after `super.onResume();`.<br></br>
-     * If you use it in a [android.app.Service], you have to
-     * call this method inside [android.app.Service.onCreate], after `super.onCreate();`.
-     *
-     * @param context context in which to register this receiver
+     * Register this upload receiver to listen for events.
      */
-    fun register(context: Context) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun register() {
         context.registerReceiver(this, UploadServiceConfig.broadcastIntentFilter)
+
+        subscribedUploadID?.let {
+            if (!UploadService.taskList.contains(it)) {
+                delegate.onCompletedWhileNotObserving()
+            }
+        }
     }
 
     /**
-     * Unregister this upload receiver.<br></br>
-     * If you use this receiver in an [android.app.Activity], you have to call this method inside
-     * [android.app.Activity.onPause], after `super.onPause();`.<br></br>
-     * If you use it in a [android.app.Service], you have to
-     * call this method inside [android.app.Service.onDestroy].
-     *
-     * @param context context in which to unregister this receiver
+     * Unregister this upload receiver from listening events.
      */
-    fun unregister(context: Context) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun unregister() {
         context.unregisterReceiver(this)
     }
 
     /**
-     * Called when the upload progress changes.
-     *
-     * @param context    context
-     * @param uploadInfo upload status information
+     * Subscribe to get only the events from the given upload request. Otherwise, it will listen to
+     * all the upload requests.
      */
-    abstract fun onProgress(context: Context, uploadInfo: UploadInfo)
-
-    /**
-     * Called when the upload is completed successfully.
-     *
-     * @param context        context
-     * @param uploadInfo     upload status information
-     * @param serverResponse response got from the server
-     */
-    abstract fun onSuccess(context: Context, uploadInfo: UploadInfo, serverResponse: ServerResponse)
-
-    /**
-     * Called when an error happens during the upload.
-     *
-     * @param context context
-     * @param uploadInfo upload status information
-     * @param exception exception that caused the error
-     */
-    abstract fun onError(context: Context, uploadInfo: UploadInfo, exception: Throwable)
-
-    /**
-     * Called when the upload is completed wither with success or error.
-     *
-     * @param context context
-     * @param uploadInfo upload status information
-     */
-    abstract fun onCompleted(context: Context, uploadInfo: UploadInfo)
+    fun subscribe(request: UploadRequest<*>) {
+        subscribedUploadID = request.startUpload()
+    }
 }

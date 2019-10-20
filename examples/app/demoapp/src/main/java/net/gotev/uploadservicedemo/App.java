@@ -14,6 +14,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.data.RetryPolicyConfig;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
+import net.gotev.uploadservice.observer.request.RequestObserver;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 
 import java.io.IOException;
@@ -64,8 +65,7 @@ public class App extends Application {
 
         createNotificationChannel();
 
-        GlobalBroadcastReceiver receiver = new GlobalBroadcastReceiver();
-        receiver.register(this);
+        new RequestObserver(this, new GlobalBroadcastReceiver()).register();
     }
 
     private void createNotificationChannel() {

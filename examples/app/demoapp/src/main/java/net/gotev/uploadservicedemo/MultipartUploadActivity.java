@@ -1,13 +1,20 @@
 package net.gotev.uploadservicedemo;
 
+import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import net.gotev.recycleradapter.AdapterItem;
+import net.gotev.uploadservice.data.UploadInfo;
+import net.gotev.uploadservice.network.ServerResponse;
+import net.gotev.uploadservice.observer.request.RequestObserverDelegate;
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.utils.UploadItemUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -72,8 +79,34 @@ public class MultipartUploadActivity extends UploadActivity {
 
             });
 
-            request.startUpload();
-            finish();
+            request.subscribe(this, new RequestObserverDelegate() {
+                @Override
+                public void onProgress(@NotNull Context context, @NotNull UploadInfo uploadInfo) {
+                    Log.e("LIFECYCLE", "Progress " + uploadInfo.getProgressPercent());
+                }
+
+                @Override
+                public void onSuccess(@NotNull Context context, @NotNull UploadInfo uploadInfo, @NotNull ServerResponse serverResponse) {
+                    Log.e("LIFECYCLE", "Success " + uploadInfo.getProgressPercent());
+                }
+
+                @Override
+                public void onError(@NotNull Context context, @NotNull UploadInfo uploadInfo, @NotNull Throwable exception) {
+                    Log.e("LIFECYCLE", "Error " + exception.getMessage());
+                }
+
+                @Override
+                public void onCompleted(@NotNull Context context, @NotNull UploadInfo uploadInfo) {
+                    Log.e("LIFECYCLE", "Completed ");
+                    finish();
+                }
+
+                @Override
+                public void onCompletedWhileNotObserving() {
+                    Log.e("LIFECYCLE", "Completed while not observing");
+                    finish();
+                }
+            });
 
         } catch (Exception exc) {
             Toast.makeText(this, exc.getMessage(), Toast.LENGTH_LONG).show();

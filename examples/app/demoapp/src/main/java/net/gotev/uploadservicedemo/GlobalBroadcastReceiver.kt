@@ -6,12 +6,12 @@ import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.exceptions.UploadError
 import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
-import net.gotev.uploadservice.observer.request.RequestObserver
+import net.gotev.uploadservice.observer.request.RequestObserverDelegate
 
 /**
  * @author Aleksandar Gotev
  */
-class GlobalBroadcastReceiver : RequestObserver() {
+class GlobalBroadcastReceiver : RequestObserverDelegate {
     override fun onProgress(context: Context, uploadInfo: UploadInfo) {
         Log.e("RECEIVER", "Progress: $uploadInfo")
     }
@@ -21,7 +21,7 @@ class GlobalBroadcastReceiver : RequestObserver() {
     }
 
     override fun onError(context: Context, uploadInfo: UploadInfo, exception: Throwable) {
-        when(exception) {
+        when (exception) {
             is UserCancelledUploadException -> {
                 Log.e("RECEIVER", "Error, user cancelled upload: $uploadInfo")
             }
@@ -39,5 +39,9 @@ class GlobalBroadcastReceiver : RequestObserver() {
 
     override fun onCompleted(context: Context, uploadInfo: UploadInfo) {
         Log.e("RECEIVER", "Completed: $uploadInfo")
+    }
+
+    override fun onCompletedWhileNotObserving() {
+        Log.e("RECEIVER", "Completed while not observing")
     }
 }

@@ -6,7 +6,8 @@ import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.startNewUpload
-import net.gotev.uploadservice.observer.request.SingleRequestObserver
+import net.gotev.uploadservice.observer.request.RequestObserver
+import net.gotev.uploadservice.observer.request.RequestObserverDelegate
 import java.util.*
 
 /**
@@ -63,8 +64,17 @@ constructor(protected val context: Context, protected var serverUrl: String) {
      * Subscribe to events of this upload request
      * @param observer observer to listen for events.
      */
-    fun subscribe(observer: SingleRequestObserver) {
+    fun subscribe(observer: RequestObserver) {
         observer.subscribe(this)
+    }
+
+    /**
+     * Subscribe to events of this upload request by creating a new request observer.
+     * @param context context
+     * @param delegate Observer delegate implementation
+     */
+    fun subscribe(context: Context, delegate: RequestObserverDelegate): RequestObserver {
+        return RequestObserver(context, delegate).apply { subscribe(this@UploadRequest) }
     }
 
     protected abstract fun getAdditionalParameters(): Parcelable
