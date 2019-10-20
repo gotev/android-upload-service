@@ -7,6 +7,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import net.gotev.uploadservice.UploadRequest
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
@@ -62,7 +63,8 @@ class RequestObserver(
      */
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun register() {
-        context.registerReceiver(this, UploadServiceConfig.broadcastIntentFilter)
+        LocalBroadcastManager.getInstance(context)
+            .registerReceiver(this, UploadServiceConfig.broadcastIntentFilter)
 
         subscribedUploadID?.let {
             if (!UploadService.taskList.contains(it)) {
@@ -76,7 +78,7 @@ class RequestObserver(
      */
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun unregister() {
-        context.unregisterReceiver(this)
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(this)
     }
 
     /**

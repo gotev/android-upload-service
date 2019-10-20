@@ -37,5 +37,5 @@ ext {
 
     // Library and app dependencies versions
     androidx_appcompat_version = '1.1.0'
-
+    androidx_local_broadcast_version = '1.0.0'
 }

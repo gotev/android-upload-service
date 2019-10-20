@@ -81,6 +81,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:$androidx_local_broadcast_version"
 }
 
 bintray {
