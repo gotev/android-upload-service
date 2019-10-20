@@ -1,6 +1,9 @@
 package net.gotev.uploadservice
 
 import android.content.Context
+import java.io.IOException
+import java.util.ArrayList
+import java.util.Date
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadTaskParameters
@@ -10,8 +13,6 @@ import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.observer.task.UploadTaskObserver
-import java.io.IOException
-import java.util.*
 
 abstract class UploadTask : Runnable {
 
@@ -64,12 +65,12 @@ abstract class UploadTask : Runnable {
 
     private val uploadInfo: UploadInfo
         get() = UploadInfo(
-                uploadId = params.id,
-                startTime = startTime,
-                uploadedBytes = uploadedBytes,
-                totalBytes = totalBytes,
-                numberOfRetries = attempts - 1,
-                files = params.files
+            uploadId = params.id,
+            startTime = startTime,
+            uploadedBytes = uploadedBytes,
+            totalBytes = totalBytes,
+            numberOfRetries = attempts - 1,
+            files = params.files
         )
 
     /**
@@ -85,7 +86,10 @@ abstract class UploadTask : Runnable {
             try {
                 action(it)
             } catch (exc: Throwable) {
-                UploadServiceLogger.error(TAG, exc) { "(uploadID: ${params.id}) error while dispatching event to observer" }
+                UploadServiceLogger.error(
+                    TAG,
+                    exc
+                ) { "(uploadID: ${params.id}) error while dispatching event to observer" }
             }
         }
     }
@@ -96,11 +100,15 @@ abstract class UploadTask : Runnable {
      * custom parameters set in [UploadRequest.initializeIntent] method.
      *
      * @param context Upload Service instance. You should use this reference as your context.
-     * @param intent  intent sent to the context to start the upload
+     * @param intent intent sent to the context to start the upload
      * @throws IOException if an I/O exception occurs while initializing
      */
     @Throws(IOException::class)
-    fun init(context: Context, taskParams: UploadTaskParameters, vararg taskObservers: UploadTaskObserver) {
+    fun init(
+        context: Context,
+        taskParams: UploadTaskParameters,
+        vararg taskObservers: UploadTaskObserver
+    ) {
         this.context = context
         this.params = taskParams
         taskObservers.forEach { observers.add(it) }
@@ -155,7 +163,8 @@ abstract class UploadTask : Runnable {
         while (condition()) {
             try {
                 Thread.sleep(millis)
-            } catch (exc: Throwable) { }
+            } catch (exc: Throwable) {
+            }
         }
     }
 
@@ -167,7 +176,7 @@ abstract class UploadTask : Runnable {
      * Broadcasts a progress update.
      *
      * @param uploadedBytes number of bytes which has been uploaded to the server
-     * @param totalBytes    total bytes of the request
+     * @param totalBytes total bytes of the request
      */
     protected fun onProgress(bytesSent: Long) {
         uploadedBytes += bytesSent
@@ -268,5 +277,4 @@ abstract class UploadTask : Runnable {
         lastProgressNotificationTime = currentTime
         return false
     }
-
 }

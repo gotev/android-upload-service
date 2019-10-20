@@ -1,9 +1,9 @@
 package net.gotev.uploadservice.okhttp
 
+import java.io.IOException
 import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.HttpStack
 import okhttp3.OkHttpClient
-import java.io.IOException
 
 /**
  * Implementation of the OkHttp Stack.

@@ -2,14 +2,14 @@ package net.gotev.uploadservice
 
 import android.content.IntentFilter
 import android.os.Build
+import java.lang.reflect.InvocationTargetException
+import java.util.LinkedHashMap
 import net.gotev.uploadservice.data.RetryPolicyConfig
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
 import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
 import net.gotev.uploadservice.schemehandlers.FileSchemeHandler
 import net.gotev.uploadservice.schemehandlers.SchemeHandler
-import java.lang.reflect.InvocationTargetException
-import java.util.*
 
 object UploadServiceConfig {
 
@@ -144,7 +144,12 @@ object UploadServiceConfig {
         schemeHandlers[scheme] = handler
     }
 
-    @Throws(NoSuchMethodException::class, IllegalAccessException::class, InvocationTargetException::class, InstantiationException::class)
+    @Throws(
+        NoSuchMethodException::class,
+        IllegalAccessException::class,
+        InvocationTargetException::class,
+        InstantiationException::class
+    )
     @JvmStatic
     fun getSchemeHandler(path: String): SchemeHandler {
         val trimmedPath = path.trim()
@@ -179,5 +184,4 @@ object UploadServiceConfig {
             }
         """.trimIndent()
     }
-
 }

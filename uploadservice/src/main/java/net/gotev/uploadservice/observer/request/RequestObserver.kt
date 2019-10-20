@@ -15,8 +15,8 @@ import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadStatus
 
 class RequestObserver(
-        private val context: Context,
-        private val delegate: RequestObserverDelegate
+    private val context: Context,
+    private val delegate: RequestObserverDelegate
 ) : BroadcastReceiver(), LifecycleObserver {
 
     private var subscribedUploadID: String? = null

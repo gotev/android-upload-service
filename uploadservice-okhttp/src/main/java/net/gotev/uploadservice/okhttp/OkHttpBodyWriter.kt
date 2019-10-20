@@ -1,14 +1,15 @@
 package net.gotev.uploadservice.okhttp
 
+import java.io.IOException
 import net.gotev.uploadservice.network.BodyWriter
 import okio.BufferedSink
-import java.io.IOException
 
 /**
  * @author Aleksandar Gotev
  */
 
-class OkHttpBodyWriter(private val sink: BufferedSink, listener: OnStreamWriteListener) : BodyWriter(listener) {
+class OkHttpBodyWriter(private val sink: BufferedSink, listener: OnStreamWriteListener) :
+    BodyWriter(listener) {
     @Throws(IOException::class)
     override fun internalWrite(bytes: ByteArray) {
         sink.write(bytes)

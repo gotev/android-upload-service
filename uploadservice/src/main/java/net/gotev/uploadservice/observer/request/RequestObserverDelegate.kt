@@ -8,7 +8,7 @@ interface RequestObserverDelegate {
     /**
      * Called when the upload progress changes.
      *
-     * @param context    context
+     * @param context context
      * @param uploadInfo upload status information
      */
     fun onProgress(context: Context, uploadInfo: UploadInfo)
@@ -16,8 +16,8 @@ interface RequestObserverDelegate {
     /**
      * Called when the upload is completed successfully.
      *
-     * @param context        context
-     * @param uploadInfo     upload status information
+     * @param context context
+     * @param uploadInfo upload status information
      * @param serverResponse response got from the server
      */
     fun onSuccess(context: Context, uploadInfo: UploadInfo, serverResponse: ServerResponse)

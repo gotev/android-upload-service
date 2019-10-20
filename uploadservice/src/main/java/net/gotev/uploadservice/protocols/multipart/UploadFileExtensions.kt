@@ -10,13 +10,18 @@ private const val PROPERTY_CONTENT_TYPE = "multipartContentType"
 
 internal var UploadFile.parameterName: String?
     get() = properties[PROPERTY_PARAM_NAME]
-    set(value) { properties.setOrRemove(PROPERTY_PARAM_NAME, value) }
+    set(value) {
+        properties.setOrRemove(PROPERTY_PARAM_NAME, value)
+    }
 
 internal var UploadFile.remoteFileName: String?
     get() = properties[PROPERTY_REMOTE_FILE_NAME]
-    set(value) { properties.setOrRemove(PROPERTY_REMOTE_FILE_NAME, value) }
-
+    set(value) {
+        properties.setOrRemove(PROPERTY_REMOTE_FILE_NAME, value)
+    }
 
 internal var UploadFile.contentType: String?
     get() = properties[PROPERTY_CONTENT_TYPE]
-    set(value) { properties.setOrRemove(PROPERTY_CONTENT_TYPE, value) }
+    set(value) {
+        properties.setOrRemove(PROPERTY_CONTENT_TYPE, value)
+    }

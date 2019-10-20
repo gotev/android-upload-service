@@ -43,9 +43,9 @@ object Placeholders {
         val safeString = string ?: return ""
 
         return safeString.replace(ELAPSED_TIME, uploadInfo.elapsedTimeString)
-                .replace(PROGRESS, "${uploadInfo.progressPercent}%")
-                .replace(UPLOAD_RATE, uploadInfo.uploadRateString)
-                .replace(UPLOADED_FILES, uploadInfo.successfullyUploadedFiles.toString())
-                .replace(TOTAL_FILES, uploadInfo.files.size.toString())
+            .replace(PROGRESS, "${uploadInfo.progressPercent}%")
+            .replace(UPLOAD_RATE, uploadInfo.uploadRateString)
+            .replace(UPLOADED_FILES, uploadInfo.successfullyUploadedFiles.toString())
+            .replace(TOTAL_FILES, uploadInfo.files.size.toString())
     }
 }

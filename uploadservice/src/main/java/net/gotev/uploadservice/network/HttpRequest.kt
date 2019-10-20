@@ -1,11 +1,10 @@
 package net.gotev.uploadservice.network
 
-import net.gotev.uploadservice.data.NameValue
 import java.io.Closeable
-
 import java.io.IOException
+import net.gotev.uploadservice.data.NameValue
 
-interface HttpRequest: Closeable {
+interface HttpRequest : Closeable {
 
     /**
      * Delegate called when the body is ready to be written.
@@ -50,5 +49,8 @@ interface HttpRequest: Closeable {
      * @return response from server
      */
     @Throws(IOException::class)
-    fun getResponse(delegate: RequestBodyDelegate, listener: BodyWriter.OnStreamWriteListener): ServerResponse
+    fun getResponse(
+        delegate: RequestBodyDelegate,
+        listener: BodyWriter.OnStreamWriteListener
+    ): ServerResponse
 }

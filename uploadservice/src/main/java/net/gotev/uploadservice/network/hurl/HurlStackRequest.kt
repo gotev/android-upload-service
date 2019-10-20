@@ -1,25 +1,25 @@
 package net.gotev.uploadservice.network.hurl
 
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.UUID
+import javax.net.ssl.HttpsURLConnection
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.BodyWriter
 import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.ServerResponse
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.*
-import javax.net.ssl.HttpsURLConnection
-import kotlin.collections.LinkedHashMap
 
 class HurlStackRequest(
-        private val uploadId: String,
-        method: String,
-        url: String,
-        followRedirects: Boolean,
-        useCaches: Boolean,
-        connectTimeout: Int,
-        readTimeout: Int) : HttpRequest {
+    private val uploadId: String,
+    method: String,
+    url: String,
+    followRedirects: Boolean,
+    useCaches: Boolean,
+    connectTimeout: Int,
+    readTimeout: Int
+) : HttpRequest {
 
     private val connection: HttpURLConnection
     private val uuid = UUID.randomUUID().toString()
@@ -69,10 +69,10 @@ class HurlStackRequest(
 
             return LinkedHashMap<String, String>(headers.size).apply {
                 headers.entries
-                        .filter { it.key != null && it.value != null && it.value.isNotEmpty() }
-                        .forEach { (key, values) ->
-                            this[key] = values.first()
-                        }
+                    .filter { it.key != null && it.value != null && it.value.isNotEmpty() }
+                    .forEach { (key, values) ->
+                        this[key] = values.first()
+                    }
             }
         }
 
@@ -85,7 +85,10 @@ class HurlStackRequest(
         return this
     }
 
-    override fun setTotalBodyBytes(totalBodyBytes: Long, isFixedLengthStreamingMode: Boolean): HttpRequest {
+    override fun setTotalBodyBytes(
+        totalBodyBytes: Long,
+        isFixedLengthStreamingMode: Boolean
+    ): HttpRequest {
         connection.apply {
             if (isFixedLengthStreamingMode) {
                 setFixedLengthStreamingMode(totalBodyBytes)
@@ -98,7 +101,10 @@ class HurlStackRequest(
     }
 
     @Throws(IOException::class)
-    override fun getResponse(delegate: HttpRequest.RequestBodyDelegate, listener: BodyWriter.OnStreamWriteListener) = use {
+    override fun getResponse(
+        delegate: HttpRequest.RequestBodyDelegate,
+        listener: BodyWriter.OnStreamWriteListener
+    ) = use {
         HurlBodyWriter(connection.outputStream, listener).use {
             delegate.onWriteRequestBody(it)
         }

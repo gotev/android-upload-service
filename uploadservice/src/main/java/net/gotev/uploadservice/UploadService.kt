@@ -6,6 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.PowerManager
+import java.util.Timer
+import java.util.TimerTask
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.acquirePartialWakeLock
 import net.gotev.uploadservice.extensions.safeRelease
@@ -13,11 +19,6 @@ import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.observer.task.BroadcastEmitter
 import net.gotev.uploadservice.observer.task.NotificationHandler
 import net.gotev.uploadservice.observer.task.TaskCompletionNotifier
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
 
 class UploadService : Service() {
 
@@ -85,7 +86,12 @@ class UploadService : Service() {
             stopAllUploads()
             context.stopService(Intent(context, UploadService::class.java))
         } else {
-            uploadTasksMap.isEmpty() && context.stopService(Intent(context, UploadService::class.java))
+            uploadTasksMap.isEmpty() && context.stopService(
+                Intent(
+                    context,
+                    UploadService::class.java
+                )
+            )
         }
     }
 
@@ -93,11 +99,11 @@ class UploadService : Service() {
     private val uploadTasksQueue = LinkedBlockingQueue<Runnable>()
     private val uploadThreadPool by lazy {
         ThreadPoolExecutor(
-                UploadServiceConfig.uploadPoolSize, // Initial pool size
-                UploadServiceConfig.uploadPoolSize, // Max pool size
-                UploadServiceConfig.keepAliveTimeSeconds.toLong(),
-                TimeUnit.SECONDS,
-                uploadTasksQueue
+            UploadServiceConfig.uploadPoolSize, // Initial pool size
+            UploadServiceConfig.uploadPoolSize, // Max pool size
+            UploadServiceConfig.keepAliveTimeSeconds.toLong(),
+            TimeUnit.SECONDS,
+            uploadTasksQueue
         )
     }
     private var idleTimer: Timer? = null
@@ -124,7 +130,7 @@ class UploadService : Service() {
         if (uploadTasksMap.containsKey(currentTask.params.id)) {
             UploadServiceLogger.error(TAG) {
                 "Preventing upload with id: ${currentTask.params.id} to be uploaded twice! " +
-                        "Please check your code and fix it!"
+                    "Please check your code and fix it!"
             }
             return shutdownIfThereArentAnyActiveTasks()
         }
@@ -153,7 +159,7 @@ class UploadService : Service() {
 
             UploadServiceLogger.info(TAG) {
                 "Service will be shut down in ${UploadServiceConfig.idleTimeoutSeconds}s " +
-                        "if no new tasks are received"
+                    "if no new tasks are received"
             }
 
             idleTimer = Timer(TAG + "IdleTimer").apply {
@@ -161,7 +167,7 @@ class UploadService : Service() {
                     override fun run() {
                         UploadServiceLogger.info(TAG) {
                             "Service is about to be stopped because idle timeout of " +
-                                    "${UploadServiceConfig.idleTimeoutSeconds}s has been reached"
+                                "${UploadServiceConfig.idleTimeoutSeconds}s has been reached"
                         }
                         stopSelf()
                     }
@@ -223,18 +229,22 @@ class UploadService : Service() {
             notificationIncrementalId += 2
 
             val observers = listOfNotNull(
-                    BroadcastEmitter(this),
-                    params.notificationConfig?.let {
-                        NotificationHandler(this, UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId, params.id, it)
-                    },
-                    TaskCompletionNotifier(this)
+                BroadcastEmitter(this),
+                params.notificationConfig?.let {
+                    NotificationHandler(
+                        this,
+                        UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
+                        params.id,
+                        it
+                    )
+                },
+                TaskCompletionNotifier(this)
             ).toTypedArray()
 
             uploadTask.init(this, params, *observers)
 
             UploadServiceLogger.debug(TAG) { "Successfully created new task with class: $taskClassString" }
             uploadTask
-
         } catch (exc: Throwable) {
             UploadServiceLogger.error(TAG, exc) { "Error while instantiating new task" }
             null

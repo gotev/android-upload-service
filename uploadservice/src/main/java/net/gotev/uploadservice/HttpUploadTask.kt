@@ -1,19 +1,20 @@
 package net.gotev.uploadservice
 
 import android.annotation.SuppressLint
+import java.io.UnsupportedEncodingException
 import net.gotev.uploadservice.data.HttpUploadTaskParameters
 import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.BodyWriter
 import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.HttpStack
-import java.io.UnsupportedEncodingException
 
 /**
  * Generic HTTP Upload Task.
  * Subclass to create your custom upload task.
  */
-abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, BodyWriter.OnStreamWriteListener {
+abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate,
+    BodyWriter.OnStreamWriteListener {
 
     protected val httpParams: HttpUploadTaskParameters
         get() = params.additionalParameters as HttpUploadTaskParameters
@@ -44,12 +45,12 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
             val userAgent = httpParams.customUserAgent
 
             requestHeaders.addHeader(
-                    name = "User-Agent",
-                    value = if (userAgent.isNullOrBlank()) {
-                        "AndroidUploadService/" + BuildConfig.VERSION_NAME
-                    } else {
-                        userAgent
-                    }
+                name = "User-Agent",
+                value = if (userAgent.isNullOrBlank()) {
+                    "AndroidUploadService/" + BuildConfig.VERSION_NAME
+                } else {
+                    userAgent
+                }
             )
         }
 
@@ -57,13 +58,13 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate, B
         totalBytes = bodyLength
 
         val response = httpStack.newRequest(params.id, httpParams.method, params.serverUrl)
-                .setHeaders(httpParams.requestHeaders.map { it.validateAsHeader() })
-                .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode)
-                .getResponse(this, this)
+            .setHeaders(httpParams.requestHeaders.map { it.validateAsHeader() })
+            .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode)
+            .getResponse(this, this)
 
         UploadServiceLogger.debug(javaClass.simpleName) {
             "Server responded with code ${response.code} " +
-                    "and body ${response.bodyString} to upload with ID: ${params.id}"
+                "and body ${response.bodyString} to upload with ID: ${params.id}"
         }
 
         // Broadcast completion only if the user has not cancelled the operation.

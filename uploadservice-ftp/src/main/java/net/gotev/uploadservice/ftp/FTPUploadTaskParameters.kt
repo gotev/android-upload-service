@@ -9,18 +9,18 @@ import kotlinx.android.parcel.Parcelize
  */
 @Parcelize
 data class FTPUploadTaskParameters(
-        var port: Int,
-        var username: String = "anonymous",
-        var password: String = "",
-        var connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT,
-        var socketTimeout: Int = DEFAULT_SOCKET_TIMEOUT,
-        @get:JvmName("isCompressedFileTransfer")
-        var compressedFileTransfer: Boolean = false,
-        var createdDirectoriesPermissions: String? = null,
-        var useSSL: Boolean = false,
-        @get:JvmName("isImplicitSecurity")
-        var implicitSecurity: Boolean = false,
-        var secureSocketProtocol: String = DEFAULT_SECURE_SOCKET_PROTOCOL
+    var port: Int,
+    var username: String = "anonymous",
+    var password: String = "",
+    var connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT,
+    var socketTimeout: Int = DEFAULT_SOCKET_TIMEOUT,
+    @get:JvmName("isCompressedFileTransfer")
+    var compressedFileTransfer: Boolean = false,
+    var createdDirectoriesPermissions: String? = null,
+    var useSSL: Boolean = false,
+    @get:JvmName("isImplicitSecurity")
+    var implicitSecurity: Boolean = false,
+    var secureSocketProtocol: String = DEFAULT_SECURE_SOCKET_PROTOCOL
 ) : Parcelable {
     companion object {
         /**

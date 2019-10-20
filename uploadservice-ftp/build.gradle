@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.ben-manes.versions'
+apply plugin: "org.jlleitschuh.gradle.ktlint"
 
 Properties properties = new Properties()
 if (project.rootProject.file("local.properties").exists()) {
@@ -16,8 +17,8 @@ def library_keywords = ['android', 'upload', 'service', 'ftp', 'upload']
 // end - module specific overrides
 
 // start - do not modify this if your project is on github
-project.ext{
-    mavDevelopers = [(properties.getProperty("bintray.user")):(maintainer)]
+project.ext {
+    mavDevelopers = [(properties.getProperty("bintray.user")): (maintainer)]
     mavSiteUrl = "https://github.com/${github_username}/${github_repository_name}"
     mavGitUrl = mavSiteUrl + '.git'
     bugTrackerUrl = mavSiteUrl + '/issues/'

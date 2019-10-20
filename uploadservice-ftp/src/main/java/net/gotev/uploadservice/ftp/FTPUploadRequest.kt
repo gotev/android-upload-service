@@ -2,11 +2,11 @@ package net.gotev.uploadservice.ftp
 
 import android.content.Context
 import android.os.Parcelable
+import java.io.File
+import java.io.FileNotFoundException
 import net.gotev.uploadservice.UploadRequest
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.data.UploadFile
-import java.io.File
-import java.io.FileNotFoundException
 
 /**
  * Creates a new FTP Upload Request.
@@ -14,7 +14,8 @@ import java.io.FileNotFoundException
  * @param serverUrl server IP address or hostname
  * @param port FTP port
  */
-class FTPUploadRequest(context: Context, serverUrl: String, port: Int) : UploadRequest<FTPUploadRequest>(context, serverUrl) {
+class FTPUploadRequest(context: Context, serverUrl: String, port: Int) :
+    UploadRequest<FTPUploadRequest>(context, serverUrl) {
     protected val ftpParams = FTPUploadTaskParameters(port)
 
     override val taskClass: Class<out UploadTask>
@@ -74,7 +75,11 @@ class FTPUploadRequest(context: Context, serverUrl: String, port: Int) : UploadR
      */
     @Throws(FileNotFoundException::class)
     @JvmOverloads
-    fun addFileToUpload(filePath: String, remotePath: String? = null, permissions: UnixPermissions? = null): FTPUploadRequest {
+    fun addFileToUpload(
+        filePath: String,
+        remotePath: String? = null,
+        permissions: UnixPermissions? = null
+    ): FTPUploadRequest {
         files.add(UploadFile(filePath).apply {
             this.remotePath = if (remotePath.isNullOrBlank()) {
                 File(filePath).name

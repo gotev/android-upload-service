@@ -3,11 +3,11 @@ package net.gotev.uploadservice
 import android.content.Context
 import android.os.Parcelable
 import android.util.Base64
+import java.util.Locale
 import net.gotev.uploadservice.data.HttpUploadTaskParameters
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.extensions.isValidHttpUrl
-import java.util.*
 
 /**
  * Represents a generic HTTP upload request.<br></br>
@@ -15,7 +15,8 @@ import java.util.*
  * @param context application context
  * @param serverUrl URL of the server side script that handles the request
  */
-abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, serverUrl: String) : UploadRequest<B>(context, serverUrl) {
+abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, serverUrl: String) :
+    UploadRequest<B>(context, serverUrl) {
 
     protected val httpParams = HttpUploadTaskParameters()
 

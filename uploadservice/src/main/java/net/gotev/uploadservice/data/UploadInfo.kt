@@ -1,42 +1,43 @@
 package net.gotev.uploadservice.data
 
 import android.os.Parcelable
+import java.util.ArrayList
+import java.util.Date
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
-import java.util.*
 
 @Parcelize
 data class UploadInfo @JvmOverloads constructor(
-        /**
-         * Upload unique ID.
-         */
-        val uploadId: String,
+    /**
+     * Upload unique ID.
+     */
+    val uploadId: String,
 
-        /**
-         * Upload task's start timestamp in milliseconds.
-         */
-        val startTime: Long = 0,
+    /**
+     * Upload task's start timestamp in milliseconds.
+     */
+    val startTime: Long = 0,
 
-        /**
-         * Bytes upload so far.
-         */
-        val uploadedBytes: Long = 0,
+    /**
+     * Bytes upload so far.
+     */
+    val uploadedBytes: Long = 0,
 
-        /**
-         * Upload task total bytes.
-         */
-        val totalBytes: Long = 0,
+    /**
+     * Upload task total bytes.
+     */
+    val totalBytes: Long = 0,
 
-        /**
-         * Number of retries that has been made during the upload process.
-         * If no retries has been made, this value will be zero.
-         */
-        val numberOfRetries: Int = 0,
+    /**
+     * Number of retries that has been made during the upload process.
+     * If no retries has been made, this value will be zero.
+     */
+    val numberOfRetries: Int = 0,
 
-        /**
-         * List of all the files present in this upload.
-         */
-        val files: ArrayList<UploadFile> = ArrayList()
+    /**
+     * List of all the files present in this upload.
+     */
+    val files: ArrayList<UploadFile> = ArrayList()
 ) : Parcelable {
 
     @IgnoredOnParcel
@@ -70,7 +71,6 @@ data class UploadInfo @JvmOverloads constructor(
             } else {
                 "$minutes min $elapsedSeconds sec"
             }
-
         }
 
     /**

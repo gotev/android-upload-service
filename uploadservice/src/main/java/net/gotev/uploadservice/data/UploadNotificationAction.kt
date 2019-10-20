@@ -12,9 +12,9 @@ import kotlinx.android.parcel.Parcelize
  */
 @Parcelize
 data class UploadNotificationAction(
-        val icon: Int,
-        val title: CharSequence,
-        val intent: PendingIntent
+    val icon: Int,
+    val title: CharSequence,
+    val intent: PendingIntent
 ) : Parcelable {
     fun asAction(): NotificationCompat.Action {
         return NotificationCompat.Action.Builder(icon, title, intent).build()

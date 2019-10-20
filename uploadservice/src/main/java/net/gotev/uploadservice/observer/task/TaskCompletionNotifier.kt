@@ -4,7 +4,7 @@ import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.network.ServerResponse
 
-class TaskCompletionNotifier(private val service: UploadService): UploadTaskObserver {
+class TaskCompletionNotifier(private val service: UploadService) : UploadTaskObserver {
     override fun initialize(info: UploadInfo) {
     }
 

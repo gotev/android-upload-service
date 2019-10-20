@@ -1,6 +1,8 @@
 package net.gotev.uploadservice.ftp
 
 import android.content.Context
+import java.io.Closeable
+import java.io.IOException
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.logger.UploadServiceLogger
@@ -10,23 +12,21 @@ import org.apache.commons.net.ftp.FTPReply
 import org.apache.commons.net.ftp.FTPSClient
 import org.apache.commons.net.io.CopyStreamEvent
 import org.apache.commons.net.io.CopyStreamListener
-import java.io.Closeable
-import java.io.IOException
 
 class FTPClientWrapper(
-        observer: Observer,
-        connectTimeout: Int,
-        useSSL: Boolean = false,
-        sslProtocol: String = "TLS",
-        implicitSecurity: Boolean = false
+    observer: Observer,
+    connectTimeout: Int,
+    useSSL: Boolean = false,
+    sslProtocol: String = "TLS",
+    implicitSecurity: Boolean = false
 ) : Closeable {
 
     interface Observer {
         fun onTransfer(
-                client: FTPClientWrapper,
-                totalBytesTransferred: Long,
-                bytesTransferred: Int,
-                streamSize: Long
+            client: FTPClientWrapper,
+            totalBytesTransferred: Long,
+            bytesTransferred: Int,
+            streamSize: Long
         )
     }
 
@@ -35,15 +35,15 @@ class FTPClientWrapper(
         }
 
         override fun bytesTransferred(
-                totalBytesTransferred: Long,
-                bytesTransferred: Int,
-                streamSize: Long
+            totalBytesTransferred: Long,
+            bytesTransferred: Int,
+            streamSize: Long
         ) {
             observer.onTransfer(
-                    this@FTPClientWrapper,
-                    totalBytesTransferred,
-                    bytesTransferred,
-                    streamSize
+                this@FTPClientWrapper,
+                totalBytesTransferred,
+                bytesTransferred,
+                streamSize
             )
         }
     }
@@ -54,10 +54,10 @@ class FTPClientWrapper(
     } else {
         UploadServiceLogger.debug(javaClass.simpleName) {
             "Creating FTP over SSL (FTPS) client with $sslProtocol protocol and " +
-                    if (implicitSecurity)
-                        "implicit security"
-                    else
-                        "explicit security"
+                if (implicitSecurity)
+                    "implicit security"
+                else
+                    "explicit security"
         }
 
         FTPSClient(sslProtocol, implicitSecurity)
@@ -85,8 +85,10 @@ class FTPClientWrapper(
 
     private fun internalLogin(server: String, port: Int, username: String, password: String) {
         if (!ftpClient.login(username, password)) {
-            throw IOException("Login error on $server:$port with username: $username. " +
-                    "Check your credentials and try again.")
+            throw IOException(
+                "Login error on $server:$port with username: $username. " +
+                    "Check your credentials and try again."
+            )
         }
     }
 
@@ -103,7 +105,7 @@ class FTPClientWrapper(
 
         UploadServiceLogger.debug(javaClass.simpleName) {
             "Socket timeout set to ${socketTimeout}ms. " +
-                    "Enabled control keep alive every ${controlKeepAliveTimeout}s"
+                "Enabled control keep alive every ${controlKeepAliveTimeout}s"
         }
     }
 
@@ -111,19 +113,23 @@ class FTPClientWrapper(
         ftpClient.apply {
             enterLocalPassiveMode()
             setFileType(FTP.BINARY_FILE_TYPE)
-            setFileTransferMode(if (compressedFileTransfer)
-                FTP.COMPRESSED_TRANSFER_MODE
-            else
-                FTP.STREAM_TRANSFER_MODE)
+            setFileTransferMode(
+                if (compressedFileTransfer)
+                    FTP.COMPRESSED_TRANSFER_MODE
+                else
+                    FTP.STREAM_TRANSFER_MODE
+            )
         }
     }
 
-    fun connect(server: String,
-                port: Int,
-                username: String,
-                password: String,
-                socketTimeout: Int,
-                compressedFileTransfer: Boolean) {
+    fun connect(
+        server: String,
+        port: Int,
+        username: String,
+        password: String,
+        socketTimeout: Int,
+        compressedFileTransfer: Boolean
+    ) {
         internalConnect(server, port)
         internalLogin(server, port, username, password)
         setupKeepAlive(socketTimeout)
@@ -152,15 +158,14 @@ class FTPClientWrapper(
             } else {
                 UploadServiceLogger.error(javaClass.simpleName) {
                     "Error while setting permissions for $remoteFileName to: $permissions. " +
-                            "Check if your FTP user can set file permissions!"
+                        "Check if your FTP user can set file permissions!"
                 }
             }
             return success
-
         } catch (exc: Throwable) {
             UploadServiceLogger.error(javaClass.simpleName, exc) {
                 "Error while setting permissions for $remoteFileName to: $permissions. " +
-                        "Check if your FTP user can set file permissions!"
+                    "Check if your FTP user can set file permissions!"
             }
             return false
         }
@@ -178,7 +183,8 @@ class FTPClientWrapper(
     fun makeDirectories(dirPath: String, permissions: String? = null) {
         if (!dirPath.contains("/")) return
 
-        val pathElements = dirPath.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val pathElements =
+            dirPath.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
         if (pathElements.size == 1) return
 
@@ -210,10 +216,10 @@ class FTPClientWrapper(
 
     @Throws(IOException::class)
     fun uploadFile(
-            context: Context,
-            baseWorkingDir: String,
-            file: UploadFile,
-            permissions: String? = null
+        context: Context,
+        baseWorkingDir: String,
+        file: UploadFile,
+        permissions: String? = null
     ) {
         UploadServiceLogger.debug(javaClass.simpleName) {
             "Starting FTP upload of: ${file.handler.name(context)} to: ${file.remotePath}"
@@ -234,11 +240,13 @@ class FTPClientWrapper(
 
         file.handler.stream(context).use { localStream ->
             val remoteFileName = file.getRemoteFileName(context)
-                    ?: throw IOException("can't get remote file name for ${file.path}")
+                ?: throw IOException("can't get remote file name for ${file.path}")
 
             if (!ftpClient.storeFile(remoteFileName, localStream)) {
-                throw IOException("Error while uploading: ${file.handler.name(context)} " +
-                        "to: ${file.remotePath}")
+                throw IOException(
+                    "Error while uploading: ${file.handler.name(context)} " +
+                        "to: ${file.remotePath}"
+                )
             }
 
             file.permissions?.let { setPermission(remoteFileName, it) }
@@ -275,7 +283,6 @@ class FTPClientWrapper(
                     "Error while disconnecting from FTP connection"
                 }
             }
-
         }
     }
 }

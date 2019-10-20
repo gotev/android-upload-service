@@ -39,7 +39,7 @@ object UploadServiceLogger {
     }
 
     private fun loggerWithLevel(minLevel: LogLevel) =
-            if (logLevel > minLevel || logLevel == LogLevel.OFF) null else loggerDelegate.get()
+        if (logLevel > minLevel || logLevel == LogLevel.OFF) null else loggerDelegate.get()
 
     @JvmOverloads
     @JvmStatic

@@ -1,11 +1,9 @@
 package net.gotev.uploadservice.network
 
-import net.gotev.uploadservice.UploadService
-import net.gotev.uploadservice.UploadServiceConfig
 import java.io.Closeable
-
 import java.io.IOException
 import java.io.InputStream
+import net.gotev.uploadservice.UploadServiceConfig
 
 abstract class BodyWriter(private val listener: OnStreamWriteListener) : Closeable {
 

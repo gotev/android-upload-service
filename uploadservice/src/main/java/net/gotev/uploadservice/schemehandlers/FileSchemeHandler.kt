@@ -1,11 +1,11 @@
 package net.gotev.uploadservice.schemehandlers
 
 import android.content.Context
-import net.gotev.uploadservice.extensions.autoDetectMimeType
-import net.gotev.uploadservice.logger.UploadServiceLogger
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
+import net.gotev.uploadservice.extensions.autoDetectMimeType
+import net.gotev.uploadservice.logger.UploadServiceLogger
 
 internal class FileSchemeHandler : SchemeHandler {
     private lateinit var file: File
@@ -21,7 +21,7 @@ internal class FileSchemeHandler : SchemeHandler {
     override fun contentType(context: Context) = file.absolutePath.autoDetectMimeType()
 
     override fun name(context: Context) = file.name
-            ?: throw IOException("Can't get file name for ${file.absolutePath}")
+        ?: throw IOException("Can't get file name for ${file.absolutePath}")
 
     override fun delete(context: Context) = try {
         file.delete()

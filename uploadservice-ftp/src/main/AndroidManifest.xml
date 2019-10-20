@@ -1,7 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.gotev.uploadservice.ftp">
+<manifest package="net.gotev.uploadservice.ftp">
 
-    <application>
-    </application>
+    <application></application>
 
 </manifest>

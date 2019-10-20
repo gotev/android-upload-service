@@ -1,11 +1,11 @@
 package net.gotev.uploadservice.network.hurl
 
-import net.gotev.uploadservice.network.BodyWriter
-
 import java.io.IOException
 import java.io.OutputStream
+import net.gotev.uploadservice.network.BodyWriter
 
-class HurlBodyWriter(private val stream: OutputStream, listener: OnStreamWriteListener) : BodyWriter(listener) {
+class HurlBodyWriter(private val stream: OutputStream, listener: OnStreamWriteListener) :
+    BodyWriter(listener) {
     @Throws(IOException::class)
     override fun internalWrite(bytes: ByteArray) {
         stream.write(bytes)

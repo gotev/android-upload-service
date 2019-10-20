@@ -3,10 +3,10 @@ package net.gotev.uploadservice.schemehandlers
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import net.gotev.uploadservice.extensions.APPLICATION_OCTET_STREAM
-import net.gotev.uploadservice.logger.UploadServiceLogger
 import java.io.File
 import java.io.IOException
+import net.gotev.uploadservice.extensions.APPLICATION_OCTET_STREAM
+import net.gotev.uploadservice.logger.UploadServiceLogger
 
 internal class ContentResolverSchemeHandler : SchemeHandler {
 
@@ -25,13 +25,13 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
             }
         } ?: run {
             UploadServiceLogger.error(javaClass.simpleName) { "no cursor data for $uri, returning size 0" }
-            //TODO: investigate what happens when size is 0
+            // TODO: investigate what happens when size is 0
             0L
         }
     }
 
     override fun stream(context: Context) = context.contentResolver.openInputStream(uri)
-            ?: throw IOException("can't open input stream for $uri")
+        ?: throw IOException("can't open input stream for $uri")
 
     override fun contentType(context: Context): String {
         val type = context.contentResolver.getType(uri)

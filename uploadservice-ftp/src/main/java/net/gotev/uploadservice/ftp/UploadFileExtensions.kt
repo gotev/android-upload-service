@@ -10,11 +10,15 @@ private const val PROPERTY_PERMISSIONS = "ftpPermissions"
 
 internal var UploadFile.remotePath: String?
     get() = properties[PROPERTY_REMOTE_PATH]
-    set(value) { properties.setOrRemove(PROPERTY_REMOTE_PATH, value) }
+    set(value) {
+        properties.setOrRemove(PROPERTY_REMOTE_PATH, value)
+    }
 
 internal var UploadFile.permissions: String?
     get() = properties[PROPERTY_PERMISSIONS]
-    set(value) { properties.setOrRemove(PROPERTY_PERMISSIONS, value) }
+    set(value) {
+        properties.setOrRemove(PROPERTY_PERMISSIONS, value)
+    }
 
 /**
  * Checks if the remote file path contains also the remote file name. If it's not specified,

@@ -23,6 +23,7 @@ ext {
     gradle_version = '3.5.0'
     gradle_versions_plugin_version = '0.20.0'
     bintray_plugin_version = '1.8.4'
+    kotlin_lint_version = '9.0.0'
 
     // Library and app testing dependencies versions
     junit_version = '4.12'
@@ -35,6 +36,6 @@ ext {
     androidx_test_espresso_version = '3.2.0'
 
     // Library and app dependencies versions
-    androidx_appcompat_version = '1.0.2'
+    androidx_appcompat_version = '1.1.0'
 
 }

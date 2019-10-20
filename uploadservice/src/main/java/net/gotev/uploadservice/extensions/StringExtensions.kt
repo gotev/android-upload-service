@@ -2,6 +2,7 @@ package net.gotev.uploadservice.extensions
 
 import android.webkit.MimeTypeMap
 import java.net.URL
+import java.util.Locale
 
 internal fun String?.isASCII(): Boolean {
     if (this.isNullOrBlank())
@@ -29,12 +30,13 @@ fun String.autoDetectMimeType(): String {
     val index = lastIndexOf(".")
 
     return if (index in 0 until lastIndex) {
-        val extension = substring(index + 1).toLowerCase()
+        val extension = substring(index + 1).toLowerCase(Locale.getDefault())
 
         if (extension == "mp4") {
             VIDEO_MP4
         } else {
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: APPLICATION_OCTET_STREAM
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+                ?: APPLICATION_OCTET_STREAM
         }
     } else {
         APPLICATION_OCTET_STREAM

@@ -1,16 +1,16 @@
 package net.gotev.uploadservice.data
 
 import android.os.Parcelable
+import java.util.LinkedHashMap
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.schemehandlers.SchemeHandler
-import java.util.*
 
 @Parcelize
 data class UploadFile @JvmOverloads constructor(
-        val path: String,
-        val properties: LinkedHashMap<String, String> = LinkedHashMap()
+    val path: String,
+    val properties: LinkedHashMap<String, String> = LinkedHashMap()
 ) : Parcelable {
 
     companion object {
@@ -25,5 +25,7 @@ data class UploadFile @JvmOverloads constructor(
     @IgnoredOnParcel
     var successfullyUploaded: Boolean
         get() = properties[successfulUpload]?.toBoolean() ?: false
-        set(value) { properties[successfulUpload] = value.toString() }
+        set(value) {
+            properties[successfulUpload] = value.toString()
+        }
 }

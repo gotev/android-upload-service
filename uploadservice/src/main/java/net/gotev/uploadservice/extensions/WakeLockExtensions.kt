@@ -7,7 +7,10 @@ fun PowerManager.WakeLock?.safeRelease() {
     this?.apply { if (isHeld) release() }
 }
 
-fun Context.acquirePartialWakeLock(currentWakeLock: PowerManager.WakeLock?, tag: String): PowerManager.WakeLock {
+fun Context.acquirePartialWakeLock(
+    currentWakeLock: PowerManager.WakeLock?,
+    tag: String
+): PowerManager.WakeLock {
     if (currentWakeLock?.isHeld == true) {
         return currentWakeLock
     }

@@ -9,21 +9,21 @@ import net.gotev.uploadservice.Placeholders
 
 @Parcelize
 class UploadNotificationConfig @JvmOverloads constructor(
-        var notificationChannelId: String,
-        //TODO: study how to apply this to notification channels
-        var isRingToneEnabled: Boolean = true,
-        val progress: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
-            message = "Uploading at ${Placeholders.UPLOAD_RATE} (${Placeholders.PROGRESS})"
-        },
-        val completed: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
-            message = "Upload completed successfully in ${Placeholders.ELAPSED_TIME}"
-        },
-        val error: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
-            message = "Error during upload"
-        },
-        val cancelled: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
-            message = "Upload cancelled"
-        }
+    var notificationChannelId: String,
+    // TODO: study how to apply this to notification channels
+    var isRingToneEnabled: Boolean = true,
+    val progress: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+        message = "Uploading at ${Placeholders.UPLOAD_RATE} (${Placeholders.PROGRESS})"
+    },
+    val completed: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+        message = "Upload completed successfully in ${Placeholders.ELAPSED_TIME}"
+    },
+    val error: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+        message = "Error during upload"
+    },
+    val cancelled: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+        message = "Upload cancelled"
+    }
 ) : Parcelable {
 
     @IgnoredOnParcel

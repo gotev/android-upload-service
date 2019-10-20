@@ -27,13 +27,13 @@ class MultipartUploadTask : HttpUploadTask() {
 
     private val NameValue.multipartHeader: ByteArray
         get() = boundaryBytes + ("Content-Disposition: form-data; " +
-                "name=\"$name\"$NEW_LINE$NEW_LINE$value$NEW_LINE").utf8Bytes
+            "name=\"$name\"$NEW_LINE$NEW_LINE$value$NEW_LINE").utf8Bytes
 
     private val UploadFile.multipartHeader: ByteArray
         get() = boundaryBytes + ("Content-Disposition: form-data; " +
-                "name=\"$parameterName\"; " +
-                "filename=\"$remoteFileName\"$NEW_LINE" +
-                "Content-Type: $contentType$NEW_LINE$NEW_LINE").utf8Bytes
+            "name=\"$parameterName\"; " +
+            "filename=\"$remoteFileName\"$NEW_LINE" +
+            "Content-Type: $contentType$NEW_LINE$NEW_LINE").utf8Bytes
 
     private val UploadFile.totalMultipartBytes: Long
         get() = multipartHeader.size.toLong() + handler.size(context) + newLineBytes.size.toLong()
@@ -71,8 +71,8 @@ class MultipartUploadTask : HttpUploadTask() {
     }
 
     override fun onWriteRequestBody(bodyWriter: BodyWriter) {
-        //reset uploaded bytes when the body is ready to be written
-        //because sometimes this gets invoked when network changes
+        // reset uploaded bytes when the body is ready to be written
+        // because sometimes this gets invoked when network changes
         resetUploadedBytes()
         setAllFilesHaveBeenSuccessfullyUploaded(false)
 

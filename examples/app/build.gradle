@@ -8,11 +8,15 @@ buildscript {
         jcenter()
         mavenCentral()
         google()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:$kotlin_lint_version"
 
         //classpath dependencies to import library project
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradle_versions_plugin_version"

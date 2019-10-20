@@ -8,9 +8,9 @@ package net.gotev.uploadservice.ftp
 class UnixPermissions @JvmOverloads constructor(value: String = "644") {
 
     data class RolePermissions(
-            var read: Boolean = false,
-            var write: Boolean = false,
-            var execute: Boolean = false
+        var read: Boolean = false,
+        var write: Boolean = false,
+        var execute: Boolean = false
     ) {
         companion object {
             fun fromChar(char: Char): RolePermissions {

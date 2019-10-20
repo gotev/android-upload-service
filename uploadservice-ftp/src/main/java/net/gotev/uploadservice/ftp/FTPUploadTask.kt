@@ -20,19 +20,19 @@ class FTPUploadTask : UploadTask(), FTPClientWrapper.Observer {
         val ftpParams = ftpParams
 
         FTPClientWrapper(
-                useSSL = ftpParams.useSSL,
-                sslProtocol = ftpParams.secureSocketProtocol,
-                implicitSecurity = ftpParams.implicitSecurity,
-                connectTimeout = ftpParams.connectTimeout,
-                observer = this
+            useSSL = ftpParams.useSSL,
+            sslProtocol = ftpParams.secureSocketProtocol,
+            implicitSecurity = ftpParams.implicitSecurity,
+            connectTimeout = ftpParams.connectTimeout,
+            observer = this
         ).use { ftpClient ->
             ftpClient.connect(
-                    server = params.serverUrl,
-                    port = ftpParams.port,
-                    username = ftpParams.username,
-                    password = ftpParams.password,
-                    socketTimeout = ftpParams.socketTimeout,
-                    compressedFileTransfer = ftpParams.compressedFileTransfer
+                server = params.serverUrl,
+                port = ftpParams.port,
+                username = ftpParams.username,
+                password = ftpParams.password,
+                socketTimeout = ftpParams.socketTimeout,
+                compressedFileTransfer = ftpParams.compressedFileTransfer
             )
 
             // this is needed to calculate the total bytes and the uploaded bytes, because if the
@@ -53,7 +53,12 @@ class FTPUploadTask : UploadTask(), FTPClientWrapper.Observer {
                 if (file.successfullyUploaded)
                     continue
 
-                ftpClient.uploadFile(context, baseWorkingDir, file, ftpParams.createdDirectoriesPermissions)
+                ftpClient.uploadFile(
+                    context,
+                    baseWorkingDir,
+                    file,
+                    ftpParams.createdDirectoriesPermissions
+                )
                 file.successfullyUploaded = true
             }
 
@@ -87,7 +92,12 @@ class FTPUploadTask : UploadTask(), FTPClientWrapper.Observer {
         onProgress(totalUploaded)
     }
 
-    override fun onTransfer(client: FTPClientWrapper, totalBytesTransferred: Long, bytesTransferred: Int, streamSize: Long) {
+    override fun onTransfer(
+        client: FTPClientWrapper,
+        totalBytesTransferred: Long,
+        bytesTransferred: Int,
+        streamSize: Long
+    ) {
         onProgress(bytesTransferred.toLong())
 
         if (!shouldContinue) {

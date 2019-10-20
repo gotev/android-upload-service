@@ -2,13 +2,14 @@ package net.gotev.uploadservice
 
 import android.content.Context
 import android.os.Parcelable
+import java.util.ArrayList
+import java.util.UUID
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.startNewUpload
 import net.gotev.uploadservice.observer.request.RequestObserver
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate
-import java.util.*
 
 /**
  * Base class to extend to create an upload request. If you are implementing an HTTP based upload,
@@ -49,7 +50,8 @@ constructor(protected val context: Context, protected var serverUrl: String) {
      * generated uploadId
      */
     open fun startUpload(): String {
-        return context.startNewUpload(taskClass, UploadTaskParameters(
+        return context.startNewUpload(
+            taskClass, UploadTaskParameters(
                 uploadId ?: UUID.randomUUID().toString(),
                 serverUrl,
                 maxRetries,
@@ -57,7 +59,8 @@ constructor(protected val context: Context, protected var serverUrl: String) {
                 notificationConfig,
                 files,
                 getAdditionalParameters()
-        ))
+            )
+        )
     }
 
     /**
