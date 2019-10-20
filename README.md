@@ -1,5 +1,6 @@
-Android Upload Service
-======================
+<p align="center">
+  <img src="uploadservice-logo.png">
+</p>
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
@@ -53,6 +54,9 @@ Contributions are welcome and encouraged! Just fork the project and then send a 
 
 ## Do you like the project? <a name="donate"></a>
 Put a star, spread the word and be part of it! New ideas, bugfixes and PRs are always welcome!
+
+## Credits
+Created my free logo at [LogoMakr.com](https://logomakr.com)
 
 ## License <a name="license"></a>
 
