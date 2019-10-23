@@ -52,28 +52,6 @@ data class UploadInfo @JvmOverloads constructor(
         get() = currentTime - startTime
 
     /**
-     * Gets the elapsed time as a string, expressed in seconds if the value is `< 60`,
-     * or expressed in minutes and seconds if the value is `>=` 60.
-     * @return string representation of the elapsed time
-     */
-    @IgnoredOnParcel
-    val elapsedTimeString: String
-        get() {
-            var elapsedSeconds = (elapsedTime / 1000).toInt()
-
-            if (elapsedSeconds == 0) return "0 sec"
-
-            val minutes = elapsedSeconds / 60
-            elapsedSeconds -= 60 * minutes
-
-            return if (minutes == 0) {
-                "$elapsedSeconds sec"
-            } else {
-                "$minutes min $elapsedSeconds sec"
-            }
-        }
-
-    /**
      * Gets the average upload rate in Kb/s (Kilo bit per second).
      * @return upload rate
      */
@@ -84,25 +62,6 @@ data class UploadInfo @JvmOverloads constructor(
             if (elapsedTime < 1000) return 0.0
 
             return uploadedBytes.toDouble() / 1024 * 8 / (elapsedTime / 1000)
-        }
-
-    /**
-     * Returns a string representation of the upload rate, expressed in the most convenient unit of
-     * measurement (Mbit/s if the value is `>=` 1024, B/s if the value is `< 1`, otherwise Kbit/s)
-     * @return string representation of the upload rate (e.g. 234 Kbit/s)
-     */
-    @IgnoredOnParcel
-    val uploadRateString: String
-        get() {
-            if (uploadRate < 1) {
-                return "${(uploadRate * 1000).toInt()} bit/s"
-            }
-
-            if (uploadRate >= 1024) {
-                return "${(uploadRate / 1024).toInt()} Mb/s"
-            }
-
-            return "${uploadRate.toInt()} Kb/s"
         }
 
     /**

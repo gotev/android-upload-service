@@ -11,11 +11,14 @@ import android.util.Log;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
+import net.gotev.uploadservice.Placeholders;
 import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.data.RetryPolicyConfig;
 import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.observer.request.RequestObserver;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +65,19 @@ public class App extends Application {
 
         // Set upload service debug log messages level
         UploadServiceLogger.setDevelopmentMode(BuildConfig.DEBUG);
+
+        // Set custom placeholder formatter
+        Placeholders.setFormatter(new Placeholders.DefaultFormatter(){
+            @NotNull
+            @Override
+            public String formatTotalFiles(final int count) {
+                return getResources().getQuantityString(
+                    R.plurals.uploading_total_files_count,
+                    count,
+                    count
+                );
+            }
+        });
 
         createNotificationChannel();
 

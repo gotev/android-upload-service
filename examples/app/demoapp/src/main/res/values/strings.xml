@@ -26,7 +26,15 @@
     <string name="cancel">Cancel</string>
     <string name="info">Info</string>
     <string name="uploading">Uploaded [[UPLOADED_FILES]] of [[TOTAL_FILES]] at [[UPLOAD_RATE]] - [[PROGRESS]]</string>
-    <string name="upload_success">Upload completed successfully in [[ELAPSED_TIME]]</string>
+    <string name="upload_success">Upload of [[TOTAL_FILES]] completed successfully in [[ELAPSED_TIME]]</string>
+    <plurals name="uploading_total_files_count">
+        <item quantity="zero">%d files</item>
+        <item quantity="one">%d file</item>
+        <item quantity="two">%d files</item>
+        <item quantity="few">%d files</item>
+        <item quantity="many">%d files</item>
+        <item quantity="other">%d files</item>
+    </plurals>
     <string name="upload_error">Error while uploading</string>
     <string name="upload_cancelled">Upload has been cancelled</string>
     <string name="multipart_upload">Multipart Upload</string>
