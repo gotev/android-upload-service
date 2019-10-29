@@ -9,9 +9,7 @@ import android.os.PowerManager
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
+import net.gotev.uploadservice.UploadServiceConfig.threadPool
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.acquirePartialWakeLock
 import net.gotev.uploadservice.extensions.safeRelease
@@ -96,16 +94,6 @@ class UploadService : Service() {
     }
 
     private var wakeLock: PowerManager.WakeLock? = null
-    private val uploadTasksQueue = LinkedBlockingQueue<Runnable>()
-    private val uploadThreadPool by lazy {
-        ThreadPoolExecutor(
-            UploadServiceConfig.uploadPoolSize, // Initial pool size
-            UploadServiceConfig.uploadPoolSize, // Max pool size
-            UploadServiceConfig.keepAliveTimeSeconds.toLong(),
-            TimeUnit.SECONDS,
-            uploadTasksQueue
-        )
-    }
     private var idleTimer: Timer? = null
 
     override fun onCreate() {
@@ -138,7 +126,7 @@ class UploadService : Service() {
         clearIdleTimer()
 
         uploadTasksMap[currentTask.params.id] = currentTask
-        uploadThreadPool.execute(currentTask)
+        threadPool.execute(currentTask)
 
         return START_STICKY
     }
@@ -184,7 +172,7 @@ class UploadService : Service() {
         super.onDestroy()
 
         stopAllUploads()
-        uploadThreadPool.shutdown()
+        threadPool.shutdown()
 
         if (UploadServiceConfig.isForegroundService) {
             UploadServiceLogger.debug(TAG) { "Stopping foreground execution" }

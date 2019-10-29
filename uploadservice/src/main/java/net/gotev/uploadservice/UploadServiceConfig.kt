@@ -4,6 +4,10 @@ import android.content.IntentFilter
 import android.os.Build
 import java.lang.reflect.InvocationTargetException
 import java.util.LinkedHashMap
+import java.util.concurrent.AbstractExecutorService
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import net.gotev.uploadservice.data.RetryPolicyConfig
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
@@ -38,25 +42,17 @@ object UploadServiceConfig {
             field
 
     /**
-     * Sets how many threads to use to handle concurrent uploads.
+     * Sets the Thread Pool to use for upload operations.
+     * By default a thread pool with size equal to the number of processors is created.
      */
     @JvmStatic
-    var uploadPoolSize = Runtime.getRuntime().availableProcessors()
-        set(value) {
-            require(value >= 1) { "Upload pool size min allowable value is 1. It cannot be $value" }
-            field = value
-        }
-
-    /**
-     * When the number of threads is greater than [uploadPoolSize], this is the maximum time that
-     * excess idle threads will wait for new tasks before terminating.
-     */
-    @JvmStatic
-    var keepAliveTimeSeconds = 5
-        set(value) {
-            require(value >= 1) { "Keep alive time min allowable value is 1. It cannot be $value" }
-            field = value
-        }
+    var threadPool: AbstractExecutorService = ThreadPoolExecutor(
+        Runtime.getRuntime().availableProcessors(), // Initial pool size
+        Runtime.getRuntime().availableProcessors(), // Max pool size
+        5.toLong(), // Keep Alive Time
+        TimeUnit.SECONDS,
+        LinkedBlockingQueue<Runnable>()
+    )
 
     /**
      * How many time to wait in idle before shutting down the service.
@@ -171,9 +167,7 @@ object UploadServiceConfig {
                 "uploadServiceVersion": "${BuildConfig.VERSION_NAME}",
                 "androidApiVesion": ${Build.VERSION.SDK_INT},
                 "namespace": "$namespace",
-                "uploadPoolSize": $uploadPoolSize,
                 "deviceProcessors": ${Runtime.getRuntime().availableProcessors()},
-                "keepAliveTimeSeconds": $keepAliveTimeSeconds,
                 "idleTimeoutSeconds": $idleTimeoutSeconds,
                 "bufferSizeBytes": $bufferSizeBytes,
                 "httpStack": "${httpStack::class.java.name}",
