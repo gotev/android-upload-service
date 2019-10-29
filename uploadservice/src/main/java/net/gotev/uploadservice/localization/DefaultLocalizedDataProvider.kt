@@ -4,12 +4,9 @@ import net.gotev.uploadservice.data.MinutesSeconds
 import net.gotev.uploadservice.data.UploadRate
 
 class DefaultLocalizedDataProvider : LocalizedDataProvider {
-    override fun minutesSeconds(minutesSeconds: MinutesSeconds): String {
-        return when {
-            minutesSeconds.totalSeconds == 0 -> "0 sec"
-            minutesSeconds.minutes == 0 -> "${minutesSeconds.seconds} sec"
-            else -> "${minutesSeconds.minutes} min ${minutesSeconds.seconds} sec"
-        }
+    override fun minutesSeconds(minutesSeconds: MinutesSeconds) = when {
+        minutesSeconds.minutes == 0 -> "${minutesSeconds.seconds} sec"
+        else -> "${minutesSeconds.minutes} min ${minutesSeconds.seconds} sec"
     }
 
     override fun uploadRate(uploadRate: UploadRate): String {
@@ -22,9 +19,7 @@ class DefaultLocalizedDataProvider : LocalizedDataProvider {
         return "${uploadRate.value} $suffix"
     }
 
-    override fun percent(percent: Int): String {
-        return "$percent %"
-    }
+    override fun percent(percent: Int) = "$percent %"
 
     override fun successfullyUploadedFiles(uploadedFiles: Int) = "$uploadedFiles"
 
