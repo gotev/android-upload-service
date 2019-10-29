@@ -40,37 +40,18 @@ data class UploadInfo @JvmOverloads constructor(
     val files: ArrayList<UploadFile> = ArrayList()
 ) : Parcelable {
 
-    @IgnoredOnParcel
-    private val currentTime: Long = Date().time
-
     /**
      * Gets upload task's elapsed time in milliseconds.
      * @return long value
      */
     @IgnoredOnParcel
-    val elapsedTime: Long
-        get() = currentTime - startTime
-
-    /**
-     * Gets the elapsed time as a string, expressed in seconds if the value is `< 60`,
-     * or expressed in minutes and seconds if the value is `>=` 60.
-     * @return string representation of the elapsed time
-     */
-    @IgnoredOnParcel
-    val elapsedTimeString: String
+    val elapsedTime: MinutesSeconds
         get() {
-            var elapsedSeconds = (elapsedTime / 1000).toInt()
+            var seconds = ((Date().time - startTime) / 1000).toInt()
+            val minutes = seconds / 60
+            seconds -= 60 * minutes
 
-            if (elapsedSeconds == 0) return "0 sec"
-
-            val minutes = elapsedSeconds / 60
-            elapsedSeconds -= 60 * minutes
-
-            return if (minutes == 0) {
-                "$elapsedSeconds sec"
-            } else {
-                "$minutes min $elapsedSeconds sec"
-            }
+            return MinutesSeconds(minutes, seconds)
         }
 
     /**
@@ -78,31 +59,32 @@ data class UploadInfo @JvmOverloads constructor(
      * @return upload rate
      */
     @IgnoredOnParcel
-    val uploadRate: Double
+    val uploadRate: UploadRate
         get() {
+            val elapsedSeconds = elapsedTime.totalSeconds
+
             // wait at least a second to stabilize the upload rate a little bit
-            if (elapsedTime < 1000) return 0.0
+            val kiloBitSecond = if (elapsedSeconds < 1)
+                0.0
+            else
+                uploadedBytes.toDouble() / 1024 * 8 / elapsedSeconds
 
-            return uploadedBytes.toDouble() / 1024 * 8 / (elapsedTime / 1000)
-        }
+            return when {
+                kiloBitSecond < 1 -> UploadRate(
+                    value = (kiloBitSecond * 1000).toInt(),
+                    unit = UploadRate.UploadRateUnit.bitSecond
+                )
 
-    /**
-     * Returns a string representation of the upload rate, expressed in the most convenient unit of
-     * measurement (Mbit/s if the value is `>=` 1024, B/s if the value is `< 1`, otherwise Kbit/s)
-     * @return string representation of the upload rate (e.g. 234 Kbit/s)
-     */
-    @IgnoredOnParcel
-    val uploadRateString: String
-        get() {
-            if (uploadRate < 1) {
-                return "${(uploadRate * 1000).toInt()} bit/s"
+                kiloBitSecond > 1024 -> UploadRate(
+                    value = (kiloBitSecond / 1024).toInt(),
+                    unit = UploadRate.UploadRateUnit.megaBitSecond
+                )
+
+                else -> UploadRate(
+                    value = kiloBitSecond.toInt(),
+                    unit = UploadRate.UploadRateUnit.kiloBitSecond
+                )
             }
-
-            if (uploadRate >= 1024) {
-                return "${(uploadRate / 1024).toInt()} Mb/s"
-            }
-
-            return "${uploadRate.toInt()} Kb/s"
         }
 
     /**

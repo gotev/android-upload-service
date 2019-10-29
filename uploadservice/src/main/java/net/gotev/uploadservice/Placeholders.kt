@@ -1,5 +1,6 @@
 package net.gotev.uploadservice
 
+import net.gotev.uploadservice.UploadServiceConfig.localizedDataProvider
 import net.gotev.uploadservice.data.UploadInfo
 
 object Placeholders {
@@ -42,9 +43,10 @@ object Placeholders {
     fun replace(string: String?, uploadInfo: UploadInfo): String {
         val safeString = string ?: return ""
 
-        return safeString.replace(ELAPSED_TIME, uploadInfo.elapsedTimeString)
-            .replace(PROGRESS, "${uploadInfo.progressPercent} %")
-            .replace(UPLOAD_RATE, uploadInfo.uploadRateString)
+        return safeString
+            .replace(ELAPSED_TIME, localizedDataProvider.localizedMinutesSeconds(uploadInfo.elapsedTime))
+            .replace(PROGRESS, localizedDataProvider.localizedPercent(uploadInfo.progressPercent))
+            .replace(UPLOAD_RATE, localizedDataProvider.localizedUploadRate(uploadInfo.uploadRate))
             .replace(UPLOADED_FILES, uploadInfo.successfullyUploadedFiles.toString())
             .replace(TOTAL_FILES, uploadInfo.files.size.toString())
     }

@@ -9,6 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import net.gotev.uploadservice.data.RetryPolicyConfig
+import net.gotev.uploadservice.localization.DefaultLocalizedDataProvider
+import net.gotev.uploadservice.localization.LocalizedDataProvider
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
 import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
@@ -127,6 +129,12 @@ object UploadServiceConfig {
     @JvmStatic
     val broadcastIntentFilter: IntentFilter
         get() = IntentFilter(broadcastAction)
+
+    /**
+     * Localizes data used in notification placeholders.
+     */
+    @JvmStatic
+    var localizedDataProvider: LocalizedDataProvider = DefaultLocalizedDataProvider()
 
     /**
      * Register a custom scheme handler.
