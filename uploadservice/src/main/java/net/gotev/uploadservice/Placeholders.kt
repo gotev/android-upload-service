@@ -43,11 +43,13 @@ object Placeholders {
     fun replace(string: String?, uploadInfo: UploadInfo): String {
         val safeString = string ?: return ""
 
-        return safeString
-            .replace(ELAPSED_TIME, localizedDataProvider.localizedMinutesSeconds(uploadInfo.elapsedTime))
-            .replace(PROGRESS, localizedDataProvider.localizedPercent(uploadInfo.progressPercent))
-            .replace(UPLOAD_RATE, localizedDataProvider.localizedUploadRate(uploadInfo.uploadRate))
-            .replace(UPLOADED_FILES, uploadInfo.successfullyUploadedFiles.toString())
-            .replace(TOTAL_FILES, uploadInfo.files.size.toString())
+        with(localizedDataProvider) {
+            return safeString
+                .replace(ELAPSED_TIME, minutesSeconds(uploadInfo.elapsedTime))
+                .replace(PROGRESS, percent(uploadInfo.progressPercent))
+                .replace(UPLOAD_RATE, uploadDate(uploadInfo.uploadRate))
+                .replace(UPLOADED_FILES, successfullyUploadedFiles(uploadInfo.successfullyUploadedFiles))
+                .replace(TOTAL_FILES, totalFiles(uploadInfo.files.size))
+        }
     }
 }
