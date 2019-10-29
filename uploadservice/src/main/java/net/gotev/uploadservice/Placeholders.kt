@@ -47,7 +47,7 @@ object Placeholders {
             return safeString
                 .replace(ELAPSED_TIME, minutesSeconds(uploadInfo.elapsedTime))
                 .replace(PROGRESS, percent(uploadInfo.progressPercent))
-                .replace(UPLOAD_RATE, uploadDate(uploadInfo.uploadRate))
+                .replace(UPLOAD_RATE, uploadRate(uploadInfo.uploadRate))
                 .replace(UPLOADED_FILES, successfullyUploadedFiles(uploadInfo.successfullyUploadedFiles))
                 .replace(TOTAL_FILES, totalFiles(uploadInfo.files.size))
         }

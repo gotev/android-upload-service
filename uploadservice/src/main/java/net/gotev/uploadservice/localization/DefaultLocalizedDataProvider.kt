@@ -12,7 +12,7 @@ class DefaultLocalizedDataProvider : LocalizedDataProvider {
         }
     }
 
-    override fun uploadDate(uploadRate: UploadRate): String {
+    override fun uploadRate(uploadRate: UploadRate): String {
         val suffix = when (uploadRate.unit) {
             UploadRate.UploadRateUnit.bitSecond -> "bit/s"
             UploadRate.UploadRateUnit.kiloBitSecond -> "Kb/s"
