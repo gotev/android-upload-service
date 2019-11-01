@@ -46,12 +46,7 @@ Apps and libraries powered by this library. To be included in the following list
 - [Samajbook](https://play.google.com/store/apps/details?id=com.marothiatechs.samaj)
 - [Codeaty](https://play.google.com/store/apps/details?id=com.saifraheem.BagoLearn)
 
-## Contributing <a name="contribute"></a>
-* Do you have a new feature in mind?
-* Do you know how to improve existing docs or code?
-* Have you found a bug?
-
-Contributions are welcome and encouraged! Just fork the project and then send a pull request. Be ready to discuss your code and design decisions.
+## [Contributing](CONTRIBUTING.md) <a name="contribute"></a>
 
 ## Do you like the project? <a name="donate"></a>
 Put a star, spread the word and be part of it! New ideas, bugfixes and PRs are always welcome!
