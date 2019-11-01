@@ -19,6 +19,17 @@ To speed up development, it's highly recommended to install ktlint and to execut
 ktlint installGitPreCommitHook
 cd examples/app/ && ktlint --android applyToIDEAProject -y && cd ../..
 ```
+If you are using Atlassian SourceTree to commit, you may encounter the following problem with pre commit hook:
+
+```
+xargs ktlint: No such file or directory
+```
+
+To solve it, open `.git/hooks/pre_commit` with your favourite editor and add the following in the second line:
+
+```bash
+export PATH=/usr/local/bin:$PATH
+```
 
 #### Development
 To develop Android Upload Service and its core modules, clone the project, then open `examples/app/build.gradle` from your Android Studio. In this way you can see all the modules and the demo app, make changes and deploy to your emulator or real device for testing.
