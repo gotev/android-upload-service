@@ -45,17 +45,18 @@ data class UploadInfo @JvmOverloads constructor(
      * @return long value
      */
     @IgnoredOnParcel
-    val elapsedTime: MinutesSeconds
+    val elapsedTime: UploadElapsedTime
         get() {
             var seconds = ((Date().time - startTime) / 1000).toInt()
             val minutes = seconds / 60
             seconds -= 60 * minutes
 
-            return MinutesSeconds(minutes, seconds)
+            return UploadElapsedTime(minutes, seconds)
         }
 
     /**
      * Gets the average upload rate in Kb/s (Kilo bit per second).
+     * https://en.wikipedia.org/wiki/Data-rate_units
      * @return upload rate
      */
     @IgnoredOnParcel
@@ -64,25 +65,25 @@ data class UploadInfo @JvmOverloads constructor(
             val elapsedSeconds = elapsedTime.totalSeconds
 
             // wait at least a second to stabilize the upload rate a little bit
-            val kiloBitSecond = if (elapsedSeconds < 1)
+            val kiloBitPerSecond = if (elapsedSeconds < 1)
                 0.0
             else
-                uploadedBytes.toDouble() / 1024 * 8 / elapsedSeconds
+                uploadedBytes.toDouble() / 1000 * 8 / elapsedSeconds
 
             return when {
-                kiloBitSecond < 1 -> UploadRate(
-                    value = (kiloBitSecond * 1000).toInt(),
-                    unit = UploadRate.UploadRateUnit.bitSecond
+                kiloBitPerSecond < 1 -> UploadRate(
+                    value = (kiloBitPerSecond * 1000).toInt(),
+                    unit = UploadRate.UploadRateUnit.bitPerSecond
                 )
 
-                kiloBitSecond > 1024 -> UploadRate(
-                    value = (kiloBitSecond / 1024).toInt(),
-                    unit = UploadRate.UploadRateUnit.megaBitSecond
+                kiloBitPerSecond >= 1000 -> UploadRate(
+                    value = (kiloBitPerSecond / 1000).toInt(),
+                    unit = UploadRate.UploadRateUnit.megaBitPerSecond
                 )
 
                 else -> UploadRate(
-                    value = kiloBitSecond.toInt(),
-                    unit = UploadRate.UploadRateUnit.kiloBitSecond
+                    value = kiloBitPerSecond.toInt(),
+                    unit = UploadRate.UploadRateUnit.kiloBitPerSecond
                 )
             }
         }

@@ -1,10 +1,6 @@
 package net.gotev.uploadservice
 
-import net.gotev.uploadservice.UploadServiceConfig.localizedDataProvider
-import net.gotev.uploadservice.data.UploadInfo
-
 object Placeholders {
-
     /**
      * Placeholder to display the total elapsed upload time in minutes and seconds.
      * E.g.: 34s, 4m 33s, 45m 21s
@@ -30,26 +26,12 @@ object Placeholders {
     const val UPLOADED_FILES = "[[UPLOADED_FILES]]"
 
     /**
+     * Placeholder to display the number of remaining files to upload.
+     */
+    const val REMAINING_FILES = "[[REMAINING_FILES]]"
+
+    /**
      * Placeholder to display the total number of files to upload.
      */
     const val TOTAL_FILES = "[[TOTAL_FILES]]"
-
-    /**
-     * Replace placeholders in a string.
-     * @param string string in which to replace placeholders
-     * @param uploadInfo upload information data
-     * @return string with replaced placeholders
-     */
-    fun replace(string: String?, uploadInfo: UploadInfo): String {
-        val safeString = string ?: return ""
-
-        with(localizedDataProvider) {
-            return safeString
-                .replace(ELAPSED_TIME, minutesSeconds(uploadInfo.elapsedTime))
-                .replace(PROGRESS, percent(uploadInfo.progressPercent))
-                .replace(UPLOAD_RATE, uploadRate(uploadInfo.uploadRate))
-                .replace(UPLOADED_FILES, successfullyUploadedFiles(uploadInfo.successfullyUploadedFiles))
-                .replace(TOTAL_FILES, totalFiles(uploadInfo.files.size))
-        }
-    }
 }

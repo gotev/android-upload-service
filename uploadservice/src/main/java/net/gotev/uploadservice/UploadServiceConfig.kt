@@ -9,8 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import net.gotev.uploadservice.data.RetryPolicyConfig
-import net.gotev.uploadservice.localization.DefaultLocalizedDataProvider
-import net.gotev.uploadservice.localization.LocalizedDataProvider
+import net.gotev.uploadservice.localization.DefaultLocalizationProvider
+import net.gotev.uploadservice.localization.LocalizationProvider
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
 import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
@@ -134,7 +134,8 @@ object UploadServiceConfig {
      * Localizes data used in notification placeholders.
      */
     @JvmStatic
-    var localizedDataProvider: LocalizedDataProvider = DefaultLocalizedDataProvider()
+    var localizationProvider: LocalizationProvider =
+        DefaultLocalizationProvider()
 
     /**
      * Register a custom scheme handler.
