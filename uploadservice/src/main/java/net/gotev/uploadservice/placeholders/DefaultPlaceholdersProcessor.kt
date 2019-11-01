@@ -1,9 +1,9 @@
-package net.gotev.uploadservice.localization
+package net.gotev.uploadservice.placeholders
 
 import net.gotev.uploadservice.data.UploadElapsedTime
 import net.gotev.uploadservice.data.UploadRate
 
-open class DefaultLocalizationProvider : LocalizationProvider() {
+open class DefaultPlaceholdersProcessor : PlaceholdersProcessor() {
     override fun uploadElapsedTime(uploadElapsedTime: UploadElapsedTime) = when {
         uploadElapsedTime.minutes == 0 -> "${uploadElapsedTime.seconds} sec"
         else -> "${uploadElapsedTime.minutes} min ${uploadElapsedTime.seconds} sec"

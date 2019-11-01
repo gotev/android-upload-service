@@ -1,11 +1,10 @@
-package net.gotev.uploadservice.localization
+package net.gotev.uploadservice.placeholders
 
-import net.gotev.uploadservice.Placeholders
 import net.gotev.uploadservice.data.UploadElapsedTime
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadRate
 
-abstract class LocalizationProvider {
+abstract class PlaceholdersProcessor {
     abstract fun uploadElapsedTime(uploadElapsedTime: UploadElapsedTime): String
     abstract fun uploadRate(uploadRate: UploadRate): String
     abstract fun uploadProgress(percent: Int): String
@@ -27,11 +26,11 @@ abstract class LocalizationProvider {
         val remainingFiles = totalFiles - uploadedFiles
 
         return safeMessage
-            .replace(Placeholders.ELAPSED_TIME, uploadElapsedTime(uploadInfo.elapsedTime))
-            .replace(Placeholders.PROGRESS, uploadProgress(uploadInfo.progressPercent))
-            .replace(Placeholders.UPLOAD_RATE, uploadRate(uploadInfo.uploadRate))
-            .replace(Placeholders.UPLOADED_FILES, uploadedFiles(uploadedFiles))
-            .replace(Placeholders.REMAINING_FILES, remainingFiles(remainingFiles))
-            .replace(Placeholders.TOTAL_FILES, totalFiles(totalFiles))
+            .replace(Placeholder.ElapsedTime.value, uploadElapsedTime(uploadInfo.elapsedTime))
+            .replace(Placeholder.UploadRate.value, uploadRate(uploadInfo.uploadRate))
+            .replace(Placeholder.Progress.value, uploadProgress(uploadInfo.progressPercent))
+            .replace(Placeholder.UploadedFiles.value, uploadedFiles(uploadedFiles))
+            .replace(Placeholder.RemainingFiles.value, remainingFiles(remainingFiles))
+            .replace(Placeholder.TotalFiles.value, totalFiles(totalFiles))
     }
 }

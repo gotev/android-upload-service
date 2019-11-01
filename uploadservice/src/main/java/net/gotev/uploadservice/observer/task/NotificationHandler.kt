@@ -7,7 +7,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
-import net.gotev.uploadservice.UploadServiceConfig.localizationProvider
+import net.gotev.uploadservice.UploadServiceConfig.placeholdersProcessor
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadNotificationStatusConfig
@@ -52,8 +52,8 @@ class NotificationHandler(
         info: UploadInfo
     ): NotificationCompat.Builder {
         return setGroup(UploadServiceConfig.namespace)
-            .setContentTitle(localizationProvider.processPlaceholders(statusConfig.title, info))
-            .setContentText(localizationProvider.processPlaceholders(statusConfig.message, info))
+            .setContentTitle(placeholdersProcessor.processPlaceholders(statusConfig.title, info))
+            .setContentText(placeholdersProcessor.processPlaceholders(statusConfig.message, info))
             .setContentIntent(statusConfig.getClickIntent(service))
             .setSmallIcon(statusConfig.iconResourceID)
             .setLargeIcon(statusConfig.largeIcon)

@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.os.Parcelable
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
-import net.gotev.uploadservice.Placeholders
+import net.gotev.uploadservice.placeholders.Placeholder
 
 @Parcelize
 class UploadNotificationConfig @JvmOverloads constructor(
@@ -13,10 +13,10 @@ class UploadNotificationConfig @JvmOverloads constructor(
     // TODO: study how to apply this to notification channels
     var isRingToneEnabled: Boolean = true,
     val progress: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
-        message = "Uploading at ${Placeholders.UPLOAD_RATE} (${Placeholders.PROGRESS})"
+        message = "Uploading at ${Placeholder.UploadRate} (${Placeholder.Progress})"
     },
     val completed: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
-        message = "Upload completed successfully in ${Placeholders.ELAPSED_TIME}"
+        message = "Upload completed successfully in ${Placeholder.ElapsedTime}"
     },
     val error: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
         message = "Error during upload"

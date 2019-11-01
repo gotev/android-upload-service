@@ -2,20 +2,20 @@ package net.gotev.uploadservice
 
 import android.content.IntentFilter
 import android.os.Build
+import net.gotev.uploadservice.data.RetryPolicyConfig
+import net.gotev.uploadservice.network.HttpStack
+import net.gotev.uploadservice.network.hurl.HurlStack
+import net.gotev.uploadservice.placeholders.DefaultPlaceholdersProcessor
+import net.gotev.uploadservice.placeholders.PlaceholdersProcessor
+import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
+import net.gotev.uploadservice.schemehandlers.FileSchemeHandler
+import net.gotev.uploadservice.schemehandlers.SchemeHandler
 import java.lang.reflect.InvocationTargetException
 import java.util.LinkedHashMap
 import java.util.concurrent.AbstractExecutorService
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
-import net.gotev.uploadservice.data.RetryPolicyConfig
-import net.gotev.uploadservice.localization.DefaultLocalizationProvider
-import net.gotev.uploadservice.localization.LocalizationProvider
-import net.gotev.uploadservice.network.HttpStack
-import net.gotev.uploadservice.network.hurl.HurlStack
-import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
-import net.gotev.uploadservice.schemehandlers.FileSchemeHandler
-import net.gotev.uploadservice.schemehandlers.SchemeHandler
 
 object UploadServiceConfig {
 
@@ -134,8 +134,8 @@ object UploadServiceConfig {
      * Localizes data used in notification placeholders.
      */
     @JvmStatic
-    var localizationProvider: LocalizationProvider =
-        DefaultLocalizationProvider()
+    var placeholdersProcessor: PlaceholdersProcessor =
+        DefaultPlaceholdersProcessor()
 
     /**
      * Register a custom scheme handler.
