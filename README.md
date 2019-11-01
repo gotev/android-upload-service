@@ -13,12 +13,17 @@ is here for developer preview! [Check this issue for more information](https://g
 
 | :information_source: | [Get started with stable 3.5.2](https://github.com/gotev/android-upload-service/wiki/Setup) |
 |--|--|
-| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.5.0/uploadservice-demo-debug.apk)|
+| :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) |
+| :heart: | [Contributing](CONTRIBUTING.md) |
+| :star2: | [Features](#features) |
+| :raising_hand: | [Who is using Upload Service](#powered) |
+| :mega: | [Credits](#credits)
+| :scroll: | [License](#license)
 
 ![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
-## Features
+## Features <a name="features"></a>
 * tiny library
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
 * be able to easily implement other upload protocols as plugins
@@ -46,12 +51,7 @@ Apps and libraries powered by this library. To be included in the following list
 - [Samajbook](https://play.google.com/store/apps/details?id=com.marothiatechs.samaj)
 - [Codeaty](https://play.google.com/store/apps/details?id=com.saifraheem.BagoLearn)
 
-## [Contributing](CONTRIBUTING.md) <a name="contribute"></a>
-
-## Do you like the project? <a name="donate"></a>
-Put a star, spread the word and be part of it! New ideas, bugfixes and PRs are always welcome!
-
-## Credits
+## Credits <a name="credits"></a>
 Created my free logo at [LogoMakr.com](https://logomakr.com)
 
 ## License <a name="license"></a>
