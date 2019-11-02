@@ -1,9 +1,6 @@
 package net.gotev.uploadservice
 
 import android.content.Context
-import java.io.IOException
-import java.util.ArrayList
-import java.util.Date
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadTaskParameters
@@ -13,6 +10,9 @@ import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.observer.task.UploadTaskObserver
+import java.io.IOException
+import java.util.ArrayList
+import java.util.Date
 
 abstract class UploadTask : Runnable {
 
@@ -24,6 +24,7 @@ abstract class UploadTask : Runnable {
 
     protected lateinit var context: Context
     lateinit var params: UploadTaskParameters
+    var notificationId: Int = 0
 
     /**
      * Flag indicating if the operation should continue or is cancelled. You should never
@@ -107,10 +108,12 @@ abstract class UploadTask : Runnable {
     fun init(
         context: Context,
         taskParams: UploadTaskParameters,
+        notificationId: Int,
         vararg taskObservers: UploadTaskObserver
     ) {
         this.context = context
         this.params = taskParams
+        this.notificationId = notificationId
         taskObservers.forEach { observers.add(it) }
         performInitialization()
     }
@@ -123,7 +126,13 @@ abstract class UploadTask : Runnable {
     }
 
     override fun run() {
-        doForEachObserver { initialize(UploadInfo(params.id)) }
+        doForEachObserver {
+            initialize(
+                UploadInfo(params.id),
+                notificationId,
+                params.notificationConfig
+            )
+        }
         resetAttempts()
 
         while (attempts <= params.maxRetries && shouldContinue) {
@@ -182,7 +191,7 @@ abstract class UploadTask : Runnable {
         uploadedBytes += bytesSent
         if (shouldThrottle(uploadedBytes, totalBytes)) return
         UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes" }
-        doForEachObserver { onProgress(uploadInfo) }
+        doForEachObserver { onProgress(uploadInfo, notificationId, params.notificationConfig) }
     }
 
     /**
@@ -207,12 +216,26 @@ abstract class UploadTask : Runnable {
                 }
             }
 
-            doForEachObserver { onSuccess(uploadInfo, response) }
+            doForEachObserver {
+                onSuccess(
+                    uploadInfo,
+                    notificationId,
+                    params.notificationConfig,
+                    response
+                )
+            }
         } else {
-            doForEachObserver { onError(uploadInfo, UploadError(response)) }
+            doForEachObserver {
+                onError(
+                    uploadInfo,
+                    notificationId,
+                    params.notificationConfig,
+                    UploadError(response)
+                )
+            }
         }
 
-        doForEachObserver { onCompleted(uploadInfo) }
+        doForEachObserver { onCompleted(uploadInfo, notificationId, params.notificationConfig) }
     }
 
     /**
@@ -239,8 +262,8 @@ abstract class UploadTask : Runnable {
     private fun onError(exception: Throwable) {
         UploadServiceLogger.error(TAG, exception) { "(uploadID: ${params.id}) error" }
         uploadInfo.let {
-            doForEachObserver { onError(it, exception) }
-            doForEachObserver { onCompleted(it) }
+            doForEachObserver { onError(it, notificationId, params.notificationConfig, exception) }
+            doForEachObserver { onCompleted(it, notificationId, params.notificationConfig) }
         }
     }
 

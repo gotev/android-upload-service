@@ -97,8 +97,18 @@ class UploadService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var idleTimer: Timer? = null
 
-    private val broadcastEmitter by lazy { BroadcastEmitter(this) }
-    private val taskCompletionNotifier by lazy { TaskCompletionNotifier(this) }
+    private val taskObservers by lazy {
+        arrayOf(
+            BroadcastEmitter(this),
+            NotificationHandler(
+                service = this,
+                notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager,
+                namespace = UploadServiceConfig.namespace!!,
+                placeholdersProcessor = UploadServiceConfig.placeholdersProcessor
+            ),
+            TaskCompletionNotifier(this)
+        )
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -220,22 +230,12 @@ class UploadService : Service() {
             // in each UploadTask. Check its sources for more info about this.
             notificationIncrementalId += 2
 
-            val observers = listOfNotNull(
-                broadcastEmitter,
-                params.notificationConfig?.let {
-                    NotificationHandler(
-                        service = this,
-                        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager,
-                        namespace = UploadServiceConfig.namespace!!,
-                        notificationId = UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
-                        config = it,
-                        placeholdersProcessor = UploadServiceConfig.placeholdersProcessor
-                    )
-                },
-                taskCompletionNotifier
-            ).toTypedArray()
-
-            uploadTask.init(this, params, *observers)
+            uploadTask.init(
+                context = this,
+                taskParams = params,
+                notificationId = UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
+                taskObservers = *taskObservers
+            )
 
             UploadServiceLogger.debug(TAG) { "Successfully created new task with class: $taskClassString" }
             uploadTask

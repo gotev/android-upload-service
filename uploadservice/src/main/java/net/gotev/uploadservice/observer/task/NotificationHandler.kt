@@ -16,15 +16,13 @@ class NotificationHandler(
     private val service: UploadService,
     private val notificationManager: NotificationManager,
     private val namespace: String,
-    private val notificationId: Int,
-    private val config: UploadNotificationConfig,
     private val placeholdersProcessor: PlaceholdersProcessor
 ) : UploadTaskObserver {
 
     private val notificationCreationTimeMillis by lazy { System.currentTimeMillis() }
 
-    private fun NotificationCompat.Builder.setRingtoneCompat(): NotificationCompat.Builder {
-        if (config.isRingToneEnabled && Build.VERSION.SDK_INT < 26) {
+    private fun NotificationCompat.Builder.setRingtoneCompat(isRingToneEnabled: Boolean): NotificationCompat.Builder {
+        if (isRingToneEnabled && Build.VERSION.SDK_INT < 26) {
             val sound = RingtoneManager.getActualDefaultRingtoneUri(
                 service,
                 RingtoneManager.TYPE_NOTIFICATION
@@ -35,7 +33,7 @@ class NotificationHandler(
         return this
     }
 
-    private fun NotificationCompat.Builder.notify(uploadId: String) {
+    private fun NotificationCompat.Builder.notify(uploadId: String, notificationId: Int) {
         build().apply {
             if (service.holdForegroundNotification(uploadId, this)) {
                 notificationManager.cancel(notificationId)
@@ -62,28 +60,35 @@ class NotificationHandler(
     }
 
     private fun ongoingNotification(
+        notificationChannelId: String,
         info: UploadInfo,
         statusConfig: UploadNotificationStatusConfig
     ): NotificationCompat.Builder? {
         if (statusConfig.message == null) return null
 
-        return NotificationCompat.Builder(service, config.notificationChannelId)
+        return NotificationCompat.Builder(service, notificationChannelId)
             .setWhen(notificationCreationTimeMillis)
             .setCommonParameters(statusConfig, info)
             .setOngoing(true)
     }
 
-    private fun updateNotification(info: UploadInfo, statusConfig: UploadNotificationStatusConfig) {
+    private fun updateNotification(
+        notificationId: Int,
+        info: UploadInfo,
+        notificationChannelId: String,
+        isRingToneEnabled: Boolean,
+        statusConfig: UploadNotificationStatusConfig
+    ) {
         notificationManager.cancel(notificationId)
 
         if (statusConfig.message == null || statusConfig.autoClear) return
 
-        val notification = NotificationCompat.Builder(service, config.notificationChannelId)
+        val notification = NotificationCompat.Builder(service, notificationChannelId)
             .setCommonParameters(statusConfig, info)
             .setProgress(0, 0, false)
             .setOngoing(false)
             .setAutoCancel(statusConfig.clearOnAction)
-            .setRingtoneCompat()
+            .setRingtoneCompat(isRingToneEnabled)
             .build()
 
         // this is needed because the main notification used to show progress is ongoing
@@ -91,36 +96,79 @@ class NotificationHandler(
         notificationManager.notify(notificationId + 1, notification)
     }
 
-    override fun initialize(info: UploadInfo) {
+    override fun initialize(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig?
+    ) {
+        val config = notificationConfig ?: return
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.getNotificationChannel(config.notificationChannelId)
                 ?: throw IllegalArgumentException("The provided notification channel ID ${config.notificationChannelId} does not exist! You must create it at app startup and before Upload Service!")
         }
 
-        ongoingNotification(info, config.progress)
+        ongoingNotification(config.notificationChannelId, info, config.progress)
             ?.setProgress(100, 0, true)
-            ?.notify(info.uploadId)
+            ?.notify(info.uploadId, notificationId)
     }
 
-    override fun onProgress(info: UploadInfo) {
-        ongoingNotification(info, config.progress)
+    override fun onProgress(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig?
+    ) {
+        val config = notificationConfig ?: return
+
+        ongoingNotification(config.notificationChannelId, info, config.progress)
             ?.setProgress(100, info.progressPercent, false)
-            ?.notify(info.uploadId)
+            ?.notify(info.uploadId, notificationId)
     }
 
-    override fun onSuccess(info: UploadInfo, response: ServerResponse) {
-        updateNotification(info, config.completed)
+    override fun onSuccess(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig?,
+        response: ServerResponse
+    ) {
+        val config = notificationConfig ?: return
+
+        updateNotification(
+            notificationId,
+            info,
+            config.notificationChannelId,
+            config.isRingToneEnabled,
+            config.completed
+        )
     }
 
-    override fun onError(info: UploadInfo, exception: Throwable) {
+    override fun onError(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig?,
+        exception: Throwable
+    ) {
+        val config = notificationConfig ?: return
+
         val statusConfig = if (exception is UserCancelledUploadException) {
             config.cancelled
         } else {
             config.error
         }
 
-        updateNotification(info, statusConfig)
+        updateNotification(
+            notificationId,
+            info,
+            config.notificationChannelId,
+            config.isRingToneEnabled,
+            statusConfig
+        )
     }
 
-    override fun onCompleted(info: UploadInfo) {}
+    override fun onCompleted(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig?
+    ) {
+    }
 }
