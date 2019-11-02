@@ -15,7 +15,7 @@ class UploadNotificationConfig @JvmOverloads constructor(
     val progress: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
         message = "Uploading at ${Placeholder.UploadRate} (${Placeholder.Progress})"
     },
-    val completed: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+    val success: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
         message = "Upload completed successfully in ${Placeholder.ElapsedTime}"
     },
     val error: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
@@ -28,7 +28,7 @@ class UploadNotificationConfig @JvmOverloads constructor(
 
     @IgnoredOnParcel
     private val allStatuses by lazy {
-        arrayOf(progress, completed, error, cancelled)
+        arrayOf(progress, success, error, cancelled)
     }
 
     /**
@@ -90,7 +90,7 @@ class UploadNotificationConfig @JvmOverloads constructor(
     /**
      * Adds the same notification action for all the notification statuses.
      * So for example, if you want to have the same action while the notification is in progress,
-     * cancelled, completed or with an error, this method will save you lines of code.
+     * cancelled, success or error, this method will save you lines of code.
      *
      * @param action [UploadNotificationAction] action to add
      * @return [UploadNotificationConfig]

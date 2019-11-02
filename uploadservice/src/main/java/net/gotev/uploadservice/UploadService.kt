@@ -1,7 +1,6 @@
 package net.gotev.uploadservice
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -100,12 +99,7 @@ class UploadService : Service() {
     private val taskObservers by lazy {
         arrayOf(
             BroadcastEmitter(this),
-            NotificationHandler(
-                service = this,
-                notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager,
-                namespace = UploadServiceConfig.namespace!!,
-                placeholdersProcessor = UploadServiceConfig.placeholdersProcessor
-            ),
+            NotificationHandler(this),
             TaskCompletionNotifier(this)
         )
     }

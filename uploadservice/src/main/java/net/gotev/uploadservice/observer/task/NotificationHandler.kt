@@ -1,33 +1,35 @@
 package net.gotev.uploadservice.observer.task
 
 import android.app.NotificationManager
+import android.content.Context
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import net.gotev.uploadservice.UploadService
+import net.gotev.uploadservice.UploadServiceConfig.namespace
+import net.gotev.uploadservice.UploadServiceConfig.placeholdersProcessor
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadNotificationStatusConfig
 import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
-import net.gotev.uploadservice.placeholders.PlaceholdersProcessor
 
-class NotificationHandler(
-    private val service: UploadService,
-    private val notificationManager: NotificationManager,
-    private val namespace: String,
-    private val placeholdersProcessor: PlaceholdersProcessor
-) : UploadTaskObserver {
+class NotificationHandler(private val service: UploadService) : UploadTaskObserver {
 
     private val notificationCreationTimeMillis by lazy { System.currentTimeMillis() }
 
+    private val notificationManager by lazy {
+        service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
     private fun NotificationCompat.Builder.setRingtoneCompat(isRingToneEnabled: Boolean): NotificationCompat.Builder {
         if (isRingToneEnabled && Build.VERSION.SDK_INT < 26) {
-            val sound = RingtoneManager.getActualDefaultRingtoneUri(
-                service,
-                RingtoneManager.TYPE_NOTIFICATION
+            setSound(
+                RingtoneManager.getActualDefaultRingtoneUri(
+                    service,
+                    RingtoneManager.TYPE_NOTIFICATION
+                )
             )
-            setSound(sound)
         }
 
         return this
@@ -138,7 +140,7 @@ class NotificationHandler(
             info,
             config.notificationChannelId,
             config.isRingToneEnabled,
-            config.completed
+            config.success
         )
     }
 

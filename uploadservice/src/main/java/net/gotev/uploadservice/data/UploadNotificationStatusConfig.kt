@@ -26,7 +26,7 @@ data class UploadNotificationStatusConfig(
     /**
      * Clear the notification automatically.
      * This would not affect progress notification, as it's ongoing and managed by upload service.
-     * It's used to be able to automatically dismiss cancelled, error or completed notifications.
+     * It's used to be able to automatically dismiss cancelled, error or success notifications.
      */
     var autoClear: Boolean = false,
 

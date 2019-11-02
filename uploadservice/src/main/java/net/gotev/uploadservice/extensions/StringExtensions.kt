@@ -4,7 +4,7 @@ import android.webkit.MimeTypeMap
 import java.net.URL
 import java.util.Locale
 
-internal fun String?.isASCII(): Boolean {
+fun String?.isASCII(): Boolean {
     if (this.isNullOrBlank())
         return false
 

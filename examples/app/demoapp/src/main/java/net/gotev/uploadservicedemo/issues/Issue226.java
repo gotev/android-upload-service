@@ -47,7 +47,7 @@ public class Issue226 implements Runnable {
         final UploadNotificationConfig notificationConfig = new UploadNotificationConfig(App.CHANNEL);
 
         notificationConfig.getCancelled().setAutoClear(false);
-        notificationConfig.getCompleted().setAutoClear(true);
+        notificationConfig.getSuccess().setAutoClear(true);
 
         try {
             final String fatherId = "father " + requestNumber + "/" + totalRequests + "-" + Long.toString(System.nanoTime());

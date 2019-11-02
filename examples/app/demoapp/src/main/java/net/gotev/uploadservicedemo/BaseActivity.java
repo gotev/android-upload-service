@@ -61,9 +61,9 @@ public class BaseActivity extends AppCompatActivity {
                 getString(R.string.cancel_upload),
                 NotificationActions.getCancelUploadAction(this, 1, uploadId)));
 
-        config.getCompleted().setMessage(getString(R.string.upload_success));
-        config.getCompleted().setIconResourceID(R.drawable.ic_upload_success);
-        config.getCompleted().setIconColorResourceID(Color.GREEN);
+        config.getSuccess().setMessage(getString(R.string.upload_success));
+        config.getSuccess().setIconResourceID(R.drawable.ic_upload_success);
+        config.getSuccess().setIconColorResourceID(Color.GREEN);
 
         config.getError().setMessage(getString(R.string.upload_error));
         config.getError().setIconResourceID(R.drawable.ic_upload_error);
