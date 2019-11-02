@@ -1,14 +1,12 @@
 package net.gotev.uploadservice
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.PowerManager
-import java.util.Timer
-import java.util.TimerTask
-import java.util.concurrent.ConcurrentHashMap
 import net.gotev.uploadservice.UploadServiceConfig.threadPool
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.acquirePartialWakeLock
@@ -17,6 +15,9 @@ import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.observer.task.BroadcastEmitter
 import net.gotev.uploadservice.observer.task.NotificationHandler
 import net.gotev.uploadservice.observer.task.TaskCompletionNotifier
+import java.util.Timer
+import java.util.TimerTask
+import java.util.concurrent.ConcurrentHashMap
 
 class UploadService : Service() {
 
@@ -220,10 +221,13 @@ class UploadService : Service() {
                 BroadcastEmitter(this),
                 params.notificationConfig?.let {
                     NotificationHandler(
-                        this,
-                        UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
-                        params.id,
-                        it
+                        service = this,
+                        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager,
+                        namespace = UploadServiceConfig.namespace!!,
+                        notificationId = UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
+                        uploadId = params.id,
+                        config = it,
+                        placeholdersProcessor = UploadServiceConfig.placeholdersProcessor
                     )
                 },
                 TaskCompletionNotifier(this)

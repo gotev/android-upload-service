@@ -1,29 +1,28 @@
 package net.gotev.uploadservice.observer.task
 
 import android.app.NotificationManager
-import android.content.Context
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import net.gotev.uploadservice.UploadService
-import net.gotev.uploadservice.UploadServiceConfig
-import net.gotev.uploadservice.UploadServiceConfig.placeholdersProcessor
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadNotificationStatusConfig
 import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
+import net.gotev.uploadservice.placeholders.PlaceholdersProcessor
 
 class NotificationHandler(
     private val service: UploadService,
+    private val notificationManager: NotificationManager,
+    private val namespace: String,
     private val notificationId: Int,
     private val uploadId: String,
-    private val config: UploadNotificationConfig
+    private val config: UploadNotificationConfig,
+    private val placeholdersProcessor: PlaceholdersProcessor
 ) : UploadTaskObserver {
 
     private val notificationCreationTimeMillis by lazy { System.currentTimeMillis() }
-    private val notificationManager =
-        service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     private fun NotificationCompat.Builder.setRingtoneCompat(): NotificationCompat.Builder {
         if (config.isRingToneEnabled && Build.VERSION.SDK_INT < 26) {
@@ -51,7 +50,7 @@ class NotificationHandler(
         statusConfig: UploadNotificationStatusConfig,
         info: UploadInfo
     ): NotificationCompat.Builder {
-        return setGroup(UploadServiceConfig.namespace)
+        return setGroup(namespace)
             .setContentTitle(placeholdersProcessor.processPlaceholders(statusConfig.title, info))
             .setContentText(placeholdersProcessor.processPlaceholders(statusConfig.message, info))
             .setContentIntent(statusConfig.getClickIntent(service))
