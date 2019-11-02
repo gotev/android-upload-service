@@ -6,7 +6,7 @@ import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.network.ServerResponse
 
 class TaskCompletionNotifier(private val service: UploadService) : UploadTaskObserver {
-    override fun initialize(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {
+    override fun onStart(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {
     }
 
     override fun onProgress(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {

@@ -127,7 +127,7 @@ abstract class UploadTask : Runnable {
 
     override fun run() {
         doForEachObserver {
-            initialize(
+            onStart(
                 UploadInfo(params.id),
                 notificationId,
                 params.notificationConfig

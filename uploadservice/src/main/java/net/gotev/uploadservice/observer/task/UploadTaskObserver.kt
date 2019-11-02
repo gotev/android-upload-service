@@ -5,7 +5,7 @@ import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.network.ServerResponse
 
 interface UploadTaskObserver {
-    fun initialize(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?)
+    fun onStart(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?)
     fun onProgress(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?)
     fun onSuccess(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?, response: ServerResponse)
     fun onError(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?, exception: Throwable)

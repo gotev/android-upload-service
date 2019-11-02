@@ -14,7 +14,7 @@ class BroadcastEmitter(private val context: Context) : UploadTaskObserver {
         LocalBroadcastManager.getInstance(context).sendBroadcast(data.toIntent())
     }
 
-    override fun initialize(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {}
+    override fun onStart(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {}
 
     override fun onProgress(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {
         send(BroadcastData(UploadStatus.IN_PROGRESS, info))

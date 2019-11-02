@@ -96,7 +96,7 @@ class NotificationHandler(
         notificationManager.notify(notificationId + 1, notification)
     }
 
-    override fun initialize(
+    override fun onStart(
         info: UploadInfo,
         notificationId: Int,
         notificationConfig: UploadNotificationConfig?
