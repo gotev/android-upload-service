@@ -1,29 +1,46 @@
 package net.gotev.uploadservice.placeholders
 
 import net.gotev.uploadservice.data.UploadElapsedTime
+import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadRate
 
-open class DefaultPlaceholdersProcessor : PlaceholdersProcessor() {
-    override fun uploadElapsedTime(uploadElapsedTime: UploadElapsedTime) = when {
+open class DefaultPlaceholdersProcessor : PlaceholdersProcessor {
+    open fun uploadElapsedTime(uploadElapsedTime: UploadElapsedTime) = when {
         uploadElapsedTime.minutes == 0 -> "${uploadElapsedTime.seconds} sec"
         else -> "${uploadElapsedTime.minutes} min ${uploadElapsedTime.seconds} sec"
     }
 
-    override fun uploadRate(uploadRate: UploadRate): String {
+    open fun uploadRate(uploadRate: UploadRate): String {
         val suffix = when (uploadRate.unit) {
             UploadRate.UploadRateUnit.bitPerSecond -> "b/s"
-            UploadRate.UploadRateUnit.kiloBitPerSecond -> "kb/s"
-            UploadRate.UploadRateUnit.megaBitPerSecond -> "Mb/s"
+            UploadRate.UploadRateUnit.kilobitPerSecond -> "kb/s"
+            UploadRate.UploadRateUnit.megabitPerSecond -> "Mb/s"
         }
 
         return "${uploadRate.value} $suffix"
     }
 
-    override fun uploadProgress(percent: Int) = "$percent %"
+    open fun uploadProgress(percent: Int) = "$percent %"
 
-    override fun uploadedFiles(uploadedFiles: Int) = "$uploadedFiles"
+    open fun uploadedFiles(uploadedFiles: Int) = "$uploadedFiles"
 
-    override fun remainingFiles(remainingFiles: Int) = "$remainingFiles"
+    open fun remainingFiles(remainingFiles: Int) = "$remainingFiles"
 
-    override fun totalFiles(totalFiles: Int) = "$totalFiles"
+    open fun totalFiles(totalFiles: Int) = "$totalFiles"
+
+    override fun processPlaceholders(message: String?, uploadInfo: UploadInfo): String {
+        val safeMessage = message ?: return ""
+
+        val uploadedFiles = uploadInfo.successfullyUploadedFiles
+        val totalFiles = uploadInfo.files.size
+        val remainingFiles = totalFiles - uploadedFiles
+
+        return safeMessage
+            .replace(Placeholder.ElapsedTime.value, uploadElapsedTime(uploadInfo.elapsedTime))
+            .replace(Placeholder.UploadRate.value, uploadRate(uploadInfo.uploadRate))
+            .replace(Placeholder.Progress.value, uploadProgress(uploadInfo.progressPercent))
+            .replace(Placeholder.UploadedFiles.value, uploadedFiles(uploadedFiles))
+            .replace(Placeholder.RemainingFiles.value, remainingFiles(remainingFiles))
+            .replace(Placeholder.TotalFiles.value, totalFiles(totalFiles))
+    }
 }

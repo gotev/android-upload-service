@@ -1,10 +1,10 @@
 package net.gotev.uploadservice.data
 
 import android.os.Parcelable
-import java.util.ArrayList
-import java.util.Date
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
+import java.util.ArrayList
+import java.util.Date
 
 @Parcelize
 data class UploadInfo @JvmOverloads constructor(
@@ -65,25 +65,25 @@ data class UploadInfo @JvmOverloads constructor(
             val elapsedSeconds = elapsedTime.totalSeconds
 
             // wait at least a second to stabilize the upload rate a little bit
-            val kiloBitPerSecond = if (elapsedSeconds < 1)
+            val kilobitPerSecond = if (elapsedSeconds < 1)
                 0.0
             else
                 uploadedBytes.toDouble() / 1000 * 8 / elapsedSeconds
 
             return when {
-                kiloBitPerSecond < 1 -> UploadRate(
-                    value = (kiloBitPerSecond * 1000).toInt(),
+                kilobitPerSecond < 1 -> UploadRate(
+                    value = (kilobitPerSecond * 1000).toInt(),
                     unit = UploadRate.UploadRateUnit.bitPerSecond
                 )
 
-                kiloBitPerSecond >= 1000 -> UploadRate(
-                    value = (kiloBitPerSecond / 1000).toInt(),
-                    unit = UploadRate.UploadRateUnit.megaBitPerSecond
+                kilobitPerSecond >= 1000 -> UploadRate(
+                    value = (kilobitPerSecond / 1000).toInt(),
+                    unit = UploadRate.UploadRateUnit.megabitPerSecond
                 )
 
                 else -> UploadRate(
-                    value = kiloBitPerSecond.toInt(),
-                    unit = UploadRate.UploadRateUnit.kiloBitPerSecond
+                    value = kilobitPerSecond.toInt(),
+                    unit = UploadRate.UploadRateUnit.kilobitPerSecond
                 )
             }
         }
