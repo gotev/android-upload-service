@@ -97,6 +97,9 @@ class UploadService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var idleTimer: Timer? = null
 
+    private val broadcastEmitter by lazy { BroadcastEmitter(this) }
+    private val taskCompletionNotifier by lazy { TaskCompletionNotifier(this) }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -218,7 +221,7 @@ class UploadService : Service() {
             notificationIncrementalId += 2
 
             val observers = listOfNotNull(
-                BroadcastEmitter(this),
+                broadcastEmitter,
                 params.notificationConfig?.let {
                     NotificationHandler(
                         service = this,
@@ -230,7 +233,7 @@ class UploadService : Service() {
                         placeholdersProcessor = UploadServiceConfig.placeholdersProcessor
                     )
                 },
-                TaskCompletionNotifier(this)
+                taskCompletionNotifier
             ).toTypedArray()
 
             uploadTask.init(this, params, *observers)
