@@ -17,7 +17,6 @@ class NotificationHandler(
     private val notificationManager: NotificationManager,
     private val namespace: String,
     private val notificationId: Int,
-    private val uploadId: String,
     private val config: UploadNotificationConfig,
     private val placeholdersProcessor: PlaceholdersProcessor
 ) : UploadTaskObserver {
@@ -36,7 +35,7 @@ class NotificationHandler(
         return this
     }
 
-    private fun NotificationCompat.Builder.notify() {
+    private fun NotificationCompat.Builder.notify(uploadId: String) {
         build().apply {
             if (service.holdForegroundNotification(uploadId, this)) {
                 notificationManager.cancel(notificationId)
@@ -100,13 +99,13 @@ class NotificationHandler(
 
         ongoingNotification(info, config.progress)
             ?.setProgress(100, 0, true)
-            ?.notify()
+            ?.notify(info.uploadId)
     }
 
     override fun onProgress(info: UploadInfo) {
         ongoingNotification(info, config.progress)
             ?.setProgress(100, info.progressPercent, false)
-            ?.notify()
+            ?.notify(info.uploadId)
     }
 
     override fun onSuccess(info: UploadInfo, response: ServerResponse) {

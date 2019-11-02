@@ -228,7 +228,6 @@ class UploadService : Service() {
                         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager,
                         namespace = UploadServiceConfig.namespace!!,
                         notificationId = UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
-                        uploadId = params.id,
                         config = it,
                         placeholdersProcessor = UploadServiceConfig.placeholdersProcessor
                     )
