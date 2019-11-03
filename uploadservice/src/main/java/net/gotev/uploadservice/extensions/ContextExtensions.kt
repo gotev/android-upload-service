@@ -33,45 +33,53 @@ fun Context.startNewUpload(taskClass: Class<out UploadTask>, params: UploadTaskP
     return params.id
 }
 
+typealias UploadTaskCreationParameters = Pair<Class<out UploadTask>, UploadTaskParameters>
+
+@Suppress("UNCHECKED_CAST")
+fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
+    if (this == null || action != UploadServiceConfig.uploadAction) return null
+
+    val taskClassString = getStringExtra(taskClassKey) ?: run {
+        UploadServiceLogger.error(UploadService.TAG) { "Error while instantiating new task. No task class defined in Intent." }
+        return null
+    }
+
+    val taskClass = Class.forName(taskClassString)
+
+    if (!UploadTask::class.java.isAssignableFrom(taskClass)) {
+        UploadServiceLogger.error(UploadService.TAG) { "$taskClassString does not extend UploadTask!" }
+        return null
+    }
+
+    val params: UploadTaskParameters = getParcelableExtra(taskParametersKey) ?: run {
+        UploadServiceLogger.error(UploadService.TAG) { "Error while instantiating new task. Missing task parameters." }
+        return null
+    }
+
+    return UploadTaskCreationParameters(taskClass as Class<out UploadTask>, params)
+}
+
 /**
  * Creates a new task instance based on the requested task class in the intent.
  * @param intent intent passed to the service
  * @return task instance or null if the task class is not supported or invalid
  */
-fun Context.getTask(
-    intent: Intent,
+fun Context.getUploadTask(
+    creationParameters: UploadTaskCreationParameters,
     notificationId: Int,
     vararg observers: UploadTaskObserver
 ): UploadTask? {
-    val taskClassString = intent.getStringExtra(taskClassKey) ?: run {
-        UploadServiceLogger.error(UploadService.TAG) { "Error while instantiating new task. No task class defined in Intent." }
-        return null
-    }
-
-    val params: UploadTaskParameters =
-        intent.getParcelableExtra(taskParametersKey) ?: run {
-            UploadServiceLogger.error(UploadService.TAG) { "Error while instantiating new task. Missing task parameters." }
-            return null
-        }
-
     return try {
-        val task = Class.forName(taskClassString)
-
-        if (!UploadTask::class.java.isAssignableFrom(task)) {
-            UploadServiceLogger.error(UploadService.TAG) { "$taskClassString does not extend UploadTask!" }
-            return null
-        }
-
-        val uploadTask = UploadTask::class.java.cast(task.newInstance())?.apply {
+        val uploadTask = creationParameters.first.newInstance().apply {
             init(
-                context = this@getTask,
-                taskParams = params,
+                context = this@getUploadTask,
+                taskParams = creationParameters.second,
                 notificationId = notificationId,
                 taskObservers = *observers
             )
-        } ?: return null
+        }
 
-        UploadServiceLogger.debug(UploadService.TAG) { "Successfully created new task with class: $taskClassString" }
+        UploadServiceLogger.debug(UploadService.TAG) { "Successfully created new task with class: ${creationParameters.first.name}" }
         uploadTask
     } catch (exc: Throwable) {
         UploadServiceLogger.error(UploadService.TAG, exc) { "Error while instantiating new task" }

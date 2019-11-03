@@ -8,7 +8,8 @@ import android.os.IBinder
 import android.os.PowerManager
 import net.gotev.uploadservice.UploadServiceConfig.threadPool
 import net.gotev.uploadservice.extensions.acquirePartialWakeLock
-import net.gotev.uploadservice.extensions.getTask
+import net.gotev.uploadservice.extensions.getUploadTask
+import net.gotev.uploadservice.extensions.getUploadTaskCreationParameters
 import net.gotev.uploadservice.extensions.safeRelease
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.observer.task.BroadcastEmitter
@@ -198,23 +199,26 @@ class UploadService : Service() {
 
         UploadServiceLogger.debug(TAG) { "Starting UploadService. Debug info: $UploadServiceConfig" }
 
-        // increment by 2 because the notificationIncrementalId + 1 is used internally
-        // in each UploadTask. Check its sources for more info about this.
-        notificationIncrementalId += 2
+        val taskCreationParameters = intent.getUploadTaskCreationParameters()
+            ?: return shutdownIfThereArentAnyActiveTasks()
 
-        val currentTask = getTask(
-            intent = intent,
-            notificationId = UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
-            observers = *taskObservers
-        ) ?: return shutdownIfThereArentAnyActiveTasks()
-
-        if (uploadTasksMap.containsKey(currentTask.params.id)) {
+        if (uploadTasksMap.containsKey(taskCreationParameters.second.id)) {
             UploadServiceLogger.error(TAG) {
-                "Preventing upload with id: ${currentTask.params.id} to be uploaded twice! " +
+                "Preventing upload with id: ${taskCreationParameters.second.id} to be uploaded twice! " +
                     "Please check your code and fix it!"
             }
             return shutdownIfThereArentAnyActiveTasks()
         }
+
+        // increment by 2 because the notificationIncrementalId + 1 is used internally
+        // in each UploadTask. Check its sources for more info about this.
+        notificationIncrementalId += 2
+
+        val currentTask = getUploadTask(
+            creationParameters = taskCreationParameters,
+            notificationId = UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
+            observers = *taskObservers
+        ) ?: return shutdownIfThereArentAnyActiveTasks()
 
         clearIdleTimer()
 
