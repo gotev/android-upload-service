@@ -37,17 +37,25 @@ typealias UploadTaskCreationParameters = Pair<Class<out UploadTask>, UploadTaskP
 
 @Suppress("UNCHECKED_CAST")
 fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
-    if (this == null || action != UploadServiceConfig.uploadAction) return null
+    if (this == null || action != UploadServiceConfig.uploadAction) {
+        UploadServiceLogger.error(UploadService.TAG) { "Error while instantiating new task. Invalid intent received" }
+        return null
+    }
 
     val taskClassString = getStringExtra(taskClassKey) ?: run {
         UploadServiceLogger.error(UploadService.TAG) { "Error while instantiating new task. No task class defined in Intent." }
         return null
     }
 
-    val taskClass = Class.forName(taskClassString)
+    val taskClass = try {
+        Class.forName(taskClassString)
+    } catch (exc: Throwable) {
+        UploadServiceLogger.error(UploadService.TAG, exc) { "Error while instantiating new task. $taskClassString does not exist." }
+        null
+    } ?: return null
 
     if (!UploadTask::class.java.isAssignableFrom(taskClass)) {
-        UploadServiceLogger.error(UploadService.TAG) { "$taskClassString does not extend UploadTask!" }
+        UploadServiceLogger.error(UploadService.TAG) { "Error while instantiating new task. $taskClassString does not extend UploadTask." }
         return null
     }
 

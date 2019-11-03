@@ -193,10 +193,6 @@ class UploadService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent == null || UploadServiceConfig.uploadAction != intent.action) {
-            return shutdownIfThereArentAnyActiveTasks()
-        }
-
         UploadServiceLogger.debug(TAG) { "Starting UploadService. Debug info: $UploadServiceConfig" }
 
         val taskCreationParameters = intent.getUploadTaskCreationParameters()
@@ -205,7 +201,8 @@ class UploadService : Service() {
         if (uploadTasksMap.containsKey(taskCreationParameters.second.id)) {
             UploadServiceLogger.error(TAG) {
                 "Preventing upload with id: ${taskCreationParameters.second.id} to be uploaded twice! " +
-                    "Please check your code and fix it!"
+                    "An upload with the same ID is already in progress. " +
+                    "Every upload must have unique ID. Please check your code and fix it!"
             }
             return shutdownIfThereArentAnyActiveTasks()
         }
