@@ -7,8 +7,8 @@ import android.content.Intent
 import android.os.IBinder
 import android.os.PowerManager
 import net.gotev.uploadservice.UploadServiceConfig.threadPool
-import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.acquirePartialWakeLock
+import net.gotev.uploadservice.extensions.getTask
 import net.gotev.uploadservice.extensions.safeRelease
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.observer.task.BroadcastEmitter
@@ -21,11 +21,7 @@ import java.util.concurrent.ConcurrentHashMap
 class UploadService : Service() {
 
     companion object {
-        private val TAG = UploadService::class.java.simpleName
-
-        // constants used in the intent which starts this service
-        internal const val taskParameters = "taskParameters"
-        internal const val taskClass = "taskClass"
+        internal val TAG = UploadService::class.java.simpleName
 
         private const val UPLOAD_NOTIFICATION_BASE_ID = 1234 // Something unique
 
@@ -104,41 +100,6 @@ class UploadService : Service() {
         )
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
-        wakeLock = acquirePartialWakeLock(wakeLock, TAG)
-    }
-
-    override fun onBind(intent: Intent): IBinder? {
-        return null
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent == null || UploadServiceConfig.uploadAction != intent.action) {
-            return shutdownIfThereArentAnyActiveTasks()
-        }
-
-        UploadServiceLogger.debug(TAG) { "Starting UploadService. Debug info: $UploadServiceConfig" }
-
-        val currentTask = getTask(intent) ?: return shutdownIfThereArentAnyActiveTasks()
-
-        if (uploadTasksMap.containsKey(currentTask.params.id)) {
-            UploadServiceLogger.error(TAG) {
-                "Preventing upload with id: ${currentTask.params.id} to be uploaded twice! " +
-                    "Please check your code and fix it!"
-            }
-            return shutdownIfThereArentAnyActiveTasks()
-        }
-
-        clearIdleTimer()
-
-        uploadTasksMap[currentTask.params.id] = currentTask
-        threadPool.execute(currentTask)
-
-        return START_STICKY
-    }
-
     @Synchronized
     private fun clearIdleTimer() {
         idleTimer?.apply {
@@ -174,69 +135,6 @@ class UploadService : Service() {
         }
 
         return START_STICKY
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        stopAllUploads()
-        threadPool.shutdown()
-
-        if (UploadServiceConfig.isForegroundService) {
-            UploadServiceLogger.debug(TAG) { "Stopping foreground execution" }
-            stopForeground(true)
-        }
-
-        wakeLock.safeRelease()
-
-        uploadTasksMap.clear()
-
-        UploadServiceLogger.debug(TAG) { "UploadService destroyed" }
-    }
-
-    /**
-     * Creates a new task instance based on the requested task class in the intent.
-     * @param intent intent passed to the service
-     * @return task instance or null if the task class is not supported or invalid
-     */
-    fun getTask(intent: Intent): UploadTask? {
-        val taskClassString = intent.getStringExtra(taskClass) ?: run {
-            UploadServiceLogger.error(TAG) { "Error while instantiating new task. No task class defined in Intent." }
-            return null
-        }
-
-        val params: UploadTaskParameters = intent.getParcelableExtra(taskParameters) ?: run {
-            UploadServiceLogger.error(TAG) { "Error while instantiating new task. Missing task parameters." }
-            return null
-        }
-
-        return try {
-            val task = Class.forName(taskClassString)
-
-            if (!UploadTask::class.java.isAssignableFrom(task)) {
-                UploadServiceLogger.error(TAG) { "$taskClassString does not extend UploadTask!" }
-                return null
-            }
-
-            val uploadTask = UploadTask::class.java.cast(task.newInstance()) ?: return null
-
-            // increment by 2 because the notificationIncrementalId + 1 is used internally
-            // in each UploadTask. Check its sources for more info about this.
-            notificationIncrementalId += 2
-
-            uploadTask.init(
-                context = this,
-                taskParams = params,
-                notificationId = UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
-                taskObservers = *taskObservers
-            )
-
-            UploadServiceLogger.debug(TAG) { "Successfully created new task with class: $taskClassString" }
-            uploadTask
-        } catch (exc: Throwable) {
-            UploadServiceLogger.error(TAG, exc) { "Error while instantiating new task" }
-            null
-        }
     }
 
     /**
@@ -281,5 +179,66 @@ class UploadService : Service() {
             stopForeground(true)
             shutdownIfThereArentAnyActiveTasks()
         }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        wakeLock = acquirePartialWakeLock(wakeLock, TAG)
+    }
+
+    override fun onBind(intent: Intent): IBinder? {
+        return null
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent == null || UploadServiceConfig.uploadAction != intent.action) {
+            return shutdownIfThereArentAnyActiveTasks()
+        }
+
+        UploadServiceLogger.debug(TAG) { "Starting UploadService. Debug info: $UploadServiceConfig" }
+
+        // increment by 2 because the notificationIncrementalId + 1 is used internally
+        // in each UploadTask. Check its sources for more info about this.
+        notificationIncrementalId += 2
+
+        val currentTask = getTask(
+            intent = intent,
+            notificationId = UPLOAD_NOTIFICATION_BASE_ID + notificationIncrementalId,
+            observers = *taskObservers
+        ) ?: return shutdownIfThereArentAnyActiveTasks()
+
+        if (uploadTasksMap.containsKey(currentTask.params.id)) {
+            UploadServiceLogger.error(TAG) {
+                "Preventing upload with id: ${currentTask.params.id} to be uploaded twice! " +
+                    "Please check your code and fix it!"
+            }
+            return shutdownIfThereArentAnyActiveTasks()
+        }
+
+        clearIdleTimer()
+
+        uploadTasksMap[currentTask.params.id] = currentTask
+        threadPool.execute(currentTask)
+
+        return START_STICKY
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        stopAllUploads()
+        threadPool.shutdown()
+
+        if (UploadServiceConfig.isForegroundService) {
+            UploadServiceLogger.debug(TAG) { "Stopping foreground execution" }
+            stopForeground(true)
+        }
+
+        wakeLock.safeRelease()
+
+        uploadTasksMap.clear()
+
+        UploadServiceLogger.debug(TAG) { "UploadService destroyed" }
     }
 }

@@ -4,19 +4,6 @@ import android.webkit.MimeTypeMap
 import java.net.URL
 import java.util.Locale
 
-fun String?.isASCII(): Boolean {
-    if (this.isNullOrBlank())
-        return false
-
-    for (index in 0 until length) {
-        if (this[index].toInt() > 127) {
-            return false
-        }
-    }
-
-    return true
-}
-
 internal const val APPLICATION_OCTET_STREAM = "application/octet-stream"
 internal const val VIDEO_MP4 = "video/mp4"
 
@@ -43,6 +30,19 @@ fun String.autoDetectMimeType(): String {
     }
 }
 
+fun String?.isASCII(): Boolean {
+    if (this.isNullOrBlank())
+        return false
+
+    for (index in 0 until length) {
+        if (this[index].toInt() > 127) {
+            return false
+        }
+    }
+
+    return true
+}
+
 fun String.isValidHttpUrl(): Boolean {
     if (!startsWith("http://") && !startsWith("https://")) return false
 
@@ -54,11 +54,8 @@ fun String.isValidHttpUrl(): Boolean {
     }
 }
 
-private val usAscii by lazy { Charsets.US_ASCII }
-private val utf8 by lazy { Charsets.UTF_8 }
-
 val String.asciiByes: ByteArray
-    get() = toByteArray(usAscii)
+    get() = toByteArray(Charsets.US_ASCII)
 
 val String.utf8Bytes: ByteArray
-    get() = toByteArray(utf8)
+    get() = toByteArray(Charsets.UTF_8)
