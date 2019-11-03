@@ -142,7 +142,10 @@ object UploadServiceConfig {
         get() = IntentFilter(broadcastAction)
 
     /**
-     * Localizes data used in notification placeholders.
+     * Processes placeholders contained in strings and replaces them with values.
+     * Custom placeholders processor can be made by either extending [DefaultPlaceholdersProcessor]
+     * and overriding only what you need (if you need to add your own placeholders on top of the
+     * default ones or modify default values) or by implementing [PlaceholdersProcessor].
      */
     @JvmStatic
     var placeholdersProcessor: PlaceholdersProcessor =
