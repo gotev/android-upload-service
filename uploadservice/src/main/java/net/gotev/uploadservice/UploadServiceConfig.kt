@@ -5,6 +5,8 @@ import android.os.Build
 import net.gotev.uploadservice.data.RetryPolicyConfig
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
+import net.gotev.uploadservice.observer.task.NotificationHandler
+import net.gotev.uploadservice.observer.task.UploadTaskObserver
 import net.gotev.uploadservice.placeholders.DefaultPlaceholdersProcessor
 import net.gotev.uploadservice.placeholders.PlaceholdersProcessor
 import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
@@ -55,6 +57,15 @@ object UploadServiceConfig {
         TimeUnit.SECONDS,
         LinkedBlockingQueue<Runnable>()
     )
+
+    /**
+     * Creates the notification handler for upload tasks.
+     * The default notification handler creates a notification for each upload task.
+     */
+    @JvmStatic
+    var notificationHandlerFactory: (UploadService) -> UploadTaskObserver = { uploadService ->
+        NotificationHandler(uploadService)
+    }
 
     /**
      * How many time to wait in idle before shutting down the service.

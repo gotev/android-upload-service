@@ -13,7 +13,6 @@ import net.gotev.uploadservice.extensions.getUploadTaskCreationParameters
 import net.gotev.uploadservice.extensions.safeRelease
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.observer.task.BroadcastEmitter
-import net.gotev.uploadservice.observer.task.NotificationHandler
 import net.gotev.uploadservice.observer.task.TaskCompletionNotifier
 import java.util.Timer
 import java.util.TimerTask
@@ -96,7 +95,7 @@ class UploadService : Service() {
     private val taskObservers by lazy {
         arrayOf(
             BroadcastEmitter(this),
-            NotificationHandler(this),
+            UploadServiceConfig.notificationHandlerFactory(this),
             TaskCompletionNotifier(this)
         )
     }

@@ -49,6 +49,9 @@ public class App extends Application {
             //enableStrictMode();
         }
 
+        // Set upload service debug log messages level
+        UploadServiceLogger.setDevelopmentMode(BuildConfig.DEBUG);
+
         // Set your application namespace to avoid conflicts with other apps
         // using this library
         UploadServiceConfig.setNamespace(BuildConfig.APPLICATION_ID);
@@ -59,9 +62,6 @@ public class App extends Application {
 
         // setup backoff multiplier
         UploadServiceConfig.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
-
-        // Set upload service debug log messages level
-        UploadServiceLogger.setDevelopmentMode(BuildConfig.DEBUG);
 
         createNotificationChannel();
 
