@@ -17,18 +17,18 @@ class BroadcastEmitter(private val context: Context) : UploadTaskObserver {
     override fun onStart(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {}
 
     override fun onProgress(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {
-        send(BroadcastData(UploadStatus.IN_PROGRESS, info))
+        send(BroadcastData(UploadStatus.InProgress, info))
     }
 
     override fun onSuccess(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?, response: ServerResponse) {
-        send(BroadcastData(UploadStatus.SUCCESS, info, response))
+        send(BroadcastData(UploadStatus.Success, info, response))
     }
 
     override fun onCompleted(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {
-        send(BroadcastData(UploadStatus.COMPLETED, info))
+        send(BroadcastData(UploadStatus.Completed, info))
     }
 
     override fun onError(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?, exception: Throwable) {
-        send(BroadcastData(UploadStatus.ERROR, info, null, exception))
+        send(BroadcastData(UploadStatus.Error, info, null, exception))
     }
 }

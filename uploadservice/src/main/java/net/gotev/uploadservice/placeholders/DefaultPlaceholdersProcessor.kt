@@ -12,9 +12,9 @@ open class DefaultPlaceholdersProcessor : PlaceholdersProcessor {
 
     open fun uploadRate(uploadRate: UploadRate): String {
         val suffix = when (uploadRate.unit) {
-            UploadRate.UploadRateUnit.bitPerSecond -> "b/s"
-            UploadRate.UploadRateUnit.kilobitPerSecond -> "kb/s"
-            UploadRate.UploadRateUnit.megabitPerSecond -> "Mb/s"
+            UploadRate.UploadRateUnit.BitPerSecond -> "b/s"
+            UploadRate.UploadRateUnit.KilobitPerSecond -> "kb/s"
+            UploadRate.UploadRateUnit.MegabitPerSecond -> "Mb/s"
         }
 
         return "${uploadRate.value} $suffix"

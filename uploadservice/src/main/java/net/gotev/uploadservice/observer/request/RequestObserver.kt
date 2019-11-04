@@ -38,10 +38,10 @@ class RequestObserver(
         }
 
         when (data.status) {
-            UploadStatus.IN_PROGRESS -> delegate.onProgress(context, uploadInfo)
-            UploadStatus.ERROR -> delegate.onError(context, uploadInfo, data.exception!!)
-            UploadStatus.SUCCESS -> delegate.onSuccess(context, uploadInfo, data.serverResponse!!)
-            UploadStatus.COMPLETED -> delegate.onCompleted(context, uploadInfo)
+            UploadStatus.InProgress -> delegate.onProgress(context, uploadInfo)
+            UploadStatus.Error -> delegate.onError(context, uploadInfo, data.exception!!)
+            UploadStatus.Success -> delegate.onSuccess(context, uploadInfo, data.serverResponse!!)
+            UploadStatus.Completed -> delegate.onCompleted(context, uploadInfo)
         }
     }
 

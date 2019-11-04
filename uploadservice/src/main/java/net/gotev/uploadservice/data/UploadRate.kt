@@ -1,9 +1,9 @@
 package net.gotev.uploadservice.data
 
-data class UploadRate(val value: Int = 0, val unit: UploadRateUnit = UploadRateUnit.bitPerSecond) {
+data class UploadRate(val value: Int = 0, val unit: UploadRateUnit = UploadRateUnit.BitPerSecond) {
     enum class UploadRateUnit {
-        bitPerSecond,
-        kilobitPerSecond,
-        megabitPerSecond
+        BitPerSecond,
+        KilobitPerSecond,
+        MegabitPerSecond
     }
 }

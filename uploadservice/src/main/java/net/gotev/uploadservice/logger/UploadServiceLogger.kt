@@ -3,15 +3,15 @@ package net.gotev.uploadservice.logger
 import java.lang.ref.WeakReference
 
 object UploadServiceLogger {
-    private var logLevel = LogLevel.OFF
+    private var logLevel = LogLevel.Off
     private val defaultLogger = DefaultLoggerDelegate()
     private var loggerDelegate = WeakReference<Delegate>(defaultLogger)
 
     enum class LogLevel {
-        DEBUG,
-        INFO,
-        ERROR,
-        OFF
+        Debug,
+        Info,
+        Error,
+        Off
     }
 
     interface Delegate {
@@ -35,25 +35,25 @@ object UploadServiceLogger {
     @Synchronized
     @JvmStatic
     fun setDevelopmentMode(devModeOn: Boolean) {
-        logLevel = if (devModeOn) LogLevel.DEBUG else LogLevel.OFF
+        logLevel = if (devModeOn) LogLevel.Debug else LogLevel.Off
     }
 
     private fun loggerWithLevel(minLevel: LogLevel) =
-        if (logLevel > minLevel || logLevel == LogLevel.OFF) null else loggerDelegate.get()
+        if (logLevel > minLevel || logLevel == LogLevel.Off) null else loggerDelegate.get()
 
     @JvmOverloads
     @JvmStatic
     fun error(tag: String, exception: Throwable? = null, message: () -> String) {
-        loggerWithLevel(LogLevel.ERROR)?.error(tag, message(), exception)
+        loggerWithLevel(LogLevel.Error)?.error(tag, message(), exception)
     }
 
     @JvmStatic
     fun info(tag: String, message: () -> String) {
-        loggerWithLevel(LogLevel.INFO)?.info(tag, message())
+        loggerWithLevel(LogLevel.Info)?.info(tag, message())
     }
 
     @JvmStatic
     fun debug(tag: String, message: () -> String) {
-        loggerWithLevel(LogLevel.DEBUG)?.debug(tag, message())
+        loggerWithLevel(LogLevel.Debug)?.debug(tag, message())
     }
 }

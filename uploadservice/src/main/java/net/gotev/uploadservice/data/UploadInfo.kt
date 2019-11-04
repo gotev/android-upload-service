@@ -73,17 +73,17 @@ data class UploadInfo @JvmOverloads constructor(
             return when {
                 kilobitPerSecond < 1 -> UploadRate(
                     value = (kilobitPerSecond * 1000).toInt(),
-                    unit = UploadRate.UploadRateUnit.bitPerSecond
+                    unit = UploadRate.UploadRateUnit.BitPerSecond
                 )
 
                 kilobitPerSecond >= 1000 -> UploadRate(
                     value = (kilobitPerSecond / 1000).toInt(),
-                    unit = UploadRate.UploadRateUnit.megabitPerSecond
+                    unit = UploadRate.UploadRateUnit.MegabitPerSecond
                 )
 
                 else -> UploadRate(
                     value = kilobitPerSecond.toInt(),
-                    unit = UploadRate.UploadRateUnit.kilobitPerSecond
+                    unit = UploadRate.UploadRateUnit.KilobitPerSecond
                 )
             }
         }
