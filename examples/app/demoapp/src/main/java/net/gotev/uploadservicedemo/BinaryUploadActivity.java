@@ -14,7 +14,6 @@ import net.gotev.uploadservicedemo.adapteritems.UploadItem;
 import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * @author Aleksandar Gotev
@@ -50,12 +49,11 @@ public class BinaryUploadActivity extends UploadActivity {
     public void onDone(String httpMethod, String serverUrl, UploadItemUtils uploadItemUtils) {
 
         try {
-            final String uploadId = UUID.randomUUID().toString();
-
             final BinaryUploadRequest request = new BinaryUploadRequest(this, serverUrl)
-                    .setUploadID(uploadId)
                     .setMethod(httpMethod)
-                    .setNotificationConfig(getNotificationConfig(uploadId, R.string.binary_upload))
+                    .setNotificationConfig(uploadId ->
+                            getNotificationConfig(uploadId, R.string.binary_upload)
+                    )
                     //.setCustomUserAgent(getUserAgent())
                     .setMaxRetries(MAX_RETRIES)
                     .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);

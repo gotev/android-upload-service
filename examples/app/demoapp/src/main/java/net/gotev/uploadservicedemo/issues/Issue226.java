@@ -50,11 +50,11 @@ public class Issue226 implements Runnable {
         notificationConfig.getSuccess().setAutoClear(true);
 
         try {
-            final String fatherId = "father " + requestNumber + "/" + totalRequests + "-" + Long.toString(System.nanoTime());
+            final String fatherId = "father " + requestNumber + "/" + totalRequests + "-" + System.nanoTime();
             new MultipartUploadRequest(ctx, endpoint)
                     .setUploadID(fatherId)
                     .setMethod("POST")
-                    .setNotificationConfig(notificationConfig.setTitleForAllStatuses(fatherId))
+                    .setNotificationConfig(uploadId -> notificationConfig.setTitleForAllStatuses(fatherId))
                     .addParameter("color", "#ffffff")
                     .setMaxRetries(maxRetries)
                     /*.setDelegate(new UploadStatusDelegate() {
@@ -90,11 +90,11 @@ public class Issue226 implements Runnable {
                                    final UploadNotificationConfig notificationConfig,
                                    final int maxRetries) {
         try {
-            String childId = fatherId + " -> child" + Long.toString(System.nanoTime());
+            String childId = fatherId + " -> child" + System.nanoTime();
             new MultipartUploadRequest(context, endpoint)
                     .setUploadID(childId)
                     .setMethod("POST")
-                    .setNotificationConfig(notificationConfig.setTitleForAllStatuses(childId))
+                    .setNotificationConfig(uploadId -> notificationConfig.setTitleForAllStatuses(childId))
                     .addParameter("color", "#ffffff")
                     .addParameter("test", "value")
                     .addParameter("new", "parameter")

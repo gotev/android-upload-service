@@ -17,7 +17,6 @@ import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * @author Aleksandar Gotev
@@ -37,13 +36,10 @@ public class MultipartUploadActivity extends UploadActivity {
     @Override
     public void onDone(String httpMethod, String serverUrl, UploadItemUtils uploadItemUtils) {
         try {
-            final String uploadId = UUID.randomUUID().toString();
-
             final MultipartUploadRequest request =
                     new MultipartUploadRequest(this, serverUrl)
-                            .setUploadID(uploadId)
                             .setMethod(httpMethod)
-                            .setNotificationConfig(getNotificationConfig(uploadId, R.string.multipart_upload))
+                            .setNotificationConfig(uploadId -> getNotificationConfig(uploadId, R.string.multipart_upload))
                             .setMaxRetries(MAX_RETRIES)
                             //.setAutoDeleteFilesAfterSuccessfulUpload(true)
                             //.setCustomUserAgent(getUserAgent())

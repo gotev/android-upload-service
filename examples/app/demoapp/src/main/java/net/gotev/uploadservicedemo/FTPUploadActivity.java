@@ -23,7 +23,6 @@ import net.gotev.uploadservicedemo.utils.UploadItemUtils;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -153,12 +152,9 @@ public class FTPUploadActivity extends FilesPickerActivity {
         }
 
         try {
-            final String uploadId = UUID.randomUUID().toString();
-
             final FTPUploadRequest request = new FTPUploadRequest(this, serverUrl.getText().toString(), ftpPort)
-                    .setUploadID(uploadId)
                     .setMaxRetries(UploadActivity.MAX_RETRIES)
-                    .setNotificationConfig(getNotificationConfig(uploadId, R.string.ftp_upload))
+                    .setNotificationConfig(uploadId -> getNotificationConfig(uploadId, R.string.ftp_upload))
                     .setUsernameAndPassword(ftpUsername.getText().toString(), ftpPassword.getText().toString())
                     //.setCreatedDirectoriesPermissions(new UnixPermissions("777"))
                     .setSocketTimeout(5000)

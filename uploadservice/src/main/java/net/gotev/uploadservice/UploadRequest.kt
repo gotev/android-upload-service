@@ -2,14 +2,14 @@ package net.gotev.uploadservice
 
 import android.content.Context
 import android.os.Parcelable
-import java.util.ArrayList
-import java.util.UUID
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.startNewUpload
 import net.gotev.uploadservice.observer.request.RequestObserver
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate
+import java.util.ArrayList
+import java.util.UUID
 
 /**
  * Base class to extend to create an upload request. If you are implementing an HTTP based upload,
@@ -26,10 +26,10 @@ abstract class UploadRequest<B : UploadRequest<B>>
 @Throws(IllegalArgumentException::class)
 constructor(protected val context: Context, protected var serverUrl: String) {
 
-    private var uploadId: String? = null
+    private var uploadId = UUID.randomUUID().toString()
     protected var maxRetries = UploadServiceConfig.retryPolicy.defaultMaxRetries
     protected var autoDeleteSuccessfullyUploadedFiles = false
-    protected var notificationConfig: UploadNotificationConfig? = null
+    protected var notificationConfig: (uploadId: String) -> UploadNotificationConfig? = { null }
     protected val files = ArrayList<UploadFile>()
 
     /**
@@ -52,11 +52,11 @@ constructor(protected val context: Context, protected var serverUrl: String) {
     open fun startUpload(): String {
         return context.startNewUpload(
             taskClass, UploadTaskParameters(
-                uploadId ?: UUID.randomUUID().toString(),
+                uploadId,
                 serverUrl,
                 maxRetries,
                 autoDeleteSuccessfullyUploadedFiles,
-                notificationConfig,
+                notificationConfig(uploadId),
                 files,
                 getAdditionalParameters()
             )
@@ -96,7 +96,7 @@ constructor(protected val context: Context, protected var serverUrl: String) {
      * to be displayed
      * @return self instance
      */
-    fun setNotificationConfig(config: UploadNotificationConfig): B {
+    fun setNotificationConfig(config: (uploadId: String) -> UploadNotificationConfig): B {
         this.notificationConfig = config
         return self()
     }
