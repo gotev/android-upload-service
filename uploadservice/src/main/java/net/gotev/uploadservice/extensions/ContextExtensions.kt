@@ -102,7 +102,6 @@ fun Context.getUploadTask(
 
 fun Context.getNotificationActionIntent(
     uploadId: String,
-    requestCode: Int,
     action: String
 ): PendingIntent {
     val intent = Intent(UploadServiceConfig.broadcastNotificationAction).apply {
@@ -111,11 +110,18 @@ fun Context.getNotificationActionIntent(
         putExtra(uploadIdKey, uploadId)
     }
 
-    return PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    return PendingIntent.getBroadcast(
+        this,
+        // this is to prevent duplicate PendingIntent request codes which can cause cancelling
+        // the wrong upload
+        uploadId.hashCode(),
+        intent,
+        PendingIntent.FLAG_ONE_SHOT
+    )
 }
 
-fun Context.getCancelUploadIntent(uploadId: String, requestCode: Int = 1) =
-    getNotificationActionIntent(uploadId, requestCode, cancelUploadAction)
+fun Context.getCancelUploadIntent(uploadId: String) =
+    getNotificationActionIntent(uploadId, cancelUploadAction)
 
 val Intent.uploadIdToCancel: String?
     get() {

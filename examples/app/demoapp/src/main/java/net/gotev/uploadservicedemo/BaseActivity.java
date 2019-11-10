@@ -59,7 +59,7 @@ public class BaseActivity extends AppCompatActivity {
         config.getProgress().getActions().add(new UploadNotificationAction(
                 R.drawable.ic_cancelled,
                 getString(R.string.cancel_upload),
-                ContextExtensionsKt.getCancelUploadIntent(this, uploadId, 1)
+                ContextExtensionsKt.getCancelUploadIntent(this, uploadId)
         ));
 
         config.getSuccess().setMessage(getString(R.string.upload_success));
