@@ -29,6 +29,11 @@ object UploadServiceConfig {
     private const val fileScheme = "/"
     private const val contentScheme = "content://"
 
+    /**
+     * Default User Agent used by default Http Stack constructors.
+     */
+    const val defaultUserAgent = "AndroidUploadService/" + BuildConfig.VERSION_NAME
+
     private val schemeHandlers by lazy {
         LinkedHashMap<String, Class<out SchemeHandler>>().apply {
             this[fileScheme] = FileSchemeHandler::class.java

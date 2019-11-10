@@ -112,21 +112,6 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
     }
 
     /**
-     * Sets the custom user agent to use for this upload request.
-     * Note! If you set the "User-Agent" header by using the "addHeader" method,
-     * that setting will be overwritten by the value set with this method.
-     *
-     * @param customUserAgent custom user agent string
-     * @return self instance
-     */
-    fun setCustomUserAgent(customUserAgent: String): B {
-        if (customUserAgent.isNotBlank()) {
-            httpParams.customUserAgent = customUserAgent
-        }
-        return self()
-    }
-
-    /**
      * Sets if this upload request is using fixed length streaming mode.
      * By default it's set to true.
      * If it uses fixed length streaming mode, then the value returned by

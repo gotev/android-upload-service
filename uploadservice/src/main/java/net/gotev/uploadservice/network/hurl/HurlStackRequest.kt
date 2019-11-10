@@ -1,24 +1,25 @@
 package net.gotev.uploadservice.network.hurl
 
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.UUID
-import javax.net.ssl.HttpsURLConnection
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.BodyWriter
 import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.ServerResponse
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.UUID
+import javax.net.ssl.HttpsURLConnection
 
 class HurlStackRequest(
+    private val userAgent: String,
     private val uploadId: String,
     method: String,
     url: String,
     followRedirects: Boolean,
     useCaches: Boolean,
-    connectTimeout: Int,
-    readTimeout: Int
+    connectTimeoutMillis: Int,
+    readTimeoutMillis: Int
 ) : HttpRequest {
 
     private val connection: HttpURLConnection
@@ -42,8 +43,8 @@ class HurlStackRequest(
         connection = url.createConnection().apply {
             doInput = true
             doOutput = true
-            this.connectTimeout = connectTimeout
-            this.readTimeout = readTimeout
+            this.connectTimeout = connectTimeoutMillis
+            this.readTimeout = readTimeoutMillis
             this.useCaches = useCaches
             instanceFollowRedirects = followRedirects
             requestMethod = method
@@ -78,6 +79,8 @@ class HurlStackRequest(
 
     @Throws(IOException::class)
     override fun setHeaders(requestHeaders: List<NameValue>): HttpRequest {
+        connection.setRequestProperty("User-Agent", userAgent)
+
         for (param in requestHeaders) {
             connection.setRequestProperty(param.name.trim(), param.value.trim())
         }

@@ -17,13 +17,10 @@ import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.observer.request.RequestObserver;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 import static com.facebook.stetho.Stetho.newInitializerBuilder;
@@ -84,20 +81,22 @@ public class App extends Application {
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
-
+                .addInterceptor(chain -> {
+                    Request request = chain.request().newBuilder()
+                            .header("User-Agent", UploadServiceConfig.defaultUserAgent)
+                            .build();
+                    return chain.proceed(request);
+                })
                 // you can add your own request interceptors to add authorization headers.
                 // do not modify the body or the http method here, as they are set and managed
                 // internally by Upload Service, and tinkering with them will result in strange,
                 // erroneous and unpredicted behaviors
-                .addNetworkInterceptor(new Interceptor() {
-                    @Override
-                    public Response intercept(Chain chain) throws IOException {
-                        Request.Builder request = chain.request().newBuilder()
-                                .addHeader("myheader", "myvalue")
-                                .addHeader("mysecondheader", "mysecondvalue");
+                .addNetworkInterceptor(chain -> {
+                    Request.Builder request = chain.request().newBuilder()
+                            .addHeader("myheader", "myvalue")
+                            .addHeader("mysecondheader", "mysecondvalue");
 
-                        return chain.proceed(request.build());
-                    }
+                    return chain.proceed(request.build());
                 })
 
                 // open up your Chrome and go to: chrome://inspect
@@ -106,12 +105,7 @@ public class App extends Application {
                 // if you use HttpLoggingInterceptor, be sure to put it always as the last interceptor
                 // in the chain and to not use BODY level logging, otherwise you will get all your
                 // file contents in the log. Logging body is suitable only for small requests.
-                .addInterceptor(new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-                    @Override
-                    public void log(String message) {
-                        Log.d("OkHttp", message);
-                    }
-                }).setLevel(HttpLoggingInterceptor.Level.HEADERS))
+                .addInterceptor(new HttpLoggingInterceptor(message -> Log.d("OkHttp", message)).setLevel(HttpLoggingInterceptor.Level.HEADERS))
 
                 .cache(null)
                 .build();

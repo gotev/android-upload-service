@@ -1,13 +1,12 @@
 package net.gotev.uploadservice
 
 import android.annotation.SuppressLint
-import java.io.UnsupportedEncodingException
 import net.gotev.uploadservice.data.HttpUploadTaskParameters
-import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.BodyWriter
 import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.HttpStack
+import java.io.UnsupportedEncodingException
 
 /**
  * Generic HTTP Upload Task.
@@ -40,19 +39,6 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate,
     @Throws(Exception::class)
     override fun upload(httpStack: HttpStack) {
         UploadServiceLogger.debug(javaClass.simpleName) { "Starting upload task with ID ${params.id}" }
-
-        val httpParams = httpParams.apply {
-            val userAgent = httpParams.customUserAgent
-
-            requestHeaders.addHeader(
-                name = "User-Agent",
-                value = if (userAgent.isNullOrBlank()) {
-                    "AndroidUploadService/" + BuildConfig.VERSION_NAME
-                } else {
-                    userAgent
-                }
-            )
-        }
 
         setAllFilesHaveBeenSuccessfullyUploaded(false)
         totalBytes = bodyLength
