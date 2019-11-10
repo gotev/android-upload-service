@@ -8,20 +8,20 @@ import android.os.Parcelable
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
-import java.util.ArrayList
 import kotlinx.android.parcel.Parcelize
+import java.util.ArrayList
 
 @Parcelize
 data class UploadNotificationStatusConfig(
     /**
      * Notification title.
      */
-    var title: String? = "File Upload",
+    var title: String,
 
     /**
      * Notification message.
      */
-    var message: String? = null,
+    var message: String,
 
     /**
      * Clear the notification automatically.
@@ -68,11 +68,5 @@ data class UploadNotificationStatusConfig(
             Intent(),
             PendingIntent.FLAG_UPDATE_CURRENT
         )
-    }
-
-    fun addActionsToNotificationBuilder(builder: NotificationCompat.Builder) {
-        actions.forEach {
-            builder.addAction(it.asAction())
-        }
     }
 }

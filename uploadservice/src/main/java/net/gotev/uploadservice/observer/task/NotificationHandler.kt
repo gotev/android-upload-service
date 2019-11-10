@@ -22,6 +22,11 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
         service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
+    private fun NotificationCompat.Builder.addActions(config: UploadNotificationStatusConfig): NotificationCompat.Builder {
+        config.actions.forEach { addAction(it.asAction()) }
+        return this
+    }
+
     private fun NotificationCompat.Builder.setRingtoneCompat(isRingToneEnabled: Boolean): NotificationCompat.Builder {
         if (isRingToneEnabled && Build.VERSION.SDK_INT < 26) {
             setSound(
@@ -56,18 +61,14 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
             .setSmallIcon(statusConfig.iconResourceID)
             .setLargeIcon(statusConfig.largeIcon)
             .setColor(statusConfig.iconColorResourceID)
-            .apply {
-                statusConfig.addActionsToNotificationBuilder(this)
-            }
+            .addActions(statusConfig)
     }
 
     private fun ongoingNotification(
         notificationChannelId: String,
         info: UploadInfo,
         statusConfig: UploadNotificationStatusConfig
-    ): NotificationCompat.Builder? {
-        if (statusConfig.message == null) return null
-
+    ): NotificationCompat.Builder {
         return NotificationCompat.Builder(service, notificationChannelId)
             .setWhen(notificationCreationTimeMillis)
             .setCommonParameters(statusConfig, info)
@@ -83,7 +84,7 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
     ) {
         notificationManager.cancel(notificationId)
 
-        if (statusConfig.message == null || statusConfig.autoClear) return
+        if (statusConfig.autoClear) return
 
         val notification = NotificationCompat.Builder(service, notificationChannelId)
             .setCommonParameters(statusConfig, info)
@@ -111,8 +112,8 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
         }
 
         ongoingNotification(config.notificationChannelId, info, config.progress)
-            ?.setProgress(100, 0, true)
-            ?.notify(info.uploadId, notificationId)
+            .setProgress(100, 0, true)
+            .notify(info.uploadId, notificationId)
     }
 
     override fun onProgress(
@@ -123,8 +124,8 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
         val config = notificationConfig ?: return
 
         ongoingNotification(config.notificationChannelId, info, config.progress)
-            ?.setProgress(100, info.progressPercent, false)
-            ?.notify(info.uploadId, notificationId)
+            .setProgress(100, info.progressPercent, false)
+            .notify(info.uploadId, notificationId)
     }
 
     override fun onSuccess(

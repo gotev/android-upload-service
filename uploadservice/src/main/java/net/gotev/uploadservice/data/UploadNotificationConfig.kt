@@ -12,18 +12,22 @@ class UploadNotificationConfig @JvmOverloads constructor(
     var notificationChannelId: String,
     // TODO: study how to apply this to notification channels
     var isRingToneEnabled: Boolean = true,
-    val progress: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+    val progress: UploadNotificationStatusConfig = UploadNotificationStatusConfig(
+        title = "Upload",
         message = "Uploading at ${Placeholder.UploadRate} (${Placeholder.Progress})"
-    },
-    val success: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+    ),
+    val success: UploadNotificationStatusConfig = UploadNotificationStatusConfig(
+        title = "Upload",
         message = "Upload completed successfully in ${Placeholder.ElapsedTime}"
-    },
-    val error: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+    ),
+    val error: UploadNotificationStatusConfig = UploadNotificationStatusConfig(
+        title = "Upload",
         message = "Error during upload"
-    },
-    val cancelled: UploadNotificationStatusConfig = UploadNotificationStatusConfig().apply {
+    ),
+    val cancelled: UploadNotificationStatusConfig = UploadNotificationStatusConfig(
+        title = "Upload",
         message = "Upload cancelled"
-    }
+    )
 ) : Parcelable {
 
     @IgnoredOnParcel
