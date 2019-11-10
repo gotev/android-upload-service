@@ -3,11 +3,11 @@ package net.gotev.uploadservice
 import android.content.Context
 import android.os.Parcelable
 import android.util.Base64
-import java.util.Locale
 import net.gotev.uploadservice.data.HttpUploadTaskParameters
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.extensions.isValidHttpUrl
+import java.util.Locale
 
 /**
  * Represents a generic HTTP upload request.<br></br>
@@ -128,6 +128,7 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
 
     /**
      * Sets if this upload request is using fixed length streaming mode.
+     * By default it's set to true.
      * If it uses fixed length streaming mode, then the value returned by
      * [HttpUploadTask.getBodyLength] will be automatically used to properly set the
      * underlying [java.net.HttpURLConnection], otherwise chunked streaming mode will be used.

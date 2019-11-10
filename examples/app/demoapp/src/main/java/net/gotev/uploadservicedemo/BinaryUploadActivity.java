@@ -53,11 +53,7 @@ public class BinaryUploadActivity extends UploadActivity {
                     .setMethod(httpMethod)
                     .setNotificationConfig(uploadId ->
                             getNotificationConfig(uploadId, R.string.binary_upload)
-                    )
-                    //.setCustomUserAgent(getUserAgent())
-                    .setMaxRetries(MAX_RETRIES)
-                    .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
-
+                    );
 
             uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 

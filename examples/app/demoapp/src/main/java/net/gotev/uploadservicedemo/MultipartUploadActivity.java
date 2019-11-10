@@ -39,11 +39,7 @@ public class MultipartUploadActivity extends UploadActivity {
             final MultipartUploadRequest request =
                     new MultipartUploadRequest(this, serverUrl)
                             .setMethod(httpMethod)
-                            .setNotificationConfig(uploadId -> getNotificationConfig(uploadId, R.string.multipart_upload))
-                            .setMaxRetries(MAX_RETRIES)
-                            //.setAutoDeleteFilesAfterSuccessfulUpload(true)
-                            //.setCustomUserAgent(getUserAgent())
-                            .setUsesFixedLengthStreamingMode(FIXED_LENGTH_STREAMING_MODE);
+                            .setNotificationConfig(uploadId -> getNotificationConfig(uploadId, R.string.multipart_upload));
 
             uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 

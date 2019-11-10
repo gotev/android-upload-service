@@ -31,9 +31,6 @@ import butterknife.OnClick;
 
 public abstract class UploadActivity extends FilesPickerActivity {
 
-    public static final int MAX_RETRIES = 4;
-    public static final boolean FIXED_LENGTH_STREAMING_MODE = true;
-
     @BindView(R.id.http_method)
     Spinner httpMethod;
 
