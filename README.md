@@ -4,14 +4,15 @@
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
-Upload Service 4.0.0 Alpha 4, 100% Kotlin with:
+Upload Service 4.0.0 Beta 1, 100% Kotlin with:
 - Android 10 support
 - New *delegates* using AndroidX lifecycle
 - Possibility to implement your own notification handler
 - Possibility to override default notification placeholders values and add your own
+- Easily add your custom notification actions
 - And many new features :gift:
 
-is here for developer preview! [Check this issue for more information](https://github.com/gotev/android-upload-service/issues/468). For production grade and battle tested version, use 3.5.2.
+is here! [Check this issue for more information](https://github.com/gotev/android-upload-service/issues/470). **THIS IS SUITABLE FOR PRODUCTION AND RECOMMENDED FOR ANDROID 10**. If you feel uncomfortable using beta libraries, use 3.5.2.
 
 | :information_source: | [Get started with stable 3.5.2](https://github.com/gotev/android-upload-service/wiki/Setup) |
 |--|--|
