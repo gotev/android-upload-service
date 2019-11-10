@@ -5,7 +5,7 @@ import net.gotev.uploadservice.network.HttpRequest
 import net.gotev.uploadservice.network.HttpStack
 import java.io.IOException
 
-class HurlStack(
+class HurlStack @JvmOverloads constructor(
     private val userAgent: String = UploadServiceConfig.defaultUserAgent,
     private val followRedirects: Boolean = true,
     private val useCaches: Boolean = false,
