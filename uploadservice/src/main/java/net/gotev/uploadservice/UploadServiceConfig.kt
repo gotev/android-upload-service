@@ -5,6 +5,7 @@ import android.os.Build
 import net.gotev.uploadservice.data.RetryPolicyConfig
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
+import net.gotev.uploadservice.observer.request.NotificationActionsObserver
 import net.gotev.uploadservice.observer.task.NotificationHandler
 import net.gotev.uploadservice.observer.task.UploadTaskObserver
 import net.gotev.uploadservice.placeholders.DefaultPlaceholdersProcessor
@@ -22,7 +23,8 @@ import java.util.concurrent.TimeUnit
 object UploadServiceConfig {
 
     private const val uploadActionSuffix = ".uploadservice.action.upload"
-    private const val broadcastActionSuffix = ".uploadservice.broadcast.status"
+    private const val broadcastStatusActionSuffix = ".uploadservice.broadcast.status"
+    private const val notificationActionSuffix = ".uploadservice.broadcast.notification.action"
 
     private const val fileScheme = "/"
     private const val contentScheme = "content://"
@@ -57,6 +59,17 @@ object UploadServiceConfig {
         TimeUnit.SECONDS,
         LinkedBlockingQueue<Runnable>()
     )
+
+    /**
+     * Creates the notification actions observer, which intercepts actions coming from notifications
+     * and executes the required business logic.
+     * By default, [NotificationActionsObserver] takes care of allowing the cancelling of
+     * running uploads
+     */
+    @JvmStatic
+    var notificationActionsObserverFactory: (UploadService) -> NotificationActionsObserver = {
+        NotificationActionsObserver(it)
+    }
 
     /**
      * Creates the notification handler for upload tasks.
@@ -131,15 +144,26 @@ object UploadServiceConfig {
         get() = "$namespace$uploadActionSuffix"
 
     @JvmStatic
-    val broadcastAction: String
-        get() = "$namespace$broadcastActionSuffix"
+    val broadcastStatusAction: String
+        get() = "$namespace$broadcastStatusActionSuffix"
+
+    @JvmStatic
+    val broadcastNotificationAction: String
+        get() = "$namespace$notificationActionSuffix"
 
     /**
      * Get the intent filter for Upload Service broadcast events
      */
     @JvmStatic
-    val broadcastIntentFilter: IntentFilter
-        get() = IntentFilter(broadcastAction)
+    val broadcastStatusIntentFilter: IntentFilter
+        get() = IntentFilter(broadcastStatusAction)
+
+    /**
+     * Get the intent filter for Upload Service Notification Actions events
+     */
+    @JvmStatic
+    val broadcastNotificationActionIntentFilter: IntentFilter
+        get() = IntentFilter(broadcastNotificationAction)
 
     /**
      * Processes placeholders contained in strings and replaces them with values.

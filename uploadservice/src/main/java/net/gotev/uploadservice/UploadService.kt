@@ -100,6 +100,10 @@ class UploadService : Service() {
         )
     }
 
+    private val notificationActionsObserver by lazy {
+        UploadServiceConfig.notificationActionsObserverFactory(this)
+    }
+
     @Synchronized
     private fun clearIdleTimer() {
         idleTimer?.apply {
@@ -185,6 +189,7 @@ class UploadService : Service() {
         super.onCreate()
 
         wakeLock = acquirePartialWakeLock(wakeLock, TAG)
+        notificationActionsObserver.register()
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -227,6 +232,7 @@ class UploadService : Service() {
     override fun onDestroy() {
         super.onDestroy()
 
+        notificationActionsObserver.unregister()
         stopAllUploads()
         threadPool.shutdown()
 

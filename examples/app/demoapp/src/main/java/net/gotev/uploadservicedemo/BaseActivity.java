@@ -12,9 +12,9 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-import net.gotev.uploadservice.data.UploadNotificationConfig;
 import net.gotev.uploadservice.data.UploadNotificationAction;
-import net.gotev.uploadservicedemo.events.NotificationActions;
+import net.gotev.uploadservice.data.UploadNotificationConfig;
+import net.gotev.uploadservice.extensions.ContextExtensionsKt;
 
 import butterknife.ButterKnife;
 
@@ -59,7 +59,8 @@ public class BaseActivity extends AppCompatActivity {
         config.getProgress().getActions().add(new UploadNotificationAction(
                 R.drawable.ic_cancelled,
                 getString(R.string.cancel_upload),
-                NotificationActions.getCancelUploadAction(this, 1, uploadId)));
+                ContextExtensionsKt.getCancelUploadIntent(this, uploadId, 1)
+        ));
 
         config.getSuccess().setMessage(getString(R.string.upload_success));
         config.getSuccess().setIconResourceID(R.drawable.ic_upload_success);

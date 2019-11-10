@@ -28,7 +28,7 @@ class RequestObserver(
 
     override fun onReceive(context: Context, intent: Intent?) {
         val safeIntent = intent ?: return
-        if (safeIntent.action != UploadServiceConfig.broadcastAction) return
+        if (safeIntent.action != UploadServiceConfig.broadcastStatusAction) return
         val data = BroadcastData.fromIntent(safeIntent) ?: return
 
         val uploadInfo = data.uploadInfo
@@ -64,7 +64,7 @@ class RequestObserver(
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun register() {
         LocalBroadcastManager.getInstance(context)
-            .registerReceiver(this, UploadServiceConfig.broadcastIntentFilter)
+            .registerReceiver(this, UploadServiceConfig.broadcastStatusIntentFilter)
 
         subscribedUploadID?.let {
             if (!UploadService.taskList.contains(it)) {

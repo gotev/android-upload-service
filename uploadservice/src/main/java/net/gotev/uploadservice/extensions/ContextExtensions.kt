@@ -1,5 +1,6 @@
 package net.gotev.uploadservice.extensions
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -13,6 +14,10 @@ import net.gotev.uploadservice.observer.task.UploadTaskObserver
 // constants used in the intent which starts this service
 private const val taskParametersKey = "taskParameters"
 private const val taskClassKey = "taskClass"
+
+private const val actionKey = "action"
+private const val uploadIdKey = "uploadId"
+private const val cancelUploadAction = "cancelUpload"
 
 fun Context.startNewUpload(taskClass: Class<out UploadTask>, params: UploadTaskParameters): String {
     val intent = Intent(this, UploadService::class.java).apply {
@@ -94,3 +99,26 @@ fun Context.getUploadTask(
         null
     }
 }
+
+fun Context.getNotificationActionIntent(
+    uploadId: String,
+    requestCode: Int,
+    action: String
+): PendingIntent {
+    val intent = Intent(UploadServiceConfig.broadcastNotificationAction).apply {
+        `package` = UploadServiceConfig.namespace
+        putExtra(actionKey, action)
+        putExtra(uploadIdKey, uploadId)
+    }
+
+    return PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+}
+
+fun Context.getCancelUploadIntent(uploadId: String, requestCode: Int = 1) =
+    getNotificationActionIntent(uploadId, requestCode, cancelUploadAction)
+
+val Intent.uploadIdToCancel: String?
+    get() {
+        if (getStringExtra(actionKey) != cancelUploadAction) return null
+        return getStringExtra(uploadIdKey)
+    }

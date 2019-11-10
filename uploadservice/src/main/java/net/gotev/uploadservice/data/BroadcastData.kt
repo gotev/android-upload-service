@@ -21,7 +21,7 @@ internal data class BroadcastData @JvmOverloads constructor(
         }
     }
 
-    fun toIntent() = Intent(UploadServiceConfig.broadcastAction).apply {
+    fun toIntent() = Intent(UploadServiceConfig.broadcastStatusAction).apply {
         setPackage(UploadServiceConfig.namespace)
         putExtra(paramName, this@BroadcastData)
     }
