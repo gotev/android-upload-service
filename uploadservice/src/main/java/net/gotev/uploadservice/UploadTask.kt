@@ -142,11 +142,12 @@ abstract class UploadTask : Runnable {
                 break
             } catch (exc: Throwable) {
                 if (!shouldContinue) {
+                    UploadServiceLogger.error(TAG, exc) { "(uploadID: ${params.id}) error but user requested cancellation." }
                     break
                 } else if (attempts >= params.maxRetries) {
                     onError(exc)
                 } else {
-                    UploadServiceLogger.error(TAG) { "(uploadID: ${params.id}) error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. " }
+                    UploadServiceLogger.error(TAG, exc) { "(uploadID: ${params.id}) error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. " }
 
                     val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
 
