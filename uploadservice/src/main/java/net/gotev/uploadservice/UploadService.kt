@@ -234,7 +234,6 @@ class UploadService : Service() {
 
         notificationActionsObserver.unregister()
         stopAllUploads()
-        threadPool.shutdown()
 
         if (UploadServiceConfig.isForegroundService) {
             UploadServiceLogger.debug(TAG) { "Stopping foreground execution" }
