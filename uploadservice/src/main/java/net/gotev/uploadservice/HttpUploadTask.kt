@@ -38,7 +38,7 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate,
     @SuppressLint("NewApi")
     @Throws(Exception::class)
     override fun upload(httpStack: HttpStack) {
-        UploadServiceLogger.debug(javaClass.simpleName) { "Starting upload task with ID ${params.id}" }
+        UploadServiceLogger.debug(javaClass.simpleName, params.id) { "Starting upload task" }
 
         setAllFilesHaveBeenSuccessfullyUploaded(false)
         totalBytes = bodyLength
@@ -48,9 +48,8 @@ abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate,
             .setTotalBodyBytes(totalBytes, httpParams.usesFixedLengthStreamingMode)
             .getResponse(this, this)
 
-        UploadServiceLogger.debug(javaClass.simpleName) {
-            "Server responded with code ${response.code} " +
-                "and body ${response.bodyString} to upload with ID: ${params.id}"
+        UploadServiceLogger.debug(javaClass.simpleName, params.id) {
+            "Server response: code ${response.code}, body ${response.bodyString}"
         }
 
         // Broadcast completion only if the user has not cancelled the operation.

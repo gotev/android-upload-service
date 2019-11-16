@@ -20,6 +20,7 @@ class FTPUploadTask : UploadTask(), FTPClientWrapper.Observer {
         val ftpParams = ftpParams
 
         FTPClientWrapper(
+            uploadId = params.id,
             useSSL = ftpParams.useSSL,
             sslProtocol = ftpParams.secureSocketProtocol,
             implicitSecurity = ftpParams.implicitSecurity,
@@ -42,7 +43,7 @@ class FTPUploadTask : UploadTask(), FTPClientWrapper.Observer {
             calculateUploadedAndTotalBytes()
 
             val baseWorkingDir = ftpClient.currentWorkingDirectory
-            UploadServiceLogger.debug(javaClass.simpleName) {
+            UploadServiceLogger.debug(javaClass.simpleName, params.id) {
                 "FTP default working directory is: $baseWorkingDir"
             }
 

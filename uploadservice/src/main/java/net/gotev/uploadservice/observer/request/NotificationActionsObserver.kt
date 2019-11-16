@@ -8,6 +8,7 @@ import net.gotev.uploadservice.UploadServiceConfig.broadcastNotificationAction
 import net.gotev.uploadservice.UploadServiceConfig.broadcastNotificationActionIntentFilter
 import net.gotev.uploadservice.extensions.uploadIdToCancel
 import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.logger.UploadServiceLogger.NA
 
 open class NotificationActionsObserver(
     private val context: Context
@@ -19,8 +20,8 @@ open class NotificationActionsObserver(
 
     open fun onActionIntent(intent: Intent) {
         intent.uploadIdToCancel?.let {
-            UploadServiceLogger.info(NotificationActionsObserver::class.java.simpleName) {
-                "Requested cancellation of upload with ID: $it"
+            UploadServiceLogger.info(NotificationActionsObserver::class.java.simpleName, it) {
+                "requested upload cancellation"
             }
             UploadService.stopUpload(it)
         }
@@ -28,15 +29,15 @@ open class NotificationActionsObserver(
 
     fun register() {
         context.registerReceiver(this, broadcastNotificationActionIntentFilter)
-        UploadServiceLogger.debug(NotificationActionsObserver::class.java.simpleName) {
-            "Registered"
+        UploadServiceLogger.debug(NotificationActionsObserver::class.java.simpleName, NA) {
+            "registered"
         }
     }
 
     fun unregister() {
         context.unregisterReceiver(this)
-        UploadServiceLogger.debug(NotificationActionsObserver::class.java.simpleName) {
-            "Unregistered"
+        UploadServiceLogger.debug(NotificationActionsObserver::class.java.simpleName, NA) {
+            "unregistered"
         }
     }
 }

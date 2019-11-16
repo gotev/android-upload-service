@@ -3,10 +3,11 @@ package net.gotev.uploadservice.schemehandlers
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import java.io.File
-import java.io.IOException
 import net.gotev.uploadservice.extensions.APPLICATION_OCTET_STREAM
 import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.logger.UploadServiceLogger.NA
+import java.io.File
+import java.io.IOException
 
 internal class ContentResolverSchemeHandler : SchemeHandler {
 
@@ -24,7 +25,7 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
                 null
             }
         } ?: run {
-            UploadServiceLogger.error(javaClass.simpleName) { "no cursor data for $uri, returning size 0" }
+            UploadServiceLogger.error(javaClass.simpleName, NA) { "no cursor data for $uri, returning size 0" }
             // TODO: investigate what happens when size is 0
             0L
         }
@@ -56,7 +57,7 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
     override fun delete(context: Context) = try {
         context.contentResolver.delete(uri, null, null) > 0
     } catch (exc: Throwable) {
-        UploadServiceLogger.error(javaClass.simpleName, exc) { "File deletion error" }
+        UploadServiceLogger.error(javaClass.simpleName, NA, exc) { "File deletion error" }
         false
     }
 }

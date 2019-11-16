@@ -1,11 +1,11 @@
 package net.gotev.uploadservice.logger
 
-import java.lang.ref.WeakReference
-
 object UploadServiceLogger {
     private var logLevel = LogLevel.Off
     private val defaultLogger = DefaultLoggerDelegate()
-    private var loggerDelegate = WeakReference<Delegate>(defaultLogger)
+    private var loggerDelegate: Delegate = defaultLogger
+
+    internal const val NA = "N/A"
 
     enum class LogLevel {
         Debug,
@@ -15,15 +15,15 @@ object UploadServiceLogger {
     }
 
     interface Delegate {
-        fun error(tag: String, message: String, exception: Throwable?)
-        fun debug(tag: String, message: String)
-        fun info(tag: String, message: String)
+        fun error(component: String, uploadId: String, message: String, exception: Throwable?)
+        fun debug(component: String, uploadId: String, message: String)
+        fun info(component: String, uploadId: String, message: String)
     }
 
     @Synchronized
     @JvmStatic
     fun setDelegate(delegate: Delegate?) {
-        loggerDelegate = WeakReference(delegate ?: defaultLogger)
+        loggerDelegate = delegate ?: defaultLogger
     }
 
     @Synchronized
@@ -39,21 +39,21 @@ object UploadServiceLogger {
     }
 
     private fun loggerWithLevel(minLevel: LogLevel) =
-        if (logLevel > minLevel || logLevel == LogLevel.Off) null else loggerDelegate.get()
+        if (logLevel > minLevel || logLevel == LogLevel.Off) null else loggerDelegate
 
     @JvmOverloads
     @JvmStatic
-    fun error(tag: String, exception: Throwable? = null, message: () -> String) {
-        loggerWithLevel(LogLevel.Error)?.error(tag, message(), exception)
+    fun error(component: String, uploadId: String, exception: Throwable? = null, message: () -> String) {
+        loggerWithLevel(LogLevel.Error)?.error(component, uploadId, message(), exception)
     }
 
     @JvmStatic
-    fun info(tag: String, message: () -> String) {
-        loggerWithLevel(LogLevel.Info)?.info(tag, message())
+    fun info(component: String, uploadId: String, message: () -> String) {
+        loggerWithLevel(LogLevel.Info)?.info(component, uploadId, message())
     }
 
     @JvmStatic
-    fun debug(tag: String, message: () -> String) {
-        loggerWithLevel(LogLevel.Debug)?.debug(tag, message())
+    fun debug(component: String, uploadId: String, message: () -> String) {
+        loggerWithLevel(LogLevel.Debug)?.debug(component, uploadId, message())
     }
 }

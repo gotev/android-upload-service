@@ -1,8 +1,6 @@
 package net.gotev.uploadservice.ftp
 
 import android.content.Context
-import java.io.Closeable
-import java.io.IOException
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.logger.UploadServiceLogger
@@ -12,8 +10,11 @@ import org.apache.commons.net.ftp.FTPReply
 import org.apache.commons.net.ftp.FTPSClient
 import org.apache.commons.net.io.CopyStreamEvent
 import org.apache.commons.net.io.CopyStreamListener
+import java.io.Closeable
+import java.io.IOException
 
 class FTPClientWrapper(
+    private val uploadId: String,
     observer: Observer,
     connectTimeout: Int,
     useSSL: Boolean = false,
@@ -49,10 +50,10 @@ class FTPClientWrapper(
     }
 
     private val ftpClient: FTPClient = if (!useSSL) {
-        UploadServiceLogger.debug(javaClass.simpleName) { "Creating plain FTP client" }
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) { "Creating plain FTP client" }
         FTPClient()
     } else {
-        UploadServiceLogger.debug(javaClass.simpleName) {
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
             "Creating FTP over SSL (FTPS) client with $sslProtocol protocol and " +
                 if (implicitSecurity)
                     "implicit security"
@@ -103,7 +104,7 @@ class FTPClientWrapper(
             controlKeepAliveReplyTimeout = controlKeepAliveTimeout * 1000
         }
 
-        UploadServiceLogger.debug(javaClass.simpleName) {
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
             "Socket timeout set to ${socketTimeout}ms. " +
                 "Enabled control keep alive every ${controlKeepAliveTimeout}s"
         }
@@ -135,7 +136,7 @@ class FTPClientWrapper(
         setupKeepAlive(socketTimeout)
         setupConnection(compressedFileTransfer)
 
-        UploadServiceLogger.debug(javaClass.simpleName) {
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
             "Successfully connected to $server:$port as $username"
         }
     }
@@ -152,18 +153,18 @@ class FTPClientWrapper(
             val success = ftpClient.sendSiteCommand("chmod $permissions $remoteFileName")
 
             if (success) {
-                UploadServiceLogger.debug(javaClass.simpleName) {
+                UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
                     "Permissions for: $remoteFileName set to: $permissions"
                 }
             } else {
-                UploadServiceLogger.error(javaClass.simpleName) {
+                UploadServiceLogger.error(javaClass.simpleName, uploadId) {
                     "Error while setting permissions for $remoteFileName to: $permissions. " +
                         "Check if your FTP user can set file permissions!"
                 }
             }
             return success
         } catch (exc: Throwable) {
-            UploadServiceLogger.error(javaClass.simpleName, exc) {
+            UploadServiceLogger.error(javaClass.simpleName, uploadId, exc) {
                 "Error while setting permissions for $remoteFileName to: $permissions. " +
                     "Check if your FTP user can set file permissions!"
             }
@@ -202,7 +203,7 @@ class FTPClientWrapper(
 
             if (!ftpClient.changeWorkingDirectory(singleDir)) {
                 if (ftpClient.makeDirectory(singleDir)) {
-                    UploadServiceLogger.debug(javaClass.simpleName) {
+                    UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
                         "Created remote directory: $singleDir"
                     }
                     permissions?.let { setPermission(singleDir, it) }
@@ -221,12 +222,12 @@ class FTPClientWrapper(
         file: UploadFile,
         permissions: String? = null
     ) {
-        UploadServiceLogger.debug(javaClass.simpleName) {
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
             "Starting FTP upload of: ${file.handler.name(context)} to: ${file.remotePath}"
         }
 
         var remoteDestination = file.remotePath ?: run {
-            UploadServiceLogger.error(javaClass.simpleName) {
+            UploadServiceLogger.error(javaClass.simpleName, uploadId) {
                 "Skipping ${file.path} because no remote path has been defined"
             }
             return
@@ -254,32 +255,32 @@ class FTPClientWrapper(
 
         // get back to base working directory
         if (!ftpClient.changeWorkingDirectory(baseWorkingDir)) {
-            UploadServiceLogger.error(javaClass.simpleName) {
+            UploadServiceLogger.error(javaClass.simpleName, uploadId) {
                 "Can't change working directory to: $baseWorkingDir"
             }
         }
     }
 
     override fun close() {
-        UploadServiceLogger.debug(javaClass.simpleName) {
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
             "Closing FTP Client"
         }
 
         if (ftpClient.isConnected) {
             try {
-                UploadServiceLogger.debug(javaClass.simpleName) { "Logout from FTP server" }
+                UploadServiceLogger.debug(javaClass.simpleName, uploadId) { "Logout from FTP server" }
                 ftpClient.logout()
             } catch (exc: Throwable) {
-                UploadServiceLogger.error(javaClass.simpleName, exc) {
+                UploadServiceLogger.error(javaClass.simpleName, uploadId, exc) {
                     "Error while closing FTP connection"
                 }
             }
 
             try {
-                UploadServiceLogger.debug(javaClass.simpleName) { "Disconnect from FTP server" }
+                UploadServiceLogger.debug(javaClass.simpleName, uploadId) { "Disconnect from FTP server" }
                 ftpClient.disconnect()
             } catch (exc: Throwable) {
-                UploadServiceLogger.error(javaClass.simpleName, exc) {
+                UploadServiceLogger.error(javaClass.simpleName, uploadId, exc) {
                     "Error while disconnecting from FTP connection"
                 }
             }

@@ -87,10 +87,9 @@ abstract class UploadTask : Runnable {
             try {
                 action(it)
             } catch (exc: Throwable) {
-                UploadServiceLogger.error(
-                    TAG,
-                    exc
-                ) { "(uploadID: ${params.id}) error while dispatching event to observer" }
+                UploadServiceLogger.error(TAG, params.id, exc) {
+                    "error while dispatching event to observer"
+                }
             }
         }
     }
@@ -142,12 +141,12 @@ abstract class UploadTask : Runnable {
                 break
             } catch (exc: Throwable) {
                 if (!shouldContinue) {
-                    UploadServiceLogger.error(TAG, exc) { "(uploadID: ${params.id}) error but user requested cancellation." }
+                    UploadServiceLogger.error(TAG, params.id, exc) { "error while uploading but user requested cancellation." }
                     break
                 } else if (attempts >= params.maxRetries) {
                     onError(exc)
                 } else {
-                    UploadServiceLogger.error(TAG, exc) { "(uploadID: ${params.id}) error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt. " }
+                    UploadServiceLogger.error(TAG, params.id, exc) { "error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt." }
 
                     val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
 
@@ -191,7 +190,7 @@ abstract class UploadTask : Runnable {
     protected fun onProgress(bytesSent: Long) {
         uploadedBytes += bytesSent
         if (shouldThrottle(uploadedBytes, totalBytes)) return
-        UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes" }
+        UploadServiceLogger.debug(TAG, params.id) { "uploaded ${uploadedBytes * 100 / totalBytes}%, $uploadedBytes of $totalBytes bytes" }
         doForEachObserver { onProgress(uploadInfo, notificationId, params.notificationConfig) }
     }
 
@@ -204,15 +203,15 @@ abstract class UploadTask : Runnable {
      * @param response response got from the server
      */
     protected fun onResponseReceived(response: ServerResponse) {
-        UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) upload ${if (response.isSuccessful) "completed" else "error"}" }
+        UploadServiceLogger.debug(TAG, params.id) { "upload ${if (response.isSuccessful) "completed" else "error"}" }
 
         if (response.isSuccessful) {
             if (params.autoDeleteSuccessfullyUploadedFiles) {
                 for (file in successfullyUploadedFiles) {
                     if (file.handler.delete(context)) {
-                        UploadServiceLogger.info(TAG) { "(uploadID: ${params.id}) successfully deleted: ${file.path}" }
+                        UploadServiceLogger.info(TAG, params.id) { "successfully deleted: ${file.path}" }
                     } else {
-                        UploadServiceLogger.error(TAG) { "(uploadID: ${params.id}) error while deleting: ${file.path}" }
+                        UploadServiceLogger.error(TAG, params.id) { "error while deleting: ${file.path}" }
                     }
                 }
             }
@@ -247,7 +246,7 @@ abstract class UploadTask : Runnable {
      * implementation.
      */
     private fun onUserCancelledUpload() {
-        UploadServiceLogger.debug(TAG) { "(uploadID: ${params.id}) upload cancelled" }
+        UploadServiceLogger.debug(TAG, params.id) { "upload cancelled" }
         onError(UserCancelledUploadException())
     }
 
@@ -261,7 +260,7 @@ abstract class UploadTask : Runnable {
      * of [UploadTask.upload]
      */
     private fun onError(exception: Throwable) {
-        UploadServiceLogger.error(TAG, exception) { "(uploadID: ${params.id}) error" }
+        UploadServiceLogger.error(TAG, params.id, exception) { "error" }
         uploadInfo.let {
             doForEachObserver { onError(it, notificationId, params.notificationConfig, exception) }
             doForEachObserver { onCompleted(it, notificationId, params.notificationConfig) }

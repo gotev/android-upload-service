@@ -1,9 +1,5 @@
 package net.gotev.uploadservice.okhttp
 
-import java.io.IOException
-import java.net.URL
-import java.util.Locale
-import java.util.UUID
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.BodyWriter
@@ -14,6 +10,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okio.BufferedSink
+import java.io.IOException
+import java.net.URL
+import java.util.Locale
+import java.util.UUID
 
 /**
  * [HttpRequest] implementation using OkHttpClient.
@@ -33,8 +33,8 @@ class OkHttpStackRequest(
     private val uuid = UUID.randomUUID().toString()
 
     init {
-        UploadServiceLogger.debug(javaClass.simpleName) {
-            "(uploadID: $uploadId) creating new OkHttp connection (uuid: $uuid)"
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
+            "creating new OkHttp connection (uuid: $uuid)"
         }
     }
 
@@ -98,8 +98,8 @@ class OkHttpStackRequest(
 
     override fun close() {
         // Resources are automatically freed after usage. Log only.
-        UploadServiceLogger.debug(javaClass.simpleName) {
-            "(uploadID: $uploadId) closing OkHttp connection (uuid: $uuid)"
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
+            "closing OkHttp connection (uuid: $uuid)"
         }
     }
 }

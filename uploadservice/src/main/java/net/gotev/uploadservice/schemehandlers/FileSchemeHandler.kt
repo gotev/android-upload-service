@@ -1,11 +1,12 @@
 package net.gotev.uploadservice.schemehandlers
 
 import android.content.Context
+import net.gotev.uploadservice.extensions.autoDetectMimeType
+import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.logger.UploadServiceLogger.NA
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import net.gotev.uploadservice.extensions.autoDetectMimeType
-import net.gotev.uploadservice.logger.UploadServiceLogger
 
 internal class FileSchemeHandler : SchemeHandler {
     private lateinit var file: File
@@ -26,7 +27,7 @@ internal class FileSchemeHandler : SchemeHandler {
     override fun delete(context: Context) = try {
         file.delete()
     } catch (exc: Throwable) {
-        UploadServiceLogger.error(javaClass.simpleName, exc) { "File deletion error" }
+        UploadServiceLogger.error(javaClass.simpleName, NA, exc) { "File deletion error" }
         false
     }
 }

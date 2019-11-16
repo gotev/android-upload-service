@@ -12,6 +12,7 @@ import net.gotev.uploadservice.extensions.getUploadTask
 import net.gotev.uploadservice.extensions.getUploadTaskCreationParameters
 import net.gotev.uploadservice.extensions.safeRelease
 import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.logger.UploadServiceLogger.NA
 import net.gotev.uploadservice.observer.task.BroadcastEmitter
 import net.gotev.uploadservice.observer.task.TaskCompletionNotifier
 import java.util.Timer
@@ -107,7 +108,7 @@ class UploadService : Service() {
     @Synchronized
     private fun clearIdleTimer() {
         idleTimer?.apply {
-            UploadServiceLogger.info(TAG) { "Clearing idle timer" }
+            UploadServiceLogger.info(TAG, NA) { "Clearing idle timer" }
             cancel()
         }
         idleTimer = null
@@ -118,7 +119,7 @@ class UploadService : Service() {
         if (uploadTasksMap.isEmpty()) {
             clearIdleTimer()
 
-            UploadServiceLogger.info(TAG) {
+            UploadServiceLogger.info(TAG, NA) {
                 "Service will be shut down in ${UploadServiceConfig.idleTimeoutSeconds}s " +
                     "if no new tasks are received"
             }
@@ -126,7 +127,7 @@ class UploadService : Service() {
             idleTimer = Timer(TAG + "IdleTimer").apply {
                 schedule(object : TimerTask() {
                     override fun run() {
-                        UploadServiceLogger.info(TAG) {
+                        UploadServiceLogger.info(TAG, NA) {
                             "Service is about to be stopped because idle timeout of " +
                                 "${UploadServiceConfig.idleTimeoutSeconds}s has been reached"
                         }
@@ -152,7 +153,7 @@ class UploadService : Service() {
 
         if (foregroundUploadId == null) {
             foregroundUploadId = uploadId
-            UploadServiceLogger.debug(TAG) { "$uploadId now holds the foreground notification" }
+            UploadServiceLogger.debug(TAG, uploadId) { "now holds foreground notification" }
         }
 
         if (uploadId == foregroundUploadId) {
@@ -174,12 +175,12 @@ class UploadService : Service() {
 
         // un-hold foreground upload ID if it's been hold
         if (UploadServiceConfig.isForegroundService && task != null && task.params.id == foregroundUploadId) {
-            UploadServiceLogger.debug(TAG) { "$uploadId now un-holded the foreground notification" }
+            UploadServiceLogger.debug(TAG, uploadId) { "now un-holded foreground notification" }
             foregroundUploadId = null
         }
 
         if (UploadServiceConfig.isForegroundService && uploadTasksMap.isEmpty()) {
-            UploadServiceLogger.debug(TAG) { "All tasks completed, stopping foreground execution" }
+            UploadServiceLogger.debug(TAG, NA) { "All tasks completed, stopping foreground execution" }
             stopForeground(true)
             shutdownIfThereArentAnyActiveTasks()
         }
@@ -197,15 +198,16 @@ class UploadService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        UploadServiceLogger.debug(TAG) { "Starting UploadService. Debug info: $UploadServiceConfig" }
+        UploadServiceLogger.debug(TAG, NA) {
+            "Starting UploadService. Debug info: $UploadServiceConfig"
+        }
 
         val taskCreationParameters = intent.getUploadTaskCreationParameters()
             ?: return shutdownIfThereArentAnyActiveTasks()
 
         if (uploadTasksMap.containsKey(taskCreationParameters.second.id)) {
-            UploadServiceLogger.error(TAG) {
-                "Preventing upload with id: ${taskCreationParameters.second.id} to be uploaded twice! " +
-                    "An upload with the same ID is already in progress. " +
+            UploadServiceLogger.error(TAG, taskCreationParameters.second.id) {
+                "Preventing upload! An upload with the same ID is already in progress. " +
                     "Every upload must have unique ID. Please check your code and fix it!"
             }
             return shutdownIfThereArentAnyActiveTasks()
@@ -236,7 +238,7 @@ class UploadService : Service() {
         stopAllUploads()
 
         if (UploadServiceConfig.isForegroundService) {
-            UploadServiceLogger.debug(TAG) { "Stopping foreground execution" }
+            UploadServiceLogger.debug(TAG, NA) { "Stopping foreground execution" }
             stopForeground(true)
         }
 
@@ -244,6 +246,6 @@ class UploadService : Service() {
 
         uploadTasksMap.clear()
 
-        UploadServiceLogger.debug(TAG) { "UploadService destroyed" }
+        UploadServiceLogger.debug(TAG, NA) { "UploadService destroyed" }
     }
 }

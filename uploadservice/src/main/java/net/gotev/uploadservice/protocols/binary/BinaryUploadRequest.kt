@@ -1,12 +1,13 @@
 package net.gotev.uploadservice.protocols.binary
 
 import android.content.Context
-import java.io.FileNotFoundException
-import java.io.IOException
 import net.gotev.uploadservice.HttpUploadRequest
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.logger.UploadServiceLogger
+import net.gotev.uploadservice.logger.UploadServiceLogger.NA
+import java.io.FileNotFoundException
+import java.io.IOException
 
 /**
  * Binary file upload request. The binary upload uses a single file as the raw body of the
@@ -56,7 +57,7 @@ class BinaryUploadRequest(context: Context, serverUrl: String) :
     }
 
     private fun logDoesNotSupportParameters() {
-        UploadServiceLogger.error(javaClass.simpleName) {
+        UploadServiceLogger.error(javaClass.simpleName, NA) {
             "This upload method does not support adding parameters"
         }
     }

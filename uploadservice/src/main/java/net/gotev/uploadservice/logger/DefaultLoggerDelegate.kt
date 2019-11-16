@@ -8,15 +8,15 @@ class DefaultLoggerDelegate : UploadServiceLogger.Delegate {
         private const val TAG = "UploadService"
     }
 
-    override fun error(tag: String, message: String, exception: Throwable?) {
-        Log.e(TAG, "$tag - $message", exception)
+    override fun error(component: String, uploadId: String, message: String, exception: Throwable?) {
+        Log.e(TAG, "$component - (uploadId: $uploadId) - $message", exception)
     }
 
-    override fun debug(tag: String, message: String) {
-        Log.i(TAG, "$tag - $message")
+    override fun debug(component: String, uploadId: String, message: String) {
+        Log.i(TAG, "$component - (uploadId: $uploadId) - $message")
     }
 
-    override fun info(tag: String, message: String) {
-        Log.i(TAG, "$tag - $message")
+    override fun info(component: String, uploadId: String, message: String) {
+        Log.i(TAG, "$component - (uploadId: $uploadId) - $message")
     }
 }

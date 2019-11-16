@@ -36,8 +36,8 @@ class HurlStackRequest(
     }
 
     init {
-        UploadServiceLogger.debug(javaClass.simpleName) {
-            "(uploadID: $uploadId) creating new HttpURLConnection"
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
+            "creating new HttpURLConnection (uuid: $uuid)"
         }
 
         connection = url.createConnection().apply {
@@ -116,8 +116,8 @@ class HurlStackRequest(
     }
 
     override fun close() {
-        UploadServiceLogger.debug(javaClass.simpleName) {
-            "(uploadID: $uploadId) closing HttpURLConnection (uuid: $uuid)"
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
+            "closing HttpURLConnection (uuid: $uuid)"
         }
 
         try {
