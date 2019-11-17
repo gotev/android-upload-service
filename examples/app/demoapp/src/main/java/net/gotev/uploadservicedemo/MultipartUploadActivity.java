@@ -39,7 +39,7 @@ public class MultipartUploadActivity extends UploadActivity {
             final MultipartUploadRequest request =
                     new MultipartUploadRequest(this, serverUrl)
                             .setMethod(httpMethod)
-                            .setNotificationConfig(uploadId -> getNotificationConfig(uploadId, R.string.multipart_upload));
+                            .setNotificationConfig((context, uploadId) -> getNotificationConfig(uploadId, R.string.multipart_upload));
 
             uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {
 

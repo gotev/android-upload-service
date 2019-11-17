@@ -12,54 +12,54 @@ import kotlinx.android.parcel.Parcelize
 import java.util.ArrayList
 
 @Parcelize
-data class UploadNotificationStatusConfig(
+data class UploadNotificationStatusConfig @JvmOverloads constructor(
     /**
      * Notification title.
      */
-    var title: String,
+    val title: String,
 
     /**
      * Notification message.
      */
-    var message: String,
+    val message: String,
+
+    /**
+     * Notification icon.
+     */
+    @DrawableRes val iconResourceID: Int = android.R.drawable.ic_menu_upload,
+
+    /**
+     * Icon color tint.
+     */
+    @ColorInt val iconColorResourceID: Int = NotificationCompat.COLOR_DEFAULT,
+
+    /**
+     * Large notification icon.
+     */
+    val largeIcon: Bitmap? = null,
+
+    /**
+     * Intent to be performed when the user taps on the notification.
+     */
+    val clickIntent: PendingIntent? = null,
+
+    /**
+     * List of actions to be added to this notification.
+     */
+    val actions: ArrayList<UploadNotificationAction> = ArrayList(3),
+
+    /**
+     * Clear the notification automatically when the clickIntent is performed.
+     * This would not affect progress notification, as it's ongoing and managed by upload service.
+     */
+    val clearOnAction: Boolean = false,
 
     /**
      * Clear the notification automatically.
      * This would not affect progress notification, as it's ongoing and managed by upload service.
      * It's used to be able to automatically dismiss cancelled, error or success notifications.
      */
-    var autoClear: Boolean = false,
-
-    /**
-     * Notification icon.
-     */
-    @DrawableRes var iconResourceID: Int = android.R.drawable.ic_menu_upload,
-
-    /**
-     * Large notification icon.
-     */
-    var largeIcon: Bitmap? = null,
-
-    /**
-     * Icon color tint.
-     */
-    @ColorInt var iconColorResourceID: Int = NotificationCompat.COLOR_DEFAULT,
-
-    /**
-     * Intent to be performed when the user taps on the notification.
-     */
-    var clickIntent: PendingIntent? = null,
-
-    /**
-     * Clear the notification automatically when the clickIntent is performed.
-     * This would not affect progress notification, as it's ongoing and managed by upload service.
-     */
-    var clearOnAction: Boolean = false,
-
-    /**
-     * List of actions to be added to this notification.
-     */
-    var actions: ArrayList<UploadNotificationAction> = ArrayList(3)
+    val autoClear: Boolean = false
 ) : Parcelable {
     fun getClickIntent(context: Context): PendingIntent {
         return clickIntent ?: PendingIntent.getBroadcast(

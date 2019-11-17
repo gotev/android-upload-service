@@ -57,6 +57,5 @@
     <string name="provide_remote_path">Please provide a remote FTP path where to upload the file</string>
     <string name="provide_valid_port">Please provide a valid port</string>
     <string name="provide_remote_path_next_instructions">Provide a remote FTP path where to upload the file and tap on next to select it</string>
-    <string name="run_issue">Run issue</string>
 
 </resources>

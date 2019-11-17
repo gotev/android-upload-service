@@ -1,14 +1,20 @@
 package net.gotev.uploadservice
 
+import android.content.Context
 import android.content.IntentFilter
 import android.os.Build
 import net.gotev.uploadservice.data.RetryPolicyConfig
+import net.gotev.uploadservice.data.UploadNotificationAction
+import net.gotev.uploadservice.data.UploadNotificationConfig
+import net.gotev.uploadservice.data.UploadNotificationStatusConfig
+import net.gotev.uploadservice.extensions.getCancelUploadIntent
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
 import net.gotev.uploadservice.observer.request.NotificationActionsObserver
 import net.gotev.uploadservice.observer.task.NotificationHandler
 import net.gotev.uploadservice.observer.task.UploadTaskObserver
 import net.gotev.uploadservice.placeholders.DefaultPlaceholdersProcessor
+import net.gotev.uploadservice.placeholders.Placeholder
 import net.gotev.uploadservice.placeholders.PlaceholdersProcessor
 import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
 import net.gotev.uploadservice.schemehandlers.FileSchemeHandler
@@ -53,6 +59,17 @@ object UploadServiceConfig {
             field
 
     /**
+     * Default notification channel to use. This must be set in application
+     * subclass onCreate method before anything else.
+     */
+    @JvmStatic
+    var defaultNotificationChannel: String? = null
+        get() = if (field == null)
+            throw IllegalArgumentException("You have to set defaultNotificationChannel in your Application subclass")
+        else
+            field
+
+    /**
      * Sets the Thread Pool to use for upload operations.
      * By default a thread pool with size equal to the number of processors is created.
      */
@@ -86,6 +103,44 @@ object UploadServiceConfig {
     }
 
     /**
+     * Creates the default notification configuration for uploads.
+     * You can set your own configuration factory. Each upload can also override those settings.
+     */
+    @JvmStatic
+    var notificationConfigFactory: (context: Context, uploadId: String) -> UploadNotificationConfig = { context, uploadId ->
+        val title = "Upload"
+
+        UploadNotificationConfig(
+            notificationChannelId = defaultNotificationChannel!!,
+            isRingToneEnabled = true,
+            progress = UploadNotificationStatusConfig(
+                title = title,
+                message = "Uploading at ${Placeholder.UploadRate} (${Placeholder.Progress})"
+            ).apply {
+                actions.add(
+                    UploadNotificationAction(
+                        icon = android.R.drawable.ic_menu_close_clear_cancel,
+                        title = "Cancel",
+                        intent = context.getCancelUploadIntent(uploadId)
+                    )
+                )
+            },
+            success = UploadNotificationStatusConfig(
+                title = title,
+                message = "Upload completed successfully in ${Placeholder.ElapsedTime}"
+            ),
+            error = UploadNotificationStatusConfig(
+                title = title,
+                message = "Error during upload"
+            ),
+            cancelled = UploadNotificationStatusConfig(
+                title = title,
+                message = "Upload cancelled"
+            )
+        )
+    }
+
+    /**
      * How many time to wait in idle before shutting down the service.
      * The service is idle when is running, but no tasks are running.
      */
@@ -116,17 +171,22 @@ object UploadServiceConfig {
     /**
      * Interval between progress notifications in milliseconds.
      * If the upload tasks report more frequently than this value, upload service will automatically apply throttling.
-     * Default is 6 updates per second
+     * Default is 3 updates per second
      */
     @JvmStatic
-    var uploadProgressNotificationIntervalMillis: Long = 1000 / 6
+    var uploadProgressNotificationIntervalMillis: Long = 1000 / 3
 
     /**
      * Sets the Upload Service Retry Policy. Refer to [RetryPolicyConfig] docs for detailed
      * explanation of each parameter.
      */
     @JvmStatic
-    var retryPolicy = RetryPolicyConfig()
+    var retryPolicy = RetryPolicyConfig(
+        initialWaitTimeSeconds = 1,
+        maxWaitTimeSeconds = 100,
+        multiplier = 2,
+        defaultMaxRetries = 3
+    )
 
     /**
      * If set to true, the service will go in foreground mode when doing uploads,

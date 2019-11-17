@@ -29,7 +29,7 @@ constructor(protected val context: Context, protected var serverUrl: String) {
     private var uploadId = UUID.randomUUID().toString()
     protected var maxRetries = UploadServiceConfig.retryPolicy.defaultMaxRetries
     protected var autoDeleteSuccessfullyUploadedFiles = false
-    protected var notificationConfig: (uploadId: String) -> UploadNotificationConfig? = { null }
+    protected var notificationConfig: (context: Context, uploadId: String) -> UploadNotificationConfig = UploadServiceConfig.notificationConfigFactory
     protected val files = ArrayList<UploadFile>()
 
     /**
@@ -56,7 +56,7 @@ constructor(protected val context: Context, protected var serverUrl: String) {
                 serverUrl,
                 maxRetries,
                 autoDeleteSuccessfullyUploadedFiles,
-                notificationConfig(uploadId),
+                notificationConfig(context, uploadId),
                 files,
                 getAdditionalParameters()
             )
@@ -89,14 +89,11 @@ constructor(protected val context: Context, protected var serverUrl: String) {
 
     /**
      * Sets custom notification configuration.
-     * If you don't want to display a notification in Notification Center, either pass null
-     * as argument or don't call this method.
      *
-     * @param config the upload configuration object or null if you don't want a notification
-     * to be displayed
+     * @param config the upload configuration object
      * @return self instance
      */
-    fun setNotificationConfig(config: (uploadId: String) -> UploadNotificationConfig): B {
+    fun setNotificationConfig(config: (context: Context, uploadId: String) -> UploadNotificationConfig): B {
         this.notificationConfig = config
         return self()
     }

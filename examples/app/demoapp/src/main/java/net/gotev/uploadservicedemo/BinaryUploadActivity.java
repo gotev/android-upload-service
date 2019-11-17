@@ -51,7 +51,7 @@ public class BinaryUploadActivity extends UploadActivity {
         try {
             final BinaryUploadRequest request = new BinaryUploadRequest(this, serverUrl)
                     .setMethod(httpMethod)
-                    .setNotificationConfig(uploadId ->
+                    .setNotificationConfig((context, uploadId) ->
                             getNotificationConfig(uploadId, R.string.binary_upload)
                     );
 

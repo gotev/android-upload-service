@@ -47,16 +47,6 @@
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:text="@string/cancel_all_uploads" />
 
-        <Button
-            android:id="@+id/run_issue"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:text="@string/run_issue" />
-
     </LinearLayout>
 </ScrollView>
 

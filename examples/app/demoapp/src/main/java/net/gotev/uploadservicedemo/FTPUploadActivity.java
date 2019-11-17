@@ -153,7 +153,7 @@ public class FTPUploadActivity extends FilesPickerActivity {
 
         try {
             final FTPUploadRequest request = new FTPUploadRequest(this, serverUrl.getText().toString(), ftpPort)
-                    .setNotificationConfig(uploadId -> getNotificationConfig(uploadId, R.string.ftp_upload))
+                    .setNotificationConfig((context, uploadId) -> getNotificationConfig(uploadId, R.string.ftp_upload))
                     .setUsernameAndPassword(ftpUsername.getText().toString(), ftpPassword.getText().toString());
 
             uploadItemUtils.forEach(new UploadItemUtils.ForEachDelegate() {

@@ -53,6 +53,8 @@ public class App extends Application {
         // using this library
         UploadServiceConfig.setNamespace(BuildConfig.APPLICATION_ID);
 
+        UploadServiceConfig.setDefaultNotificationChannel(App.CHANNEL);
+
         // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
         // used by default
         UploadServiceConfig.setHttpStack(new OkHttpStack(getOkHttpClient()));
