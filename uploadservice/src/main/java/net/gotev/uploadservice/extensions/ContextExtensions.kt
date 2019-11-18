@@ -28,9 +28,6 @@ fun Context.startNewUpload(taskClass: Class<out UploadTask>, params: UploadTaskP
     }
 
     if (Build.VERSION.SDK_INT >= 26) {
-        require(params.notificationConfig != null) {
-            "Android Oreo and newer (API 26+) requires a notification configuration for the upload service to run. https://developer.android.com/reference/android/content/Context.html#startForegroundService(android.content.Intent)"
-        }
         startForegroundService(intent)
     } else {
         startService(intent)

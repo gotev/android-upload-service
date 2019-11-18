@@ -102,16 +102,14 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
     override fun onStart(
         info: UploadInfo,
         notificationId: Int,
-        notificationConfig: UploadNotificationConfig?
+        notificationConfig: UploadNotificationConfig
     ) {
-        val config = notificationConfig ?: return
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.getNotificationChannel(config.notificationChannelId)
-                ?: throw IllegalArgumentException("The provided notification channel ID ${config.notificationChannelId} does not exist! You must create it at app startup and before Upload Service!")
+            notificationManager.getNotificationChannel(notificationConfig.notificationChannelId)
+                ?: throw IllegalArgumentException("The provided notification channel ID ${notificationConfig.notificationChannelId} does not exist! You must create it at app startup and before Upload Service!")
         }
 
-        ongoingNotification(config.notificationChannelId, info, config.progress)
+        ongoingNotification(notificationConfig.notificationChannelId, info, notificationConfig.progress)
             .setProgress(100, 0, true)
             .notify(info.uploadId, notificationId)
     }
@@ -119,11 +117,13 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
     override fun onProgress(
         info: UploadInfo,
         notificationId: Int,
-        notificationConfig: UploadNotificationConfig?
+        notificationConfig: UploadNotificationConfig
     ) {
-        val config = notificationConfig ?: return
-
-        ongoingNotification(config.notificationChannelId, info, config.progress)
+        ongoingNotification(
+            notificationConfig.notificationChannelId,
+            info,
+            notificationConfig.progress
+        )
             .setProgress(100, info.progressPercent, false)
             .notify(info.uploadId, notificationId)
     }
@@ -131,39 +131,35 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
     override fun onSuccess(
         info: UploadInfo,
         notificationId: Int,
-        notificationConfig: UploadNotificationConfig?,
+        notificationConfig: UploadNotificationConfig,
         response: ServerResponse
     ) {
-        val config = notificationConfig ?: return
-
         updateNotification(
             notificationId,
             info,
-            config.notificationChannelId,
-            config.isRingToneEnabled,
-            config.success
+            notificationConfig.notificationChannelId,
+            notificationConfig.isRingToneEnabled,
+            notificationConfig.success
         )
     }
 
     override fun onError(
         info: UploadInfo,
         notificationId: Int,
-        notificationConfig: UploadNotificationConfig?,
+        notificationConfig: UploadNotificationConfig,
         exception: Throwable
     ) {
-        val config = notificationConfig ?: return
-
         val statusConfig = if (exception is UserCancelledUploadException) {
-            config.cancelled
+            notificationConfig.cancelled
         } else {
-            config.error
+            notificationConfig.error
         }
 
         updateNotification(
             notificationId,
             info,
-            config.notificationChannelId,
-            config.isRingToneEnabled,
+            notificationConfig.notificationChannelId,
+            notificationConfig.isRingToneEnabled,
             statusConfig
         )
     }
@@ -171,7 +167,7 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
     override fun onCompleted(
         info: UploadInfo,
         notificationId: Int,
-        notificationConfig: UploadNotificationConfig?
+        notificationConfig: UploadNotificationConfig
     ) {
     }
 }

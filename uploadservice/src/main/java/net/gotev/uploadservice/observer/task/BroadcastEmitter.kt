@@ -14,21 +14,44 @@ class BroadcastEmitter(private val context: Context) : UploadTaskObserver {
         LocalBroadcastManager.getInstance(context).sendBroadcast(data.toIntent())
     }
 
-    override fun onStart(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {}
+    override fun onStart(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig
+    ) {
+    }
 
-    override fun onProgress(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {
+    override fun onProgress(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig
+    ) {
         send(BroadcastData(UploadStatus.InProgress, info))
     }
 
-    override fun onSuccess(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?, response: ServerResponse) {
+    override fun onSuccess(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig,
+        response: ServerResponse
+    ) {
         send(BroadcastData(UploadStatus.Success, info, response))
     }
 
-    override fun onCompleted(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?) {
+    override fun onCompleted(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig
+    ) {
         send(BroadcastData(UploadStatus.Completed, info))
     }
 
-    override fun onError(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig?, exception: Throwable) {
+    override fun onError(
+        info: UploadInfo,
+        notificationId: Int,
+        notificationConfig: UploadNotificationConfig,
+        exception: Throwable
+    ) {
         send(BroadcastData(UploadStatus.Error, info, null, exception))
     }
 }

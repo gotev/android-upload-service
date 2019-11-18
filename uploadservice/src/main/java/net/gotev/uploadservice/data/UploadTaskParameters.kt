@@ -9,7 +9,7 @@ data class UploadTaskParameters(
     val serverUrl: String,
     val maxRetries: Int,
     val autoDeleteSuccessfullyUploadedFiles: Boolean,
-    val notificationConfig: UploadNotificationConfig?,
+    val notificationConfig: UploadNotificationConfig,
     val files: ArrayList<UploadFile>,
     val additionalParameters: Parcelable? = null
 ) : Parcelable
