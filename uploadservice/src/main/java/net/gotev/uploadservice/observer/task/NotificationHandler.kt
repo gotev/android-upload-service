@@ -65,13 +65,12 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
     }
 
     private fun ongoingNotification(
-        notificationChannelId: String,
-        info: UploadInfo,
-        statusConfig: UploadNotificationStatusConfig
+        notificationConfig: UploadNotificationConfig,
+        info: UploadInfo
     ): NotificationCompat.Builder {
-        return NotificationCompat.Builder(service, notificationChannelId)
+        return NotificationCompat.Builder(service, notificationConfig.notificationChannelId)
             .setWhen(notificationCreationTimeMillis)
-            .setCommonParameters(statusConfig, info)
+            .setCommonParameters(notificationConfig.progress, info)
             .setOngoing(true)
     }
 
@@ -109,7 +108,7 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
                 ?: throw IllegalArgumentException("The provided notification channel ID ${notificationConfig.notificationChannelId} does not exist! You must create it at app startup and before Upload Service!")
         }
 
-        ongoingNotification(notificationConfig.notificationChannelId, info, notificationConfig.progress)
+        ongoingNotification(notificationConfig, info)
             .setProgress(100, 0, true)
             .notify(info.uploadId, notificationId)
     }
@@ -119,11 +118,7 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
         notificationId: Int,
         notificationConfig: UploadNotificationConfig
     ) {
-        ongoingNotification(
-            notificationConfig.notificationChannelId,
-            info,
-            notificationConfig.progress
-        )
+        ongoingNotification(notificationConfig, info)
             .setProgress(100, info.progressPercent, false)
             .notify(info.uploadId, notificationId)
     }
