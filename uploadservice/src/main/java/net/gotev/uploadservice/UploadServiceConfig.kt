@@ -8,6 +8,7 @@ import net.gotev.uploadservice.data.UploadNotificationAction
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadNotificationStatusConfig
 import net.gotev.uploadservice.extensions.getCancelUploadIntent
+import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.hurl.HurlStack
 import net.gotev.uploadservice.observer.request.NotificationActionsObserver
@@ -48,11 +49,26 @@ object UploadServiceConfig {
     }
 
     /**
+     * Initializes Upload Service with namespace and default notification channel.
+     * This must be done in your application subclass onCreate method before anything else.
+     * @param namespace set this to your BuildConfig.APPLICATION_ID
+     * @param defaultNotificationChannel Default notification channel to use
+     * @param debug set this to your BuildConfig.DEBUG
+     */
+    @JvmStatic
+    fun initialize(namespace: String, defaultNotificationChannel: String, debug: Boolean) {
+        this.namespace = namespace
+        this.defaultNotificationChannel = defaultNotificationChannel
+        UploadServiceLogger.setDevelopmentMode(debug)
+    }
+
+    /**
      * Namespace with which Upload Service is going to operate. This must be set in application
      * subclass onCreate method before anything else.
      */
     @JvmStatic
     var namespace: String? = null
+        private set
         get() = if (field == null)
             throw IllegalArgumentException("You have to set namespace to BuildConfig.APPLICATION_ID in your Application subclass")
         else
@@ -64,6 +80,7 @@ object UploadServiceConfig {
      */
     @JvmStatic
     var defaultNotificationChannel: String? = null
+        private set
         get() = if (field == null)
             throw IllegalArgumentException("You have to set defaultNotificationChannel in your Application subclass")
         else

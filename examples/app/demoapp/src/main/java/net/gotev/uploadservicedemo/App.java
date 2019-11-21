@@ -13,7 +13,6 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.data.RetryPolicyConfig;
-import net.gotev.uploadservice.logger.UploadServiceLogger;
 import net.gotev.uploadservice.observer.request.RequestObserver;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 
@@ -46,14 +45,9 @@ public class App extends Application {
             //enableStrictMode();
         }
 
-        // Set upload service debug log messages level
-        UploadServiceLogger.setDevelopmentMode(BuildConfig.DEBUG);
-
         // Set your application namespace to avoid conflicts with other apps
         // using this library
-        UploadServiceConfig.setNamespace(BuildConfig.APPLICATION_ID);
-
-        UploadServiceConfig.setDefaultNotificationChannel(App.CHANNEL);
+        UploadServiceConfig.initialize(BuildConfig.APPLICATION_ID, App.CHANNEL, BuildConfig.DEBUG);
 
         // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
         // used by default
