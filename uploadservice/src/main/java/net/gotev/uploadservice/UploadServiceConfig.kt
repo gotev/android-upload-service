@@ -51,7 +51,7 @@ object UploadServiceConfig {
     /**
      * Initializes Upload Service with namespace and default notification channel.
      * This must be done in your application subclass onCreate method before anything else.
-     * @param namespace set this to your BuildConfig.APPLICATION_ID
+     * @param namespace set this to your package name (context.packageName)
      * @param defaultNotificationChannel Default notification channel to use
      * @param debug set this to your BuildConfig.DEBUG
      */
@@ -70,7 +70,7 @@ object UploadServiceConfig {
     var namespace: String? = null
         private set
         get() = if (field == null)
-            throw IllegalArgumentException("You have to set namespace to BuildConfig.APPLICATION_ID in your Application subclass")
+            throw IllegalArgumentException("You have to set namespace to your app package name (context.packageName) in your Application subclass")
         else
             field
 
