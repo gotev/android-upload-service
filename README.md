@@ -14,8 +14,9 @@ Upload Service 4.0.0 Release Candidate 2, 100% Kotlin with:
 
 is here! [Check this issue for more information](https://github.com/gotev/android-upload-service/issues/478). **THIS IS SUITABLE FOR PRODUCTION AND RECOMMENDED CHOICE FOR ANDROID 10. IF YOU FEEL UNCOMFORTABLE USING RELEASE CANDIDATE VERSIONS, USE OLD 3.5.2**.
 
-| :information_source: | [Get started with 3.5.2](https://github.com/gotev/android-upload-service/wiki/Setup) |
+| :information_source: :new: | [Get started with 4.0](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
 |--|--|
+| :information_source: | [Get started with 3.5.2](https://github.com/gotev/android-upload-service/wiki/Setup) |
 | :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) |
 | :heart: | [Contributing](CONTRIBUTING.md) |
 | :star2: | [Features](#features) |
