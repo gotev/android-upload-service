@@ -47,7 +47,7 @@ public class App extends Application {
 
         // Set your application namespace to avoid conflicts with other apps
         // using this library
-        UploadServiceConfig.initialize(BuildConfig.APPLICATION_ID, App.CHANNEL, BuildConfig.DEBUG);
+        UploadServiceConfig.initialize(this, App.CHANNEL, BuildConfig.DEBUG);
 
         // Set up the Http Stack to use. If you omit this or comment it, HurlStack will be
         // used by default

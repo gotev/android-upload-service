@@ -1,5 +1,6 @@
 package net.gotev.uploadservice
 
+import android.app.Application
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Build
@@ -51,13 +52,13 @@ object UploadServiceConfig {
     /**
      * Initializes Upload Service with namespace and default notification channel.
      * This must be done in your application subclass onCreate method before anything else.
-     * @param namespace set this to your package name (context.packageName)
+     * @param context your Application's context
      * @param defaultNotificationChannel Default notification channel to use
      * @param debug set this to your BuildConfig.DEBUG
      */
     @JvmStatic
-    fun initialize(namespace: String, defaultNotificationChannel: String, debug: Boolean) {
-        this.namespace = namespace
+    fun initialize(context: Application, defaultNotificationChannel: String, debug: Boolean) {
+        this.namespace = context.packageName
         this.defaultNotificationChannel = defaultNotificationChannel
         UploadServiceLogger.setDevelopmentMode(debug)
     }
