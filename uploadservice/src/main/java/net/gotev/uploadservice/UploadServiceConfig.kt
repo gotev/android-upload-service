@@ -304,7 +304,7 @@ object UploadServiceConfig {
                 "uploadProgressNotificationIntervalMillis": $uploadProgressNotificationIntervalMillis,
                 "retryPolicy": $retryPolicy,
                 "isForegroundService": $isForegroundService,
-                "schemeHandlers": {${schemeHandlers.entries.joinToString { (key, value) -> "\"$key\": \"$value\"" }}}
+                "schemeHandlers": {${schemeHandlers.entries.joinToString { (key, value) -> "\"$key\": \"${value.name}\"" }}}
             }
         """.trimIndent()
     }
