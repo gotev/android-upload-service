@@ -295,7 +295,7 @@ object UploadServiceConfig {
         return """
             {
                 "uploadServiceVersion": "${BuildConfig.VERSION_NAME}",
-                "androidApiVesion": ${Build.VERSION.SDK_INT},
+                "androidApiVersion": ${Build.VERSION.SDK_INT},
                 "namespace": "$namespace",
                 "deviceProcessors": ${Runtime.getRuntime().availableProcessors()},
                 "idleTimeoutSeconds": $idleTimeoutSeconds,
@@ -304,7 +304,7 @@ object UploadServiceConfig {
                 "uploadProgressNotificationIntervalMillis": $uploadProgressNotificationIntervalMillis,
                 "retryPolicy": $retryPolicy,
                 "isForegroundService": $isForegroundService,
-                "schemeHandlers": [${schemeHandlers.entries.joinToString { (key, value) -> "\"$key\": \"$value\"" }}]
+                "schemeHandlers": {${schemeHandlers.entries.joinToString { (key, value) -> "\"$key\": \"$value\"" }}}
             }
         """.trimIndent()
     }
