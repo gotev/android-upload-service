@@ -4,19 +4,8 @@
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
-Upload Service 4.0.0 Release Candidate 2, 100% Kotlin with:
-- Android 10 support
-- New *delegates* using AndroidX lifecycle
-- Possibility to implement your own notification handler
-- Possibility to override default notification placeholders values and add your own
-- Easily add your custom notification actions
-- And many new features :gift:
-
-is here! [Check this issue for more information](https://github.com/gotev/android-upload-service/issues/478). **THIS IS SUITABLE FOR PRODUCTION AND RECOMMENDED CHOICE FOR ANDROID 10. IF YOU FEEL UNCOMFORTABLE USING RELEASE CANDIDATE VERSIONS, USE OLD 3.5.2**.
-
 | :information_source: :new: | [Get started with 4.0](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
 |--|--|
-| :information_source: | [Get started with 3.5.2](https://github.com/gotev/android-upload-service/wiki/Setup) |
 | :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) |
 | :heart: | [Contributing](CONTRIBUTING.md) |
 | :star2: | [Features](#features) |
@@ -28,6 +17,7 @@ is here! [Check this issue for more information](https://github.com/gotev/androi
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
 ## Features <a name="features"></a>
+* Android 5.0 (API 21) to Android 10 (API 29) support
 * tiny library
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
 * be able to easily implement other upload protocols as plugins
@@ -38,6 +28,8 @@ is here! [Check this issue for more information](https://github.com/gotev/androi
 * be able to change the underlying HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported. You can also implement your own.
 * be able to set library log level and to provide custom logger implementation
 * easily customize the notification with text, icons and actions for the different states
+* Possibility to implement your own notification handler
+* Lifecycle-Aware RequestObserver to monitor your uploads
 
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
 
