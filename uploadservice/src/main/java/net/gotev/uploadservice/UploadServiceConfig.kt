@@ -133,16 +133,15 @@ object UploadServiceConfig {
             isRingToneEnabled = true,
             progress = UploadNotificationStatusConfig(
                 title = title,
-                message = "Uploading at ${Placeholder.UploadRate} (${Placeholder.Progress})"
-            ).apply {
-                actions.add(
+                message = "Uploading at ${Placeholder.UploadRate} (${Placeholder.Progress})",
+                actions = arrayListOf(
                     UploadNotificationAction(
                         icon = android.R.drawable.ic_menu_close_clear_cancel,
                         title = "Cancel",
                         intent = context.getCancelUploadIntent(uploadId)
                     )
                 )
-            },
+            ),
             success = UploadNotificationStatusConfig(
                 title = title,
                 message = "Upload completed successfully in ${Placeholder.ElapsedTime}"
