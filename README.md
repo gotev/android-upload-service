@@ -4,7 +4,7 @@
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-| :information_source: :new: | [Get started with 4.0](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
+| :information_source: :new: | [Get started with 4.x](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
 |--|--|
 | :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) |
 | :heart: | [Contributing](CONTRIBUTING.md) |
