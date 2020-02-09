@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: "org.jlleitschuh.gradle.ktlint"
+apply plugin: 'kotlin-kapt'
 
 Properties properties = new Properties()
 if (project.rootProject.file("local.properties").exists()) {
@@ -79,6 +80,7 @@ dependencies {
 
     // Support
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
+    kapt "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:$androidx_local_broadcast_version"

@@ -17,13 +17,14 @@ import net.gotev.uploadservice.data.UploadStatus
 
 class RequestObserver(
     private val context: Context,
+    lifecycleOwner: LifecycleOwner,
     private val delegate: RequestObserverDelegate
 ) : BroadcastReceiver(), LifecycleObserver {
 
     private var subscribedUploadID: String? = null
 
     init {
-        (context as? LifecycleOwner)?.lifecycle?.addObserver(this)
+        lifecycleOwner.lifecycle.addObserver(this)
     }
 
     override fun onReceive(context: Context, intent: Intent?) {

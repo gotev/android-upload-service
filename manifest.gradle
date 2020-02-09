@@ -12,7 +12,7 @@ ext {
     library_licenses = ["Apache-2.0"]
     library_licenses_url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
     library_project_group = 'net.gotev'
-    library_version = '4.0.0'
+    library_version = '4.1.0'
     version_code = 40
     min_sdk = 21
     target_sdk = 29
@@ -36,6 +36,7 @@ ext {
     androidx_test_espresso_version = '3.2.0'
 
     // Library and app dependencies versions
+    androidx_lifecycle_version = '2.2.0'
     androidx_appcompat_version = '1.1.0'
     androidx_local_broadcast_version = '1.0.0'
 }

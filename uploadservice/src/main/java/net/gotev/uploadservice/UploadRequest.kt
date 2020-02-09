@@ -2,6 +2,7 @@ package net.gotev.uploadservice
 
 import android.content.Context
 import android.os.Parcelable
+import androidx.lifecycle.LifecycleOwner
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadTaskParameters
@@ -74,10 +75,11 @@ constructor(protected val context: Context, protected var serverUrl: String) {
     /**
      * Subscribe to events of this upload request by creating a new request observer.
      * @param context context
+     * @param lifecycleOwner lifecycle to use when subscribing for events
      * @param delegate Observer delegate implementation
      */
-    fun subscribe(context: Context, delegate: RequestObserverDelegate): RequestObserver {
-        return RequestObserver(context, delegate).apply { subscribe(this@UploadRequest) }
+    fun subscribe(context: Context, lifecycleOwner: LifecycleOwner, delegate: RequestObserverDelegate): RequestObserver {
+        return RequestObserver(context, lifecycleOwner, delegate).apply { subscribe(this@UploadRequest) }
     }
 
     protected abstract fun getAdditionalParameters(): Parcelable

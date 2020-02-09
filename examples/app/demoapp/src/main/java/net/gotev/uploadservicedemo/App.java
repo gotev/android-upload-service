@@ -8,6 +8,8 @@ import android.os.Build;
 import android.os.StrictMode;
 import android.util.Log;
 
+import androidx.lifecycle.ProcessLifecycleOwner;
+
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
@@ -56,9 +58,7 @@ public class App extends Application {
         // setup backoff multiplier
         UploadServiceConfig.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
 
-        createNotificationChannel();
-
-        new RequestObserver(this, new GlobalBroadcastReceiver()).register();
+        new RequestObserver(this, ProcessLifecycleOwner.get(), new GlobalBroadcastReceiver()).register();
     }
 
     private void createNotificationChannel() {

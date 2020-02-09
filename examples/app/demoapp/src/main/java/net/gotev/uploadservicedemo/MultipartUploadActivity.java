@@ -71,7 +71,7 @@ public class MultipartUploadActivity extends UploadActivity {
 
             });
 
-            request.subscribe(this, new RequestObserverDelegate() {
+            request.subscribe(this, this, new RequestObserverDelegate() {
                 @Override
                 public void onProgress(@NotNull Context context, @NotNull UploadInfo uploadInfo) {
                     Log.e("LIFECYCLE", "Progress " + uploadInfo.getProgressPercent());

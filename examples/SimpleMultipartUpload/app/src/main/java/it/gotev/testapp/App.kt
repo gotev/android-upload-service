@@ -27,7 +27,7 @@ class App : Application() {
         createNotificationChannel()
 
         UploadServiceConfig.initialize(
-            namespace = packageName,
+            context = this,
             defaultNotificationChannel = notificationChannelID,
             debug = BuildConfig.DEBUG
         )
