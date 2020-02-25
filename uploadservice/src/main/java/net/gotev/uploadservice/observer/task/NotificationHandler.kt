@@ -1,6 +1,7 @@
 package net.gotev.uploadservice.observer.task
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.media.RingtoneManager
 import android.os.Build
@@ -74,6 +75,12 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
             .setOngoing(true)
     }
 
+    private fun NotificationCompat.Builder.setDeleteIntentIfPresent(
+        intent: PendingIntent?
+    ): NotificationCompat.Builder {
+        return intent?.let { setDeleteIntent(it) } ?: this
+    }
+
     private fun updateNotification(
         notificationId: Int,
         info: UploadInfo,
@@ -89,6 +96,7 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
             .setCommonParameters(statusConfig, info)
             .setProgress(0, 0, false)
             .setOngoing(false)
+            .setDeleteIntentIfPresent(statusConfig.onDismissed)
             .setAutoCancel(statusConfig.clearOnAction)
             .setRingtoneCompat(isRingToneEnabled)
             .build()

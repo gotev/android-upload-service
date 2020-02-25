@@ -59,7 +59,13 @@ data class UploadNotificationStatusConfig @JvmOverloads constructor(
      * This would not affect progress notification, as it's ongoing and managed by upload service.
      * It's used to be able to automatically dismiss cancelled, error or success notifications.
      */
-    val autoClear: Boolean = false
+    val autoClear: Boolean = false,
+
+    /**
+     * Intent to be performed when the user swipes away the notification or clears all notifications.
+     * Only applied to cancelled, error or success notifications.
+     */
+    val onDismissed: PendingIntent? = null
 ) : Parcelable {
     fun getClickIntent(context: Context): PendingIntent {
         return clickIntent ?: PendingIntent.getBroadcast(
