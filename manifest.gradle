@@ -12,7 +12,7 @@ ext {
     library_licenses = ["Apache-2.0"]
     library_licenses_url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
     library_project_group = 'net.gotev'
-    library_version = '4.1.0'
+    library_version = '4.2.0'
     version_code = 40
     min_sdk = 21
     target_sdk = 29
