@@ -58,7 +58,7 @@ public class App extends Application {
         // setup backoff multiplier
         UploadServiceConfig.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
 
-        new RequestObserver(this, ProcessLifecycleOwner.get(), new GlobalBroadcastReceiver()).register();
+        new RequestObserver(this, ProcessLifecycleOwner.get(), new GlobalBroadcastReceiver());
     }
 
     private void createNotificationChannel() {

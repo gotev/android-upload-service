@@ -15,10 +15,11 @@ import net.gotev.uploadservice.data.BroadcastData
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadStatus
 
-class RequestObserver(
+class RequestObserver @JvmOverloads constructor(
     private val context: Context,
     lifecycleOwner: LifecycleOwner,
-    private val delegate: RequestObserverDelegate
+    private val delegate: RequestObserverDelegate,
+    private var shouldAcceptEventsFrom: (uploadInfo: UploadInfo) -> Boolean = { true }
 ) : BroadcastReceiver(), LifecycleObserver {
 
     private var subscribedUploadID: String? = null
@@ -34,7 +35,7 @@ class RequestObserver(
 
         val uploadInfo = data.uploadInfo
 
-        if (!shouldAcceptEventFrom(uploadInfo)) {
+        if (!shouldAcceptEventsFrom(uploadInfo)) {
             return
         }
 
@@ -44,19 +45,6 @@ class RequestObserver(
             UploadStatus.Success -> delegate.onSuccess(context, uploadInfo, data.serverResponse!!)
             UploadStatus.Completed -> delegate.onCompleted(context, uploadInfo)
         }
-    }
-
-    /**
-     * Method called every time a new event arrives from an upload task, to decide whether or not
-     * to process it. If this request observer subscribed a particular upload task, it will listen
-     * only to it
-     *
-     * @param uploadInfo upload info to
-     * @return true to accept the event, false to discard it
-     */
-    private fun shouldAcceptEventFrom(uploadInfo: UploadInfo): Boolean {
-        val uploadId = subscribedUploadID ?: return true
-        return uploadId == uploadInfo.uploadId
     }
 
     /**
@@ -88,5 +76,8 @@ class RequestObserver(
      */
     fun subscribe(request: UploadRequest<*>) {
         subscribedUploadID = request.startUpload()
+        shouldAcceptEventsFrom = { uploadInfo ->
+            subscribedUploadID?.let { it == uploadInfo.uploadId } ?: true
+        }
     }
 }
