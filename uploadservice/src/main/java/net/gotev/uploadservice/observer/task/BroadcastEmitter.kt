@@ -1,7 +1,6 @@
 package net.gotev.uploadservice.observer.task
 
 import android.content.Context
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import net.gotev.uploadservice.data.BroadcastData
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
@@ -11,7 +10,7 @@ import net.gotev.uploadservice.network.ServerResponse
 class BroadcastEmitter(private val context: Context) : UploadTaskObserver {
 
     private fun send(data: BroadcastData) {
-        LocalBroadcastManager.getInstance(context).sendBroadcast(data.toIntent())
+        context.sendBroadcast(data.toIntent())
     }
 
     override fun onStart(

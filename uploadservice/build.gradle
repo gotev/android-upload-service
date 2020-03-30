@@ -83,7 +83,6 @@ dependencies {
     kapt "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:$androidx_local_broadcast_version"
 }
 
 bintray {
