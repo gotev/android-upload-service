@@ -57,7 +57,7 @@ public class App extends Application {
         UploadServiceConfig.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
 
         // Uncomment to experiment Single Notification Handler
-        // UploadServiceConfig.setNotificationHandlerFactory((service) -> new MyNotificationHandler(service));
+        // UploadServiceConfig.setNotificationHandlerFactory(ExampleSingleNotificationHandler::new);
 
         new GlobalRequestObserver(this, new GlobalRequestObserverDelegate());
     }
