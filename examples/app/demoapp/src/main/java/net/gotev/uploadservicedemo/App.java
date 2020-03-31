@@ -8,14 +8,12 @@ import android.os.Build;
 import android.os.StrictMode;
 import android.util.Log;
 
-import androidx.lifecycle.ProcessLifecycleOwner;
-
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.data.RetryPolicyConfig;
-import net.gotev.uploadservice.observer.request.RequestObserver;
+import net.gotev.uploadservice.observer.request.GlobalRequestObserver;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
 
 import java.util.concurrent.TimeUnit;
@@ -58,7 +56,10 @@ public class App extends Application {
         // setup backoff multiplier
         UploadServiceConfig.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
 
-        new RequestObserver(this, ProcessLifecycleOwner.get(), new GlobalBroadcastReceiver());
+        // Uncomment to experiment Single Notification Handler
+        // UploadServiceConfig.setNotificationHandlerFactory((service) -> new MyNotificationHandler(service));
+
+        new GlobalRequestObserver(this, new GlobalRequestObserverDelegate());
     }
 
     private void createNotificationChannel() {
