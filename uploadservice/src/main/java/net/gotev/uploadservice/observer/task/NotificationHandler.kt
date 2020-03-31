@@ -13,6 +13,7 @@ import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadNotificationStatusConfig
 import net.gotev.uploadservice.exceptions.UserCancelledUploadException
+import net.gotev.uploadservice.extensions.validateNotificationChannel
 import net.gotev.uploadservice.network.ServerResponse
 
 class NotificationHandler(private val service: UploadService) : UploadTaskObserver {
@@ -111,10 +112,7 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
         notificationId: Int,
         notificationConfig: UploadNotificationConfig
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.getNotificationChannel(notificationConfig.notificationChannelId)
-                ?: throw IllegalArgumentException("The provided notification channel ID ${notificationConfig.notificationChannelId} does not exist! You must create it at app startup and before Upload Service!")
-        }
+        notificationManager.validateNotificationChannel(notificationConfig.notificationChannelId)
 
         ongoingNotification(notificationConfig, info)
             .setProgress(100, 0, true)

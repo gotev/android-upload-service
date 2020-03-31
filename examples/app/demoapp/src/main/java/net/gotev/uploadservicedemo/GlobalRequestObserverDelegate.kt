@@ -11,7 +11,7 @@ import net.gotev.uploadservice.observer.request.RequestObserverDelegate
 /**
  * @author Aleksandar Gotev
  */
-class GlobalBroadcastReceiver : RequestObserverDelegate {
+class GlobalRequestObserverDelegate : RequestObserverDelegate {
     override fun onProgress(context: Context, uploadInfo: UploadInfo) {
         Log.e("RECEIVER", "Progress: $uploadInfo")
     }
@@ -32,7 +32,6 @@ class GlobalBroadcastReceiver : RequestObserverDelegate {
 
             else -> {
                 Log.e("RECEIVER", "Error: $uploadInfo", exception)
-
             }
         }
     }
