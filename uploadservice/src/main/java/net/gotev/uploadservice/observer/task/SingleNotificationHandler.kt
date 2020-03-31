@@ -11,7 +11,7 @@ import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
 import java.util.concurrent.ConcurrentHashMap
 
-abstract class AbstractNotificationHandler(private val service: UploadService, private val notificationChannelId: String) : UploadTaskObserver {
+abstract class SingleNotificationHandler(private val service: UploadService, private val notificationChannelId: String) : UploadTaskObserver {
 
     private val tasks = ConcurrentHashMap<String, TaskData>()
 
@@ -77,5 +77,4 @@ abstract class AbstractNotificationHandler(private val service: UploadService, p
     override fun onCompleted(info: UploadInfo, notificationId: Int, notificationConfig: UploadNotificationConfig) {
 
     }
-
 }
