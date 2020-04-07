@@ -1,7 +1,7 @@
 ## Contents
 * [Contributing](#contribute)
+* [Issues](#issues)
 * [Asking for help and bug reports](#help)
-* [Issue readability](#readability)
 
 ### <a name="contribute"></a> Contributing
 * Do you have a new feature in mind?
@@ -9,6 +9,19 @@
 * Have you found a bug?
 
 Contributions are welcome and encouraged! Just fork the project and then send a pull request. Be ready to discuss your code and design decisions.
+
+### <a name="issues"></a> Issues
+Before opening a new issue, search the existing ones. If an issue is closed and you have the same problem, either reopen the issue or create a new one, filling in all the details required in the issue template. If you don't provide those data, you may not have a response in return for lack of relevant context.
+
+Bugs are better explained with a test or a demo project. At least with some working code.
+
+When posting code, logs or stack traces, please use the following Markdown syntax to improve readability:
+<pre>
+```kotlin
+your code, log or stack trace
+```
+</pre>
+
 
 #### Code Style
 Android Upload Service enforces Kotlin standard coding style, using [ktlint](https://ktlint.github.io/).
@@ -51,11 +64,3 @@ Remember, there's nothing more annoying than:
 
 [Here](http://coenjacobs.me/2013/12/06/effective-bug-reports-on-github/) there's a nice blog post about effective bug reports.
 If you already know how to fix the bug, send a pull request.
-
-### <a name="readability"></a> Issue readability
-When posting code, logs or stack traces, please use the following Markdown syntax to improve readability:
-<pre>
-```java
-your code, log or stack trace
-```
-</pre>
