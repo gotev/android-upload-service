@@ -6,6 +6,7 @@
 
 | :information_source: :new: | [Get started with 4.x](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
 |--|--|
+| Still using 3.x ? | [Let me know why](https://github.com/gotev/android-upload-service/issues/501) |
 | :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) |
 | :heart: | [Contributing](CONTRIBUTING.md) |
 | :star2: | [Features](#features) |
