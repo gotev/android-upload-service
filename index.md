@@ -1,14 +1,24 @@
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![Javadocs](http://javadoc.io/badge/net.gotev/uploadservice.svg)](http://javadoc.io/doc/net.gotev/uploadservice) <a href="http://www.methodscount.com/?lib=net.gotev%3Auploadservice%3A3.3"><img src="https://img.shields.io/badge/Methods and size-core: 658 | deps: 19372 | 91 KB-e91e63.svg"/></a>
+<p align="center">
+  <img src="uploadservice-logo.png">
+</p>
+
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
+| :information_source: :new: | [Get started with 4.x](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
+|--|--|
+| Still using 3.x ? | [Let me know why](https://github.com/gotev/android-upload-service/issues/501) |
+| :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) |
+| :heart: | [Contributing](CONTRIBUTING.md) |
+| :star2: | [Features](#features) |
+| :raising_hand: | [Who is using Upload Service](#powered) |
+| :mega: | [Credits](#credits)
+| :scroll: | [License](#license)
 
 ![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
-| :information_source: | [Get started!](https://github.com/gotev/android-upload-service/wiki/Setup) |
-|--|--|
-| :iphone: | [Download demo APK](https://github.com/gotev/android-upload-service/releases/download/3.3/uploadservice-demo-debug.apk)|
-| :question: | [Ask for help](https://github.com/gotev/android-upload-service/wiki/Asking%20for%20help) |
-
-## Features
+## Features <a name="features"></a>
+* Android 5.0 (API 21) to Android 10 (API 29) support
 * tiny library
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
 * be able to easily implement other upload protocols as plugins
@@ -19,31 +29,31 @@
 * be able to change the underlying HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported. You can also implement your own.
 * be able to set library log level and to provide custom logger implementation
 * easily customize the notification with text, icons and actions for the different states
+* Possibility to implement your own notification handler
+* Lifecycle-Aware RequestObserver to monitor your uploads
 
 At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
 
-## Apps powered by Android Upload Service <a name="powered"></a>
-To be included in the following list, simply create an issue and provide the app name and a link.
+## Powered by Android Upload Service <a name="powered"></a>
+Apps and libraries powered by this library. To be included in the following list, simply create an issue and provide the app name and a link.
 
+- [JIRA Cloud](https://play.google.com/store/apps/details?id=com.atlassian.android.jira.core)
+- [Quora](https://play.google.com/store/apps/details?id=com.quora.android)
 - [crystal.io](https://play.google.com/store/apps/details?id=net.igenius.crystal)
+- [Vydia](https://play.google.com/store/apps/details?id=com.vydia.app)
+- [React Native Background Upload](https://github.com/Vydia/react-native-background-upload)
+- [Background Upload Plugin for Cordova](https://www.npmjs.com/package/cordova-plugin-background-upload)
 - [VoiSmart IP Communicator](https://play.google.com/store/apps/details?id=com.voismart.softphone)
-- [Motolife](https://play.google.com/store/apps/details?id=bg.motolife.app)
 - [NativeScript Background HTTP](https://www.npmjs.com/package/nativescript-background-http)
-- [MyCyberLaw](https://play.google.com/store/apps/details?id=com.mycyberlaw)
+- [Samajbook](https://play.google.com/store/apps/details?id=com.marothiatechs.samaj)
+- [Codeaty](https://play.google.com/store/apps/details?id=com.saifraheem.BagoLearn)
 
-## Contributing <a name="contribute"></a>
-* Do you have a new feature in mind?
-* Do you know how to improve existing docs or code?
-* Have you found a bug?
-
-Contributions are welcome and encouraged! Just fork the project and then send a pull request. Be ready to discuss your code and design decisions.
-
-## Do you like the project? <a name="donate"></a>
-Put a star, spread the word and if you want to offer me a free beer, [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alexgotev%40gmail%2ecom&lc=US&item_name=Android%20Upload%20Service&item_number=AndroidUploadService&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
+## Credits <a name="credits"></a>
+Created my free logo at [LogoMakr.com](https://logomakr.com)
 
 ## License <a name="license"></a>
 
-    Copyright (C) 2013-2017 Aleksandar Gotev
+    Copyright (C) 2013-2020 Aleksandar Gotev
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
