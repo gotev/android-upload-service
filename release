@@ -1,3 +1,5 @@
 #!/bin/bash
 ./gradlew clean test publish bintrayUpload
 
+version=$(cat manifest.gradle | grep "library_version" | tr "'" '\n' | head -n 2 | tail -n 1)
+hub release create -m "$version" "$version"
