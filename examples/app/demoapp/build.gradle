@@ -14,8 +14,18 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            storeFile file("../keystore")
+            storePassword "password"
+            keyAlias "demoapp"
+            keyPassword "password"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -58,8 +68,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // Debugging
-    implementation "com.facebook.stetho:stetho:${stethoVersion}"
-    implementation "com.facebook.stetho:stetho-okhttp3:${stethoVersion}"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
 
     // ButterKnife

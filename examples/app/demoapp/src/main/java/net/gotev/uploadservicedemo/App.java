@@ -8,9 +8,6 @@ import android.os.Build;
 import android.os.StrictMode;
 import android.util.Log;
 
-import com.facebook.stetho.Stetho;
-import com.facebook.stetho.okhttp3.StethoInterceptor;
-
 import net.gotev.uploadservice.UploadServiceConfig;
 import net.gotev.uploadservice.data.RetryPolicyConfig;
 import net.gotev.uploadservice.observer.request.GlobalRequestObserver;
@@ -21,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
-
-import static com.facebook.stetho.Stetho.newInitializerBuilder;
 
 /**
  * @author gotev (Aleksandar Gotev)
@@ -36,12 +31,6 @@ public class App extends Application {
         super.onCreate();
 
         if (BuildConfig.DEBUG) {
-            Stetho.initialize(
-                    newInitializerBuilder(this)
-                            .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                            .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
-                            .build());
-
             //enableStrictMode();
         }
 
@@ -95,9 +84,6 @@ public class App extends Application {
 
                     return chain.proceed(request.build());
                 })
-
-                // open up your Chrome and go to: chrome://inspect
-                .addNetworkInterceptor(new StethoInterceptor())
 
                 // if you use HttpLoggingInterceptor, be sure to put it always as the last interceptor
                 // in the chain and to not use BODY level logging, otherwise you will get all your
