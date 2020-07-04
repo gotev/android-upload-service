@@ -34,6 +34,8 @@ public class App extends Application {
             //enableStrictMode();
         }
 
+        createNotificationChannel();
+
         // Set your application namespace to avoid conflicts with other apps
         // using this library
         UploadServiceConfig.initialize(this, App.CHANNEL, BuildConfig.DEBUG);
