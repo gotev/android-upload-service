@@ -18,7 +18,7 @@
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
 ## Features <a name="features"></a>
-* Android 5.0 (API 21) to Android 10 (API 29) support
+* Android 5.0 (API 21) to Android 11 (API 30) support
 * tiny library
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
 * be able to easily implement other upload protocols as plugins

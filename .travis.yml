@@ -15,9 +15,13 @@ android:
     - build-tools-29.0.2
     - android-28
     - android-29
+    - android-30
     - extra-google-m2repository
     - extra-android-m2repository
 
 env:
   global:
-    - API=29 # Android API default
+    - API=30 # Android API default
+    
+before_install:
+  - yes | sdkmanager "platforms;android-30;android-29"
