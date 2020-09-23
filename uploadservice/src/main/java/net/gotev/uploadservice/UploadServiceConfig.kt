@@ -22,7 +22,7 @@ import net.gotev.uploadservice.schemehandlers.ContentResolverSchemeHandler
 import net.gotev.uploadservice.schemehandlers.FileSchemeHandler
 import net.gotev.uploadservice.schemehandlers.SchemeHandler
 import java.lang.reflect.InvocationTargetException
-import java.util.LinkedHashMap
+import java.util.*
 import java.util.concurrent.AbstractExecutorService
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -36,6 +36,12 @@ object UploadServiceConfig {
 
     private const val fileScheme = "/"
     private const val contentScheme = "content://"
+
+    var CancelText = "İptal"
+    var UploadText = "Yükleniyor"
+    var SuccesText = "Yükleme başarılı"
+    var ErrorText = "Yükleme başarısız"
+    var CancelUploadText = "Yükleme iptal edildi"
 
     /**
      * Default User Agent used by default Http Stack constructors.
@@ -126,34 +132,34 @@ object UploadServiceConfig {
      */
     @JvmStatic
     var notificationConfigFactory: (context: Context, uploadId: String) -> UploadNotificationConfig = { context, uploadId ->
-        val title = "Upload"
+        val title = UploadText
 
         UploadNotificationConfig(
-            notificationChannelId = defaultNotificationChannel!!,
-            isRingToneEnabled = true,
-            progress = UploadNotificationStatusConfig(
-                title = title,
-                message = "Uploading at ${Placeholder.UploadRate} (${Placeholder.Progress})",
-                actions = arrayListOf(
-                    UploadNotificationAction(
-                        icon = android.R.drawable.ic_menu_close_clear_cancel,
-                        title = "Cancel",
-                        intent = context.getCancelUploadIntent(uploadId)
-                    )
+                notificationChannelId = defaultNotificationChannel!!,
+                isRingToneEnabled = true,
+                progress = UploadNotificationStatusConfig(
+                        title = title,
+                        message = "Uploading at ${Placeholder.UploadRate} (${Placeholder.Progress})",
+                        actions = arrayListOf(
+                                UploadNotificationAction(
+                                        icon = android.R.drawable.ic_menu_close_clear_cancel,
+                                        title = CancelText,
+                                        intent = context.getCancelUploadIntent(uploadId)
+                                )
+                        )
+                ),
+                success = UploadNotificationStatusConfig(
+                        title = title,
+                        message = "$SuccesText ${Placeholder.ElapsedTime}"
+                ),
+                error = UploadNotificationStatusConfig(
+                        title = title,
+                        message = ErrorText
+                ),
+                cancelled = UploadNotificationStatusConfig(
+                        title = title,
+                        message = CancelUploadText
                 )
-            ),
-            success = UploadNotificationStatusConfig(
-                title = title,
-                message = "Upload completed successfully in ${Placeholder.ElapsedTime}"
-            ),
-            error = UploadNotificationStatusConfig(
-                title = title,
-                message = "Error during upload"
-            ),
-            cancelled = UploadNotificationStatusConfig(
-                title = title,
-                message = "Upload cancelled"
-            )
         )
     }
 
