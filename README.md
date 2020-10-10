@@ -19,7 +19,7 @@
 
 ## Features <a name="features"></a>
 * Android 5.0 (API 21) to Android 11 (API 30) support
-* tiny library
+* tiny library. 100% Kotlin and fully interoperable with Java.
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
 * be able to easily implement other upload protocols as plugins
 * handle multiple concurrent uploads in the background, even if the device is idle (Doze mode)
