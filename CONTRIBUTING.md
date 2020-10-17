@@ -50,17 +50,13 @@ To develop Android Upload Service and its core modules, clone the project, then 
 **Working on your first Pull Request?** You can learn how from this *free* series [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)
 
 ### <a name="help"></a> Asking for help and bug reports
-If you need help because you can't make a successful upload to your server, first check the [troubleshooting procedure](https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure). If you still haven't solved your issue after that, ask on stack overflow, not here. Ask also "how to.." questions there. The issue tracker here on GitHub is used for library bugs and enhancements. Add this to help others help you:
-* the code you use to make the request, 
-* log from LogCat (enable [debug log](https://github.com/gotev/android-upload-service/wiki/Recipes#logging-))
-* log from your server (replace sensible data)
-* what did you expect
-* what happened instead
-* version of Android
-* version of Android Upload Service
+If you need help because you can't make a successful upload to your server, first check the [troubleshooting procedure](https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure). 
 
-Remember, there's nothing more annoying than:
-> Hi, I've setup everything right by following the instructions, but it doesn't work! Help me!
+Bug reports without relevant details will be closed. Time is precious for everybody.
+
+Good and precise bug reports help improve the library fast and make it easier for everybody.
+
+> Complaints are not useful.
 
 [Here](http://coenjacobs.me/2013/12/06/effective-bug-reports-on-github/) there's a nice blog post about effective bug reports.
-If you already know how to fix the bug, send a pull request.
+If you already know how to fix the bug, you can directly send a pull request.
