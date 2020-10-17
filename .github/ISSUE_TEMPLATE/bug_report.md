@@ -7,8 +7,13 @@ assignees: ''
 
 ---
 
-<!--- Before opening this issue, be sure to have read https://github.com/gotev/android-upload-service/wiki/Usage -->
-<!--- Many questions and issues already have an answer in https://github.com/gotev/android-upload-service/wiki/Troubleshooting -->
+<!-- 
+Be sure the problem you're facing can be replicated with the upload service testbed, 
+otherwise it may be a network error, your server error or a device specific error which 
+is not related to the library
+
+check https://github.com/gotev/android-upload-service/wiki/Upload-Service-Testbed 
+-->
 
 **Describe the bug**
 A clear and concise description of what the bug is.
