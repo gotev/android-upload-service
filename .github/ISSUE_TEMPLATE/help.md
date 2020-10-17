@@ -12,7 +12,7 @@ assignees: ''
 Describe us shortly and concisely.
 
 <!-- 
-I strongly recommend using the testbed https://github.com/gotev/android-upload-service/wiki/Upload-Service-Testbed when you're experimenting with the library, with which you can learn many things.
+I strongly recommend checking the troubleshooting procedure https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure
 -->
 
 **What have you tried to do?**
