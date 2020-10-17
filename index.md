@@ -2,12 +2,14 @@
   <img src="uploadservice-logo.png">
 </p>
 
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![Build Status](https://travis-ci.org/gotev/android-upload-service.svg?branch=master)](https://travis-ci.org/gotev/android-upload-service) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-upload-service/images/download.svg) ](https://bintray.com/gotev/maven/android-upload-service/_latestVersion) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 | :information_source: :new: | [Get started with 4.x](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
 |--|--|
-| Still using 3.x ? | [Let me know why](https://github.com/gotev/android-upload-service/issues/501) |
-| :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) |
+| Still using 3.x ? | It's not maintained or supported. You may have security issues and problems with newer Androids. Switch to 4.x |
+| :collision: | It's not working? Keep calm and follow the [troubleshooting procedure](https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure) |
+| :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) Read this to discover all the possibilities |
+| :gift: | Find this library useful? Consider sponsoring its development by pressing the Sponsor button on the top right of this page. |
 | :heart: | [Contributing](CONTRIBUTING.md) |
 | :star2: | [Features](#features) |
 | :raising_hand: | [Who is using Upload Service](#powered) |
@@ -18,8 +20,8 @@
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
 ## Features <a name="features"></a>
-* Android 5.0 (API 21) to Android 10 (API 29) support
-* tiny library
+* Android 5.0 (API 21) to Android 11 (API 30) support
+* tiny library. 100% Kotlin and fully interoperable with Java.
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
 * be able to easily implement other upload protocols as plugins
 * handle multiple concurrent uploads in the background, even if the device is idle (Doze mode)
