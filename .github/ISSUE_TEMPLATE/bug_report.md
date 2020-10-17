@@ -7,12 +7,11 @@ assignees: ''
 
 ---
 
-<!-- 
-Be sure the problem you're facing can be replicated with the upload service testbed, 
-otherwise it may be a network error, your server error or a device specific error which 
-is not related to the library
+<!--
+Follow the troubleshooting procedure before opening a bug
+https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure
 
-check https://github.com/gotev/android-upload-service/wiki/Upload-Service-Testbed 
+Bug reports without relevant details will be closed. Time is precious for everybody.
 -->
 
 **Describe the bug**
@@ -51,3 +50,6 @@ If applicable, add screenshots to help explain your problem.
 ```
 // your debug log
 ```
+
+**Other info**:
+<!-- For example, URL to a demo project where the issue is replicated -->
