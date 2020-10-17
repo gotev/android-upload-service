@@ -9,6 +9,7 @@
 | Still using 3.x ? | It's not maintained or supported. You may have security issues and problems with newer Androids. Switch to 4.x |
 | :collision: | It's not working? Keep calm and follow the [troubleshooting procedure](https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure) |
 | :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) Read this to discover all the possibilities |
+| :gift: | Find this library useful? Consider sponsoring its development by pressing the Sponsor button on the top right of this page. |
 | :heart: | [Contributing](CONTRIBUTING.md) |
 | :star2: | [Features](#features) |
 | :raising_hand: | [Who is using Upload Service](#powered) |
