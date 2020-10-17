@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 ./gradlew clean test publish bintrayUpload
 
 version=$(cat manifest.gradle | grep "library_version" | tr "'" '\n' | head -n 2 | tail -n 1)
