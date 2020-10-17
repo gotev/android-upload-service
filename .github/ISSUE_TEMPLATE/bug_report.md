@@ -12,6 +12,9 @@ Follow the troubleshooting procedure before opening a bug
 https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure
 
 Bug reports without relevant details will be closed. Time is precious for everybody.
+
+Good and precise bug reports help improve the library fast and make it easier for everybody.
+Complaints are not useful.
 -->
 
 **Describe the bug**
