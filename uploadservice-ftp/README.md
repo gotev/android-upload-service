@@ -4,28 +4,25 @@ FTP Upload for Android Upload Service
 This module adds FTP upload ([RFC959](https://tools.ietf.org/html/rfc959)) capability to Android Upload Service. It wraps [Apache Commons Net FTP](https://commons.apache.org/proper/commons-net/dependency-info.html) library.
 
 ## Setup
-Refer to [UploadService Setup](https://github.com/gotev/android-upload-service/wiki/Setup) to get the latest upload service version
+Refer to the [Getting Started](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) guide to get the latest upload service version.
+
+Add the following to your dependencies:
 ```groovy
-compile "net.gotev:uploadservice-ftp:$uploadServiceVersion"
+implementation "net.gotev:uploadservice-ftp:$uploadServiceVersion"
 ```
 
 ## Minimal example
-```java
-public void uploadFTP(final Context context) {
-    try {
-        String uploadId =
-          new FTPUploadRequest(context, "my.ftpserver.com", 21)
-            .setUsernameAndPassword("ftpuser", "testpassword")
-            .addFileToUpload("/absolute/path/to/file", "/remote/path")
-            .setNotificationConfig(new UploadNotificationConfig())
-            .setMaxRetries(4)
-            .startUpload();
-    } catch (Exception exc) {
-        Log.e("AndroidUploadService", exc.getMessage(), exc);
-    }
-}
+
+Example in kotlin:
+```kotlin
+FTPUploadRequest(context, "my.ftpserver.com", 21)
+    .setUsernameAndPassword("ftpuser", "testpassword")
+    .addFileToUpload("/absolute/path/to/file", "/remote/path")
+    .startUpload();
 ```
-Refer to [FTPUploadRequest JavaDoc](http://gotev.github.io/android-upload-service/javadoc-ftp/net/gotev/uploadservice/ftp/FTPUploadRequest.html) for all the available features.
+Check the FTPUploadRequest class and its docs for all the available features. To monitor upload progress and status, check: https://github.com/gotev/android-upload-service/wiki/Monitor-Uploads
+
+> By default, the global [notification configuration](https://github.com/gotev/android-upload-service/wiki/Configuration#notifications) and [retry policy](https://github.com/gotev/android-upload-service/wiki/Configuration#retry-policy) will be applied. You can override both in each request using `setNotificationConfig` and `setMaxRetries` methods.
 
 ## Test FTP server
 If you don't already have an FTP server to make tests, no worries. You only need docker installed
