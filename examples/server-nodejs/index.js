@@ -58,7 +58,8 @@ function getEndpoints(ipAddress) {
            "HTTP/Multipart (Basic Auth): http://" + ipAddress + ":" + SERVER_PORT + "/upload/multipart-ba\n" +
            "Binary:                      http://" + ipAddress + ":" + SERVER_PORT + "/upload/binary\n" +
            "Binary (Basic Auth):         http://" + ipAddress + ":" + SERVER_PORT + "/upload/binary-ba\n" +
-           "401 Forbidden:               http://" + ipAddress + ":" + SERVER_PORT + "/upload/forbidden\n"
+           "401 Forbidden:               http://" + ipAddress + ":" + SERVER_PORT + "/upload/forbidden\n" +
+           "Validate Content Length:     http://" + ipAddress + ":" + SERVER_PORT + "/upload/validate-content-length\n"
 }
 
 function printAvailableEndpoints() {
@@ -157,6 +158,28 @@ app.post('/upload/forbidden', function(req, res) {
     res.json({
         success: false,
         message: "this endpoint always returns 401! It's for testing only"
+    });
+});
+
+app.post('/upload/validate-content-length', function(req, res) {
+    var expected_length = parseInt(req.headers['content-length'], 10);
+    var actual_length = 0;
+
+    req.on('data', function (chunk) {
+        actual_length += chunk.length;
+    });
+
+    req.on('end', function() {
+        var success = expected_length == actual_length;
+        console.log('/upload/validate-content-length -> ' + (success ? 'OK!' : 'KO') + ', expected: ' + expected_length + ', actual: ' + actual_length);
+        res.status(success ? 200 : 400);
+        res.json({
+            success: success,
+            data: {
+                expected: expected_length,
+                actual: actual_length
+            }
+        })
     });
 });
 
