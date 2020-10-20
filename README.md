@@ -16,6 +16,8 @@
 | :mega: | [Credits](#credits)
 | :scroll: | [License](#license)
 
+Screencasts from the example app included in this repository:
+
 ![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
@@ -34,7 +36,11 @@
 * Possibility to implement your own notification handler
 * Lifecycle-Aware RequestObserver to monitor your uploads
 
-At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. Read further to learn how you can use it in your App.
+At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. You are safe launching upload requests from your fragments, activities and services without worrying about locking the thread in which you are. Read further to learn how you can use it in your App.
+
+You are also safe if your app is put in the background. All the uploads will continue to be executed also when your device is idle.
+
+Bear in mind that if you kill your app, the service gets killed as well, as it's attached to your app's process and all the currently running uploads will be terminated abruptly.
 
 ## Powered by Android Upload Service <a name="powered"></a>
 Apps and libraries powered by this library. To be included in the following list, simply create an issue and provide the app name and a link.
