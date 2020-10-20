@@ -36,7 +36,7 @@ Screencasts from the example app included in this repository:
 * Possibility to implement your own notification handler
 * Lifecycle-Aware RequestObserver to monitor your uploads
 
-At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. You are safe launching upload requests from your fragments, activities and services without worrying about locking the thread in which you are. Read further to learn how you can use it in your App.
+At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. You are safe launching upload requests from your fragments, activities and services without worrying about locking the thread in which you are. [Check the wiki](https://github.com/gotev/android-upload-service/wiki) to learn how you can use it in your App.
 
 You are also safe if your app is put in the background. All the uploads will continue to be executed also when your device is idle.
 
