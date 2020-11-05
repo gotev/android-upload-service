@@ -66,7 +66,7 @@ public class BaseActivity extends AppCompatActivity {
         progressActions.add(cancelAction);
 
         UploadNotificationStatusConfig progress = new UploadNotificationStatusConfig(
-                getString(title),
+                getString(title) + ": " + CustomPlaceholdersProcessor.FILENAME_PLACEHOLDER,
                 getString(R.string.uploading),
                 R.drawable.ic_upload,
                 Color.BLUE,
@@ -78,7 +78,7 @@ public class BaseActivity extends AppCompatActivity {
         );
 
         UploadNotificationStatusConfig success = new UploadNotificationStatusConfig(
-                getString(title),
+                getString(title) + ": " + CustomPlaceholdersProcessor.FILENAME_PLACEHOLDER,
                 getString(R.string.upload_success),
                 R.drawable.ic_upload_success,
                 Color.GREEN,
@@ -90,7 +90,7 @@ public class BaseActivity extends AppCompatActivity {
         );
 
         UploadNotificationStatusConfig error = new UploadNotificationStatusConfig(
-                getString(title),
+                getString(title) + ": " + CustomPlaceholdersProcessor.FILENAME_PLACEHOLDER,
                 getString(R.string.upload_error),
                 R.drawable.ic_upload_error,
                 Color.RED,
@@ -102,7 +102,7 @@ public class BaseActivity extends AppCompatActivity {
         );
 
         UploadNotificationStatusConfig cancelled = new UploadNotificationStatusConfig(
-                getString(title),
+                getString(title) + ": " + CustomPlaceholdersProcessor.FILENAME_PLACEHOLDER,
                 getString(R.string.upload_cancelled),
                 R.drawable.ic_cancelled,
                 Color.YELLOW,

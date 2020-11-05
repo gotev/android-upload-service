@@ -47,6 +47,10 @@ public class App extends Application {
         // setup backoff multiplier
         UploadServiceConfig.setRetryPolicy(new RetryPolicyConfig(1, 10, 2, 3));
 
+        // you can add also your own custom placeholders to be used in notification titles and
+        // messages
+        UploadServiceConfig.setPlaceholdersProcessor(new CustomPlaceholdersProcessor());
+
         // Uncomment to experiment Single Notification Handler
         // UploadServiceConfig.setNotificationHandlerFactory(ExampleSingleNotificationHandler::new);
 

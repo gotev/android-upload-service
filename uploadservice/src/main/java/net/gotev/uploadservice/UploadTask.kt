@@ -70,7 +70,7 @@ abstract class UploadTask : Runnable {
             startTime = startTime,
             uploadedBytes = uploadedBytes,
             totalBytes = totalBytes,
-            numberOfRetries = attempts - 1,
+            numberOfRetries = attempts,
             files = params.files
         )
 
@@ -127,7 +127,7 @@ abstract class UploadTask : Runnable {
     override fun run() {
         doForEachObserver {
             onStart(
-                UploadInfo(params.id),
+                uploadInfo,
                 notificationId,
                 params.notificationConfig
             )
