@@ -1,7 +1,6 @@
 package net.gotev.uploadservice
 
 import android.content.Context
-import android.os.Parcelable
 import androidx.lifecycle.LifecycleOwner
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadNotificationConfig
@@ -9,6 +8,7 @@ import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.extensions.startNewUpload
 import net.gotev.uploadservice.observer.request.RequestObserver
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate
+import net.gotev.uploadservice.persistence.PersistableData
 import java.util.ArrayList
 import java.util.UUID
 
@@ -52,15 +52,16 @@ constructor(protected val context: Context, protected var serverUrl: String) {
      */
     open fun startUpload(): String {
         return context.startNewUpload(
-            taskClass, UploadTaskParameters(
+            taskClass = taskClass,
+            params = UploadTaskParameters(
                 uploadId,
                 serverUrl,
                 maxRetries,
                 autoDeleteSuccessfullyUploadedFiles,
-                notificationConfig(context, uploadId),
                 files,
                 getAdditionalParameters()
-            )
+            ),
+            notificationConfig = notificationConfig(context, uploadId)
         )
     }
 
@@ -82,7 +83,7 @@ constructor(protected val context: Context, protected var serverUrl: String) {
         return RequestObserver(context, lifecycleOwner, delegate).apply { subscribe(this@UploadRequest) }
     }
 
-    protected abstract fun getAdditionalParameters(): Parcelable
+    protected abstract fun getAdditionalParameters(): PersistableData
 
     @Suppress("UNCHECKED_CAST")
     protected fun self(): B {

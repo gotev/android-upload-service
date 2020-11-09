@@ -7,6 +7,7 @@ import android.os.Build
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.UploadTask
+import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.logger.UploadServiceLogger.NA
@@ -15,16 +16,22 @@ import net.gotev.uploadservice.observer.task.UploadTaskObserver
 // constants used in the intent which starts this service
 private const val taskParametersKey = "taskParameters"
 private const val taskClassKey = "taskClass"
+private const val taskNotificationConfig = "taskUploadConfig"
 
 private const val actionKey = "action"
 private const val uploadIdKey = "uploadId"
 private const val cancelUploadAction = "cancelUpload"
 
-fun Context.startNewUpload(taskClass: Class<out UploadTask>, params: UploadTaskParameters): String {
+fun Context.startNewUpload(
+    taskClass: Class<out UploadTask>,
+    params: UploadTaskParameters,
+    notificationConfig: UploadNotificationConfig
+): String {
     val intent = Intent(this, UploadService::class.java).apply {
         action = UploadServiceConfig.uploadAction
         putExtra(taskClassKey, taskClass.name)
         putExtra(taskParametersKey, params)
+        putExtra(taskNotificationConfig, notificationConfig)
     }
 
     if (Build.VERSION.SDK_INT >= 26) {
@@ -36,7 +43,11 @@ fun Context.startNewUpload(taskClass: Class<out UploadTask>, params: UploadTaskP
     return params.id
 }
 
-typealias UploadTaskCreationParameters = Pair<Class<out UploadTask>, UploadTaskParameters>
+data class UploadTaskCreationParameters(
+    val taskClass: Class<out UploadTask>,
+    val params: UploadTaskParameters,
+    val notificationConfig: UploadNotificationConfig
+)
 
 @Suppress("UNCHECKED_CAST")
 fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
@@ -67,7 +78,16 @@ fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
         return null
     }
 
-    return UploadTaskCreationParameters(taskClass as Class<out UploadTask>, params)
+    val notificationConfig: UploadNotificationConfig = getParcelableExtra(taskNotificationConfig) ?: run {
+        UploadServiceLogger.error(UploadService.TAG, NA) { "Error while instantiating new task. Missing notification config." }
+        return null
+    }
+
+    return UploadTaskCreationParameters(
+        taskClass = taskClass as Class<out UploadTask>,
+        params = params,
+        notificationConfig = notificationConfig
+    )
 }
 
 /**
@@ -81,16 +101,17 @@ fun Context.getUploadTask(
     vararg observers: UploadTaskObserver
 ): UploadTask? {
     return try {
-        val uploadTask = creationParameters.first.newInstance().apply {
+        val uploadTask = creationParameters.taskClass.newInstance().apply {
             init(
                 context = this@getUploadTask,
-                taskParams = creationParameters.second,
+                taskParams = creationParameters.params,
+                notificationConfig = creationParameters.notificationConfig,
                 notificationId = notificationId,
-                taskObservers = *observers
+                taskObservers = observers
             )
         }
 
-        UploadServiceLogger.debug(UploadService.TAG, NA) { "Successfully created new task with class: ${creationParameters.first.name}" }
+        UploadServiceLogger.debug(UploadService.TAG, NA) { "Successfully created new task with class: ${creationParameters.taskClass.name}" }
         uploadTask
     } catch (exc: Throwable) {
         UploadServiceLogger.error(UploadService.TAG, NA, exc) { "Error while instantiating new task" }
