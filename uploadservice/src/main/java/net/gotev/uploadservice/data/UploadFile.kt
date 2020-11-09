@@ -26,7 +26,7 @@ data class UploadFile @JvmOverloads constructor(
         override fun createFromPersistableData(data: PersistableData) = UploadFile(
             path = data.getString(CodingKeys.path),
             properties = LinkedHashMap<String, String>().apply {
-                val bundle = data.getData(CodingKeys.properties).asBundle()
+                val bundle = data.getData(CodingKeys.properties).toBundle()
                 bundle.keySet().forEach { propKey ->
                     put(propKey, bundle.getString(propKey)!!)
                 }
@@ -46,7 +46,7 @@ data class UploadFile @JvmOverloads constructor(
             properties[successfulUpload] = value.toString()
         }
 
-    override fun asPersistableData() = PersistableData().apply {
+    override fun toPersistableData() = PersistableData().apply {
         putString(CodingKeys.path, path)
         putData(CodingKeys.properties, PersistableData().apply {
             properties.entries.forEach { (propKey, propVal) ->

@@ -32,7 +32,7 @@ open class PersistableData() : Parcelable {
     override fun describeContents() = 0
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
-        asBundle().writeToParcel(dest, flags)
+        toBundle().writeToParcel(dest, flags)
     }
 
     companion object CREATOR : Parcelable.Creator<PersistableData> {
@@ -127,7 +127,7 @@ open class PersistableData() : Parcelable {
         return outList
     }
 
-    fun asBundle() = Bundle().also { bundle ->
+    fun toBundle() = Bundle().also { bundle ->
         data.keys.forEach { key ->
             when (val value = data[key]) {
                 is Boolean -> bundle.putBoolean(key, value)
@@ -139,7 +139,7 @@ open class PersistableData() : Parcelable {
         }
     }
 
-    fun asJson() = JSONObject().also { json ->
+    fun toJson() = JSONObject().also { json ->
         data.keys.forEach { key ->
             when (val value = data[key]) {
                 is Boolean, is Double, is Int, is Long, is String -> json.put(key, value)

@@ -12,7 +12,7 @@ class DataTypesPersistableTests {
     @Test
     fun nameValue() {
         val data = NameValue(name = "key", value = "someval")
-        val persistableData = data.asPersistableData()
+        val persistableData = data.toPersistableData()
 
         assertEquals(data, NameValue.createFromPersistableData(persistableData))
     }
@@ -28,7 +28,7 @@ class DataTypesPersistableTests {
             }
         )
 
-        val persistableData = data.asPersistableData()
+        val persistableData = data.toPersistableData()
 
         assertEquals(data, UploadFile.createFromPersistableData(persistableData))
     }
@@ -42,7 +42,7 @@ class DataTypesPersistableTests {
         params.requestParameters.add(NameValue("someparam2", "someparamval2"))
         params.requestParameters.add(NameValue("someparam3", "someparamval3"))
 
-        val data = params.asPersistableData()
+        val data = params.toPersistableData()
 
         assertEquals(params, HttpUploadTaskParameters.createFromPersistableData(data))
     }
@@ -67,7 +67,7 @@ class DataTypesPersistableTests {
             )
         )
 
-        val data = params.asPersistableData()
+        val data = params.toPersistableData()
 
         assertEquals(params, UploadTaskParameters.createFromPersistableData(data))
     }
@@ -96,7 +96,7 @@ class DataTypesPersistableTests {
             }
         )
 
-        val data = params.asPersistableData()
+        val data = params.toPersistableData()
 
         assertEquals(params, UploadTaskParameters.createFromPersistableData(data))
     }

@@ -71,13 +71,13 @@ class PersistableDataTests {
 
     @Test
     fun persistableDataAsBundle() {
-        assertEqualsBundle(expectedBundle, data.asBundle())
+        assertEqualsBundle(expectedBundle, data.toBundle())
     }
 
     @Test
     fun persistableDataAsParcel() {
         val expectedParcel = expectedBundle.toParcel()
-        val actualParcel = data.asBundle().toParcel()
+        val actualParcel = data.toBundle().toParcel()
 
         assertEqualsBundle(expectedParcel.readBundle()!!, actualParcel.readBundle()!!)
     }
@@ -246,7 +246,7 @@ class PersistableDataTests {
         val extractedData = data.getData("nested")
 
         assertEquals(nestedData, extractedData)
-        assertEqualsBundle(expectedBundle, data.asBundle())
+        assertEqualsBundle(expectedBundle, data.toBundle())
     }
 
     @Test
@@ -278,7 +278,7 @@ class PersistableDataTests {
             putInt("23", 231)
         }
 
-        assertEqualsBundle(expectedBundle, data.asBundle())
+        assertEqualsBundle(expectedBundle, data.toBundle())
 
         val extractedData = data.getArrayData("nested")
         assertEquals(nestedList, extractedData)
@@ -373,7 +373,7 @@ class PersistableDataTests {
             putArrayData("nested", nestedList)
             putString("Hey", "hoData")
             putInt("23", 231)
-        }.asJson()
+        }.toJson()
 
         expectedJson.assertEquals(JSONObject(actualJson))
     }
@@ -398,6 +398,6 @@ class PersistableDataTests {
             putInt("23", 231)
         }
 
-        assertEquals(expectedData, PersistableData.fromJson(expectedData.asJson()))
+        assertEquals(expectedData, PersistableData.fromJson(expectedData.toJson()))
     }
 }

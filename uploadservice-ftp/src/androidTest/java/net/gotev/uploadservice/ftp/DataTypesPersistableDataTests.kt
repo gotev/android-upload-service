@@ -19,7 +19,7 @@ class DataTypesPersistableDataTests {
             secureSocketProtocol = "someProto"
         )
 
-        val data = params.asPersistableData()
+        val data = params.toPersistableData()
 
         assertEquals(params, FTPUploadTaskParameters.createFromPersistableData(data))
     }
@@ -39,7 +39,7 @@ class DataTypesPersistableDataTests {
             secureSocketProtocol = "someProto"
         )
 
-        val data = params.asPersistableData()
+        val data = params.toPersistableData()
 
         assertEquals(params, FTPUploadTaskParameters.createFromPersistableData(data))
     }

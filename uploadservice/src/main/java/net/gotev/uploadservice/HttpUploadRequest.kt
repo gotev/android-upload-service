@@ -23,7 +23,7 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
         require(serverUrl.isValidHttpUrl()) { "Specify either http:// or https:// as protocol" }
     }
 
-    override fun getAdditionalParameters() = httpParams.asPersistableData()
+    override fun getAdditionalParameters() = httpParams.toPersistableData()
 
     /**
      * Adds a header to this upload request.

@@ -15,13 +15,13 @@ data class UploadTaskParameters(
     val files: ArrayList<UploadFile>,
     val additionalParameters: PersistableData? = null
 ) : Parcelable, Persistable {
-    override fun asPersistableData() = PersistableData().apply {
+    override fun toPersistableData() = PersistableData().apply {
         putString(CodingKeys.taskClass, taskClass)
         putString(CodingKeys.id, id)
         putString(CodingKeys.serverUrl, serverUrl)
         putInt(CodingKeys.maxRetries, maxRetries)
         putBoolean(CodingKeys.autoDeleteFiles, autoDeleteSuccessfullyUploadedFiles)
-        putArrayData(CodingKeys.files, files.map { it.asPersistableData() })
+        putArrayData(CodingKeys.files, files.map { it.toPersistableData() })
         additionalParameters?.let { putData(CodingKeys.params, it) }
     }
 

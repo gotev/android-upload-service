@@ -71,7 +71,7 @@ data class FTPUploadTaskParameters(
         )
     }
 
-    override fun asPersistableData() = PersistableData().apply {
+    override fun toPersistableData() = PersistableData().apply {
         putInt(CodingKeys.port, port)
         putString(CodingKeys.username, username)
         putString(CodingKeys.password, password)

@@ -24,7 +24,7 @@ class FTPUploadRequest(context: Context, serverUrl: String, port: Int) :
         require(port > 0) { "Specify valid FTP port!" }
     }
 
-    override fun getAdditionalParameters() = ftpParams.asPersistableData()
+    override fun getAdditionalParameters() = ftpParams.toPersistableData()
 
     /**
      * Set the credentials used to login on the FTP Server.

@@ -16,7 +16,7 @@ data class NameValue(val name: String, val value: String) : Parcelable, Persista
         return this
     }
 
-    override fun asPersistableData() = PersistableData().apply {
+    override fun toPersistableData() = PersistableData().apply {
         putString(CodingKeys.name, name)
         putString(CodingKeys.value, value)
     }

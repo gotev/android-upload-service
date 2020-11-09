@@ -2,7 +2,6 @@ package net.gotev.uploadservice.data
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
-import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.persistence.Persistable
 import net.gotev.uploadservice.persistence.PersistableData
 import java.util.ArrayList
@@ -26,29 +25,29 @@ data class HttpUploadTaskParameters(
             const val parameters = "params"
         }
 
-        private fun List<PersistableData>.asNameValueArrayList() =
+        private fun List<PersistableData>.toNameValueArrayList() =
             ArrayList(map { NameValue.createFromPersistableData(it) })
 
         override fun createFromPersistableData(data: PersistableData) = HttpUploadTaskParameters(
             method = data.getString(CodingKeys.method),
             usesFixedLengthStreamingMode = data.getBoolean(CodingKeys.fixedLength),
             requestHeaders = try {
-                data.getArrayData(CodingKeys.headers).asNameValueArrayList()
+                data.getArrayData(CodingKeys.headers).toNameValueArrayList()
             } catch (exc: Throwable) {
                 ArrayList()
             },
             requestParameters = try {
-                data.getArrayData(CodingKeys.parameters).asNameValueArrayList()
+                data.getArrayData(CodingKeys.parameters).toNameValueArrayList()
             } catch (exc: Throwable) {
                 ArrayList()
             }
         )
     }
 
-    override fun asPersistableData() = PersistableData().apply {
+    override fun toPersistableData() = PersistableData().apply {
         putString(CodingKeys.method, method)
         putBoolean(CodingKeys.fixedLength, usesFixedLengthStreamingMode)
-        putArrayData(CodingKeys.headers, requestHeaders.map { it.asPersistableData() })
-        putArrayData(CodingKeys.parameters, requestParameters.map { it.asPersistableData() })
+        putArrayData(CodingKeys.headers, requestHeaders.map { it.toPersistableData() })
+        putArrayData(CodingKeys.parameters, requestParameters.map { it.toPersistableData() })
     }
 }
