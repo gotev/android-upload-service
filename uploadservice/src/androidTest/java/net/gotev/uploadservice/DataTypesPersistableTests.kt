@@ -50,6 +50,7 @@ class DataTypesPersistableTests {
     @Test
     fun uploadTaskParameters() {
         val params = UploadTaskParameters(
+            taskClass = "net.gotev.someclass",
             id = "abcd",
             serverUrl = "https://server.url",
             maxRetries = 3,
@@ -74,6 +75,7 @@ class DataTypesPersistableTests {
     @Test
     fun uploadTaskParameters2() {
         val params = UploadTaskParameters(
+            taskClass = "net.gotev.someclass",
             id = "abcd",
             serverUrl = "https://server.url",
             maxRetries = 3,

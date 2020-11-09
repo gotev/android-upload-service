@@ -2,6 +2,7 @@ package net.gotev.uploadservice.data
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.persistence.Persistable
 import net.gotev.uploadservice.persistence.PersistableData
 import java.util.ArrayList
@@ -31,8 +32,16 @@ data class HttpUploadTaskParameters(
         override fun createFromPersistableData(data: PersistableData) = HttpUploadTaskParameters(
             method = data.getString(CodingKeys.method),
             usesFixedLengthStreamingMode = data.getBoolean(CodingKeys.fixedLength),
-            requestHeaders = data.getArrayData(CodingKeys.headers).asNameValueArrayList(),
-            requestParameters = data.getArrayData(CodingKeys.parameters).asNameValueArrayList()
+            requestHeaders = try {
+                data.getArrayData(CodingKeys.headers).asNameValueArrayList()
+            } catch (exc: Throwable) {
+                ArrayList()
+            },
+            requestParameters = try {
+                data.getArrayData(CodingKeys.parameters).asNameValueArrayList()
+            } catch (exc: Throwable) {
+                ArrayList()
+            }
         )
     }
 

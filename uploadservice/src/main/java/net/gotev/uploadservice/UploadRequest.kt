@@ -52,14 +52,14 @@ constructor(protected val context: Context, protected var serverUrl: String) {
      */
     open fun startUpload(): String {
         return context.startNewUpload(
-            taskClass = taskClass,
             params = UploadTaskParameters(
-                uploadId,
-                serverUrl,
-                maxRetries,
-                autoDeleteSuccessfullyUploadedFiles,
-                files,
-                getAdditionalParameters()
+                taskClass = taskClass.name,
+                id = uploadId,
+                serverUrl = serverUrl,
+                maxRetries = maxRetries,
+                autoDeleteSuccessfullyUploadedFiles = autoDeleteSuccessfullyUploadedFiles,
+                files = files,
+                additionalParameters = getAdditionalParameters()
             ),
             notificationConfig = notificationConfig(context, uploadId)
         )
