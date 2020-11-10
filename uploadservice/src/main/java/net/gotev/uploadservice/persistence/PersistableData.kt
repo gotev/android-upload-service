@@ -7,6 +7,17 @@ import android.os.Parcelable
 import org.json.JSONObject
 import java.lang.IllegalArgumentException
 
+/**
+ * Utility class used to be able to easily serialize/deserialize complex and nested data using
+ * only a flat key - value map. It has been created specifically for the use cases present in this
+ * library. Its purpose is to be able to serialize/deserialize upload requests.
+ *
+ * It supports serialization and deserialization from:
+ * - Bundle
+ * - Parcel
+ * - Json
+ * - PersistableData
+ */
 open class PersistableData() : Parcelable {
     protected val data = HashMap<String, Any>()
 
@@ -40,6 +51,10 @@ open class PersistableData() : Parcelable {
         override fun createFromParcel(parcel: Parcel) = PersistableData(parcel)
         override fun newArray(size: Int): Array<PersistableData?> = arrayOfNulls(size)
 
+        /**
+         * Creates a [PersistableData] from a PersistableData JSON representation.
+         */
+        @JvmStatic
         fun fromJson(rawJsonString: String): PersistableData {
             val json = JSONObject(rawJsonString)
             val data = PersistableData()
@@ -127,6 +142,9 @@ open class PersistableData() : Parcelable {
         return outList
     }
 
+    /**
+     * Creates a new bundle containing all the fields present in this [PersistableData].
+     */
     fun toBundle() = Bundle().also { bundle ->
         data.keys.forEach { key ->
             when (val value = data[key]) {
@@ -139,6 +157,10 @@ open class PersistableData() : Parcelable {
         }
     }
 
+    /**
+     * Creates a JSON string representation containing all the fields present
+     * in this [PersistableData].
+     */
     fun toJson() = JSONObject().also { json ->
         data.keys.forEach { key ->
             when (val value = data[key]) {
