@@ -85,7 +85,7 @@ open class PersistableData() : Parcelable {
 
     fun getData(key: String): PersistableData {
         val entries = data.entries.filter { it.key.startsWith("$key$separator") }
-        if (entries.isEmpty()) throw IllegalArgumentException("no data found for key \"$key\"")
+        if (entries.isEmpty()) return PersistableData()
 
         return PersistableData().also { extractedData ->
             entries.forEach { (entryKey, entryValue) ->
@@ -104,7 +104,7 @@ open class PersistableData() : Parcelable {
 
     fun getArrayData(key: String): List<PersistableData> {
         val entries = ArrayList(data.entries.filter { it.key.startsWith("$key$separator") })
-        if (entries.isEmpty()) throw IllegalArgumentException("no data found for key \"$key\"")
+        if (entries.isEmpty()) return emptyList()
 
         var index = 0
 

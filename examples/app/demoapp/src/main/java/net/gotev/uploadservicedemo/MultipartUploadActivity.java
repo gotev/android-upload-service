@@ -6,9 +6,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import net.gotev.recycleradapter.AdapterItem;
+import net.gotev.uploadservice.CreateUploadRequest;
 import net.gotev.uploadservice.data.UploadInfo;
 import net.gotev.uploadservice.network.ServerResponse;
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate;
+import net.gotev.uploadservice.persistence.PersistableData;
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest;
 import net.gotev.uploadservicedemo.adapteritems.EmptyItem;
 import net.gotev.uploadservicedemo.adapteritems.UploadItem;
@@ -71,7 +73,9 @@ public class MultipartUploadActivity extends UploadActivity {
 
             });
 
-            request.subscribe(this, this, new RequestObserverDelegate() {
+            PersistableData data = request.toPersistableData();
+
+            CreateUploadRequest.fromPersistableData(this, data).subscribe(this, this, new RequestObserverDelegate() {
                 @Override
                 public void onProgress(@NotNull Context context, @NotNull UploadInfo uploadInfo) {
                     Log.e("LIFECYCLE", "Progress " + uploadInfo.getProgressPercent());

@@ -101,6 +101,10 @@ public class FilesPickerActivity extends BaseActivity {
         // it would be "*/*".
         intent.setType("*/*");
 
+        // Get read URI permission and persistable URI permission
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
         startActivityForResult(intent, READ_REQUEST_CODE);
     }
 

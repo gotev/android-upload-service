@@ -295,12 +295,9 @@ class PersistableDataTests {
             assertTrue(exc is IllegalArgumentException)
         }
 
-        try {
-            empty.getData("nonexistent")
-            fail("should throw exception")
-        } catch (exc: Throwable) {
-            assertTrue(exc is IllegalArgumentException)
-        }
+        assertEquals(PersistableData(), empty.getData("nonexistent"))
+
+        assertEquals(emptyList<PersistableData>(), empty.getArrayData("nonexistent"))
 
         try {
             empty.getString("nonexistent")
