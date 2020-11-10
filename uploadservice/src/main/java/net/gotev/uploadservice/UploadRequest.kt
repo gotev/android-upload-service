@@ -143,9 +143,11 @@ constructor(protected val context: Context, protected var serverUrl: String) : P
 
     /**
      * Gets a [PersistableData] object representing this upload request.
+     *
      * [UploadNotificationConfig] is not included as it's not persistable. When the upload request
-     * gets recreated, [UploadServiceConfig.notificationConfigFactory] will be used by default to
-     * get an [UploadNotificationConfig] if not provided by you.
+     * gets recreated using [CreateUploadRequest], [UploadServiceConfig.notificationConfigFactory]
+     * will be used by default to get an [UploadNotificationConfig]. You can override it using
+     * [CreateUploadRequest.setNotificationConfig] method.
      *
      * @return [PersistableData] object representing this upload
      */

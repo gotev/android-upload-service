@@ -64,7 +64,8 @@ class DataTypesPersistableTests {
                     "propwow" to "valwow",
                     "otherpropwow" to "othervalwow"
                 ))
-            )
+            ),
+            additionalParameters = PersistableData()
         )
 
         val data = params.toPersistableData()

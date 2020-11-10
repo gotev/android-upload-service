@@ -13,7 +13,7 @@ data class UploadTaskParameters(
     val maxRetries: Int,
     val autoDeleteSuccessfullyUploadedFiles: Boolean,
     val files: ArrayList<UploadFile>,
-    val additionalParameters: PersistableData? = null
+    val additionalParameters: PersistableData
 ) : Parcelable, Persistable {
     override fun toPersistableData() = PersistableData().apply {
         putString(CodingKeys.taskClass, taskClass)
@@ -22,7 +22,7 @@ data class UploadTaskParameters(
         putInt(CodingKeys.maxRetries, maxRetries)
         putBoolean(CodingKeys.autoDeleteFiles, autoDeleteSuccessfullyUploadedFiles)
         putArrayData(CodingKeys.files, files.map { it.toPersistableData() })
-        additionalParameters?.let { putData(CodingKeys.params, it) }
+        putData(CodingKeys.params, additionalParameters)
     }
 
     companion object : Persistable.Creator<UploadTaskParameters> {
@@ -43,11 +43,7 @@ data class UploadTaskParameters(
             maxRetries = data.getInt(CodingKeys.maxRetries),
             autoDeleteSuccessfullyUploadedFiles = data.getBoolean(CodingKeys.autoDeleteFiles),
             files = ArrayList(data.getArrayData(CodingKeys.files).map { UploadFile.createFromPersistableData(it) }),
-            additionalParameters = try {
-                data.getData(CodingKeys.params)
-            } catch (exc: Throwable) {
-                null
-            }
+            additionalParameters = data.getData(CodingKeys.params)
         )
     }
 }
