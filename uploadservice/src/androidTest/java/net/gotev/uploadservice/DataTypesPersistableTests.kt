@@ -6,7 +6,6 @@ import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.persistence.PersistableData
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
 import org.junit.Test
 
 class DataTypesPersistableTests {
@@ -101,10 +100,5 @@ class DataTypesPersistableTests {
         val data = params.toPersistableData()
 
         assertEquals(params, UploadTaskParameters.createFromPersistableData(data))
-    }
-
-    @Test
-    fun programmaticAndroidTestFailure() {
-        fail("this is to test failure on CI")
     }
 }

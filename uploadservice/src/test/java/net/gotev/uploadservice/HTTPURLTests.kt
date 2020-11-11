@@ -1,7 +1,6 @@
 package net.gotev.uploadservice
 
 import net.gotev.uploadservice.extensions.isValidHttpUrl
-import org.junit.Assert
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -35,10 +34,5 @@ class HTTPURLTests {
     @Test
     fun `missing protocol url`() {
         assertFalse("gotev.net".isValidHttpUrl())
-    }
-
-    @Test
-    fun programmaticUnitTestFailure() {
-        Assert.fail("this is to test failure on CI")
     }
 }
