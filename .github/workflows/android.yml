@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  test:
+  android-test:
     runs-on: macos-latest
   
     steps:
@@ -21,7 +21,7 @@ jobs:
         api-level: 29
         script: ./gradlew connectedCheck
   
-  build:
+  unit-test-and-build:
     runs-on: ubuntu-latest
 
     steps:
