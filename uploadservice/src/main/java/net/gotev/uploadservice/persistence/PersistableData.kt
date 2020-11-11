@@ -30,7 +30,7 @@ open class PersistableData() : Parcelable {
     override fun hashCode() = data.hashCode()
 
     @SuppressLint("ParcelClassLoader")
-    private constructor(parcel: Parcel): this() {
+    private constructor(parcel: Parcel) : this() {
         parcel.readBundle()?.let { bundle ->
             bundle.keySet().forEach { key ->
                 when (val value = bundle[key]) {
