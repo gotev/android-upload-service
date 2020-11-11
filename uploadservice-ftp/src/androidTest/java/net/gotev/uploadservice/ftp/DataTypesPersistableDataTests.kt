@@ -1,5 +1,6 @@
 package net.gotev.uploadservice.ftp
 
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -42,5 +43,10 @@ class DataTypesPersistableDataTests {
         val data = params.toPersistableData()
 
         assertEquals(params, FTPUploadTaskParameters.createFromPersistableData(data))
+    }
+
+    @Test
+    fun programmaticFTPAndroidTestFailure() {
+        Assert.fail("this is to test failure on CI")
     }
 }
