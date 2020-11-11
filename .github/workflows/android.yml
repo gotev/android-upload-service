@@ -17,5 +17,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Unit Test
+      run: ./gradlew testDebugUnitTest
+    - name: Android Test Report
+      uses: asadmansr/android-test-report-action@v1.2.0
+      if: ${{ always() }} # IMPORTANT: run Android Test Report regardless of result
     - name: Build with Gradle
       run: ./gradlew clean build
