@@ -38,15 +38,15 @@ class CreateUploadRequestTests {
         val multipartUploadData = MultipartUploadRequest(context, "https://my.server.com")
             .addFileToUpload(
                 filePath = "/path/to/file",
-                parameterName = "file",
-                fileName = "testing",
+                parameterName = "file$",
+                fileName = "testing$",
                 contentType = "application/octet-stream"
             ).addHeader(
-                headerName = "myHeader",
-                headerValue = "myHeaderValue"
+                headerName = "myHeader$",
+                headerValue = "myHeaderValue$"
             ).addParameter(
-                paramName = "myParam",
-                paramValue = "myParamValue"
+                paramName = "myParam$",
+                paramValue = "myParamValue$"
             ).toPersistableData()
 
         assertRecreatedUploadRequestIsEqualTo(context, multipartUploadData)
@@ -92,8 +92,8 @@ class CreateUploadRequestTests {
         val binaryUploadData = BinaryUploadRequest(context, "https://my.server.com")
             .setFileToUpload("/path/to/file")
             .addHeader(
-                headerName = "headerName",
-                headerValue = "headerValue"
+                headerName = "headerName$",
+                headerValue = "headerValue$"
             ).toPersistableData()
 
         assertRecreatedUploadRequestIsEqualTo(context, binaryUploadData)
