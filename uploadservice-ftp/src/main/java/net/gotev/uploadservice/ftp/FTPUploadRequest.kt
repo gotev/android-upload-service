@@ -1,7 +1,6 @@
 package net.gotev.uploadservice.ftp
 
 import android.content.Context
-import android.os.Parcelable
 import java.io.File
 import java.io.FileNotFoundException
 import net.gotev.uploadservice.UploadRequest
@@ -25,9 +24,7 @@ class FTPUploadRequest(context: Context, serverUrl: String, port: Int) :
         require(port > 0) { "Specify valid FTP port!" }
     }
 
-    override fun getAdditionalParameters(): Parcelable {
-        return ftpParams
-    }
+    override fun getAdditionalParameters() = ftpParams.toPersistableData()
 
     /**
      * Set the credentials used to login on the FTP Server.

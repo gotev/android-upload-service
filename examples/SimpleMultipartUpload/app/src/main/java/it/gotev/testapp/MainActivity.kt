@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity() {
             addCategory(Intent.CATEGORY_OPENABLE)
             // search for all documents available via installed storage providers
             type = "*/*"
+            // obtain permission to read and persistable permission
+            flags = (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
         }
         startActivityForResult(intent, pickFileRequestCode)
     }

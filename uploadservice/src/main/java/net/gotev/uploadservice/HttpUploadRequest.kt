@@ -1,7 +1,6 @@
 package net.gotev.uploadservice
 
 import android.content.Context
-import android.os.Parcelable
 import android.util.Base64
 import net.gotev.uploadservice.data.HttpUploadTaskParameters
 import net.gotev.uploadservice.data.NameValue
@@ -24,9 +23,7 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
         require(serverUrl.isValidHttpUrl()) { "Specify either http:// or https:// as protocol" }
     }
 
-    override fun getAdditionalParameters(): Parcelable {
-        return httpParams
-    }
+    override fun getAdditionalParameters() = httpParams.toPersistableData()
 
     /**
      * Adds a header to this upload request.

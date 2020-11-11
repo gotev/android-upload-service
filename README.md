@@ -23,15 +23,16 @@ Screencasts from the example app included in this repository:
 
 ## Features <a name="features"></a>
 * Android 5.0 (API 21) to Android 11 (API 30) support
-* tiny library. 100% Kotlin and fully interoperable with Java.
-* upload files to a server with `FTP`, `HTTP multipart/form-data` or binary requests
-* be able to easily implement other upload protocols as plugins
+* 100% Kotlin and fully interoperable with Java
+* upload files to a server with `FTP`, `HTTP multipart/form-data` or `Binary` data requests
+* upload requests can be serialized and executed later
 * handle multiple concurrent uploads in the background, even if the device is idle (Doze mode)
 * automatically retry failed uploads, with a configurable exponential backoff
+* possiblity implement other upload protocols as plugins
 * possibility to automatically delete uploaded files when the upload is successful
-* show status in the Android Notification Center (with support for [stacking notifications](http://developer.android.com/training/wearables/notifications/stacks.html)).
-* be able to change the underlying HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported. You can also implement your own.
-* be able to set library log level and to provide custom logger implementation
+* show status in the Android Notification Center.
+* change the underlying HTTP stack. Currently `HttpURLConnection` (the default) and `OkHttp` are supported. You can also implement your own.
+* set library log level and provide custom logger implementation
 * easily customize the notification with text, icons and actions for the different states
 * Possibility to implement your own notification handler
 * Lifecycle-Aware RequestObserver to monitor your uploads

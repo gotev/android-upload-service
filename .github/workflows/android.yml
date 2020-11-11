@@ -7,8 +7,21 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
 
+  android-test:
+    runs-on: macos-latest
+  
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: run tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        script: ./gradlew connectedCheck
+  
+  unit-test-and-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,5 +30,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Unit Test
+      run: ./gradlew testDebugUnitTest
+    - name: Android Test Report
+      uses: asadmansr/android-test-report-action@v1.2.0
+      if: ${{ always() }} # IMPORTANT: run Android Test Report regardless of result
     - name: Build with Gradle
       run: ./gradlew clean build
