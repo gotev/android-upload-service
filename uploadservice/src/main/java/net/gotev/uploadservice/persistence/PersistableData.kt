@@ -160,6 +160,9 @@ open class PersistableData() : Parcelable {
     /**
      * Creates a JSON string representation containing all the fields present
      * in this [PersistableData].
+     *
+     * It's not meant to be human readable, but a convenient way to pass complex
+     * structured data using a string.
      */
     fun toJson() = JSONObject().also { json ->
         data.keys.forEach { key ->

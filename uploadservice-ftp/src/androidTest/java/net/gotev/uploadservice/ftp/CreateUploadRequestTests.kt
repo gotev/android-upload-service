@@ -34,7 +34,7 @@ class CreateUploadRequestTests {
     fun ftpUploadRequest() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        val multipartUploadData = FTPUploadRequest(context, "https:://my.server.url", 1234)
+        val ftpData = FTPUploadRequest(context, "https:://my.server.url", 1234)
             .addFileToUpload(
                 filePath = "/path/to/file",
                 remotePath = "/remote/path",
@@ -51,14 +51,14 @@ class CreateUploadRequestTests {
             .setMaxRetries(2)
             .toPersistableData()
 
-        assertRecreatedUploadRequestIsEqualTo(context, multipartUploadData)
+        assertRecreatedUploadRequestIsEqualTo(context, ftpData)
     }
 
     @Test
     fun ftpUploadRequest2() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        val multipartUploadData = FTPUploadRequest(context, "https:://my.server.url", 1234)
+        val ftpData = FTPUploadRequest(context, "https:://my.server.url", 1234)
             .addFileToUpload(
                 filePath = "/path/to/file",
                 remotePath = "/remote/path",
@@ -71,14 +71,14 @@ class CreateUploadRequestTests {
             )
             .toPersistableData()
 
-        assertRecreatedUploadRequestIsEqualTo(context, multipartUploadData)
+        assertRecreatedUploadRequestIsEqualTo(context, ftpData)
     }
 
     @Test
     fun ftpUploadRequest3() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        val multipartUploadData = FTPUploadRequest(context, "https:://my.server.url", 1234)
+        val ftpData = FTPUploadRequest(context, "https:://my.server.url", 1234)
             .addFileToUpload(
                 filePath = "/path/to/file",
                 remotePath = "/remote/path",
@@ -86,6 +86,6 @@ class CreateUploadRequestTests {
             )
             .toPersistableData()
 
-        assertRecreatedUploadRequestIsEqualTo(context, multipartUploadData)
+        assertRecreatedUploadRequestIsEqualTo(context, ftpData)
     }
 }
