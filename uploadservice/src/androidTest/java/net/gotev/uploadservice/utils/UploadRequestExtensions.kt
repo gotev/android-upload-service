@@ -67,16 +67,16 @@ fun UploadRequest<*>.getBlockingResponse(context: Application, doOnProgress: ((U
     val response = resultingServerResponse
     val exception = resultingException
 
+    if (response != null) {
+        return UploadRequestStatus.Successful(response)
+    }
+
     if (exception != null && exception is UserCancelledUploadException) {
         return UploadRequestStatus.CancelledByUser()
     }
 
     if (exception != null && exception is UploadError) {
         return UploadRequestStatus.ServerError(exception.serverResponse)
-    }
-
-    if (response != null) {
-        return UploadRequestStatus.Successful(response)
     }
 
     return UploadRequestStatus.OtherError(exception!!)

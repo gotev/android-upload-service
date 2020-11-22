@@ -111,9 +111,9 @@ class MultipartUploadTest {
 
         var shutdownIsTriggered = false
 
-        val response = uploadRequest.getBlockingResponse(appContext, doOnProgress = { uploadInfo ->
+        val response = uploadRequest.getBlockingResponse(appContext, doOnProgress = { _ ->
             // shutdown server on first progress
-            if (uploadInfo.progressPercent > 0 && !shutdownIsTriggered) {
+            if (!shutdownIsTriggered) {
                 shutdownIsTriggered = true
                 mockWebServer.shutdown()
             }
