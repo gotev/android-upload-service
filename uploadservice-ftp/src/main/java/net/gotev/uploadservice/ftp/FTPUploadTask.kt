@@ -11,8 +11,9 @@ import net.gotev.uploadservice.network.ServerResponse
  */
 class FTPUploadTask : UploadTask(), FTPClientWrapper.Observer {
 
-    private val ftpParams: FTPUploadTaskParameters
-        get() = FTPUploadTaskParameters.createFromPersistableData(params.additionalParameters)
+    private val ftpParams by lazy {
+        FTPUploadTaskParameters.createFromPersistableData(params.additionalParameters)
+    }
 
     @Throws(Exception::class)
     override fun upload(httpStack: HttpStack) {

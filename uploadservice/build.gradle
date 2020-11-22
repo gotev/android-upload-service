@@ -78,6 +78,9 @@ dependencies {
     // Espresso dependencies
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidx_test_espresso_version"
 
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:$mock_web_server_version"
+    androidTestImplementation "com.squareup.okhttp3:okhttp-tls:$mock_web_server_version"
+
     // Support
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
     kapt "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version"
