@@ -19,6 +19,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.net.InetAddress
@@ -152,5 +153,9 @@ class MultipartUploadTest {
         assertEquals("POST", request.method)
         assertEquals(request.headers["Content-Length"]!!.toLong(), request.bodySize)
         assertEquals(2432, request.bodySize)
+
+        assertEquals("Bearer bearerToken", request.headers["Authorization"])
+        assertEquals("SomeUserAgent", request.headers["User-Agent"])
+        assertTrue(request.headers["Content-Type"]?.startsWith("multipart/form-data; boundary=-------UploadService") ?: false)
     }
 }
