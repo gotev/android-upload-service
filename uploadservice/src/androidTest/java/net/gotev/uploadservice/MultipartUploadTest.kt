@@ -7,6 +7,7 @@ import net.gotev.uploadservice.utils.assertContentTypeIsMultipartFormData
 import net.gotev.uploadservice.utils.assertDeclaredContentLengthMatchesPostBodySize
 import net.gotev.uploadservice.utils.assertHttpMethodIs
 import net.gotev.uploadservice.utils.baseUrl
+import net.gotev.uploadservice.utils.classEquals
 import net.gotev.uploadservice.utils.createTestFile
 import net.gotev.uploadservice.utils.createTestNotificationChannel
 import net.gotev.uploadservice.utils.deleteTestNotificationChannel
@@ -38,20 +39,21 @@ class MultipartUploadTest {
         UploadService.stop(appContext, true)
     }
 
-    private fun createMultipartUploadRequest() = MultipartUploadRequest(appContext, mockWebServer.baseUrl)
-        .setMethod("POST")
-        .setBearerAuth("bearerToken")
-        .setUsesFixedLengthStreamingMode(true)
-        .addHeader("User-Agent", "SomeUserAgent")
-        .addParameter("privacy", "1")
-        .addParameter("nsfw", "false")
-        .addParameter("name", "myfilename")
-        .addParameter("commentsEnabled", "true")
-        .addParameter("downloadEnabled", "true")
-        .addParameter("waitTranscoding", "true")
-        .addParameter("channelId", "123456")
-        .addFileToUpload(appContext.createTestFile(), "videofile")
-        .setMaxRetries(0)
+    private fun createMultipartUploadRequest() =
+        MultipartUploadRequest(appContext, mockWebServer.baseUrl)
+            .setMethod("POST")
+            .setBearerAuth("bearerToken")
+            .setUsesFixedLengthStreamingMode(true)
+            .addHeader("User-Agent", "SomeUserAgent")
+            .addParameter("privacy", "1")
+            .addParameter("nsfw", "false")
+            .addParameter("name", "myfilename")
+            .addParameter("commentsEnabled", "true")
+            .addParameter("downloadEnabled", "true")
+            .addParameter("waitTranscoding", "true")
+            .addParameter("channelId", "123456")
+            .addFileToUpload(appContext.createTestFile(), "videofile")
+            .setMaxRetries(0)
 
     @Test
     fun successfulMultipartUpload() {
@@ -61,7 +63,7 @@ class MultipartUploadTest {
 
         val responseStatus = uploadRequest.getBlockingResponse(appContext)
 
-        assertTrue(responseStatus is UploadRequestStatus.Successful)
+        responseStatus.classEquals(UploadRequestStatus.Successful::class)
         val response = (responseStatus as UploadRequestStatus.Successful).response
 
         assertEquals(200, response.code)
@@ -84,7 +86,7 @@ class MultipartUploadTest {
 
         val responseStatus = uploadRequest.getBlockingResponse(appContext)
 
-        assertTrue(responseStatus is UploadRequestStatus.ServerError)
+        responseStatus.classEquals(UploadRequestStatus.ServerError::class)
         val response = (responseStatus as UploadRequestStatus.ServerError).response
 
         assertEquals(400, response.code)
@@ -119,7 +121,7 @@ class MultipartUploadTest {
             }
         })
 
-        assertTrue(response is UploadRequestStatus.OtherError)
+        response.classEquals(UploadRequestStatus.OtherError::class)
         assertTrue((response as UploadRequestStatus.OtherError).exception is SocketException)
     }
 
@@ -143,7 +145,7 @@ class MultipartUploadTest {
             }
         })
 
-        assertTrue(response is UploadRequestStatus.CancelledByUser)
+        response.classEquals(UploadRequestStatus.CancelledByUser::class)
 
         mockWebServer.takeRequest().apply {
             assertHttpMethodIs("POST")

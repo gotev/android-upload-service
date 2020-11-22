@@ -9,9 +9,11 @@ import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.observer.request.GlobalRequestObserver
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate
+import org.junit.Assert.assertEquals
 import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.KClass
 
 sealed class UploadRequestStatus {
     class Successful(val response: ServerResponse) : UploadRequestStatus()
@@ -80,4 +82,8 @@ fun UploadRequest<*>.getBlockingResponse(context: Application, doOnProgress: ((U
     }
 
     return UploadRequestStatus.OtherError(exception!!)
+}
+
+fun UploadRequestStatus.classEquals(expected: KClass<out UploadRequestStatus>) {
+    assertEquals(expected.java.name, this::class.java.name)
 }
