@@ -131,6 +131,7 @@ class MultipartUploadTest {
         val req = MultipartUploadRequest(context, mockWebServer.url("/").toString())
             .setMethod("POST")
             .setBearerAuth("bearerToken")
+            .setUsesFixedLengthStreamingMode(true)
             .addHeader("User-Agent", "SomeUserAgent")
             .addParameter("privacy", "1")
             .addParameter("nsfw", "false")
@@ -149,6 +150,7 @@ class MultipartUploadTest {
 
         val request = mockWebServer.takeRequest()
         assertEquals("POST", request.method)
+        assertEquals(request.headers["Content-Length"]!!.toLong(), request.bodySize)
         assertEquals(2432, request.bodySize)
     }
 }
