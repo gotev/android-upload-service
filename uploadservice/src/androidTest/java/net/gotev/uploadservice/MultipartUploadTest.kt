@@ -1,11 +1,5 @@
 package net.gotev.uploadservice
 
-import android.content.Context
-import net.gotev.uploadservice.data.UploadInfo
-import net.gotev.uploadservice.exceptions.UserCancelledUploadException
-import net.gotev.uploadservice.network.ServerResponse
-import net.gotev.uploadservice.observer.request.GlobalRequestObserver
-import net.gotev.uploadservice.observer.request.RequestObserverDelegate
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
 import net.gotev.uploadservice.utils.UploadRequestStatus
 import net.gotev.uploadservice.utils.appContext
@@ -16,17 +10,14 @@ import net.gotev.uploadservice.utils.baseUrl
 import net.gotev.uploadservice.utils.createTestFile
 import net.gotev.uploadservice.utils.createTestNotificationChannel
 import net.gotev.uploadservice.utils.deleteTestNotificationChannel
-import net.gotev.uploadservice.utils.newSSLMockWebServer
 import net.gotev.uploadservice.utils.getBlockingResponse
+import net.gotev.uploadservice.utils.newSSLMockWebServer
 import okhttp3.mockwebserver.MockResponse
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.net.SocketException
-import java.util.UUID
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class MultipartUploadTest {
@@ -109,107 +100,49 @@ class MultipartUploadTest {
 
     @Test
     fun serverInterruptedMultipartUpload() {
-        mockWebServer.enqueue(MockResponse().setResponseCode(200))
+        mockWebServer.enqueue(
+            MockResponse()
+                .throttleBody(100, 10, TimeUnit.MILLISECONDS)
+                .setResponseCode(200)
+        )
 
-        val uploadId = UUID.randomUUID().toString()
+        val uploadRequest = createMultipartUploadRequest()
 
-        val uploadRequest = createMultipartUploadRequest().setUploadID(uploadId)
+        var shutdownIsTriggered = false
 
-        var resultingException: Throwable? = null
-
-        val lock = CountDownLatch(1)
-
-        val observer = GlobalRequestObserver(appContext, object : RequestObserverDelegate {
-            var shutdownIsTriggered = false
-
-            override fun onProgress(context: Context, uploadInfo: UploadInfo) {
-                // shutdown server on first progress
-                if (uploadInfo.progressPercent > 0 && !shutdownIsTriggered) {
-                    shutdownIsTriggered = true
-                    mockWebServer.shutdown()
-                }
+        val response = uploadRequest.getBlockingResponse(appContext, doOnProgress = { uploadInfo ->
+            // shutdown server on first progress
+            if (uploadInfo.progressPercent > 0 && !shutdownIsTriggered) {
+                shutdownIsTriggered = true
+                mockWebServer.shutdown()
             }
+        })
 
-            override fun onSuccess(
-                context: Context,
-                uploadInfo: UploadInfo,
-                serverResponse: ServerResponse
-            ) {
-            }
-
-            override fun onError(context: Context, uploadInfo: UploadInfo, exception: Throwable) {
-                resultingException = exception
-            }
-
-            override fun onCompleted(context: Context, uploadInfo: UploadInfo) {
-                lock.countDown()
-            }
-
-            override fun onCompletedWhileNotObserving() {
-                lock.countDown()
-            }
-        }, shouldAcceptEventsFrom = { it.uploadId == uploadId })
-
-        observer.register()
-
-        uploadRequest.startUpload()
-
-        lock.await(5000, TimeUnit.MILLISECONDS)
-
-        assertTrue(resultingException is SocketException)
-        assertEquals("Connection reset", (resultingException as SocketException).message)
+        assertTrue(response is UploadRequestStatus.OtherError)
+        assertEquals("Connection reset", (response as UploadRequestStatus.OtherError).exception.message)
     }
 
     @Test
     fun userCancelledMultipartUpload() {
-        mockWebServer.enqueue(MockResponse().setResponseCode(200))
+        mockWebServer.enqueue(
+            MockResponse()
+                .throttleBody(100, 10, TimeUnit.MILLISECONDS)
+                .setResponseCode(200)
+        )
 
-        val uploadId = UUID.randomUUID().toString()
+        val uploadRequest = createMultipartUploadRequest()
 
-        val uploadRequest = createMultipartUploadRequest().setUploadID(uploadId)
+        var cancellationIsTriggered = false
 
-        var resultingException: Throwable? = null
-
-        val lock = CountDownLatch(1)
-
-        val observer = GlobalRequestObserver(appContext, object : RequestObserverDelegate {
-            var cancellationIsTriggered = false
-
-            override fun onProgress(context: Context, uploadInfo: UploadInfo) {
-                // cancel upload on first progress
-                if (uploadInfo.progressPercent > 0 && !cancellationIsTriggered) {
-                    cancellationIsTriggered = true
-                    UploadService.stopUpload(uploadId)
-                }
+        val response = uploadRequest.getBlockingResponse(appContext, doOnProgress = { uploadInfo ->
+            // cancel upload on first progress
+            if (!cancellationIsTriggered) {
+                cancellationIsTriggered = true
+                UploadService.stopUpload(uploadInfo.uploadId)
             }
+        })
 
-            override fun onSuccess(
-                context: Context,
-                uploadInfo: UploadInfo,
-                serverResponse: ServerResponse
-            ) {
-            }
-
-            override fun onError(context: Context, uploadInfo: UploadInfo, exception: Throwable) {
-                resultingException = exception
-            }
-
-            override fun onCompleted(context: Context, uploadInfo: UploadInfo) {
-                lock.countDown()
-            }
-
-            override fun onCompletedWhileNotObserving() {
-                lock.countDown()
-            }
-        }, shouldAcceptEventsFrom = { it.uploadId == uploadId })
-
-        observer.register()
-
-        uploadRequest.startUpload()
-
-        lock.await(5000, TimeUnit.MILLISECONDS)
-
-        assertTrue(resultingException is UserCancelledUploadException)
+        assertTrue(response is UploadRequestStatus.CancelledByUser)
 
         mockWebServer.takeRequest().apply {
             assertHttpMethodIs("POST")
