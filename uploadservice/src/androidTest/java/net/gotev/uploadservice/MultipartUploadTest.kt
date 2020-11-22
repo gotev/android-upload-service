@@ -152,7 +152,6 @@ class MultipartUploadTest {
         val request = mockWebServer.takeRequest()
         assertEquals("POST", request.method)
         assertEquals(request.headers["Content-Length"]!!.toLong(), request.bodySize)
-        assertEquals(2432, request.bodySize)
 
         assertEquals("Bearer bearerToken", request.headers["Authorization"])
         assertEquals("SomeUserAgent", request.headers["User-Agent"])
