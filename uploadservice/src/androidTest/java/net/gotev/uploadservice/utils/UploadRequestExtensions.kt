@@ -18,7 +18,7 @@ sealed class UploadRequestStatus {
     class OtherError(val exception: Throwable) : UploadRequestStatus()
 }
 
-fun UploadRequest<*>.runBlocking(context: Application): UploadRequestStatus {
+fun UploadRequest<*>.getBlockingResponse(context: Application): UploadRequestStatus {
     val lock = CountDownLatch(1)
 
     var resultingException: Throwable? = null

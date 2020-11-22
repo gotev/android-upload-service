@@ -8,7 +8,7 @@ import net.gotev.uploadservice.utils.createTestFile
 import net.gotev.uploadservice.utils.createTestNotificationChannel
 import net.gotev.uploadservice.utils.deleteTestNotificationChannel
 import net.gotev.uploadservice.utils.newSSLMockWebServer
-import net.gotev.uploadservice.utils.runBlocking
+import net.gotev.uploadservice.utils.getBlockingResponse
 import okhttp3.mockwebserver.MockResponse
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -53,7 +53,7 @@ class MultipartUploadTest {
             .addFileToUpload(appContext.createTestFile(), "videofile")
             .setMaxRetries(0)
 
-        val responseStatus = uploadRequest.runBlocking(appContext)
+        val responseStatus = uploadRequest.getBlockingResponse(appContext)
 
         assertTrue(responseStatus is UploadRequestStatus.Successful)
         val response = (responseStatus as UploadRequestStatus.Successful).response
@@ -92,7 +92,7 @@ class MultipartUploadTest {
             .addFileToUpload(appContext.createTestFile(), "videofile")
             .setMaxRetries(0)
 
-        val responseStatus = uploadRequest.runBlocking(appContext)
+        val responseStatus = uploadRequest.getBlockingResponse(appContext)
 
         assertTrue(responseStatus is UploadRequestStatus.ServerError)
         val response = (responseStatus as UploadRequestStatus.ServerError).response
