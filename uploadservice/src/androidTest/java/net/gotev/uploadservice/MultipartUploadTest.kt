@@ -24,6 +24,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.net.SocketException
 import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -35,7 +36,6 @@ class MultipartUploadTest {
     @Before
     fun setup() {
         mockWebServer.start(8080)
-
         UploadServiceConfig.initialize(appContext, appContext.createTestNotificationChannel(), true)
     }
 
@@ -46,24 +46,26 @@ class MultipartUploadTest {
         UploadService.stop(appContext, true)
     }
 
+    private fun createMultipartUploadRequest() = MultipartUploadRequest(appContext, mockWebServer.baseUrl)
+        .setMethod("POST")
+        .setBearerAuth("bearerToken")
+        .setUsesFixedLengthStreamingMode(true)
+        .addHeader("User-Agent", "SomeUserAgent")
+        .addParameter("privacy", "1")
+        .addParameter("nsfw", "false")
+        .addParameter("name", "myfilename")
+        .addParameter("commentsEnabled", "true")
+        .addParameter("downloadEnabled", "true")
+        .addParameter("waitTranscoding", "true")
+        .addParameter("channelId", "123456")
+        .addFileToUpload(appContext.createTestFile(), "videofile")
+        .setMaxRetries(0)
+
     @Test
     fun successfulMultipartUpload() {
         mockWebServer.enqueue(MockResponse().setResponseCode(200))
 
-        val uploadRequest = MultipartUploadRequest(appContext, mockWebServer.baseUrl)
-            .setMethod("POST")
-            .setBearerAuth("bearerToken")
-            .setUsesFixedLengthStreamingMode(true)
-            .addHeader("User-Agent", "SomeUserAgent")
-            .addParameter("privacy", "1")
-            .addParameter("nsfw", "false")
-            .addParameter("name", "myfilename")
-            .addParameter("commentsEnabled", "true")
-            .addParameter("downloadEnabled", "true")
-            .addParameter("waitTranscoding", "true")
-            .addParameter("channelId", "123456")
-            .addFileToUpload(appContext.createTestFile(), "videofile")
-            .setMaxRetries(0)
+        val uploadRequest = createMultipartUploadRequest()
 
         val responseStatus = uploadRequest.getBlockingResponse(appContext)
 
@@ -86,20 +88,7 @@ class MultipartUploadTest {
     fun serverErrorMultipartUpload() {
         mockWebServer.enqueue(MockResponse().setResponseCode(400))
 
-        val uploadRequest = MultipartUploadRequest(appContext, mockWebServer.baseUrl)
-            .setMethod("POST")
-            .setBearerAuth("bearerToken")
-            .setUsesFixedLengthStreamingMode(true)
-            .addHeader("User-Agent", "SomeUserAgent")
-            .addParameter("privacy", "1")
-            .addParameter("nsfw", "false")
-            .addParameter("name", "myfilename")
-            .addParameter("commentsEnabled", "true")
-            .addParameter("downloadEnabled", "true")
-            .addParameter("waitTranscoding", "true")
-            .addParameter("channelId", "123456")
-            .addFileToUpload(appContext.createTestFile(), "videofile")
-            .setMaxRetries(0)
+        val uploadRequest = createMultipartUploadRequest()
 
         val responseStatus = uploadRequest.getBlockingResponse(appContext)
 
@@ -119,26 +108,65 @@ class MultipartUploadTest {
     }
 
     @Test
+    fun serverInterruptedMultipartUpload() {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200))
+
+        val uploadId = UUID.randomUUID().toString()
+
+        val uploadRequest = createMultipartUploadRequest().setUploadID(uploadId)
+
+        var resultingException: Throwable? = null
+
+        val lock = CountDownLatch(1)
+
+        val observer = GlobalRequestObserver(appContext, object : RequestObserverDelegate {
+            var shutdownIsTriggered = false
+
+            override fun onProgress(context: Context, uploadInfo: UploadInfo) {
+                // shutdown server on first progress
+                if (uploadInfo.progressPercent > 0 && !shutdownIsTriggered) {
+                    shutdownIsTriggered = true
+                    mockWebServer.shutdown()
+                }
+            }
+
+            override fun onSuccess(
+                context: Context,
+                uploadInfo: UploadInfo,
+                serverResponse: ServerResponse
+            ) {
+            }
+
+            override fun onError(context: Context, uploadInfo: UploadInfo, exception: Throwable) {
+                resultingException = exception
+            }
+
+            override fun onCompleted(context: Context, uploadInfo: UploadInfo) {
+                lock.countDown()
+            }
+
+            override fun onCompletedWhileNotObserving() {
+                lock.countDown()
+            }
+        }, shouldAcceptEventsFrom = { it.uploadId == uploadId })
+
+        observer.register()
+
+        uploadRequest.startUpload()
+
+        lock.await(5000, TimeUnit.MILLISECONDS)
+
+        assertTrue(resultingException is SocketException)
+        assertEquals("Connection reset", (resultingException as SocketException).message)
+    }
+
+    @Test
     fun userCancelledMultipartUpload() {
         mockWebServer.enqueue(MockResponse().setResponseCode(200))
 
         val uploadId = UUID.randomUUID().toString()
 
-        val uploadRequest = MultipartUploadRequest(appContext, mockWebServer.baseUrl)
-            .setUploadID(uploadId)
-            .setMethod("POST")
-            .setBearerAuth("bearerToken")
-            .setUsesFixedLengthStreamingMode(true)
-            .addHeader("User-Agent", "SomeUserAgent")
-            .addParameter("privacy", "1")
-            .addParameter("nsfw", "false")
-            .addParameter("name", "myfilename")
-            .addParameter("commentsEnabled", "true")
-            .addParameter("downloadEnabled", "true")
-            .addParameter("waitTranscoding", "true")
-            .addParameter("channelId", "123456")
-            .addFileToUpload(appContext.createTestFile(), "videofile")
-            .setMaxRetries(0)
+        val uploadRequest = createMultipartUploadRequest().setUploadID(uploadId)
 
         var resultingException: Throwable? = null
 
