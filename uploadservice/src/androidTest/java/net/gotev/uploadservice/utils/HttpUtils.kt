@@ -2,8 +2,11 @@ package net.gotev.uploadservice.utils
 
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import okhttp3.tls.HandshakeCertificates
 import okhttp3.tls.HeldCertificate
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import java.net.InetAddress
 import javax.net.ssl.HttpsURLConnection
 
@@ -36,3 +39,18 @@ val MockWebServer.baseUrl: String
 fun newSSLOkHttpClientBuilder() =
     OkHttpClient.Builder()
         .sslSocketFactory(clientCertificates.sslSocketFactory(), clientCertificates.trustManager)
+
+fun RecordedRequest.assertContentTypeIsMultipartFormData() {
+    assertTrue(
+        headers["Content-Type"]?.startsWith("multipart/form-data; boundary=-------UploadService")
+            ?: false
+    )
+}
+
+fun RecordedRequest.assertDeclaredContentLengthMatchesPostBodySize() {
+    assertEquals(headers["Content-Length"]!!.toLong(), bodySize)
+}
+
+fun RecordedRequest.assertHttpMethodIs(expectedMethod: String) {
+    assertEquals(expectedMethod, method)
+}
