@@ -20,11 +20,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
-import java.net.SocketException
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLException
 
-class MultipartUploadTest {
+class MultipartUploadTests {
 
     private val mockWebServer = newSSLMockWebServer()
 
