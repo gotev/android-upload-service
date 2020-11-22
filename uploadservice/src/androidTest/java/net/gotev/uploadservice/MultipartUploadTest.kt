@@ -19,8 +19,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 import java.net.SocketException
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLException
 
 class MultipartUploadTest {
 
@@ -122,7 +124,11 @@ class MultipartUploadTest {
         })
 
         response.classEquals(UploadRequestStatus.OtherError::class)
-        assertEquals(SocketException::class.java.name, (response as UploadRequestStatus.OtherError).exception::class.java.name)
+        val exception = (response as UploadRequestStatus.OtherError).exception
+        assertTrue(
+            "A subclass of IOException has to be thrown. Got ${exception::class.java}",
+            exception is IOException
+        )
     }
 
     @Test
