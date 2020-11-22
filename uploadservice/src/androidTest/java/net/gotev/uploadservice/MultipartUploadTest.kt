@@ -67,7 +67,7 @@ class MultipartUploadTest {
         val response = (responseStatus as UploadRequestStatus.Successful).response
 
         assertEquals(200, response.code)
-        assertTrue(response.body.isEmpty())
+        assertTrue("body should be empty!", response.body.isEmpty())
 
         mockWebServer.takeRequest().apply {
             assertHttpMethodIs("POST")
@@ -90,7 +90,7 @@ class MultipartUploadTest {
         val response = (responseStatus as UploadRequestStatus.ServerError).response
 
         assertEquals(400, response.code)
-        assertTrue(response.body.isEmpty())
+        assertTrue("body should be empty!", response.body.isEmpty())
 
         mockWebServer.takeRequest().apply {
             assertHttpMethodIs("POST")
@@ -122,7 +122,7 @@ class MultipartUploadTest {
         })
 
         response.classEquals(UploadRequestStatus.OtherError::class)
-        assertTrue((response as UploadRequestStatus.OtherError).exception is SocketException)
+        assertEquals(SocketException::class.java.name, (response as UploadRequestStatus.OtherError).exception::class.java.name)
     }
 
     @Test
