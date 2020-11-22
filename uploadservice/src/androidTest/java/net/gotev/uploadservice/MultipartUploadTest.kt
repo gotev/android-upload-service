@@ -1,65 +1,44 @@
 package net.gotev.uploadservice
 
-import android.app.Application
-import androidx.test.platform.app.InstrumentationRegistry
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
+import net.gotev.uploadservice.utils.UploadRequestStatus
+import net.gotev.uploadservice.utils.appContext
+import net.gotev.uploadservice.utils.baseUrl
 import net.gotev.uploadservice.utils.createTestFile
 import net.gotev.uploadservice.utils.createTestNotificationChannel
-import net.gotev.uploadservice.utils.startAndObserveGlobally
+import net.gotev.uploadservice.utils.deleteTestNotificationChannel
+import net.gotev.uploadservice.utils.newSSLMockWebServer
+import net.gotev.uploadservice.utils.runBlocking
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.tls.HandshakeCertificates
-import okhttp3.tls.HeldCertificate
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.net.InetAddress
-import javax.net.ssl.HttpsURLConnection
 
 class MultipartUploadTest {
 
-    private val localhostCertificate = HeldCertificate.Builder()
-        .addSubjectAlternativeName(InetAddress.getByName("localhost").canonicalHostName)
-        .build()
-
-    private val serverCertificates = HandshakeCertificates.Builder()
-        .heldCertificate(localhostCertificate)
-        .build()
-
-    private val clientCertificates = HandshakeCertificates.Builder()
-        .addTrustedCertificate(localhostCertificate.certificate)
-        .build()
-
-    private val mockWebServer = MockWebServer().apply {
-        useHttps(serverCertificates.sslSocketFactory(), false)
-    }
-
-    private val context by lazy {
-        InstrumentationRegistry.getInstrumentation().context.applicationContext as Application
-    }
+    private val mockWebServer = newSSLMockWebServer()
 
     @Before
     fun setup() {
         mockWebServer.start(8080)
 
-        HttpsURLConnection.setDefaultSSLSocketFactory(clientCertificates.sslSocketFactory())
-        UploadServiceConfig.initialize(context, context.createTestNotificationChannel(), true)
+        UploadServiceConfig.initialize(appContext, appContext.createTestNotificationChannel(), true)
     }
 
     @After
     fun teardown() {
         mockWebServer.shutdown()
+        appContext.deleteTestNotificationChannel()
+        UploadService.stop(appContext, true)
     }
 
     @Test
-    fun multipartUpload() {
+    fun successfulMultipartUpload() {
         mockWebServer.enqueue(MockResponse().setResponseCode(200))
 
-        val uploadRequest = MultipartUploadRequest(context, mockWebServer.url("/").toString())
+        val uploadRequest = MultipartUploadRequest(appContext, mockWebServer.baseUrl)
             .setMethod("POST")
             .setBearerAuth("bearerToken")
             .setUsesFixedLengthStreamingMode(true)
@@ -71,16 +50,16 @@ class MultipartUploadTest {
             .addParameter("downloadEnabled", "true")
             .addParameter("waitTranscoding", "true")
             .addParameter("channelId", "123456")
-            .addFileToUpload(context.createTestFile(), "videofile")
+            .addFileToUpload(appContext.createTestFile(), "videofile")
             .setMaxRetries(0)
 
-        uploadRequest.startAndObserveGlobally(context).let { (serverResponse, exception) ->
-            assertNotNull(serverResponse)
-            assertNull(exception)
+        val responseStatus = uploadRequest.runBlocking(appContext)
 
-            assertEquals(200, serverResponse!!.code)
-            assertTrue(serverResponse.body.isEmpty())
-        }
+        assertTrue(responseStatus is UploadRequestStatus.Successful)
+        val response = (responseStatus as UploadRequestStatus.Successful).response
+
+        assertEquals(200, response.code)
+        assertTrue(response.body.isEmpty())
 
         val httpRequest = mockWebServer.takeRequest()
         assertEquals("POST", httpRequest.method)
@@ -88,6 +67,48 @@ class MultipartUploadTest {
 
         assertEquals("Bearer bearerToken", httpRequest.headers["Authorization"])
         assertEquals("SomeUserAgent", httpRequest.headers["User-Agent"])
-        assertTrue(httpRequest.headers["Content-Type"]?.startsWith("multipart/form-data; boundary=-------UploadService") ?: false)
+        assertTrue(
+            httpRequest.headers["Content-Type"]?.startsWith("multipart/form-data; boundary=-------UploadService")
+                ?: false
+        )
+    }
+
+    @Test
+    fun serverErrorMultipartUpload() {
+        mockWebServer.enqueue(MockResponse().setResponseCode(400))
+
+        val uploadRequest = MultipartUploadRequest(appContext, mockWebServer.baseUrl)
+            .setMethod("POST")
+            .setBearerAuth("bearerToken")
+            .setUsesFixedLengthStreamingMode(true)
+            .addHeader("User-Agent", "SomeUserAgent")
+            .addParameter("privacy", "1")
+            .addParameter("nsfw", "false")
+            .addParameter("name", "myfilename")
+            .addParameter("commentsEnabled", "true")
+            .addParameter("downloadEnabled", "true")
+            .addParameter("waitTranscoding", "true")
+            .addParameter("channelId", "123456")
+            .addFileToUpload(appContext.createTestFile(), "videofile")
+            .setMaxRetries(0)
+
+        val responseStatus = uploadRequest.runBlocking(appContext)
+
+        assertTrue(responseStatus is UploadRequestStatus.ServerError)
+        val response = (responseStatus as UploadRequestStatus.ServerError).response
+
+        assertEquals(400, response.code)
+        assertTrue(response.body.isEmpty())
+
+        val httpRequest = mockWebServer.takeRequest()
+        assertEquals("POST", httpRequest.method)
+        assertEquals(httpRequest.headers["Content-Length"]!!.toLong(), httpRequest.bodySize)
+
+        assertEquals("Bearer bearerToken", httpRequest.headers["Authorization"])
+        assertEquals("SomeUserAgent", httpRequest.headers["User-Agent"])
+        assertTrue(
+            httpRequest.headers["Content-Type"]?.startsWith("multipart/form-data; boundary=-------UploadService")
+                ?: false
+        )
     }
 }

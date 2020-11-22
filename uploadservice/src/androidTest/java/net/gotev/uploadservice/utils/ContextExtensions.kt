@@ -1,10 +1,15 @@
 package net.gotev.uploadservice.utils
 
+import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.test.platform.app.InstrumentationRegistry
 import java.util.UUID
+
+val appContext: Application
+    get() = InstrumentationRegistry.getInstrumentation().context.applicationContext as Application
 
 fun Context.createTestFile(name: String = "testFile"): String {
     openFileOutput(name, Context.MODE_PRIVATE).use { fileOutput ->
@@ -16,14 +21,27 @@ fun Context.createTestFile(name: String = "testFile"): String {
     return getFileStreamPath(name).absolutePath
 }
 
-fun Context.createTestNotificationChannel(): String {
-    val notificationChannelId = "UploadServiceTestChannel"
+val Context.notificationManager: NotificationManager
+    get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
+private const val notificationChannelId = "UploadServiceTestChannel"
+
+fun Context.createTestNotificationChannel(): String {
     if (Build.VERSION.SDK_INT >= 26) {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(notificationChannelId, "Upload Service Test Channel", NotificationManager.IMPORTANCE_LOW)
-        notificationManager.createNotificationChannel(channel)
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                notificationChannelId,
+                "Upload Service Test Channel",
+                NotificationManager.IMPORTANCE_LOW
+            )
+        )
     }
 
     return notificationChannelId
+}
+
+fun Context.deleteTestNotificationChannel() {
+    if (Build.VERSION.SDK_INT >= 26) {
+        notificationManager.deleteNotificationChannel(notificationChannelId)
+    }
 }

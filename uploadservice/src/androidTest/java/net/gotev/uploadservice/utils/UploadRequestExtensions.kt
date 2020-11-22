@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import net.gotev.uploadservice.UploadRequest
 import net.gotev.uploadservice.data.UploadInfo
+import net.gotev.uploadservice.exceptions.UploadError
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.observer.request.GlobalRequestObserver
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate
@@ -11,7 +12,13 @@ import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-fun UploadRequest<*>.startAndObserveGlobally(context: Application): Pair<ServerResponse?, Throwable?> {
+sealed class UploadRequestStatus {
+    class Successful(val response: ServerResponse) : UploadRequestStatus()
+    class ServerError(val response: ServerResponse) : UploadRequestStatus()
+    class OtherError(val exception: Throwable) : UploadRequestStatus()
+}
+
+fun UploadRequest<*>.runBlocking(context: Application): UploadRequestStatus {
     val lock = CountDownLatch(1)
 
     var resultingException: Throwable? = null
@@ -54,5 +61,16 @@ fun UploadRequest<*>.startAndObserveGlobally(context: Application): Pair<ServerR
 
     observer.unregister()
 
-    return Pair(resultingServerResponse, resultingException)
+    val response = resultingServerResponse
+    val exception = resultingException
+
+    if (response != null) {
+        return UploadRequestStatus.Successful(response)
+    }
+
+    if (exception != null && exception is UploadError) {
+        return UploadRequestStatus.ServerError(exception.serverResponse)
+    }
+
+    return UploadRequestStatus.OtherError(exception!!)
 }
