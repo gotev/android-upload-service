@@ -5,14 +5,19 @@ import net.gotev.uploadservice.utils.UploadRequestStatus
 import net.gotev.uploadservice.utils.appContext
 import net.gotev.uploadservice.utils.assertContentTypeIsMultipartFormData
 import net.gotev.uploadservice.utils.assertDeclaredContentLengthMatchesPostBodySize
+import net.gotev.uploadservice.utils.assertFile
+import net.gotev.uploadservice.utils.assertHeader
 import net.gotev.uploadservice.utils.assertHttpMethodIs
+import net.gotev.uploadservice.utils.assertParameter
 import net.gotev.uploadservice.utils.baseUrl
 import net.gotev.uploadservice.utils.classEquals
 import net.gotev.uploadservice.utils.createTestFile
 import net.gotev.uploadservice.utils.createTestNotificationChannel
 import net.gotev.uploadservice.utils.deleteTestNotificationChannel
 import net.gotev.uploadservice.utils.getBlockingResponse
+import net.gotev.uploadservice.utils.multipartBodyParts
 import net.gotev.uploadservice.utils.newSSLMockWebServer
+import net.gotev.uploadservice.utils.readFile
 import okhttp3.mockwebserver.MockResponse
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -52,7 +57,7 @@ class MultipartUploadTests {
             .addParameter("downloadEnabled", "true")
             .addParameter("waitTranscoding", "true")
             .addParameter("channelId", "123456")
-            .addFileToUpload(appContext.createTestFile(), "videofile")
+            .addFileToUpload(appContext.createTestFile("testFile"), "videofile")
             .setMaxRetries(0)
 
     @Test
@@ -73,8 +78,24 @@ class MultipartUploadTests {
             assertHttpMethodIs("POST")
             assertDeclaredContentLengthMatchesPostBodySize()
             assertContentTypeIsMultipartFormData()
-            assertEquals("Bearer bearerToken", headers["Authorization"])
-            assertEquals("SomeUserAgent", headers["User-Agent"])
+            assertHeader("Authorization", "Bearer bearerToken")
+            assertHeader("User-Agent", "SomeUserAgent")
+
+            multipartBodyParts.apply {
+                assertEquals("number of parts is wrong", 8, size)
+                assertParameter("privacy", "1")
+                assertParameter("nsfw", "false")
+                assertParameter("name", "myfilename")
+                assertParameter("commentsEnabled", "true")
+                assertParameter("downloadEnabled", "true")
+                assertParameter("waitTranscoding", "true")
+                assertParameter("channelId", "123456")
+                assertFile(
+                    parameterName = "videofile",
+                    fileContent = appContext.readFile("testFile"),
+                    filename = "testFile"
+                )
+            }
         }
     }
 
@@ -96,8 +117,8 @@ class MultipartUploadTests {
             assertHttpMethodIs("POST")
             assertDeclaredContentLengthMatchesPostBodySize()
             assertContentTypeIsMultipartFormData()
-            assertEquals("Bearer bearerToken", headers["Authorization"])
-            assertEquals("SomeUserAgent", headers["User-Agent"])
+            assertHeader("Authorization", "Bearer bearerToken")
+            assertHeader("User-Agent", "SomeUserAgent")
         }
     }
 
@@ -154,8 +175,8 @@ class MultipartUploadTests {
         mockWebServer.takeRequest().apply {
             assertHttpMethodIs("POST")
             assertContentTypeIsMultipartFormData()
-            assertEquals("Bearer bearerToken", headers["Authorization"])
-            assertEquals("SomeUserAgent", headers["User-Agent"])
+            assertHeader("Authorization", "Bearer bearerToken")
+            assertHeader("User-Agent", "SomeUserAgent")
         }
     }
 }
