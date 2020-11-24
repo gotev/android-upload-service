@@ -10,7 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
-import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 import java.net.InetAddress
 import javax.net.ssl.HttpsURLConnection
 
@@ -52,8 +52,14 @@ fun RecordedRequest.assertContentTypeIsMultipartFormData() {
 }
 
 sealed class BodyPart(val name: String) {
-    class Parameter(name: String, val value: String): BodyPart(name)
-    class File(name: String, val filename: String?, val contentType: String, val body: ByteArray) : BodyPart(name)
+    class Parameter(name: String, val value: String) : BodyPart(name)
+
+    class File(
+        name: String,
+        val filename: String?,
+        val contentType: String,
+        val body: ByteArray
+    ) : BodyPart(name)
 }
 
 val RecordedRequest.multipartBodyParts: Map<String, BodyPart>
@@ -61,17 +67,17 @@ val RecordedRequest.multipartBodyParts: Map<String, BodyPart>
         val parts = HashMap<String, BodyPart>()
 
         val contentType = headers["Content-Type"]
-            ?: throw IllegalArgumentException("missing Content-Type header")
+            ?: throw IllegalStateException("missing Content-Type header")
 
         MultipartReader(body, contentType.split("boundary=")[1]).use {
             while (true) {
                 val part = it.nextPart() ?: return@use
                 val contentDisposition = part.headers["Content-Disposition"]
-                    ?: throw IllegalArgumentException("missing Content-Disposition header")
+                    ?: throw IllegalStateException("missing Content-Disposition header")
                 val contentDispositionValues = contentDisposition.split(";")
 
                 if (contentDispositionValues.first() != "form-data")
-                    throw IllegalArgumentException("Content-Disposition misses form-data")
+                    throw IllegalStateException("Content-Disposition misses form-data")
 
                 val map = HashMap<String, String>()
 
@@ -82,15 +88,16 @@ val RecordedRequest.multipartBodyParts: Map<String, BodyPart>
                 }
 
                 val partContentType = part.headers["Content-Type"]
+                val name = map["name"] ?: throw IllegalStateException("Missing part name")
 
                 val multipartPart = if (partContentType == null) {
                     BodyPart.Parameter(
-                        name = map["name"]!!,
+                        name = name,
                         value = part.body.readUtf8()
                     )
                 } else {
                     BodyPart.File(
-                        name = map["name"]!!,
+                        name = name,
                         filename = map["filename"],
                         contentType = partContentType,
                         body = part.body.readByteArray()
@@ -104,16 +111,21 @@ val RecordedRequest.multipartBodyParts: Map<String, BodyPart>
         return parts
     }
 
-fun Map<String, BodyPart>.assertParameter(name: String, value: String) {
+fun Map<String, BodyPart>.assertParameter(name: String, hasValue: String) {
     assertTrue("No parameter $name found", containsKey(name))
 
-    when (val param = get(name)!!) {
+    when (val param = get(name)) {
         is BodyPart.Parameter -> {
-            assertEquals(value, param.value)
+            assertEquals(hasValue, param.value)
         }
 
         else -> {
-            fail("$name is present in the map, but it's not a parameter")
+            val message = if (param == null)
+                "is not present in the map"
+            else
+                "is present in the map, but it's not a parameter"
+
+            fail("$name $message")
         }
     }
 }
@@ -126,7 +138,7 @@ fun Map<String, BodyPart>.assertFile(
 ) {
     assertTrue("No parameter $parameterName found", containsKey(parameterName))
 
-    when (val file = get(parameterName)!!) {
+    when (val file = get(parameterName)) {
         is BodyPart.File -> {
             assertEquals(contentType, file.contentType)
             filename?.let { assertEquals(it, file.filename) }
@@ -135,7 +147,12 @@ fun Map<String, BodyPart>.assertFile(
         }
 
         else -> {
-            fail("$parameterName is present in the map, but it's not a file")
+            val message = if (file == null)
+                "is not present in the map"
+            else
+                "is present in the map, but it's not a file"
+
+            fail("$parameterName $message")
         }
     }
 }
@@ -148,7 +165,9 @@ fun RecordedRequest.assertHeader(name: String, value: String) {
 }
 
 fun RecordedRequest.assertDeclaredContentLengthMatchesPostBodySize() {
-    assertEquals(headers["Content-Length"]!!.toLong(), bodySize)
+    val value = headers["Content-Length"]
+    assertNotNull("Missing Content-Length", value)
+    assertEquals(value!!.toLong(), bodySize)
 }
 
 fun RecordedRequest.assertHttpMethodIs(expectedMethod: String) {

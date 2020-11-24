@@ -9,11 +9,9 @@ import net.gotev.uploadservice.exceptions.UserCancelledUploadException
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.observer.request.GlobalRequestObserver
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate
-import org.junit.Assert.assertEquals
 import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.reflect.KClass
 
 sealed class UploadRequestStatus {
     class Successful(val response: ServerResponse) : UploadRequestStatus()
@@ -22,7 +20,38 @@ sealed class UploadRequestStatus {
     class OtherError(val exception: Throwable) : UploadRequestStatus()
 }
 
-fun UploadRequest<*>.getBlockingResponse(context: Application, doOnProgress: ((UploadInfo) -> Unit)? = null): UploadRequestStatus {
+fun UploadRequestStatus.requireSuccessful(): ServerResponse {
+    when (this) {
+        is UploadRequestStatus.Successful -> return response
+        else -> throw IllegalStateException("required ${UploadRequestStatus.Successful::class.java.name} but got ${this::class.java.name} instead")
+    }
+}
+
+fun UploadRequestStatus.requireCancelledByUser() {
+    when (this) {
+        is UploadRequestStatus.CancelledByUser -> return
+        else -> throw IllegalStateException("required ${UploadRequestStatus.CancelledByUser::class.java.name} but got ${this::class.java.name} instead")
+    }
+}
+
+fun UploadRequestStatus.requireServerError(): ServerResponse {
+    when (this) {
+        is UploadRequestStatus.ServerError -> return response
+        else -> throw IllegalStateException("required ${UploadRequestStatus.ServerError::class.java.name} but got ${this::class.java.name} instead")
+    }
+}
+
+fun UploadRequestStatus.requireOtherError(): Throwable {
+    when (this) {
+        is UploadRequestStatus.OtherError -> return exception
+        else -> throw IllegalStateException("required ${UploadRequestStatus.OtherError::class.java.name} but got ${this::class.java.name} instead")
+    }
+}
+
+fun UploadRequest<*>.getBlockingResponse(
+    context: Application,
+    doOnProgress: ((UploadInfo) -> Unit)? = null
+): UploadRequestStatus {
     val lock = CountDownLatch(1)
 
     var resultingException: Throwable? = null
@@ -82,8 +111,4 @@ fun UploadRequest<*>.getBlockingResponse(context: Application, doOnProgress: ((U
     }
 
     return UploadRequestStatus.OtherError(exception!!)
-}
-
-fun UploadRequestStatus.classEquals(expected: KClass<out UploadRequestStatus>) {
-    assertEquals(expected.java.name, this::class.java.name)
 }

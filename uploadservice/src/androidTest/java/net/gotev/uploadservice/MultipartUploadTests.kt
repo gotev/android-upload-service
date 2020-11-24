@@ -1,7 +1,6 @@
 package net.gotev.uploadservice
 
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
-import net.gotev.uploadservice.utils.UploadRequestStatus
 import net.gotev.uploadservice.utils.appContext
 import net.gotev.uploadservice.utils.assertContentTypeIsMultipartFormData
 import net.gotev.uploadservice.utils.assertDeclaredContentLengthMatchesPostBodySize
@@ -10,7 +9,6 @@ import net.gotev.uploadservice.utils.assertHeader
 import net.gotev.uploadservice.utils.assertHttpMethodIs
 import net.gotev.uploadservice.utils.assertParameter
 import net.gotev.uploadservice.utils.baseUrl
-import net.gotev.uploadservice.utils.classEquals
 import net.gotev.uploadservice.utils.createTestFile
 import net.gotev.uploadservice.utils.createTestNotificationChannel
 import net.gotev.uploadservice.utils.deleteTestNotificationChannel
@@ -18,6 +16,10 @@ import net.gotev.uploadservice.utils.getBlockingResponse
 import net.gotev.uploadservice.utils.multipartBodyParts
 import net.gotev.uploadservice.utils.newSSLMockWebServer
 import net.gotev.uploadservice.utils.readFile
+import net.gotev.uploadservice.utils.requireCancelledByUser
+import net.gotev.uploadservice.utils.requireOtherError
+import net.gotev.uploadservice.utils.requireServerError
+import net.gotev.uploadservice.utils.requireSuccessful
 import okhttp3.mockwebserver.MockResponse
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -66,15 +68,12 @@ class MultipartUploadTests {
 
         val uploadRequest = createMultipartUploadRequest()
 
-        val responseStatus = uploadRequest.getBlockingResponse(appContext)
-
-        responseStatus.classEquals(UploadRequestStatus.Successful::class)
-        val response = (responseStatus as UploadRequestStatus.Successful).response
+        val response = uploadRequest.getBlockingResponse(appContext).requireSuccessful()
 
         assertEquals(200, response.code)
         assertTrue("body should be empty!", response.body.isEmpty())
 
-        mockWebServer.takeRequest().apply {
+        with(mockWebServer.takeRequest()) {
             assertHttpMethodIs("POST")
             assertDeclaredContentLengthMatchesPostBodySize()
             assertContentTypeIsMultipartFormData()
@@ -105,15 +104,12 @@ class MultipartUploadTests {
 
         val uploadRequest = createMultipartUploadRequest()
 
-        val responseStatus = uploadRequest.getBlockingResponse(appContext)
-
-        responseStatus.classEquals(UploadRequestStatus.ServerError::class)
-        val response = (responseStatus as UploadRequestStatus.ServerError).response
+        val response = uploadRequest.getBlockingResponse(appContext).requireServerError()
 
         assertEquals(400, response.code)
         assertTrue("body should be empty!", response.body.isEmpty())
 
-        mockWebServer.takeRequest().apply {
+        with(mockWebServer.takeRequest()) {
             assertHttpMethodIs("POST")
             assertDeclaredContentLengthMatchesPostBodySize()
             assertContentTypeIsMultipartFormData()
@@ -134,16 +130,14 @@ class MultipartUploadTests {
 
         var shutdownIsTriggered = false
 
-        val response = uploadRequest.getBlockingResponse(appContext, doOnProgress = { _ ->
+        val exception = uploadRequest.getBlockingResponse(appContext, doOnProgress = { _ ->
             // shutdown server on first progress
             if (!shutdownIsTriggered) {
                 shutdownIsTriggered = true
                 mockWebServer.shutdown()
             }
-        })
+        }).requireOtherError()
 
-        response.classEquals(UploadRequestStatus.OtherError::class)
-        val exception = (response as UploadRequestStatus.OtherError).exception
         assertTrue(
             "A subclass of IOException has to be thrown. Got ${exception::class.java}",
             exception is IOException
@@ -170,9 +164,9 @@ class MultipartUploadTests {
             }
         })
 
-        response.classEquals(UploadRequestStatus.CancelledByUser::class)
+        response.requireCancelledByUser()
 
-        mockWebServer.takeRequest().apply {
+        with(mockWebServer.takeRequest()) {
             assertHttpMethodIs("POST")
             assertContentTypeIsMultipartFormData()
             assertHeader("Authorization", "Bearer bearerToken")
