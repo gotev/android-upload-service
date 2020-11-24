@@ -50,7 +50,7 @@ fun UploadRequestStatus.requireOtherError(): Throwable {
 
 fun UploadRequest<*>.getBlockingResponse(
     context: Application,
-    doOnProgress: ((UploadInfo) -> Unit)? = null
+    doOnFirstProgress: ((UploadInfo) -> Unit)? = null
 ): UploadRequestStatus {
     val lock = CountDownLatch(1)
 
@@ -62,8 +62,13 @@ fun UploadRequest<*>.getBlockingResponse(
     setUploadID(uploadID)
 
     val observer = GlobalRequestObserver(context, object : RequestObserverDelegate {
+        var isFirstProgressActionTriggered = false
+
         override fun onProgress(context: Context, uploadInfo: UploadInfo) {
-            doOnProgress?.invoke(uploadInfo)
+            if (!isFirstProgressActionTriggered && doOnFirstProgress != null) {
+                isFirstProgressActionTriggered = true
+                doOnFirstProgress(uploadInfo)
+            }
         }
 
         override fun onSuccess(

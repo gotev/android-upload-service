@@ -128,14 +128,9 @@ class MultipartUploadTests {
 
         val uploadRequest = createMultipartUploadRequest()
 
-        var shutdownIsTriggered = false
-
-        val exception = uploadRequest.getBlockingResponse(appContext, doOnProgress = { _ ->
+        val exception = uploadRequest.getBlockingResponse(appContext, doOnFirstProgress = { _ ->
             // shutdown server on first progress
-            if (!shutdownIsTriggered) {
-                shutdownIsTriggered = true
-                mockWebServer.shutdown()
-            }
+            mockWebServer.shutdown()
         }).requireOtherError()
 
         assertTrue(
@@ -154,17 +149,10 @@ class MultipartUploadTests {
 
         val uploadRequest = createMultipartUploadRequest()
 
-        var cancellationIsTriggered = false
-
-        val response = uploadRequest.getBlockingResponse(appContext, doOnProgress = { uploadInfo ->
+        uploadRequest.getBlockingResponse(appContext, doOnFirstProgress = { info ->
             // cancel upload on first progress
-            if (!cancellationIsTriggered) {
-                cancellationIsTriggered = true
-                UploadService.stopUpload(uploadInfo.uploadId)
-            }
-        })
-
-        response.requireCancelledByUser()
+            UploadService.stopUpload(info.uploadId)
+        }).requireCancelledByUser()
 
         with(mockWebServer.takeRequest()) {
             assertHttpMethodIs("POST")
