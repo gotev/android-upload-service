@@ -1,50 +1,30 @@
 package net.gotev.uploadservice
 
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
-import net.gotev.uploadservice.utils.appContext
-import net.gotev.uploadservice.utils.assertContentTypeIsMultipartFormData
-import net.gotev.uploadservice.utils.assertDeclaredContentLengthMatchesPostBodySize
-import net.gotev.uploadservice.utils.assertFile
-import net.gotev.uploadservice.utils.assertHeader
-import net.gotev.uploadservice.utils.assertHttpMethodIs
-import net.gotev.uploadservice.utils.assertParameter
-import net.gotev.uploadservice.utils.baseUrl
-import net.gotev.uploadservice.utils.createTestFile
-import net.gotev.uploadservice.utils.createTestNotificationChannel
-import net.gotev.uploadservice.utils.deleteTestNotificationChannel
-import net.gotev.uploadservice.utils.getBlockingResponse
-import net.gotev.uploadservice.utils.multipartBodyParts
-import net.gotev.uploadservice.utils.newSSLMockWebServer
-import net.gotev.uploadservice.utils.readFile
-import net.gotev.uploadservice.utils.requireCancelledByUser
-import net.gotev.uploadservice.utils.requireOtherError
-import net.gotev.uploadservice.utils.requireServerError
-import net.gotev.uploadservice.utils.requireSuccessful
+import net.gotev.uploadservice.testcore.UploadServiceTestSuite
+import net.gotev.uploadservice.testcore.assertContentTypeIsMultipartFormData
+import net.gotev.uploadservice.testcore.assertDeclaredContentLengthMatchesPostBodySize
+import net.gotev.uploadservice.testcore.assertFile
+import net.gotev.uploadservice.testcore.assertHeader
+import net.gotev.uploadservice.testcore.assertHttpMethodIs
+import net.gotev.uploadservice.testcore.assertParameter
+import net.gotev.uploadservice.testcore.baseUrl
+import net.gotev.uploadservice.testcore.createTestFile
+import net.gotev.uploadservice.testcore.getBlockingResponse
+import net.gotev.uploadservice.testcore.multipartBodyParts
+import net.gotev.uploadservice.testcore.readFile
+import net.gotev.uploadservice.testcore.requireCancelledByUser
+import net.gotev.uploadservice.testcore.requireOtherError
+import net.gotev.uploadservice.testcore.requireServerError
+import net.gotev.uploadservice.testcore.requireSuccessful
 import okhttp3.mockwebserver.MockResponse
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class MultipartUploadTests {
-
-    private val mockWebServer = newSSLMockWebServer()
-
-    @Before
-    fun setup() {
-        mockWebServer.start(8080)
-        UploadServiceConfig.initialize(appContext, appContext.createTestNotificationChannel(), true)
-    }
-
-    @After
-    fun teardown() {
-        mockWebServer.shutdown()
-        appContext.deleteTestNotificationChannel()
-        UploadService.stop(appContext, true)
-    }
+class MultipartUploadTests : UploadServiceTestSuite() {
 
     private fun createMultipartUploadRequest() =
         MultipartUploadRequest(appContext, mockWebServer.baseUrl)

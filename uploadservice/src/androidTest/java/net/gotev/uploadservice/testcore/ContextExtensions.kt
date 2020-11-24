@@ -1,17 +1,12 @@
-package net.gotev.uploadservice.utils
+package net.gotev.uploadservice.testcore
 
-import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import androidx.test.platform.app.InstrumentationRegistry
 import okio.buffer
 import okio.source
 import java.util.UUID
-
-val appContext: Application
-    get() = InstrumentationRegistry.getInstrumentation().context.applicationContext as Application
 
 fun Context.createTestFile(name: String): String {
     openFileOutput(name, Context.MODE_PRIVATE).use { fileOutput ->

@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.utils
+package net.gotev.uploadservice.testcore
 
 import android.app.Application
 import android.content.Context

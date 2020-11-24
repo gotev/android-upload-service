@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.utils
+package net.gotev.uploadservice.testcore
 
 import okhttp3.MultipartReader
 import okhttp3.OkHttpClient
