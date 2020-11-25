@@ -26,7 +26,6 @@ class BinaryUploadTests : UploadServiceTestSuite() {
 
     private fun createBinaryUploadRequest() =
         BinaryUploadRequest(appContext, mockWebServer.baseUrl)
-            .setMethod("POST")
             .setBearerAuth("bearerToken")
             .setUsesFixedLengthStreamingMode(true)
             .addHeader("User-Agent", "SomeUserAgent")

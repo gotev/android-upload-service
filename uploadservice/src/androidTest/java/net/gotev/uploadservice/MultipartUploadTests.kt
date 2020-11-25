@@ -29,7 +29,6 @@ class MultipartUploadTests : UploadServiceTestSuite() {
 
     private fun createMultipartUploadRequest() =
         MultipartUploadRequest(appContext, mockWebServer.baseUrl)
-            .setMethod("POST")
             .setBearerAuth("bearerToken")
             .setUsesFixedLengthStreamingMode(true)
             .addHeader("User-Agent", "SomeUserAgent")
