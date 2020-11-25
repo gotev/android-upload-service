@@ -2,6 +2,7 @@ package net.gotev.uploadservice
 
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
 import net.gotev.uploadservice.testcore.UploadServiceTestSuite
+import net.gotev.uploadservice.testcore.assertBodySizeIsLowerThanDeclaredContentLength
 import net.gotev.uploadservice.testcore.assertContentTypeIsMultipartFormData
 import net.gotev.uploadservice.testcore.assertDeclaredContentLengthMatchesPostBodySize
 import net.gotev.uploadservice.testcore.assertFile
@@ -40,6 +41,7 @@ class MultipartUploadTests : UploadServiceTestSuite() {
             .addParameter("waitTranscoding", "true")
             .addParameter("channelId", "123456")
             .addFileToUpload(appContext.createTestFile("testFile"), "videofile")
+            .addFileToUpload(appContext.createTestFile("testFile2"), "videofile2", contentType = "video/mp4")
             .setMaxRetries(0)
 
     @Test
@@ -61,7 +63,7 @@ class MultipartUploadTests : UploadServiceTestSuite() {
             assertHeader("User-Agent", "SomeUserAgent")
 
             multipartBodyParts.apply {
-                assertEquals("number of parts is wrong", 8, size)
+                assertEquals("number of parts is wrong", 9, size)
                 assertParameter("privacy", "1")
                 assertParameter("nsfw", "false")
                 assertParameter("name", "myfilename")
@@ -72,7 +74,14 @@ class MultipartUploadTests : UploadServiceTestSuite() {
                 assertFile(
                     parameterName = "videofile",
                     fileContent = appContext.readFile("testFile"),
-                    filename = "testFile"
+                    filename = "testFile",
+                    contentType = "application/octet-stream"
+                )
+                assertFile(
+                    parameterName = "videofile2",
+                    fileContent = appContext.readFile("testFile2"),
+                    filename = "testFile2",
+                    contentType = "video/mp4"
                 )
             }
         }
@@ -95,6 +104,29 @@ class MultipartUploadTests : UploadServiceTestSuite() {
             assertContentTypeIsMultipartFormData()
             assertHeader("Authorization", "Bearer bearerToken")
             assertHeader("User-Agent", "SomeUserAgent")
+
+            multipartBodyParts.apply {
+                assertEquals("number of parts is wrong", 9, size)
+                assertParameter("privacy", "1")
+                assertParameter("nsfw", "false")
+                assertParameter("name", "myfilename")
+                assertParameter("commentsEnabled", "true")
+                assertParameter("downloadEnabled", "true")
+                assertParameter("waitTranscoding", "true")
+                assertParameter("channelId", "123456")
+                assertFile(
+                    parameterName = "videofile",
+                    fileContent = appContext.readFile("testFile"),
+                    filename = "testFile",
+                    contentType = "application/octet-stream"
+                )
+                assertFile(
+                    parameterName = "videofile2",
+                    fileContent = appContext.readFile("testFile2"),
+                    filename = "testFile2",
+                    contentType = "video/mp4"
+                )
+            }
         }
     }
 
@@ -137,6 +169,7 @@ class MultipartUploadTests : UploadServiceTestSuite() {
         with(mockWebServer.takeRequest()) {
             assertHttpMethodIs("POST")
             assertContentTypeIsMultipartFormData()
+            assertBodySizeIsLowerThanDeclaredContentLength()
             assertHeader("Authorization", "Bearer bearerToken")
             assertHeader("User-Agent", "SomeUserAgent")
         }

@@ -10,7 +10,7 @@ import java.util.UUID
 
 fun Context.createTestFile(name: String): String {
     openFileOutput(name, Context.MODE_PRIVATE).use { fileOutput ->
-        (1..100).forEach { number ->
+        (1..200).forEach { number ->
             fileOutput.write("$number${UUID.randomUUID()}".toByteArray())
         }
     }
