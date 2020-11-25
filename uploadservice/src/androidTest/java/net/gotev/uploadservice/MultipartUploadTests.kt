@@ -5,6 +5,7 @@ import net.gotev.uploadservice.testcore.UploadServiceTestSuite
 import net.gotev.uploadservice.testcore.assertBodySizeIsLowerThanDeclaredContentLength
 import net.gotev.uploadservice.testcore.assertContentTypeIsMultipartFormData
 import net.gotev.uploadservice.testcore.assertDeclaredContentLengthMatchesPostBodySize
+import net.gotev.uploadservice.testcore.assertEmptyBodyAndHttpCodeIs
 import net.gotev.uploadservice.testcore.assertFile
 import net.gotev.uploadservice.testcore.assertHeader
 import net.gotev.uploadservice.testcore.assertHttpMethodIs
@@ -19,6 +20,8 @@ import net.gotev.uploadservice.testcore.requireOtherError
 import net.gotev.uploadservice.testcore.requireServerError
 import net.gotev.uploadservice.testcore.requireSuccessful
 import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.RecordedRequest
+import okhttp3.mockwebserver.SocketPolicy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -40,8 +43,43 @@ class MultipartUploadTests : UploadServiceTestSuite() {
             .addParameter("waitTranscoding", "true")
             .addParameter("channelId", "123456")
             .addFileToUpload(appContext.createTestFile("testFile"), "videofile")
-            .addFileToUpload(appContext.createTestFile("testFile2"), "videofile2", contentType = "video/mp4")
+            .addFileToUpload(
+                appContext.createTestFile("testFile2"),
+                "videofile2",
+                contentType = "video/mp4"
+            )
             .setMaxRetries(0)
+
+    private fun RecordedRequest.verifyMultipartUploadRequestHeadersAndBody() {
+        assertHttpMethodIs("POST")
+        assertDeclaredContentLengthMatchesPostBodySize()
+        assertContentTypeIsMultipartFormData()
+        assertHeader("Authorization", "Bearer bearerToken")
+        assertHeader("User-Agent", "SomeUserAgent")
+
+        multipartBodyParts.apply {
+            assertEquals("number of parts is wrong", 9, size)
+            assertParameter("privacy", "1")
+            assertParameter("nsfw", "false")
+            assertParameter("name", "myfilename")
+            assertParameter("commentsEnabled", "true")
+            assertParameter("downloadEnabled", "true")
+            assertParameter("waitTranscoding", "true")
+            assertParameter("channelId", "123456")
+            assertFile(
+                parameterName = "videofile",
+                fileContent = appContext.readFile("testFile"),
+                filename = "testFile",
+                contentType = "application/octet-stream"
+            )
+            assertFile(
+                parameterName = "videofile2",
+                fileContent = appContext.readFile("testFile2"),
+                filename = "testFile2",
+                contentType = "video/mp4"
+            )
+        }
+    }
 
     @Test
     fun successfulMultipartUpload() {
@@ -51,39 +89,25 @@ class MultipartUploadTests : UploadServiceTestSuite() {
 
         val response = uploadRequest.getBlockingResponse(appContext).requireSuccessful()
 
-        assertEquals(200, response.code)
-        assertTrue("body should be empty!", response.body.isEmpty())
+        response.assertEmptyBodyAndHttpCodeIs(200)
 
-        with(mockWebServer.takeRequest()) {
-            assertHttpMethodIs("POST")
-            assertDeclaredContentLengthMatchesPostBodySize()
-            assertContentTypeIsMultipartFormData()
-            assertHeader("Authorization", "Bearer bearerToken")
-            assertHeader("User-Agent", "SomeUserAgent")
+        mockWebServer.takeRequest().verifyMultipartUploadRequestHeadersAndBody()
+    }
 
-            multipartBodyParts.apply {
-                assertEquals("number of parts is wrong", 9, size)
-                assertParameter("privacy", "1")
-                assertParameter("nsfw", "false")
-                assertParameter("name", "myfilename")
-                assertParameter("commentsEnabled", "true")
-                assertParameter("downloadEnabled", "true")
-                assertParameter("waitTranscoding", "true")
-                assertParameter("channelId", "123456")
-                assertFile(
-                    parameterName = "videofile",
-                    fileContent = appContext.readFile("testFile"),
-                    filename = "testFile",
-                    contentType = "application/octet-stream"
-                )
-                assertFile(
-                    parameterName = "videofile2",
-                    fileContent = appContext.readFile("testFile2"),
-                    filename = "testFile2",
-                    contentType = "video/mp4"
-                )
-            }
-        }
+    @Test
+    fun successfulMultipartUploadAfterOneRetry() {
+        mockWebServer.enqueue(MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_DURING_REQUEST_BODY))
+        mockWebServer.enqueue(MockResponse().setResponseCode(200))
+
+        val uploadRequest = createMultipartUploadRequest()
+            .setMaxRetries(1)
+
+        val response = uploadRequest.getBlockingResponse(appContext).requireSuccessful()
+
+        response.assertEmptyBodyAndHttpCodeIs(200)
+
+        mockWebServer.takeRequest() // discard the first request being made
+        mockWebServer.takeRequest().verifyMultipartUploadRequestHeadersAndBody()
     }
 
     @Test
@@ -94,55 +118,18 @@ class MultipartUploadTests : UploadServiceTestSuite() {
 
         val response = uploadRequest.getBlockingResponse(appContext).requireServerError()
 
-        assertEquals(400, response.code)
-        assertTrue("body should be empty!", response.body.isEmpty())
+        response.assertEmptyBodyAndHttpCodeIs(400)
 
-        with(mockWebServer.takeRequest()) {
-            assertHttpMethodIs("POST")
-            assertDeclaredContentLengthMatchesPostBodySize()
-            assertContentTypeIsMultipartFormData()
-            assertHeader("Authorization", "Bearer bearerToken")
-            assertHeader("User-Agent", "SomeUserAgent")
-
-            multipartBodyParts.apply {
-                assertEquals("number of parts is wrong", 9, size)
-                assertParameter("privacy", "1")
-                assertParameter("nsfw", "false")
-                assertParameter("name", "myfilename")
-                assertParameter("commentsEnabled", "true")
-                assertParameter("downloadEnabled", "true")
-                assertParameter("waitTranscoding", "true")
-                assertParameter("channelId", "123456")
-                assertFile(
-                    parameterName = "videofile",
-                    fileContent = appContext.readFile("testFile"),
-                    filename = "testFile",
-                    contentType = "application/octet-stream"
-                )
-                assertFile(
-                    parameterName = "videofile2",
-                    fileContent = appContext.readFile("testFile2"),
-                    filename = "testFile2",
-                    contentType = "video/mp4"
-                )
-            }
-        }
+        mockWebServer.takeRequest().verifyMultipartUploadRequestHeadersAndBody()
     }
 
     @Test
     fun serverInterruptedMultipartUpload() {
-        mockWebServer.enqueue(
-            MockResponse()
-                .throttleBody(100, 10, TimeUnit.MILLISECONDS)
-                .setResponseCode(200)
-        )
+        mockWebServer.enqueue(MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_DURING_REQUEST_BODY))
 
         val uploadRequest = createMultipartUploadRequest()
 
-        val exception = uploadRequest.getBlockingResponse(appContext, doOnFirstProgress = { _ ->
-            // shutdown server on first progress
-            mockWebServer.shutdown()
-        }).requireOtherError()
+        val exception = uploadRequest.getBlockingResponse(appContext).requireOtherError()
 
         assertTrue(
             "A subclass of IOException has to be thrown. Got ${exception::class.java}",

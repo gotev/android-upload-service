@@ -1,5 +1,6 @@
 package net.gotev.uploadservice.testcore
 
+import net.gotev.uploadservice.network.ServerResponse
 import okhttp3.MultipartReader
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
@@ -60,6 +61,11 @@ sealed class BodyPart(val name: String) {
         val contentType: String,
         val body: ByteArray
     ) : BodyPart(name)
+}
+
+fun ServerResponse.assertEmptyBodyAndHttpCodeIs(expectedCode: Int) {
+    assertEquals(expectedCode, code)
+    assertTrue("body should be empty!", body.isEmpty())
 }
 
 val RecordedRequest.multipartBodyParts: Map<String, BodyPart>
