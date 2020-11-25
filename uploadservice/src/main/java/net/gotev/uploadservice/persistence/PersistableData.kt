@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import com.amazonaws.regions.Region
 import org.json.JSONObject
+import java.io.File
 import java.lang.IllegalArgumentException
 
 /**
@@ -91,6 +94,15 @@ open class PersistableData() : Parcelable {
 
     fun putString(key: String, value: String) { data[key.validated()] = value }
     fun getString(key: String) = data[key.validated(checkExists = true)] as String
+
+    fun putCognitoCachingCredentialsProvider(key: String, value: CognitoCachingCredentialsProvider) { data[key.validated()] = value }
+    fun getCognitoCachingCredentialsProvider(key: String) = data[key.validated(checkExists = true)] as CognitoCachingCredentialsProvider
+
+    fun putRegion(key: String, value: Region) { data[key.validated()] = value }
+    fun getRegion(key: String) = data[key.validated(checkExists = true)] as Region
+
+    fun putFile(key: String, value: File) { data[key.validated()] = value }
+    fun getFile(key: String) = data[key.validated(checkExists = true)] as File
 
     fun putData(key: String, data: PersistableData) {
         data.data.forEach { (dataKey, value) ->
