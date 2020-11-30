@@ -1,3 +1,4 @@
+include ':uploadservice-s3'
 include ':demoapp'
 include ':uploadservice'
 include ':uploadservice-okhttp'
