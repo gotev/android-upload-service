@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.protocols.s3
+package com.example.s3
 
 import android.os.Parcelable
 import com.amazonaws.auth.CognitoCachingCredentialsProvider

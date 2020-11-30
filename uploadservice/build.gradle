@@ -87,7 +87,6 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation "com.amazonaws:aws-android-sdk-s3:$amazon_aws_version"
 }
 
 bintray {

@@ -1,12 +1,10 @@
-package net.gotev.uploadservice.protocols.s3
+package com.example.s3
 
 import android.content.Context
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.regions.Region
 import net.gotev.uploadservice.UploadRequest
 import net.gotev.uploadservice.UploadTask
-import net.gotev.uploadservice.persistence.PersistableData
-import net.gotev.uploadservice.protocols.binary.BinaryUploadTask
 import java.io.File
 
 class s3UploadRequest(context: Context, serverUrl: String,

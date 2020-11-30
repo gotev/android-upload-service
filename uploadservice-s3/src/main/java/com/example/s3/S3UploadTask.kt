@@ -1,4 +1,4 @@
-package net.gotev.uploadservice.protocols.s3
+package com.example.s3
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
@@ -11,7 +11,7 @@ import net.gotev.uploadservice.network.HttpStack
 class s3UploadTask : UploadTask() {
 
     private val s3params by lazy {
-        s3UploadTaskParameters.createFromPersistableData(params.additionalParameters)
+        com.example.s3.s3UploadTaskParameters.createFromPersistableData(params.additionalParameters)
     }
     
     override fun upload(httpStack: HttpStack) {
