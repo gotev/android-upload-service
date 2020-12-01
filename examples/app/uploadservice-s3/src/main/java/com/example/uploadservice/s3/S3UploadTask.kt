@@ -12,6 +12,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.network.HttpStack
+import net.gotev.uploadservice.network.ServerResponse
 import java.io.File
 
 class S3UploadTask : UploadTask() {
@@ -23,11 +24,12 @@ class S3UploadTask : UploadTask() {
     override fun upload(httpStack: HttpStack) {
         val s3params = s3params
         val credentialsProvider = CognitoCachingCredentialsProvider(context, s3params.identityPoolId, Regions.fromName(s3params.region))
-
         val s3 = AmazonS3Client(credentialsProvider, Region.getRegion(Regions.fromName(s3params.region)))
+        s3.getUrl(s3params.bucket_name, s3params.serverSubpath)
         val transferUtility = TransferUtility.builder().s3Client(s3).context(context).build()
         val file = File(s3params.uploadFilepath)
-
+        require(file.exists()) { "Error! Please choose a valid file for upload" }
+        
         val observer = transferUtility.upload(
                 s3params.bucket_name,
                 s3params.serverSubpath,
@@ -39,6 +41,7 @@ class S3UploadTask : UploadTask() {
         observer.setTransferListener(object : TransferListener {
             override fun onStateChanged(id: Int, state: TransferState) {
                 if (state == TransferState.COMPLETED) {
+                    onResponseReceived(ServerResponse.successfulEmpty())
                     Log.i("UtilityObserver","Upload Finished!");
                 } else if (state == TransferState.FAILED) {
                     Log.i("UtilityObserver","Upload Failed!");
@@ -50,8 +53,8 @@ class S3UploadTask : UploadTask() {
             override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
                 resetUploadedBytes()
                 totalBytes = bytesTotal
-                val progress = bytesCurrent.toDouble() / bytesTotal * 100
                 onProgress(bytesCurrent)
+                val progress = bytesCurrent.toDouble() / bytesTotal * 100
                 Log.i("UtilityObserver","Progress: " + progress);
             }
 

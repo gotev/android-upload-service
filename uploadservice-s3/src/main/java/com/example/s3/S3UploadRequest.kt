@@ -4,14 +4,13 @@ import android.content.Context
 import net.gotev.uploadservice.UploadRequest
 import net.gotev.uploadservice.UploadTask
 
-class S3UploadRequest(context: Context, serverUrl: String,
+class S3UploadRequest(context: Context,
                       uploadFilepath: String,
                       serverSubpath: String,
                       bucket_name: String,
                       identityPoolId: String,
                       region: String,
-
-                      ) : UploadRequest<S3UploadRequest>(context, serverUrl) {
+                      ) : UploadRequest<S3UploadRequest>(context, "serverURL") {
     protected val s3params = S3UploadTaskParameters(uploadFilepath, serverSubpath,
             bucket_name , identityPoolId, region);
 
