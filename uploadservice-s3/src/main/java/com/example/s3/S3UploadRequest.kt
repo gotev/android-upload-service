@@ -1,18 +1,23 @@
 package com.example.s3
 
 import android.content.Context
+import com.amazonaws.regions.Regions
 import net.gotev.uploadservice.UploadRequest
 import net.gotev.uploadservice.UploadTask
+import java.io.File
 
 class S3UploadRequest(context: Context,
-                      uploadFilepath: String,
-                      serverSubpath: String,
                       bucket_name: String,
                       identityPoolId: String,
-                      region: String,
-                      ) : UploadRequest<S3UploadRequest>(context, "serverURL") {
-    protected val s3params = S3UploadTaskParameters(uploadFilepath, serverSubpath,
-            bucket_name , identityPoolId, region);
+                      region: Regions,
+                      uploadFilepath: String,
+) : UploadRequest<S3UploadRequest>(context, "serverUrl") {
+
+    val addressLastSegment = "/" + File(uploadFilepath).name
+
+    protected val s3params = S3UploadTaskParameters(uploadFilepath, addressLastSegment,
+            bucket_name , identityPoolId, region.getName());
+
 
 
     override val taskClass: Class<out UploadTask>
@@ -20,9 +25,13 @@ class S3UploadRequest(context: Context,
 
     override fun getAdditionalParameters() = s3params.toPersistableData()
 
+    fun setSubDirectory(subDirectory: String): S3UploadRequest {
+        s3params.serverSubpath = subDirectory + addressLastSegment
+        return this
+    }
+
 
     override fun startUpload(): String {
-        /*require(file.isNotEmpty()) { "Add at least one file to start FTP upload!" }*/
         return super.startUpload()
     }
 }

@@ -12,6 +12,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.network.HttpStack
+import net.gotev.uploadservice.network.ServerResponse
 import java.io.File
 
 class S3UploadTask : UploadTask() {
@@ -25,20 +26,23 @@ class S3UploadTask : UploadTask() {
         val credentialsProvider = CognitoCachingCredentialsProvider(context, s3params.identityPoolId, Regions.fromName(s3params.region))
 
         val s3 = AmazonS3Client(credentialsProvider, Region.getRegion(Regions.fromName(s3params.region)))
+        s3.getUrl(s3params.bucket_name, s3params.serverSubpath)
         val transferUtility = TransferUtility.builder().s3Client(s3).context(context).build()
         val file = File(s3params.uploadFilepath)
-
+        require(file.exists()) { "Error! Please choose a valid file for upload" }
+        TransferNetworkLossHandler.getInstance(context)
         val observer = transferUtility.upload(
                 s3params.bucket_name,
                 s3params.serverSubpath,
                 file,
                 CannedAccessControlList.Private
         )
-        TransferNetworkLossHandler.getInstance(context)
+
 
         observer.setTransferListener(object : TransferListener {
             override fun onStateChanged(id: Int, state: TransferState) {
                 if (state == TransferState.COMPLETED) {
+                    onResponseReceived(ServerResponse.successfulEmpty())
                     Log.i("UtilityObserver","Upload Finished!");
                 } else if (state == TransferState.FAILED) {
                     Log.i("UtilityObserver","Upload Failed!");

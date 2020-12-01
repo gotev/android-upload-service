@@ -29,14 +29,14 @@ class S3UploadTask : UploadTask() {
         val transferUtility = TransferUtility.builder().s3Client(s3).context(context).build()
         val file = File(s3params.uploadFilepath)
         require(file.exists()) { "Error! Please choose a valid file for upload" }
-        
+        TransferNetworkLossHandler.getInstance(context)
         val observer = transferUtility.upload(
                 s3params.bucket_name,
                 s3params.serverSubpath,
                 file,
                 CannedAccessControlList.Private
         )
-        TransferNetworkLossHandler.getInstance(context)
+
 
         observer.setTransferListener(object : TransferListener {
             override fun onStateChanged(id: Int, state: TransferState) {
