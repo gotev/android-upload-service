@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import org.json.JSONObject
-import java.io.File
 import java.lang.IllegalArgumentException
 
 /**
@@ -92,9 +91,6 @@ open class PersistableData() : Parcelable {
 
     fun putString(key: String, value: String) { data[key.validated()] = value }
     fun getString(key: String) = data[key.validated(checkExists = true)] as String
-
-    fun putFile(key: String, value: File) { data[key.validated()] = value }
-    fun getFile(key: String) = data[key.validated(checkExists = true)] as File
 
     fun putData(key: String, data: PersistableData) {
         data.data.forEach { (dataKey, value) ->
