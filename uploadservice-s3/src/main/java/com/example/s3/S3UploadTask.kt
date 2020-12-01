@@ -48,7 +48,10 @@ class S3UploadTask : UploadTask() {
             }
 
             override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+                resetUploadedBytes()
+                totalBytes = bytesTotal
                 val progress = bytesCurrent.toDouble() / bytesTotal * 100
+                onProgress(bytesCurrent)
                 Log.i("UtilityObserver","Progress: " + progress);
             }
 
