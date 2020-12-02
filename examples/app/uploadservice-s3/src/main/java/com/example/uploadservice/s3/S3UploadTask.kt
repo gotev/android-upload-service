@@ -1,66 +1,101 @@
 package com.example.uploadservice.s3
 
 import android.util.Log
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferNetworkLossHandler
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
-import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.s3.model.CannedAccessControlList
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.ServerResponse
-import java.io.File
 
-class S3UploadTask : UploadTask() {
+class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
+
+    private var uploadBytes: Long = 0
 
     private val s3params by lazy {
         S3UploadTaskParameters.createFromPersistableData(params.additionalParameters)
     }
-
+    @Throws(Exception::class)
     override fun upload(httpStack: HttpStack) {
         val s3params = s3params
-        val credentialsProvider = CognitoCachingCredentialsProvider(context, s3params.identityPoolId, Regions.fromName(s3params.region))
-        val s3 = AmazonS3Client(credentialsProvider, Region.getRegion(Regions.fromName(s3params.region)))
-        s3.getUrl(s3params.bucket_name, s3params.serverSubpath)
-        val transferUtility = TransferUtility.builder().s3Client(s3).context(context).build()
-        val file = File(s3params.uploadFilepath)
-        require(file.exists()) { "Error! Please choose a valid file for upload" }
-        TransferNetworkLossHandler.getInstance(context)
-        val observer = transferUtility.upload(
-                s3params.bucket_name,
-                s3params.serverSubpath,
-                file,
-                CannedAccessControlList.Private
-        )
+        S3ClientWrapper(uploadId = params.id,
+                context = context,
+                identityPoolId = s3params.identityPoolId,
+                region = Regions.fromName(s3params.region),
+                observer = this
+        ).use { s3Client ->
 
 
-        observer.setTransferListener(object : TransferListener {
-            override fun onStateChanged(id: Int, state: TransferState) {
-                if (state == TransferState.COMPLETED) {
-                    onResponseReceived(ServerResponse.successfulEmpty())
-                    Log.i("UtilityObserver","Upload Finished!");
-                } else if (state == TransferState.FAILED) {
-                    Log.i("UtilityObserver","Upload Failed!");
-                } else {
-                    Log.i("UtilityObserver","Unkown!");
-                }
+            // this is needed to calculate the total bytes and the uploaded bytes, because if the
+            // request fails, the upload method will be called again
+            // (until max retries is reached) to retry the upload, so it's necessary to
+            // know at which status we left, to be able to properly notify further progress.
+            calculateUploadedAndTotalBytes();
+
+
+            for (file in params.files) {
+                if (!shouldContinue)
+                    break
+
+                if (file.successfullyUploaded)
+                    continue
+
+                s3Client.uploadFile(context, s3params.bucket_name, s3params.serverSubpath, file)
+                file.successfullyUploaded = true
             }
+        }
+    }
 
-            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
-                resetUploadedBytes()
-                totalBytes = bytesTotal
-                onProgress(bytesCurrent)
-                val progress = bytesCurrent.toDouble() / bytesTotal * 100
-                Log.i("UtilityObserver","Progress: " + progress);
-            }
+    /**
+     * Calculates the total bytes of this upload task.
+     * This the sum of all the lengths of the successfully uploaded files and also the pending
+     * ones.
+     */
+    private fun calculateUploadedAndTotalBytes() {
+        resetUploadedBytes()
+        uploadBytes = 0
+        var totalUploaded: Long = 0
 
-            override fun onError(id: Int, ex: Exception) {
-                Log.e("UtilityObserver","Error Occured");
+        for (file in successfullyUploadedFiles) {
+            totalUploaded += file.handler.size(context)
+        }
+
+        totalBytes = totalUploaded
+
+        for (file in params.files) {
+            totalBytes += file.handler.size(context)
+        }
+
+        onProgress(totalUploaded)
+    }
+
+    override fun onStateChanged(client: S3ClientWrapper, id: Int, state: TransferState?) {
+        if (state == TransferState.COMPLETED) {
+            if (shouldContinue) {
+                onResponseReceived(ServerResponse.successfulEmpty())
             }
-        })
+        } else if (state == TransferState.FAILED) {
+            Log.i("UtilityObserver","Upload Failed!");
+        } else if (state == TransferState.IN_PROGRESS){
+            Log.i("UtilityObserver","In progress");
+        } else if (state == TransferState.WAITING_FOR_NETWORK) {
+            Log.i("UtilityObserver","Waiting for Network");
+        } else {
+            if (state != null) {
+                Log.i("UtilityObserver",state.name)
+            };
+        }
+    }
+
+    override fun onProgressChanged(client: S3ClientWrapper, id: Int, bytesCurrent: Long, bytesTotal: Long) {
+        onProgress(bytesCurrent - uploadBytes)
+        uploadBytes = bytesCurrent
+        if (!shouldContinue) {
+            client.close()
+        }
+
+    }
+
+    override fun onError(client: S3ClientWrapper, id: Int, ex: java.lang.Exception?) {
+        Log.e("UtilityObserver","Error Occured");
     }
 }

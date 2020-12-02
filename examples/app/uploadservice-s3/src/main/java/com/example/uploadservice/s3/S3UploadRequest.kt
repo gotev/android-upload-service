@@ -4,7 +4,9 @@ import android.content.Context
 import com.amazonaws.regions.Regions
 import net.gotev.uploadservice.UploadRequest
 import net.gotev.uploadservice.UploadTask
+import net.gotev.uploadservice.data.UploadFile
 import java.io.File
+import java.io.FileNotFoundException
 
 
 class S3UploadRequest(context: Context,
@@ -33,6 +35,14 @@ class S3UploadRequest(context: Context,
 
 
     override fun startUpload(): String {
+        require(files.isNotEmpty()) { "Add at least one file to start S3 upload!" }
         return super.startUpload()
+    }
+
+    @Throws(FileNotFoundException::class)
+    @JvmOverloads
+    fun addFileToUpload(filePath: String): S3UploadRequest {
+        files.add(UploadFile(filePath))
+        return this
     }
 }
