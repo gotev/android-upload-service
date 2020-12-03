@@ -1,7 +1,7 @@
 package com.example.uploadservice.s3
 
 import android.content.Context
-import android.util.Log
+import android.content.Intent
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.s3.transferutility.*
 import com.amazonaws.regions.Region
@@ -10,10 +10,8 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.logger.UploadServiceLogger
-import net.gotev.uploadservice.network.ServerResponse
 import java.io.Closeable
 import java.io.File
-import java.io.IOException
 import java.lang.Exception
 
 class S3ClientWrapper (private val uploadId: String,
@@ -26,16 +24,21 @@ class S3ClientWrapper (private val uploadId: String,
     private val s3: AmazonS3Client = AmazonS3Client(credentialsProvider, Region.getRegion(region))
     private val transferUtility = TransferUtility.builder().s3Client(s3).context(context).build()
     private lateinit var transferObserver : TransferObserver
+    private lateinit var uploadingFile: UploadFile
+
+    init {
+        context.startService(Intent(context, TransferService::class.java))
+    }
 
     interface Observer {
-        fun onStateChanged(client: S3ClientWrapper, id: Int, state: TransferState?)
+        fun onStateChanged(client: S3ClientWrapper, uploadFile: UploadFile, id: Int, state: TransferState?)
         fun onProgressChanged(client: S3ClientWrapper, id: Int, bytesCurrent: Long, bytesTotal: Long)
         fun onError(client: S3ClientWrapper, id: Int, ex: Exception?)
     }
     
     private val transferListener = object : TransferListener {
         override fun onStateChanged(id: Int, state: TransferState?) {
-            observer.onStateChanged(this@S3ClientWrapper, id, state)
+            observer.onStateChanged(this@S3ClientWrapper, uploadingFile, id, state)
         }
 
         override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
@@ -47,7 +50,7 @@ class S3ClientWrapper (private val uploadId: String,
         }
     }
 
-    @Throws(IOException::class)
+    @Throws(Exception::class)
     fun uploadFile(
             context: Context,
             bucketName :String,
@@ -56,8 +59,7 @@ class S3ClientWrapper (private val uploadId: String,
         UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
             "Starting S3 upload of: ${uploadFile.handler.name(context)}"
         }
-
-        TransferNetworkLossHandler.getInstance(context)
+        uploadingFile = uploadFile
         val file = File(uploadFile.path)
         transferObserver = transferUtility.upload(
                 bucketName,
@@ -68,11 +70,11 @@ class S3ClientWrapper (private val uploadId: String,
         transferObserver.setTransferListener(transferListener)
     }
     
-    override fun close() {
-        UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
-            "Closing S3 Client"
-        }
-        /*transferUtility.pause(transferObserver.id)*/
-    }
+    override fun close() {  }
 
+    fun stopUpload() {
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) { "Closing S3 Client" }
+        transferUtility.pause(transferObserver.id)
+        transferObserver.cleanTransferListener()
+    }
 }

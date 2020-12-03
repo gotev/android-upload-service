@@ -4,6 +4,7 @@ import android.util.Log
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.regions.Regions
 import net.gotev.uploadservice.UploadTask
+import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.ServerResponse
 
@@ -40,7 +41,6 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
                     continue
 
                 s3Client.uploadFile(context, s3params.bucketName, s3params.serverSubpath, file)
-                file.successfullyUploaded = true
             }
         }
     }
@@ -68,17 +68,13 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
         onProgress(totalUploaded)
     }
 
-    override fun onStateChanged(client: S3ClientWrapper, id: Int, state: TransferState?) {
+    @Throws(Exception::class)
+    override fun onStateChanged(client: S3ClientWrapper, uploadFile: UploadFile , id: Int, state: TransferState?) {
         if (state == TransferState.COMPLETED) {
             if (shouldContinue) {
+                params.files.filter { it.equals(uploadFile) }.first().successfullyUploaded = true
                 onResponseReceived(ServerResponse.successfulEmpty())
             }
-        } else if (state == TransferState.FAILED) {
-            Log.i("UtilityObserver","Upload Failed!");
-        } else if (state == TransferState.IN_PROGRESS){
-            Log.i("UtilityObserver","In progress");
-        } else if (state == TransferState.WAITING_FOR_NETWORK) {
-            Log.i("UtilityObserver","Waiting for Network");
         } else {
             if (state != null) {
                 Log.i("UtilityObserver",state.name)
@@ -90,12 +86,12 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
         onProgress(bytesCurrent - uploadBytes)
         uploadBytes = bytesCurrent
         if (!shouldContinue) {
-            client.close()
+            client.stopUpload()
         }
-
     }
 
     override fun onError(client: S3ClientWrapper, id: Int, ex: java.lang.Exception?) {
-        Log.e("UtilityObserver","Error Occured");
+        onResponseReceived(ServerResponse.errorEmpty())
+        exceptionHandling(Exception(ex))
     }
 }

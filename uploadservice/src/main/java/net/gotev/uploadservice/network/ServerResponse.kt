@@ -53,5 +53,12 @@ data class ServerResponse(
                 headers = LinkedHashMap()
             )
         }
+        fun errorEmpty(): ServerResponse {
+            return ServerResponse(
+                    code = -1,
+                    body = ByteArray(1),
+                    headers = LinkedHashMap()
+            )
+        }
     }
 }

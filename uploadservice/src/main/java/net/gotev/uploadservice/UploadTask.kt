@@ -137,39 +137,46 @@ abstract class UploadTask : Runnable {
             )
         }
         resetAttempts()
+        runUpload()
 
+    }
+
+    private fun runUpload() {
         while (attempts <= params.maxRetries && shouldContinue) {
+            attempts++
             try {
                 resetUploadedBytes()
                 upload(UploadServiceConfig.httpStack)
                 break
             } catch (exc: Throwable) {
-                if (!shouldContinue) {
-                    UploadServiceLogger.error(TAG, params.id, exc) { "error while uploading but user requested cancellation." }
-                    break
-                } else if (attempts >= params.maxRetries) {
-                    onError(exc)
-                } else {
-                    UploadServiceLogger.error(TAG, params.id, exc) { "error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt." }
-
-                    val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
-
-                    sleepWhile { shouldContinue && System.currentTimeMillis() < sleepDeadline }
-
-                    errorDelay *= UploadServiceConfig.retryPolicy.multiplier.toLong()
-
-                    if (errorDelay > UploadServiceConfig.retryPolicy.maxWaitTimeSeconds) {
-                        errorDelay = UploadServiceConfig.retryPolicy.maxWaitTimeSeconds.toLong()
-                    }
-                }
+                exceptionHandling(exc)
             }
-
-            attempts++
         }
 
         if (!shouldContinue) {
             onUserCancelledUpload()
         }
+    }
+
+    fun exceptionHandling(exc: Throwable) {
+        if (!shouldContinue) {
+            UploadServiceLogger.error(TAG, params.id, exc) { "error while uploading but user requested cancellation." }
+        } else if (attempts >= params.maxRetries) {
+            onError(exc)
+        } else {
+            UploadServiceLogger.error(TAG, params.id, exc) { "error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt." }
+
+            val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
+
+            sleepWhile { shouldContinue && System.currentTimeMillis() < sleepDeadline }
+
+            errorDelay *= UploadServiceConfig.retryPolicy.multiplier.toLong()
+
+            if (errorDelay > UploadServiceConfig.retryPolicy.maxWaitTimeSeconds) {
+                errorDelay = UploadServiceConfig.retryPolicy.maxWaitTimeSeconds.toLong()
+            }
+        }
+        runUpload()
     }
 
     private inline fun sleepWhile(millis: Long = 1000, condition: () -> Boolean) {
