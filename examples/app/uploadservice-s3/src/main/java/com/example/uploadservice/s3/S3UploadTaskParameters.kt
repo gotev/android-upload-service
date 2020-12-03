@@ -9,7 +9,6 @@ import java.io.File
 
 @Parcelize
 data class S3UploadTaskParameters (
-        var uploadFilepath : String,
         var serverSubpath: String = "",
         var bucket_name: String,
         var identityPoolId: String,
@@ -23,7 +22,6 @@ data class S3UploadTaskParameters (
          */
 
         private object CodingKeys {
-            const val uploadFilepath = "uploadFilepath"
             const val serverSubpath = "serverSubpath"
             const val bucket_name = "bucket_name"
             const val identityPoolId = "identityPoolId"
@@ -33,7 +31,6 @@ data class S3UploadTaskParameters (
         }
 
         override fun createFromPersistableData(data: PersistableData) = S3UploadTaskParameters(
-                uploadFilepath = data.getString(CodingKeys.uploadFilepath),
                 serverSubpath = data.getString(CodingKeys.serverSubpath),
                 bucket_name = data.getString(CodingKeys.bucket_name),
                 identityPoolId = data.getString(CodingKeys.identityPoolId),
@@ -44,7 +41,6 @@ data class S3UploadTaskParameters (
     }
 
     override fun toPersistableData() = PersistableData().apply {
-        putString(CodingKeys.uploadFilepath, uploadFilepath)
         putString(CodingKeys.serverSubpath, serverSubpath)
         putString(CodingKeys.bucket_name, bucket_name)
         putString(CodingKeys.identityPoolId, identityPoolId)

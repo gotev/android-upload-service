@@ -52,16 +52,17 @@ class S3ClientWrapper (private val uploadId: String,
             context: Context,
             bucketName :String,
             serverSubPath: String,
-            file: UploadFile) {
+            uploadFile: UploadFile) {
         UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
-            "Starting S3 upload of: ${file.handler.name(context)}"
+            "Starting S3 upload of: ${uploadFile.handler.name(context)}"
         }
 
         TransferNetworkLossHandler.getInstance(context)
+        val file = File(uploadFile.path)
         transferObserver = transferUtility.upload(
                 bucketName,
-                serverSubPath,
-                File(file.path),
+                serverSubPath + "/" + file.name,
+                file,
                 CannedAccessControlList.Private
         )
         transferObserver.setTransferListener(transferListener)

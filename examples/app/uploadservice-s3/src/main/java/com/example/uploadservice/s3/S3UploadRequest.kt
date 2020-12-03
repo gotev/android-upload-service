@@ -13,13 +13,14 @@ class S3UploadRequest(context: Context,
                       bucket_name: String,
                       identityPoolId: String,
                       region: Regions,
-                      uploadFilepath: String,
                       ) : UploadRequest<S3UploadRequest>(context, "serverUrl") {
 
-    val addressLastSegment = "/" + File(uploadFilepath).name
-    
-    protected val s3params = S3UploadTaskParameters(uploadFilepath, addressLastSegment,
-            bucket_name , identityPoolId, region.getName());
+   
+    protected val s3params = S3UploadTaskParameters(
+            bucket_name = bucket_name,
+            identityPoolId = identityPoolId,
+            region = region.getName()
+            );
 
     
     
@@ -27,9 +28,18 @@ class S3UploadRequest(context: Context,
         get() = S3UploadTask::class.java
 
     override fun getAdditionalParameters() = s3params.toPersistableData()
-    
+
+    /* if this is not set, The uploaded file path will be stored on the root directory of the server
+    * if you are uploading `/path/to/myfile.txt`, you will have `myfile.txt`
+    * inside the default remote working directory.
+    *
+    * If this is set, your uploaded file will put to the relative subdirectories
+    * so for example if you want to upload to '/images/usa/vacations.zip`, 
+    * set this to '/images/usa'. Note: no slash should be added at the end
+    * If the directory(ies) does not exists, it would automatically create them
+     */
     fun setSubDirectory(subDirectory: String): S3UploadRequest {
-        s3params.serverSubpath = subDirectory + addressLastSegment
+        s3params.serverSubpath = subDirectory
         return this
     }
 
