@@ -5,19 +5,18 @@ import com.amazonaws.regions.Regions
 import net.gotev.uploadservice.UploadRequest
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.data.UploadFile
-import java.io.File
 import java.io.FileNotFoundException
 
 
 class S3UploadRequest(context: Context,
-                      bucket_name: String,
+                      bucketName: String,
                       identityPoolId: String,
                       region: Regions,
                       ) : UploadRequest<S3UploadRequest>(context, "serverUrl") {
 
    
     protected val s3params = S3UploadTaskParameters(
-            bucket_name = bucket_name,
+            bucketName = bucketName,
             identityPoolId = identityPoolId,
             region = region.getName()
             );

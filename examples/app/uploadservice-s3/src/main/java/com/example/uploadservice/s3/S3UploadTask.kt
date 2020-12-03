@@ -39,7 +39,7 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
                 if (file.successfullyUploaded)
                     continue
 
-                s3Client.uploadFile(context, s3params.bucket_name, s3params.serverSubpath, file)
+                s3Client.uploadFile(context, s3params.bucketName, s3params.serverSubpath, file)
                 file.successfullyUploaded = true
             }
         }
