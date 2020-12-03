@@ -1,4 +1,4 @@
-package com.example.uploadservice.s3
+package net.gotev.uploadservice.s3
 
 import org.junit.Test
 

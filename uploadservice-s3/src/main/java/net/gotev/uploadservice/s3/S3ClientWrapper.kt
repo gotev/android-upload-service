@@ -1,4 +1,4 @@
-package com.example.uploadservice.s3
+package net.gotev.uploadservice.s3
 
 import android.content.Context
 import android.content.Intent
@@ -35,7 +35,7 @@ class S3ClientWrapper (private val uploadId: String,
         fun onProgressChanged(client: S3ClientWrapper, id: Int, bytesCurrent: Long, bytesTotal: Long)
         fun onError(client: S3ClientWrapper, id: Int, ex: Exception?)
     }
-    
+
     private val transferListener = object : TransferListener {
         override fun onStateChanged(id: Int, state: TransferState?) {
             observer.onStateChanged(this@S3ClientWrapper, uploadingFile, id, state)
@@ -69,11 +69,11 @@ class S3ClientWrapper (private val uploadId: String,
         )
         transferObserver.setTransferListener(transferListener)
     }
-    
+
     override fun close() {  }
 
     fun stopUpload() {
-        UploadServiceLogger.debug(javaClass.simpleName, uploadId) { "Closing S3 Client" }
+        UploadServiceLogger.debug(javaClass.simpleName, uploadId) { "Stopping S3 Upload" }
         transferUtility.pause(transferObserver.id)
         transferObserver.cleanTransferListener()
     }

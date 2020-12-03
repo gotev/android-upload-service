@@ -1,10 +1,10 @@
-package com.example.uploadservice.s3
+package net.gotev.uploadservice.s3
 
-import android.util.Log
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.regions.Regions
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.data.UploadFile
+import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.network.HttpStack
 import net.gotev.uploadservice.network.ServerResponse
 
@@ -77,7 +77,7 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
             }
         } else {
             if (state != null) {
-                Log.i("UtilityObserver",state.name)
+                UploadServiceLogger.debug(javaClass.simpleName, params.id ) { "state of file " + uploadFile.path + " changed to" + state.name }
             };
         }
     }
@@ -91,6 +91,7 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
     }
 
     override fun onError(client: S3ClientWrapper, id: Int, ex: java.lang.Exception?) {
+        UploadServiceLogger.debug(javaClass.simpleName, params.id) { ex.toString() }
         onResponseReceived(ServerResponse.errorEmpty())
         exceptionHandling(Exception(ex))
     }
