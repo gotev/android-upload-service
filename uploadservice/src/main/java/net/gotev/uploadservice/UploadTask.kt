@@ -68,12 +68,12 @@ abstract class UploadTask : Runnable {
 
     private val uploadInfo: UploadInfo
         get() = UploadInfo(
-            uploadId = params.id,
-            startTime = startTime,
-            uploadedBytes = uploadedBytes,
-            totalBytes = totalBytes,
-            numberOfRetries = attempts,
-            files = params.files
+                uploadId = params.id,
+                startTime = startTime,
+                uploadedBytes = uploadedBytes,
+                totalBytes = totalBytes,
+                numberOfRetries = attempts,
+                files = params.files
         )
 
     /**
@@ -107,11 +107,11 @@ abstract class UploadTask : Runnable {
      */
     @Throws(IOException::class)
     fun init(
-        context: Context,
-        taskParams: UploadTaskParameters,
-        notificationConfig: UploadNotificationConfig,
-        notificationId: Int,
-        vararg taskObservers: UploadTaskObserver
+            context: Context,
+            taskParams: UploadTaskParameters,
+            notificationConfig: UploadNotificationConfig,
+            notificationId: Int,
+            vararg taskObservers: UploadTaskObserver
     ) {
         this.context = context
         this.params = taskParams
@@ -131,9 +131,9 @@ abstract class UploadTask : Runnable {
     override fun run() {
         doForEachObserver {
             onStart(
-                uploadInfo,
-                notificationId,
-                notificationConfig
+                    uploadInfo,
+                    notificationId,
+                    notificationConfig
             )
         }
         resetAttempts()
@@ -151,7 +151,6 @@ abstract class UploadTask : Runnable {
                 exceptionHandling(exc)
             }
         }
-
         if (!shouldContinue) {
             onUserCancelledUpload()
         }
@@ -164,13 +163,9 @@ abstract class UploadTask : Runnable {
             onError(exc)
         } else {
             UploadServiceLogger.error(TAG, params.id, exc) { "error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt." }
-
             val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
-
             sleepWhile { shouldContinue && System.currentTimeMillis() < sleepDeadline }
-
             errorDelay *= UploadServiceConfig.retryPolicy.multiplier.toLong()
-
             if (errorDelay > UploadServiceConfig.retryPolicy.maxWaitTimeSeconds) {
                 errorDelay = UploadServiceConfig.retryPolicy.maxWaitTimeSeconds.toLong()
             }
@@ -228,19 +223,19 @@ abstract class UploadTask : Runnable {
 
             doForEachObserver {
                 onSuccess(
-                    uploadInfo,
-                    notificationId,
-                    notificationConfig,
-                    response
+                        uploadInfo,
+                        notificationId,
+                        notificationConfig,
+                        response
                 )
             }
         } else {
             doForEachObserver {
                 onError(
-                    uploadInfo,
-                    notificationId,
-                    notificationConfig,
-                    UploadError(response)
+                        uploadInfo,
+                        notificationId,
+                        notificationConfig,
+                        UploadError(response)
                 )
             }
         }
