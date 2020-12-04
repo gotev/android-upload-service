@@ -128,6 +128,9 @@ abstract class UploadTask : Runnable {
         errorDelay = UploadServiceConfig.retryPolicy.initialWaitTimeSeconds.toLong()
     }
 
+    /**
+     * This and runUpload will run the upload task
+     */
     override fun run() {
         doForEachObserver {
             onStart(
@@ -156,6 +159,11 @@ abstract class UploadTask : Runnable {
         }
     }
 
+    /**
+     * If an exception is thrown while uploading this method will be executed to do the retry.
+     * If you want you require to call this method directly on error, you can do so on your upload task
+     * See S3 implementation for example
+     */
     fun exceptionHandling(exc: Throwable) {
         if (!shouldContinue) {
             UploadServiceLogger.error(TAG, params.id, exc) { "error while uploading but user requested cancellation." }
