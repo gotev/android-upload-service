@@ -68,12 +68,12 @@ abstract class UploadTask : Runnable {
 
     private val uploadInfo: UploadInfo
         get() = UploadInfo(
-                uploadId = params.id,
-                startTime = startTime,
-                uploadedBytes = uploadedBytes,
-                totalBytes = totalBytes,
-                numberOfRetries = attempts,
-                files = params.files
+            uploadId = params.id,
+            startTime = startTime,
+            uploadedBytes = uploadedBytes,
+            totalBytes = totalBytes,
+            numberOfRetries = attempts,
+            files = params.files
         )
 
     /**
@@ -107,11 +107,11 @@ abstract class UploadTask : Runnable {
      */
     @Throws(IOException::class)
     fun init(
-            context: Context,
-            taskParams: UploadTaskParameters,
-            notificationConfig: UploadNotificationConfig,
-            notificationId: Int,
-            vararg taskObservers: UploadTaskObserver
+        context: Context,
+        taskParams: UploadTaskParameters,
+        notificationConfig: UploadNotificationConfig,
+        notificationId: Int,
+        vararg taskObservers: UploadTaskObserver
     ) {
         this.context = context
         this.params = taskParams
@@ -131,9 +131,9 @@ abstract class UploadTask : Runnable {
     override fun run() {
         doForEachObserver {
             onStart(
-                    uploadInfo,
-                    notificationId,
-                    notificationConfig
+                uploadInfo,
+                notificationId,
+                notificationConfig
             )
         }
         resetAttempts()
@@ -142,10 +142,10 @@ abstract class UploadTask : Runnable {
 
     private fun runUpload() {
         while (attempts <= params.maxRetries && shouldContinue) {
-            attempts++
             try {
                 resetUploadedBytes()
                 upload(UploadServiceConfig.httpStack)
+                attempts++
                 break
             } catch (exc: Throwable) {
                 exceptionHandling(exc)
@@ -170,6 +170,7 @@ abstract class UploadTask : Runnable {
                 errorDelay = UploadServiceConfig.retryPolicy.maxWaitTimeSeconds.toLong()
             }
         }
+        attempts++
         runUpload()
     }
 
