@@ -87,6 +87,7 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
         uploadBytes = bytesCurrent
         if (!shouldContinue) {
             client.stopUpload()
+            exceptionHandling(Exception("User cancelled upload!"))
         }
     }
 
