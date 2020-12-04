@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.example.uploadservice_s3.test", appContext.packageName)
+        assertEquals("net.gotev.uploadservice.s3.test", appContext.packageName)
     }
 }

@@ -138,7 +138,6 @@ abstract class UploadTask : Runnable {
         }
         resetAttempts()
         runUpload()
-
     }
 
     private fun runUpload() {
