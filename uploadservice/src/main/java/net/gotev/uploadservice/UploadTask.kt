@@ -224,19 +224,19 @@ abstract class UploadTask : Runnable {
 
             doForEachObserver {
                 onSuccess(
-                        uploadInfo,
-                        notificationId,
-                        notificationConfig,
-                        response
+                    uploadInfo,
+                    notificationId,
+                    notificationConfig,
+                    response
                 )
             }
         } else {
             doForEachObserver {
                 onError(
-                        uploadInfo,
-                        notificationId,
-                        notificationConfig,
-                        UploadError(response)
+                    uploadInfo,
+                    notificationId,
+                    notificationConfig,
+                    UploadError(response)
                 )
             }
         }
