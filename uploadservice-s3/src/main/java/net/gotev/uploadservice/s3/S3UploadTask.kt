@@ -76,9 +76,7 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
                 onResponseReceived(ServerResponse.successfulEmpty())
             }
         } else {
-            if (state != null) {
-                UploadServiceLogger.debug(javaClass.simpleName, params.id ) { "state of file " + uploadFile.path + " changed to" + state.name }
-            };
+            UploadServiceLogger.debug(javaClass.simpleName, params.id ) { "state of file " + uploadFile.path + " changed to" + (state?.name ?: "unknown!!!") }
         }
     }
 

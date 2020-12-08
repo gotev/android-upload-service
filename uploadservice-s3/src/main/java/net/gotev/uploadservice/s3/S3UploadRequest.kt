@@ -41,14 +41,15 @@ class S3UploadRequest(context: Context,
         return this
     }
 
-
+    /**
+     * This would call the upload method of the upload task class (S3UploadTask)
+     */
     override fun startUpload(): String {
         require(files.isNotEmpty()) { "Add at least one file to start S3 upload!" }
         return super.startUpload()
     }
 
     @Throws(FileNotFoundException::class)
-    @JvmOverloads
     fun addFileToUpload(filePath: String): S3UploadRequest {
         files.add(UploadFile(filePath))
         return this

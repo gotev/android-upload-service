@@ -16,9 +16,6 @@ data class S3UploadTaskParameters (
         var identityKey: String = "com.aws.s3$identityPoolId",
 ) : Parcelable, Persistable {
     companion object : Persistable.Creator<S3UploadTaskParameters> {
-        /**
-         * The default FTP connection timeout in milliseconds.
-         */
 
         private object CodingKeys {
             const val serverSubpath = "serverSubpath"
