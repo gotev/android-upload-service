@@ -55,7 +55,8 @@ class S3ClientWrapper (private val uploadId: String,
             context: Context,
             bucketName :String,
             serverSubPath: String,
-            uploadFile: UploadFile) {
+            uploadFile: UploadFile,
+            cannedAccessControlList: CannedAccessControlList) {
         UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
             "Starting S3 upload of: ${uploadFile.handler.name(context)}"
         }
@@ -65,7 +66,7 @@ class S3ClientWrapper (private val uploadId: String,
                 bucketName,
                 serverSubPath + "/" + file.name,
                 file,
-                CannedAccessControlList.Private
+                cannedAccessControlList
         )
         transferObserver.setTransferListener(transferListener)
     }

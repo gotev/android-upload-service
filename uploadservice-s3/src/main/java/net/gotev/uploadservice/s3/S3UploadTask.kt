@@ -2,6 +2,7 @@ package net.gotev.uploadservice.s3
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.model.CannedAccessControlList
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.logger.UploadServiceLogger
@@ -40,7 +41,7 @@ class S3UploadTask() : UploadTask(), S3ClientWrapper.Observer {
                 if (file.successfullyUploaded)
                     continue
 
-                s3Client.uploadFile(context, s3params.bucketName, s3params.serverSubpath, file)
+                s3Client.uploadFile(context, s3params.bucketName, s3params.serverSubpath, file, CannedAccessControlList.valueOf(s3params.cannedAccessControlList))
             }
         }
     }
