@@ -128,6 +128,10 @@ abstract class UploadTask : Runnable {
         errorDelay = UploadServiceConfig.retryPolicy.initialWaitTimeSeconds.toLong()
     }
 
+    /**
+     * Executes the upload task and notifies UploadTaskObservers the start of the upload.
+     * The body is impelemented on runUpload method.
+     */
     override fun run() {
         doForEachObserver {
             onStart(
@@ -137,39 +141,56 @@ abstract class UploadTask : Runnable {
             )
         }
         resetAttempts()
+        runUpload()
+    }
 
+    /**
+     * Runs the body of upload task. If exception is thrown on the body of upload task it runs the exceptionHandeling method.
+     * The exceptionHandeling implementation is moved into it's separate method so that it can be called directly via inherited classes (if needed)
+     * In some cases such as S3 where the upload thread happens on a different thread than the upload task
+     * and we don't have control over it, we can call the exceptionHandeling manually on observance of an error.
+     * This method is called at the end of exceptionHandeling for the number of attempts.
+     * Note: "run" resets attempts as well so at the end of exceptionHandeling "run" should not be called. Instead this method is called.
+     */
+    private fun runUpload() {
         while (attempts <= params.maxRetries && shouldContinue) {
             try {
                 resetUploadedBytes()
                 upload(UploadServiceConfig.httpStack)
+                attempts++
                 break
             } catch (exc: Throwable) {
-                if (!shouldContinue) {
-                    UploadServiceLogger.error(TAG, params.id, exc) { "error while uploading but user requested cancellation." }
-                    break
-                } else if (attempts >= params.maxRetries) {
-                    onError(exc)
-                } else {
-                    UploadServiceLogger.error(TAG, params.id, exc) { "error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt." }
-
-                    val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
-
-                    sleepWhile { shouldContinue && System.currentTimeMillis() < sleepDeadline }
-
-                    errorDelay *= UploadServiceConfig.retryPolicy.multiplier.toLong()
-
-                    if (errorDelay > UploadServiceConfig.retryPolicy.maxWaitTimeSeconds) {
-                        errorDelay = UploadServiceConfig.retryPolicy.maxWaitTimeSeconds.toLong()
-                    }
-                }
+                exceptionHandling(exc)
             }
-
-            attempts++
         }
-
         if (!shouldContinue) {
             onUserCancelledUpload()
         }
+    }
+
+    /**
+     * If an exception is thrown while uploading, this method will be executed to do the retry.
+     * This method (retry) is automatically called on upload task exception.
+     * However, if upload is carried over a separate thread you need to call this manually.
+     * You can call this method directly on observance of an error. See S3 implementation for example
+     * @param exc: The exception that has been thrown
+     */
+    fun exceptionHandling(exc: Throwable) {
+        if (!shouldContinue) {
+            UploadServiceLogger.error(TAG, params.id, exc) { "error while uploading but user requested cancellation." }
+        } else if (attempts >= params.maxRetries) {
+            onError(exc)
+        } else {
+            UploadServiceLogger.error(TAG, params.id, exc) { "error on attempt ${attempts + 1}. Waiting ${errorDelay}s before next attempt." }
+            val sleepDeadline = System.currentTimeMillis() + errorDelay * 1000
+            sleepWhile { shouldContinue && System.currentTimeMillis() < sleepDeadline }
+            errorDelay *= UploadServiceConfig.retryPolicy.multiplier.toLong()
+            if (errorDelay > UploadServiceConfig.retryPolicy.maxWaitTimeSeconds) {
+                errorDelay = UploadServiceConfig.retryPolicy.maxWaitTimeSeconds.toLong()
+            }
+        }
+        attempts++
+        runUpload()
     }
 
     private inline fun sleepWhile(millis: Long = 1000, condition: () -> Boolean) {

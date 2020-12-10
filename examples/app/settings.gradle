@@ -2,6 +2,8 @@ include ':demoapp'
 include ':uploadservice'
 include ':uploadservice-okhttp'
 include ':uploadservice-ftp'
+include ':uploadservice-s3'
 project(':uploadservice').projectDir = file('../../uploadservice')
 project(':uploadservice-okhttp').projectDir = file('../../uploadservice-okhttp')
 project(':uploadservice-ftp').projectDir = file('../../uploadservice-ftp')
+project(':uploadservice-s3').projectDir = file('../../uploadservice-s3')

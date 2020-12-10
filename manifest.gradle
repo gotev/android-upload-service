@@ -39,4 +39,7 @@ ext {
     // Library and app dependencies versions
     androidx_lifecycle_version = '2.2.0'
     androidx_appcompat_version = '1.1.0'
+
+    // aws dependencies versions
+    amazon_aws_version = '2.14.2'
 }

@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/../../uploadservice" />
             <option value="$PROJECT_DIR$/../../uploadservice-ftp" />
             <option value="$PROJECT_DIR$/../../uploadservice-okhttp" />
+            <option value="$PROJECT_DIR$/../../uploadservice-s3" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
