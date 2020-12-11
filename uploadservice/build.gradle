@@ -39,6 +39,12 @@ android {
         targetSdkVersion target_sdk
         versionCode version_code
         versionName library_version
+
+        // https://commonsware.com/blog/2020/10/14/android-studio-4p1-library-modules-version-code.html
+        // https://issuetracker.google.com/issues/158695880#comment15
+        buildConfigField 'int', 'VERSION_CODE', "$version_code"
+        buildConfigField 'String', 'VERSION_NAME', "\"$library_version\""
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
