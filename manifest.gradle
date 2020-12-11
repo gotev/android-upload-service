@@ -1,7 +1,7 @@
 ext {
     mavRepoInternalUrl = System.getenv('LOCAL_MAVEN_URL')
 
-    github_username = 'gotev'
+    github_username = 'biosensics'
     github_repository_name = 'android-upload-service'
 
     maintainer = 'Aleksandar Gotev'
