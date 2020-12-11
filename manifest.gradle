@@ -23,7 +23,7 @@ ext {
     gradle_version = '4.1.1'
     gradle_versions_plugin_version = '0.28.0'
     bintray_plugin_version = '1.8.4'
-    kotlin_lint_version = '9.0.0'
+    kotlin_lint_version = '9.4.1'
 
     // Library and app testing dependencies versions
     junit_version = '4.13.1'
