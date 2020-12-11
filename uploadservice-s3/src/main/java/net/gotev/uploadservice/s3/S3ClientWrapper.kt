@@ -3,7 +3,11 @@ package net.gotev.uploadservice.s3
 import android.content.Context
 import android.content.Intent
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
-import com.amazonaws.mobileconnectors.s3.transferutility.*
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferService
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
@@ -14,16 +18,18 @@ import java.io.Closeable
 import java.io.File
 import java.lang.Exception
 
-class S3ClientWrapper (private val uploadId: String,
-                       observer: Observer,
-                       context: Context,
-                       identityPoolId: String,
-                       region: Regions) : Closeable {
+class S3ClientWrapper(
+    private val uploadId: String,
+    observer: Observer,
+    context: Context,
+    identityPoolId: String,
+    region: Regions
+) : Closeable {
 
     private val credentialsProvider = CognitoCachingCredentialsProvider(context, identityPoolId, region)
     private val s3: AmazonS3Client = AmazonS3Client(credentialsProvider, Region.getRegion(region))
     private val transferUtility = TransferUtility.builder().s3Client(s3).context(context).build()
-    private lateinit var transferObserver : TransferObserver
+    private lateinit var transferObserver: TransferObserver
     private lateinit var uploadingFile: UploadFile
 
     init {
@@ -52,26 +58,27 @@ class S3ClientWrapper (private val uploadId: String,
 
     @Throws(Exception::class)
     fun uploadFile(
-            context: Context,
-            bucketName :String,
-            serverSubPath: String,
-            uploadFile: UploadFile,
-            cannedAccessControlList: CannedAccessControlList) {
+        context: Context,
+        bucketName: String,
+        serverSubPath: String,
+        uploadFile: UploadFile,
+        cannedAccessControlList: CannedAccessControlList
+    ) {
         UploadServiceLogger.debug(javaClass.simpleName, uploadId) {
             "Starting S3 upload of: ${uploadFile.handler.name(context)}"
         }
         uploadingFile = uploadFile
         val file = File(uploadFile.path)
         transferObserver = transferUtility.upload(
-                bucketName,
-                serverSubPath + "/" + file.name,
-                file,
-                cannedAccessControlList
+            bucketName,
+            serverSubPath + "/" + file.name,
+            file,
+            cannedAccessControlList
         )
         transferObserver.setTransferListener(transferListener)
     }
 
-    override fun close() {  }
+    override fun close() { }
 
     fun stopUpload() {
         UploadServiceLogger.debug(javaClass.simpleName, uploadId) { "Stopping S3 Upload" }
