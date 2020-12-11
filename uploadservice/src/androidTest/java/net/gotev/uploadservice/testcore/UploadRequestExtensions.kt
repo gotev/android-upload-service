@@ -61,36 +61,40 @@ fun UploadRequest<*>.getBlockingResponse(
 
     setUploadID(uploadID)
 
-    val observer = GlobalRequestObserver(context, object : RequestObserverDelegate {
-        var isFirstProgressActionTriggered = false
+    val observer = GlobalRequestObserver(
+        context,
+        object : RequestObserverDelegate {
+            var isFirstProgressActionTriggered = false
 
-        override fun onProgress(context: Context, uploadInfo: UploadInfo) {
-            if (!isFirstProgressActionTriggered && doOnFirstProgress != null) {
-                isFirstProgressActionTriggered = true
-                doOnFirstProgress(uploadInfo)
+            override fun onProgress(context: Context, uploadInfo: UploadInfo) {
+                if (!isFirstProgressActionTriggered && doOnFirstProgress != null) {
+                    isFirstProgressActionTriggered = true
+                    doOnFirstProgress(uploadInfo)
+                }
             }
-        }
 
-        override fun onSuccess(
-            context: Context,
-            uploadInfo: UploadInfo,
-            serverResponse: ServerResponse
-        ) {
-            resultingServerResponse = serverResponse
-        }
+            override fun onSuccess(
+                context: Context,
+                uploadInfo: UploadInfo,
+                serverResponse: ServerResponse
+            ) {
+                resultingServerResponse = serverResponse
+            }
 
-        override fun onError(context: Context, uploadInfo: UploadInfo, exception: Throwable) {
-            resultingException = exception
-        }
+            override fun onError(context: Context, uploadInfo: UploadInfo, exception: Throwable) {
+                resultingException = exception
+            }
 
-        override fun onCompleted(context: Context, uploadInfo: UploadInfo) {
-            lock.countDown()
-        }
+            override fun onCompleted(context: Context, uploadInfo: UploadInfo) {
+                lock.countDown()
+            }
 
-        override fun onCompletedWhileNotObserving() {
-            lock.countDown()
-        }
-    }, shouldAcceptEventsFrom = { it.uploadId == uploadID })
+            override fun onCompletedWhileNotObserving() {
+                lock.countDown()
+            }
+        },
+        shouldAcceptEventsFrom = { it.uploadId == uploadID }
+    )
 
     observer.register()
 

@@ -48,10 +48,13 @@ data class UploadFile @JvmOverloads constructor(
 
     override fun toPersistableData() = PersistableData().apply {
         putString(CodingKeys.path, path)
-        putData(CodingKeys.properties, PersistableData().apply {
-            properties.entries.forEach { (propKey, propVal) ->
-                putString(propKey, propVal)
+        putData(
+            CodingKeys.properties,
+            PersistableData().apply {
+                properties.entries.forEach { (propKey, propVal) ->
+                    putString(propKey, propVal)
+                }
             }
-        })
+        )
     }
 }

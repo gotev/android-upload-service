@@ -26,14 +26,18 @@ class MultipartUploadTask : HttpUploadTask() {
     private val newLineBytes = NEW_LINE.utf8Bytes
 
     private val NameValue.multipartHeader: ByteArray
-        get() = boundaryBytes + ("Content-Disposition: form-data; " +
-            "name=\"$name\"$NEW_LINE$NEW_LINE$value$NEW_LINE").utf8Bytes
+        get() = boundaryBytes + (
+            "Content-Disposition: form-data; " +
+                "name=\"$name\"$NEW_LINE$NEW_LINE$value$NEW_LINE"
+            ).utf8Bytes
 
     private val UploadFile.multipartHeader: ByteArray
-        get() = boundaryBytes + ("Content-Disposition: form-data; " +
-            "name=\"$parameterName\"; " +
-            "filename=\"$remoteFileName\"$NEW_LINE" +
-            "Content-Type: $contentType$NEW_LINE$NEW_LINE").utf8Bytes
+        get() = boundaryBytes + (
+            "Content-Disposition: form-data; " +
+                "name=\"$parameterName\"; " +
+                "filename=\"$remoteFileName\"$NEW_LINE" +
+                "Content-Type: $contentType$NEW_LINE$NEW_LINE"
+            ).utf8Bytes
 
     private val UploadFile.totalMultipartBytes: Long
         get() = multipartHeader.size.toLong() + handler.size(context) + newLineBytes.size.toLong()

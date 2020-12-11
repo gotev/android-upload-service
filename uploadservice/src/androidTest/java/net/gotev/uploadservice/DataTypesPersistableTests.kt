@@ -56,14 +56,20 @@ class DataTypesPersistableTests {
             maxRetries = 3,
             autoDeleteSuccessfullyUploadedFiles = false,
             files = arrayListOf(
-                UploadFile(path = "/path/to/file", properties = linkedMapOf(
-                    "prop" to "val",
-                    "otherprop" to "otherval"
-                )),
-                UploadFile(path = "/path/to/file/wow", properties = linkedMapOf(
-                    "propwow" to "valwow",
-                    "otherpropwow" to "othervalwow"
-                ))
+                UploadFile(
+                    path = "/path/to/file",
+                    properties = linkedMapOf(
+                        "prop" to "val",
+                        "otherprop" to "otherval"
+                    )
+                ),
+                UploadFile(
+                    path = "/path/to/file/wow",
+                    properties = linkedMapOf(
+                        "propwow" to "valwow",
+                        "otherpropwow" to "othervalwow"
+                    )
+                )
             ),
             additionalParameters = PersistableData()
         )
@@ -82,14 +88,20 @@ class DataTypesPersistableTests {
             maxRetries = 3,
             autoDeleteSuccessfullyUploadedFiles = false,
             files = arrayListOf(
-                UploadFile(path = "/path/to/file", properties = linkedMapOf(
-                    "prop" to "val",
-                    "otherprop" to "otherval"
-                )),
-                UploadFile(path = "/path/to/file/wow", properties = linkedMapOf(
-                    "propwow" to "valwow",
-                    "otherpropwow" to "othervalwow"
-                ))
+                UploadFile(
+                    path = "/path/to/file",
+                    properties = linkedMapOf(
+                        "prop" to "val",
+                        "otherprop" to "otherval"
+                    )
+                ),
+                UploadFile(
+                    path = "/path/to/file/wow",
+                    properties = linkedMapOf(
+                        "propwow" to "valwow",
+                        "otherpropwow" to "othervalwow"
+                    )
+                )
             ),
             additionalParameters = PersistableData().apply {
                 putString("id", "hey")
