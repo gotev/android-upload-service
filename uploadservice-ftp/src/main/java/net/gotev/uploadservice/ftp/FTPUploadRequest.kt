@@ -77,15 +77,17 @@ class FTPUploadRequest(context: Context, serverUrl: String, port: Int) :
         remotePath: String? = null,
         permissions: UnixPermissions? = null
     ): FTPUploadRequest {
-        files.add(UploadFile(filePath).apply {
-            this.remotePath = if (remotePath.isNullOrBlank()) {
-                File(filePath).name
-            } else {
-                remotePath
-            }
+        files.add(
+            UploadFile(filePath).apply {
+                this.remotePath = if (remotePath.isNullOrBlank()) {
+                    File(filePath).name
+                } else {
+                    remotePath
+                }
 
-            this.permissions = permissions?.toString()
-        })
+                this.permissions = permissions?.toString()
+            }
+        )
         return this
     }
 
