@@ -62,10 +62,6 @@ android {
 
     lintOptions {
         warning 'InvalidPackage'
-        disable 'TypographyFractions', 'TypographyQuotes'
-        abortOnError false
-        // if true, only report errors.
-        ignoreWarnings true
     }
 }
 
