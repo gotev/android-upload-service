@@ -1,7 +1,7 @@
 ext {
     mavRepoInternalUrl = System.getenv('LOCAL_MAVEN_URL')
 
-    github_username = 'gotev'
+    github_username = 'biosensics'
     github_repository_name = 'android-upload-service'
 
     maintainer = 'Aleksandar Gotev'
@@ -12,7 +12,7 @@ ext {
     library_licenses = ["Apache-2.0"]
     library_licenses_url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
     library_project_group = 'net.gotev'
-    library_version = '4.6.3'
+    library_version = '4.6.14'
     version_code = 43
     min_sdk = 21
     target_sdk = 30
@@ -23,7 +23,7 @@ ext {
     gradle_version = '4.1.1'
     gradle_versions_plugin_version = '0.28.0'
     bintray_plugin_version = '1.8.4'
-    kotlin_lint_version = '9.0.0'
+    kotlin_lint_version = '9.4.1'
 
     // Library and app testing dependencies versions
     junit_version = '4.13.1'

@@ -16,8 +16,14 @@ class HurlStack @JvmOverloads constructor(
     @Throws(IOException::class)
     override fun newRequest(uploadId: String, method: String, url: String): HttpRequest {
         return HurlStackRequest(
-            userAgent, uploadId, method, url, followRedirects, useCaches,
-            connectTimeoutMillis, readTimeoutMillis
+            userAgent,
+            uploadId,
+            method,
+            url,
+            followRedirects,
+            useCaches,
+            connectTimeoutMillis,
+            readTimeoutMillis
         )
     }
 }

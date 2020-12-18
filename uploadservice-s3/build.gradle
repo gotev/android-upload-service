@@ -2,6 +2,41 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'com.jfrog.bintray'
+    id 'com.github.ben-manes.versions'
+    id "org.jlleitschuh.gradle.ktlint"
+}
+
+Properties properties = new Properties()
+if (project.rootProject.file("local.properties").exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
+
+
+// start - module specific overrides of default values written in manifest.gradle
+def bintray_project_name = "android-upload-service-s3"
+def library_description = "S3 Upload implementation for Android Upload Service."
+def library_keywords = ['android', 'upload', 'service', 's3', 'upload']
+// end - module specific overrides
+
+// start - do not modify this if your project is on github
+project.ext {
+    mavDevelopers = [(properties.getProperty("bintray.user")): (maintainer)]
+    mavSiteUrl = "https://github.com/${github_username}/${github_repository_name}"
+    mavGitUrl = mavSiteUrl + '.git'
+    bugTrackerUrl = mavSiteUrl + '/issues/'
+    mavProjectName = bintray_project_name
+    mavLibraryLicenses = ["Apache-2.0": 'http://www.apache.org/licenses/LICENSE-2.0.txt']
+    mavLibraryDescription = library_description
+    mavVersion = library_version
+}
+// end - do not modify this if your project is on github
+
+group = library_project_group
+version = library_version
+
+androidExtensions {
+    experimental = true
 }
 
 android {
@@ -30,16 +65,43 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    lintOptions {
+        warning 'InvalidPackage'
+        disable 'TypographyFractions', 'TypographyQuotes'
+        abortOnError false
+        // if true, only report errors.
+        ignoreWarnings true
+    }
 }
 
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
-    api project(path: ':uploadservice')
+    api project(':uploadservice')
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$androidx_test_ext_junit_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidx_test_espresso_version"
 
     implementation "com.amazonaws:aws-android-sdk-s3:$amazon_aws_version"
 }
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    publications = ['mavenPublish']
+    pkg {
+        repo = "maven"
+        name = mavProjectName
+        desc = library_description
+        websiteUrl = mavSiteUrl
+        vcsUrl = mavGitUrl
+        issueTrackerUrl = bugTrackerUrl
+        licenses = library_licenses
+        labels = library_keywords
+        publicDownloadNumbers = true
+        publish = true
+    }
+}
+
+apply from: 'https://raw.githubusercontent.com/sky-uk/gradle-maven-plugin/master/gradle-mavenizer.gradle'

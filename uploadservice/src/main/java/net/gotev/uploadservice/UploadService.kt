@@ -125,15 +125,18 @@ class UploadService : Service() {
             }
 
             idleTimer = Timer(TAG + "IdleTimer").apply {
-                schedule(object : TimerTask() {
-                    override fun run() {
-                        UploadServiceLogger.info(TAG, NA) {
-                            "Service is about to be stopped because idle timeout of " +
-                                "${UploadServiceConfig.idleTimeoutSeconds}s has been reached"
+                schedule(
+                    object : TimerTask() {
+                        override fun run() {
+                            UploadServiceLogger.info(TAG, NA) {
+                                "Service is about to be stopped because idle timeout of " +
+                                    "${UploadServiceConfig.idleTimeoutSeconds}s has been reached"
+                            }
+                            stopSelf()
                         }
-                        stopSelf()
-                    }
-                }, (UploadServiceConfig.idleTimeoutSeconds * 1000).toLong())
+                    },
+                    (UploadServiceConfig.idleTimeoutSeconds * 1000).toLong()
+                )
             }
 
             return START_NOT_STICKY

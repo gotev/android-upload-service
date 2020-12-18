@@ -36,10 +36,13 @@ class PersistableDataTests {
         putInt("intValue", Int.MAX_VALUE)
         putLong("longValue", Long.MAX_VALUE)
         putString("Str", "somestring")
-        putData("nested", PersistableData().apply {
-            putString("Str", "nestedstr")
-            putBoolean("boolKey", false)
-        })
+        putData(
+            "nested",
+            PersistableData().apply {
+                putString("Str", "nestedstr")
+                putBoolean("boolKey", false)
+            }
+        )
     }
 
     val expectedBundle = Bundle().apply {

@@ -147,10 +147,13 @@ class MultipartUploadTests : UploadServiceTestSuite() {
 
         val uploadRequest = createMultipartUploadRequest()
 
-        uploadRequest.getBlockingResponse(appContext, doOnFirstProgress = { info ->
-            // cancel upload on first progress
-            UploadService.stopUpload(info.uploadId)
-        }).requireCancelledByUser()
+        uploadRequest.getBlockingResponse(
+            appContext,
+            doOnFirstProgress = { info ->
+                // cancel upload on first progress
+                UploadService.stopUpload(info.uploadId)
+            }
+        ).requireCancelledByUser()
 
         with(mockWebServer.takeRequest()) {
             assertHttpMethodIs("POST")

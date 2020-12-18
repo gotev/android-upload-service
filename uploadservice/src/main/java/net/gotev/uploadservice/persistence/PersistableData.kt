@@ -128,12 +128,14 @@ open class PersistableData() : Parcelable {
         val outList = ArrayList<PersistableData>()
 
         while (elements.isNotEmpty()) {
-            outList.add(PersistableData().also { extractedData ->
-                elements.forEach { (entryKey, entryValue) ->
-                    extractedData.data[entryKey.removePrefix("$key$separator$index$separator")] = entryValue
+            outList.add(
+                PersistableData().also { extractedData ->
+                    elements.forEach { (entryKey, entryValue) ->
+                        extractedData.data[entryKey.removePrefix("$key$separator$index$separator")] = entryValue
+                    }
+                    entries.removeAll(elements)
                 }
-                entries.removeAll(elements)
-            })
+            )
 
             index += 1
             elements = entries.filter { it.key.startsWith("$key$separator$index$separator") }

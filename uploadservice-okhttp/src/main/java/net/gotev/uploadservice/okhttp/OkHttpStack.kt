@@ -23,14 +23,16 @@ class OkHttpStack(
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .cache(null)
-            .addInterceptor(object : Interceptor {
-                override fun intercept(chain: Interceptor.Chain): Response {
-                    val request = chain.request().newBuilder()
-                        .header("User-Agent", UploadServiceConfig.defaultUserAgent)
-                        .build()
-                    return chain.proceed(request)
+            .addInterceptor(
+                object : Interceptor {
+                    override fun intercept(chain: Interceptor.Chain): Response {
+                        val request = chain.request().newBuilder()
+                            .header("User-Agent", UploadServiceConfig.defaultUserAgent)
+                            .build()
+                        return chain.proceed(request)
+                    }
                 }
-            })
+            )
             .build()
 ) : HttpStack {
     @Throws(IOException::class)

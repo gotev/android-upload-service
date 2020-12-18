@@ -141,10 +141,13 @@ class BinaryUploadTests : UploadServiceTestSuite() {
 
         val uploadRequest = createBinaryUploadRequest()
 
-        uploadRequest.getBlockingResponse(appContext, doOnFirstProgress = { info ->
-            // cancel upload on first progress
-            UploadService.stopUpload(info.uploadId)
-        }).requireCancelledByUser()
+        uploadRequest.getBlockingResponse(
+            appContext,
+            doOnFirstProgress = { info ->
+                // cancel upload on first progress
+                UploadService.stopUpload(info.uploadId)
+            }
+        ).requireCancelledByUser()
 
         with(mockWebServer.takeRequest()) {
             verifyBinaryUploadRequestHeaders()

@@ -12,7 +12,9 @@ import java.io.UnsupportedEncodingException
  * Generic HTTP Upload Task.
  * Subclass to create your custom upload task.
  */
-abstract class HttpUploadTask : UploadTask(), HttpRequest.RequestBodyDelegate,
+abstract class HttpUploadTask :
+    UploadTask(),
+    HttpRequest.RequestBodyDelegate,
     BodyWriter.OnStreamWriteListener {
 
     protected val httpParams by lazy {

@@ -43,21 +43,23 @@ class MultipartUploadRequest(context: Context, serverUrl: String) :
             "Please specify valid filePath and parameterName. They cannot be blank."
         }
 
-        files.add(UploadFile(filePath).apply {
-            this.parameterName = parameterName
+        files.add(
+            UploadFile(filePath).apply {
+                this.parameterName = parameterName
 
-            this.contentType = if (contentType.isNullOrBlank()) {
-                handler.contentType(context)
-            } else {
-                contentType
-            }
+                this.contentType = if (contentType.isNullOrBlank()) {
+                    handler.contentType(context)
+                } else {
+                    contentType
+                }
 
-            remoteFileName = if (fileName.isNullOrBlank()) {
-                handler.name(context)
-            } else {
-                fileName
+                remoteFileName = if (fileName.isNullOrBlank()) {
+                    handler.name(context)
+                } else {
+                    fileName
+                }
             }
-        })
+        )
 
         return this
     }
