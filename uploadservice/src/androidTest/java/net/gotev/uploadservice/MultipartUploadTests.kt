@@ -2,7 +2,7 @@ package net.gotev.uploadservice
 
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
 import net.gotev.uploadservice.testcore.UploadServiceTestSuite
-import net.gotev.uploadservice.testcore.assertBodySizeIsLowerThanDeclaredContentLength
+import net.gotev.uploadservice.testcore.assertBodySizeIsLowerOrEqualThanDeclaredContentLength
 import net.gotev.uploadservice.testcore.assertContentTypeIsMultipartFormData
 import net.gotev.uploadservice.testcore.assertDeclaredContentLengthMatchesPostBodySize
 import net.gotev.uploadservice.testcore.assertEmptyBodyAndHttpCodeIs
@@ -155,7 +155,7 @@ class MultipartUploadTests : UploadServiceTestSuite() {
         with(mockWebServer.takeRequest()) {
             assertHttpMethodIs("POST")
             assertContentTypeIsMultipartFormData()
-            assertBodySizeIsLowerThanDeclaredContentLength()
+            assertBodySizeIsLowerOrEqualThanDeclaredContentLength()
             assertHeader("Authorization", "Bearer bearerToken")
             assertHeader("User-Agent", "SomeUserAgent")
         }

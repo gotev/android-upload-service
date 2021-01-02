@@ -176,12 +176,12 @@ fun RecordedRequest.assertDeclaredContentLengthMatchesPostBodySize() {
     assertEquals(value!!.toLong(), bodySize)
 }
 
-fun RecordedRequest.assertBodySizeIsLowerThanDeclaredContentLength() {
+fun RecordedRequest.assertBodySizeIsLowerOrEqualThanDeclaredContentLength() {
     val value = headers["Content-Length"]
     assertNotNull("Missing Content-Length", value)
     assertTrue(
-        "body size ($bodySize) is not < than declared Content-Length (${value!!.toLong()}!",
-        bodySize < value.toLong()
+        "body size ($bodySize) is not <= than declared Content-Length (${value!!.toLong()})!",
+        bodySize <= value.toLong()
     )
 }
 

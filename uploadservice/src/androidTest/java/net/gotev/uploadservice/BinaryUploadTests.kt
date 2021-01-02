@@ -2,7 +2,7 @@ package net.gotev.uploadservice
 
 import net.gotev.uploadservice.protocols.binary.BinaryUploadRequest
 import net.gotev.uploadservice.testcore.UploadServiceTestSuite
-import net.gotev.uploadservice.testcore.assertBodySizeIsLowerThanDeclaredContentLength
+import net.gotev.uploadservice.testcore.assertBodySizeIsLowerOrEqualThanDeclaredContentLength
 import net.gotev.uploadservice.testcore.assertDeclaredContentLengthMatchesPostBodySize
 import net.gotev.uploadservice.testcore.assertEmptyBodyAndHttpCodeIs
 import net.gotev.uploadservice.testcore.assertHeader
@@ -148,7 +148,7 @@ class BinaryUploadTests : UploadServiceTestSuite() {
 
         with(mockWebServer.takeRequest()) {
             verifyBinaryUploadRequestHeaders()
-            assertBodySizeIsLowerThanDeclaredContentLength()
+            assertBodySizeIsLowerOrEqualThanDeclaredContentLength()
         }
     }
 }
