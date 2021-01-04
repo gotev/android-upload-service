@@ -15,7 +15,7 @@ class S3UploadRequest(
     context: Context,
     bucketName: String,
     identityPoolId: String,
-    region: Regions,
+    region: Regions
 ) : UploadRequest<S3UploadRequest>(context, "serverUrl") {
 
     protected val s3params = S3UploadTaskParameters(

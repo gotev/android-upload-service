@@ -1,12 +1,10 @@
 package net.gotev.uploadservice.s3
 
 import android.content.Context
-import android.content.Intent
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferService
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
@@ -31,10 +29,6 @@ class S3ClientWrapper(
     private val transferUtility = TransferUtility.builder().s3Client(s3).context(context).build()
     private lateinit var transferObserver: TransferObserver
     private lateinit var uploadingFile: UploadFile
-
-    init {
-        context.startService(Intent(context, TransferService::class.java))
-    }
 
     interface Observer {
         fun onStateChanged(client: S3ClientWrapper, uploadFile: UploadFile, id: Int, state: TransferState?)

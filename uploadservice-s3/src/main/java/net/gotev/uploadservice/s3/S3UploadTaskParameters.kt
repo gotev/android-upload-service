@@ -15,7 +15,7 @@ data class S3UploadTaskParameters(
     var region: String = Regions.US_EAST_1.name,
     var bucketKey: String = "com.aws.s3.$bucketName",
     var identityKey: String = "com.aws.s3.$identityPoolId",
-    var cannedAccessControlList: String = CannedAccessControlList.Private.name,
+    var cannedAccessControlList: String = CannedAccessControlList.Private.name
 ) : Parcelable, Persistable {
     companion object : Persistable.Creator<S3UploadTaskParameters> {
 
