@@ -36,6 +36,10 @@ data class UploadNotificationStatusConfig @JvmOverloads constructor(
     /**
      * Large notification icon.
      */
+    val largeIcon: Bitmap? = null,
+    /**
+     * Large notification icon res id.
+     */
     val largeIconResId: Int? = null,
 
     /**
