@@ -36,7 +36,7 @@ data class UploadNotificationStatusConfig @JvmOverloads constructor(
     /**
      * Large notification icon.
      */
-    val largeIcon: Bitmap? = null,
+    val largeIconResId: Int? = null,
 
     /**
      * Intent to be performed when the user taps on the notification.

@@ -3,6 +3,7 @@ package net.gotev.uploadservice.observer.task
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -61,7 +62,7 @@ class NotificationHandler(private val service: UploadService) : UploadTaskObserv
             .setContentText(placeholdersProcessor.processPlaceholders(statusConfig.message, info))
             .setContentIntent(statusConfig.getClickIntent(service))
             .setSmallIcon(statusConfig.iconResourceID)
-            .setLargeIcon(statusConfig.largeIcon)
+            .setLargeIcon(if (statusConfig.largeIconResId != null) BitmapFactory.decodeResource(service.applicationContext.resources, statusConfig.largeIconResId) else null)
             .setColor(statusConfig.iconColorResourceID)
             .addActions(statusConfig)
     }
