@@ -20,7 +20,7 @@ ext {
 
     // Gradle classpath dependencies versions
     kotlin_version = '1.4.10'
-    gradle_version = '4.1.1'
+    gradle_version = '4.1.2'
     gradle_versions_plugin_version = '0.28.0'
     bintray_plugin_version = '1.8.4'
     kotlin_lint_version = '9.0.0'
