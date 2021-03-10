@@ -54,7 +54,7 @@ fun String.isValidHttpUrl(): Boolean {
     }
 }
 
-val String.asciiByes: ByteArray
+val String.asciiBytes: ByteArray
     get() = toByteArray(Charsets.US_ASCII)
 
 val String.utf8Bytes: ByteArray

@@ -5,7 +5,7 @@ import net.gotev.uploadservice.HttpUploadTask
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.data.UploadFile
 import net.gotev.uploadservice.extensions.addHeader
-import net.gotev.uploadservice.extensions.asciiByes
+import net.gotev.uploadservice.extensions.asciiBytes
 import net.gotev.uploadservice.extensions.utf8Bytes
 import net.gotev.uploadservice.network.BodyWriter
 
@@ -21,8 +21,8 @@ class MultipartUploadTask : HttpUploadTask() {
     }
 
     private val boundary = BOUNDARY_SIGNATURE + System.nanoTime()
-    private val boundaryBytes = (TWO_HYPHENS + boundary + NEW_LINE).asciiByes
-    private val trailerBytes = (TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).asciiByes
+    private val boundaryBytes = (TWO_HYPHENS + boundary + NEW_LINE).asciiBytes
+    private val trailerBytes = (TWO_HYPHENS + boundary + TWO_HYPHENS + NEW_LINE).asciiBytes
     private val newLineBytes = NEW_LINE.utf8Bytes
 
     private val NameValue.multipartHeader: ByteArray
