@@ -20,7 +20,8 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
     override fun size(context: Context): Long {
         return context.contentResolver.query(uri, null, null, null, null)?.use {
             if (it.moveToFirst()) {
-                it.getLong(it.getColumnIndex(OpenableColumns.SIZE))
+                val sizeColumn = it.getColumnIndex(OpenableColumns.SIZE)
+                if (sizeColumn >= 0) it.getLong(sizeColumn) else null
             } else {
                 null
             }
@@ -47,7 +48,8 @@ internal class ContentResolverSchemeHandler : SchemeHandler {
     override fun name(context: Context): String {
         return context.contentResolver.query(uri, null, null, null, null)?.use {
             if (it.moveToFirst()) {
-                it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val displayNameColumn = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (displayNameColumn >= 0) it.getString(displayNameColumn) else null
             } else {
                 null
             }
