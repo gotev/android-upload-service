@@ -86,3 +86,7 @@ dependencies {
     implementation project(':uploadservice-okhttp')
     implementation project(':uploadservice-ftp')
 }
+
+task prepareKotlinBuildScriptModel {
+
+}
