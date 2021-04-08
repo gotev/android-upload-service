@@ -192,14 +192,6 @@ class UploadService : Service() {
 
         wakeLock = acquirePartialWakeLock(wakeLock, TAG)
         notificationActionsObserver.register()
-
-        val notification = NotificationCompat.Builder(this, UploadServiceConfig.defaultNotificationChannel!!)
-            .setSmallIcon(android.R.drawable.ic_menu_upload)
-            .setOngoing(true)
-            .setGroup(UploadServiceConfig.namespace)
-            .build()
-
-        startForeground(UPLOAD_NOTIFICATION_BASE_ID, notification)
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -210,6 +202,14 @@ class UploadService : Service() {
         UploadServiceLogger.debug(TAG, NA) {
             "Starting UploadService. Debug info: $UploadServiceConfig"
         }
+
+        val notification = NotificationCompat.Builder(this, UploadServiceConfig.defaultNotificationChannel!!)
+            .setSmallIcon(android.R.drawable.ic_menu_upload)
+            .setOngoing(true)
+            .setGroup(UploadServiceConfig.namespace)
+            .build()
+
+        startForeground(UPLOAD_NOTIFICATION_BASE_ID, notification)
 
         val taskCreationParameters = intent.getUploadTaskCreationParameters()
             ?: return shutdownIfThereArentAnyActiveTasks()
