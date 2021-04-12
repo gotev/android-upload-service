@@ -3,7 +3,6 @@ package net.gotev.uploadservice.extensions
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.UploadTask
@@ -31,11 +30,7 @@ fun Context.startNewUpload(
         putExtra(taskNotificationConfig, notificationConfig)
     }
 
-    if (Build.VERSION.SDK_INT >= 26) {
-        startForegroundService(intent)
-    } else {
-        startService(intent)
-    }
+    startService(intent)
 
     return params.id
 }
