@@ -170,16 +170,22 @@ fun Context.getUploadTask(
         }
 
         UploadServiceLogger.debug(
-            UploadService.TAG,
-            NA
-        ) { "Successfully created new task with class: ${taskClass.name}" }
+            component = UploadService.TAG,
+            uploadId = NA,
+            message = {
+                "Successfully created new task with class: ${taskClass.name}"
+            }
+        )
         uploadTask
     } catch (exc: Throwable) {
         UploadServiceLogger.error(
-            UploadService.TAG,
-            NA,
-            exc
-        ) { "Error while instantiating new task" }
+            component = UploadService.TAG,
+            uploadId = NA,
+            exception = exc,
+            message = {
+                "Error while instantiating new task"
+            }
+        )
         null
     }
 }
