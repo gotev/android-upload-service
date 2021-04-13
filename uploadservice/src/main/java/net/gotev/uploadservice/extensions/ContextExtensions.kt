@@ -3,6 +3,7 @@ package net.gotev.uploadservice.extensions
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.UploadTask
@@ -11,6 +12,7 @@ import net.gotev.uploadservice.data.UploadTaskParameters
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.logger.UploadServiceLogger.NA
 import net.gotev.uploadservice.observer.task.UploadTaskObserver
+import java.lang.IllegalStateException
 
 // constants used in the intent which starts this service
 private const val taskParametersKey = "taskParameters"
@@ -30,7 +32,37 @@ fun Context.startNewUpload(
         putExtra(taskNotificationConfig, notificationConfig)
     }
 
-    startService(intent)
+    try {
+        /*
+        When trying to start a service on API 26+
+        while the app is in the background, an IllegalStateException will be fired
+
+        https://developer.android.com/reference/android/content/Context#startService(android.content.Intent)
+
+        Then why not using startForegroundService always on API 26+? Read below
+         */
+        startService(intent)
+    } catch (exc: IllegalStateException) {
+        if (Build.VERSION.SDK_INT >= 26) {
+            /*
+            this is a bugged Android API and Google is not going to fix it
+
+            https://issuetracker.google.com/issues/76112072#comment158
+
+            Android SDK can not guarantee that the service is going to be started in under 5 seconds
+            which in turn can cause the non catchable
+
+            RemoteServiceException: Context.startForegroundService() did not then call Service.startForeground()
+
+            so the library is going to use this bugged API only as a last resort, to be able
+            to support starting uploads also when the app is in the background, but preventing
+            non catchable exceptions when you launch uploads while the app is in foreground.
+             */
+            startForegroundService(intent)
+        } else {
+            throw exc
+        }
+    }
 
     return params.id
 }
