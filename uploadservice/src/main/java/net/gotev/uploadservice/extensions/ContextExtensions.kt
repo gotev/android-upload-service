@@ -9,7 +9,6 @@ import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.UploadTask
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadTaskParameters
-import net.gotev.uploadservice.exceptions.RemoteServiceExceptionHandler
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.logger.UploadServiceLogger.NA
 import net.gotev.uploadservice.observer.task.UploadTaskObserver
@@ -58,23 +57,7 @@ fun Context.startNewUpload(
             so the library is going to use this bugged API only as a last resort, to be able
             to support starting uploads also when the app is in the background, but preventing
             non catchable exceptions when you launch uploads while the app is in foreground.
-
-            As a supplementary safety measure, the library is going to try to catch the
-            RemoteServiceException when using the unsafe API,
-            logging a BuggedAndroidServiceAPIException which you can also handle in a custom way
-            by setting a custom logger delegate with:
-
-            UploadServiceLogger.setDelegate
              */
-
-            val defaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
-
-            if (defaultExceptionHandler !is RemoteServiceExceptionHandler) {
-                Thread.setDefaultUncaughtExceptionHandler(
-                    RemoteServiceExceptionHandler(defaultExceptionHandler)
-                )
-            }
-
             startForegroundService(intent)
         } else {
             UploadServiceLogger.error(
