@@ -83,17 +83,23 @@ data class UploadTaskCreationParameters(
 fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
     if (this == null || action != UploadServiceConfig.uploadAction) {
         UploadServiceLogger.error(
-            UploadService.TAG,
-            NA
-        ) { "Error while instantiating new task. Invalid intent received" }
+            component = UploadService.TAG,
+            uploadId = NA,
+            message = {
+                "Error while instantiating new task. Invalid intent received"
+            }
+        )
         return null
     }
 
     val params: UploadTaskParameters = getParcelableExtra(taskParametersKey) ?: run {
         UploadServiceLogger.error(
-            UploadService.TAG,
-            NA
-        ) { "Error while instantiating new task. Missing task parameters." }
+            component = UploadService.TAG,
+            uploadId = NA,
+            message = {
+                "Error while instantiating new task. Missing task parameters."
+            }
+        )
         return null
     }
 
@@ -101,27 +107,36 @@ fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
         Class.forName(params.taskClass)
     } catch (exc: Throwable) {
         UploadServiceLogger.error(
-            UploadService.TAG,
-            NA,
-            exc
-        ) { "Error while instantiating new task. ${params.taskClass} does not exist." }
+            component = UploadService.TAG,
+            uploadId = NA,
+            exception = exc,
+            message = {
+                "Error while instantiating new task. ${params.taskClass} does not exist."
+            }
+        )
         null
     } ?: return null
 
     if (!UploadTask::class.java.isAssignableFrom(taskClass)) {
         UploadServiceLogger.error(
-            UploadService.TAG,
-            NA
-        ) { "Error while instantiating new task. ${params.taskClass} does not extend UploadTask." }
+            component = UploadService.TAG,
+            uploadId = NA,
+            message = {
+                "Error while instantiating new task. ${params.taskClass} does not extend UploadTask."
+            }
+        )
         return null
     }
 
     val notificationConfig: UploadNotificationConfig =
         getParcelableExtra(taskNotificationConfig) ?: run {
             UploadServiceLogger.error(
-                UploadService.TAG,
-                NA
-            ) { "Error while instantiating new task. Missing notification config." }
+                component = UploadService.TAG,
+                uploadId = NA,
+                message = {
+                    "Error while instantiating new task. Missing notification config."
+                }
+            )
             return null
         }
 
