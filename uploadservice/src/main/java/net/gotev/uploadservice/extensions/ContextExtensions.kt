@@ -42,8 +42,8 @@ fun Context.startNewUpload(
         Then why not using startForegroundService always on API 26+? Read below
          */
         startService(intent)
-    } catch (exc: IllegalStateException) {
-        if (Build.VERSION.SDK_INT >= 26) {
+    } catch (exc: Throwable) {
+        if (Build.VERSION.SDK_INT >= 26 && exc is IllegalStateException) {
             /*
             this is a bugged Android API and Google is not going to fix it
 
@@ -60,7 +60,14 @@ fun Context.startNewUpload(
              */
             startForegroundService(intent)
         } else {
-            throw exc
+            UploadServiceLogger.error(
+                component = "UploadService",
+                uploadId = params.id,
+                exception = exc,
+                message = {
+                    "Error while starting AndroidUploadService"
+                }
+            )
         }
     }
 
@@ -75,31 +82,48 @@ data class UploadTaskCreationParameters(
 @Suppress("UNCHECKED_CAST")
 fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
     if (this == null || action != UploadServiceConfig.uploadAction) {
-        UploadServiceLogger.error(UploadService.TAG, NA) { "Error while instantiating new task. Invalid intent received" }
+        UploadServiceLogger.error(
+            UploadService.TAG,
+            NA
+        ) { "Error while instantiating new task. Invalid intent received" }
         return null
     }
 
     val params: UploadTaskParameters = getParcelableExtra(taskParametersKey) ?: run {
-        UploadServiceLogger.error(UploadService.TAG, NA) { "Error while instantiating new task. Missing task parameters." }
+        UploadServiceLogger.error(
+            UploadService.TAG,
+            NA
+        ) { "Error while instantiating new task. Missing task parameters." }
         return null
     }
 
     val taskClass = try {
         Class.forName(params.taskClass)
     } catch (exc: Throwable) {
-        UploadServiceLogger.error(UploadService.TAG, NA, exc) { "Error while instantiating new task. ${params.taskClass} does not exist." }
+        UploadServiceLogger.error(
+            UploadService.TAG,
+            NA,
+            exc
+        ) { "Error while instantiating new task. ${params.taskClass} does not exist." }
         null
     } ?: return null
 
     if (!UploadTask::class.java.isAssignableFrom(taskClass)) {
-        UploadServiceLogger.error(UploadService.TAG, NA) { "Error while instantiating new task. ${params.taskClass} does not extend UploadTask." }
+        UploadServiceLogger.error(
+            UploadService.TAG,
+            NA
+        ) { "Error while instantiating new task. ${params.taskClass} does not extend UploadTask." }
         return null
     }
 
-    val notificationConfig: UploadNotificationConfig = getParcelableExtra(taskNotificationConfig) ?: run {
-        UploadServiceLogger.error(UploadService.TAG, NA) { "Error while instantiating new task. Missing notification config." }
-        return null
-    }
+    val notificationConfig: UploadNotificationConfig =
+        getParcelableExtra(taskNotificationConfig) ?: run {
+            UploadServiceLogger.error(
+                UploadService.TAG,
+                NA
+            ) { "Error while instantiating new task. Missing notification config." }
+            return null
+        }
 
     return UploadTaskCreationParameters(
         params = params,
@@ -130,10 +154,17 @@ fun Context.getUploadTask(
             )
         }
 
-        UploadServiceLogger.debug(UploadService.TAG, NA) { "Successfully created new task with class: ${taskClass.name}" }
+        UploadServiceLogger.debug(
+            UploadService.TAG,
+            NA
+        ) { "Successfully created new task with class: ${taskClass.name}" }
         uploadTask
     } catch (exc: Throwable) {
-        UploadServiceLogger.error(UploadService.TAG, NA, exc) { "Error while instantiating new task" }
+        UploadServiceLogger.error(
+            UploadService.TAG,
+            NA,
+            exc
+        ) { "Error while instantiating new task" }
         null
     }
 }
