@@ -6,9 +6,6 @@ ext {
 
     maintainer = 'Aleksandar Gotev'
 
-    bintray_project_name = 'android-upload-service'
-    library_description = 'Easily upload files in the background with automatic Android Notification Center progress indication.'
-    library_keywords = ['android', 'upload', 'service', 'library', 'background', 'notification']
     library_licenses = ["Apache-2.0"]
     library_licenses_url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
     library_project_group = 'net.gotev'
@@ -22,7 +19,6 @@ ext {
     kotlin_version = '1.4.10'
     gradle_version = '4.1.2'
     gradle_versions_plugin_version = '0.28.0'
-    bintray_plugin_version = '1.8.4'
     kotlin_lint_version = '9.0.0'
 
     // Library and app testing dependencies versions

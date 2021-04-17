@@ -1,6 +1,14 @@
 #!/bin/bash -e
-./gradlew clean test publish bintrayUpload
+echo "Releasing on Maven Central ..."
+./gradlew clean test publish -PmavSigning=true -PmavPublishToRemoteRepo=true --max-workers 1
 
+echo "Generating Demo Apk ..."
 version=$(cat manifest.gradle | grep "library_version" | tr "'" '\n' | head -n 2 | tail -n 1)
 ./generate-debug-apk
+
+echo "Creating GitHub Release ..."
 hub release create -a uploadservice-demo-debug.apk -m "$version" "$version"
+
+echo
+echo "Done!"
+echo "Visit https://oss.sonatype.org/#stagingRepositories and confirm the release"

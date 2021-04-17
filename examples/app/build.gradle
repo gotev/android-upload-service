@@ -20,7 +20,6 @@ buildscript {
 
         //classpath dependencies to import library project
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradle_versions_plugin_version"
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:$bintray_plugin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
