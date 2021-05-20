@@ -24,8 +24,10 @@ import okhttp3.mockwebserver.RecordedRequest
 import okhttp3.mockwebserver.SocketPolicy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 import java.io.IOException
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class MultipartUploadTests : UploadServiceTestSuite() {
@@ -158,6 +160,46 @@ class MultipartUploadTests : UploadServiceTestSuite() {
             assertBodySizeIsLowerOrEqualThanDeclaredContentLength()
             assertHeader("Authorization", "Bearer bearerToken")
             assertHeader("User-Agent", "SomeUserAgent")
+        }
+    }
+
+    @Test
+    fun multipleCallsToStartUpload() {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200))
+
+        val uploadRequest = createMultipartUploadRequest()
+
+        uploadRequest.startUpload()
+
+        try {
+            uploadRequest.startUpload()
+            fail("This should throw an exception")
+        } catch (exc: Throwable) {
+            assertTrue("$exc", exc is IllegalStateException)
+            assertTrue("$exc", exc.message?.startsWith("You have already called startUpload() on this Upload request instance once") ?: false)
+        }
+    }
+
+    @Test
+    fun multipleUploadsWithSameID() {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setHeadersDelay(2, TimeUnit.SECONDS))
+
+        val uploadID = UUID.randomUUID().toString()
+
+        createMultipartUploadRequest()
+            .setUploadID(uploadID)
+            .startUpload()
+
+        Thread.sleep(1000)
+
+        try {
+            createMultipartUploadRequest()
+                .setUploadID(uploadID)
+                .startUpload()
+            fail("This should throw an exception")
+        } catch (exc: Throwable) {
+            assertTrue("$exc", exc is IllegalStateException)
+            assertTrue("$exc", exc.message?.startsWith("You have tried to perform startUpload() using the same uploadID") ?: false)
         }
     }
 }

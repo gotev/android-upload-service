@@ -29,9 +29,11 @@ abstract class UploadRequest<B : UploadRequest<B>>
 constructor(protected val context: Context, protected var serverUrl: String) : Persistable {
 
     private var uploadId = UUID.randomUUID().toString()
+    private var started: Boolean = false
     protected var maxRetries = UploadServiceConfig.retryPolicy.defaultMaxRetries
     protected var autoDeleteSuccessfullyUploadedFiles = false
-    protected var notificationConfig: (context: Context, uploadId: String) -> UploadNotificationConfig = UploadServiceConfig.notificationConfigFactory
+    protected var notificationConfig: (context: Context, uploadId: String) -> UploadNotificationConfig =
+        UploadServiceConfig.notificationConfigFactory
     protected val files = ArrayList<UploadFile>()
 
     /**
@@ -63,6 +65,18 @@ constructor(protected val context: Context, protected var serverUrl: String) : P
      * generated uploadId
      */
     open fun startUpload(): String {
+        check(!started) {
+            "You have already called startUpload() on this Upload request instance once and you " +
+                "cannot call it multiple times. Check your code."
+        }
+
+        check(!UploadService.taskList.contains(uploadTaskParameters.id)) {
+            "You have tried to perform startUpload() using the same uploadID of an " +
+                "already running task. You're trying to use the same ID for multiple uploads."
+        }
+
+        started = true
+
         return context.startNewUpload(
             params = uploadTaskParameters,
             notificationConfig = notificationConfig(context, uploadId)
@@ -83,8 +97,16 @@ constructor(protected val context: Context, protected var serverUrl: String) : P
      * @param lifecycleOwner lifecycle to use when subscribing for events
      * @param delegate Observer delegate implementation
      */
-    fun subscribe(context: Context, lifecycleOwner: LifecycleOwner, delegate: RequestObserverDelegate): RequestObserver {
-        return RequestObserver(context, lifecycleOwner, delegate).apply { subscribe(this@UploadRequest) }
+    fun subscribe(
+        context: Context,
+        lifecycleOwner: LifecycleOwner,
+        delegate: RequestObserverDelegate
+    ): RequestObserver {
+        return RequestObserver(
+            context,
+            lifecycleOwner,
+            delegate
+        ).apply { subscribe(this@UploadRequest) }
     }
 
     protected abstract fun getAdditionalParameters(): PersistableData

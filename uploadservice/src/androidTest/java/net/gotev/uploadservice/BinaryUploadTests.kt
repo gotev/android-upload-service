@@ -18,9 +18,12 @@ import net.gotev.uploadservice.testcore.requireSuccessful
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import okhttp3.mockwebserver.SocketPolicy
+import org.junit.Assert
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 import java.io.IOException
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class BinaryUploadTests : UploadServiceTestSuite() {
@@ -149,6 +152,46 @@ class BinaryUploadTests : UploadServiceTestSuite() {
         with(mockWebServer.takeRequest()) {
             verifyBinaryUploadRequestHeaders()
             assertBodySizeIsLowerOrEqualThanDeclaredContentLength()
+        }
+    }
+
+    @Test
+    fun multipleCallsToStartUpload() {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200))
+
+        val uploadRequest = createBinaryUploadRequest()
+
+        uploadRequest.startUpload()
+
+        try {
+            uploadRequest.startUpload()
+            fail("This should throw an exception")
+        } catch (exc: Throwable) {
+            assertTrue("$exc", exc is IllegalStateException)
+            assertTrue("$exc", exc.message?.startsWith("You have already called startUpload() on this Upload request instance once") ?: false)
+        }
+    }
+
+    @Test
+    fun multipleUploadsWithSameID() {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setHeadersDelay(2, TimeUnit.SECONDS))
+
+        val uploadID = UUID.randomUUID().toString()
+
+        createBinaryUploadRequest()
+            .setUploadID(uploadID)
+            .startUpload()
+
+        Thread.sleep(1000)
+
+        try {
+            createBinaryUploadRequest()
+                .setUploadID(uploadID)
+                .startUpload()
+            fail("This should throw an exception")
+        } catch (exc: Throwable) {
+            assertTrue("$exc", exc is IllegalStateException)
+            assertTrue("$exc", exc.message?.startsWith("You have tried to perform startUpload() using the same uploadID") ?: false)
         }
     }
 }
