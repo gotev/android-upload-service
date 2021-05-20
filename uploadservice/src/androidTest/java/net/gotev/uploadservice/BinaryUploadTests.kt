@@ -18,7 +18,6 @@ import net.gotev.uploadservice.testcore.requireSuccessful
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import okhttp3.mockwebserver.SocketPolicy
-import org.junit.Assert
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
