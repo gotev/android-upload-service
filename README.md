@@ -4,13 +4,13 @@
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) ![Maven Central](https://img.shields.io/maven-central/v/net.gotev/uploadservice) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-| :information_source: :new: | [Get started with 4.x](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
+| :information_source: | [Get started](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
 |--|--|
+| :book: Learn | Check the [Wiki](https://github.com/gotev/android-upload-service/wiki) to learn how to use the library |
 | :point_right: Try it out | [Get the demo APK](https://github.com/gotev/android-upload-service/releases/latest) |
-| Still using 3.x ? | It's not maintained or supported. You may have security issues and problems with newer Androids. Switch to 4.x |
 | :collision: | Not working? Keep calm and follow the [troubleshooting procedure](https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure) |
-| :book: | [Wiki](https://github.com/gotev/android-upload-service/wiki) Read this to discover all the possibilities |
 | :gift: | Find this library useful? Consider sponsoring its development by pressing the Sponsor button on the top right of this page. |
+| Still using 3.x ? | It's not maintained or supported. You may have security issues and problems with newer Androids. Switch to 4.x |
 | :heart: | [Contributing](CONTRIBUTING.md) |
 | :star2: | [Features](#features) |
 | :raising_hand: | [Who is using Upload Service](#powered) |
