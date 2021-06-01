@@ -6,8 +6,8 @@
 
 | :information_source: | [Get started](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
 |--|--|
-| :book: Learn | Check the [Wiki](https://github.com/gotev/android-upload-service/wiki) to learn how to use the library |
-| :point_right: Try it out | [Get the demo APK](https://github.com/gotev/android-upload-service/releases/latest) |
+| :book: | [Check the Wiki](https://github.com/gotev/android-upload-service/wiki) to learn how to use the library |
+| :point_right: | Try it out in action, [Get the demo APK](https://github.com/gotev/android-upload-service/releases/latest) |
 | :collision: | Not working? Keep calm and follow the [troubleshooting procedure](https://github.com/gotev/android-upload-service/wiki/Troubleshooting-Procedure) |
 | :gift: | Find this library useful? Consider sponsoring its development by pressing the Sponsor button on the top right of this page. |
 | Still using 3.x ? | It's not maintained or supported. You may have security issues and problems with newer Androids. Switch to 4.x |
