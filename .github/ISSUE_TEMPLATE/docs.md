@@ -1,6 +1,6 @@
 ---
 name: Docs improvement
-about: You want to make the docs better
+about: Broken link, missing info or misleading info? Let us know! Help us to improve the docs
 title: ''
 labels: ''
 assignees: ''
