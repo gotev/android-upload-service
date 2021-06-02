@@ -1,7 +1,6 @@
 ---
 name: Help
-about: You are trying to accomplish something, but you're stuck and the wiki does
-  not have any useful information. Fill in the required information requested. Issues without them may be closed without further notice.
+about: Check the Wiki before opening a help issue. Fill in the required information requested. Issues without them may be closed without further notice.
 title: ''
 labels: support
 assignees: ''
