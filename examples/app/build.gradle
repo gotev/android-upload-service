@@ -5,7 +5,6 @@ buildscript {
     apply from: '../../manifest.gradle'
 
     repositories {
-        jcenter()
         mavenCentral()
         google()
         maven {
@@ -28,7 +27,6 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         mavenCentral()
         google()
     }

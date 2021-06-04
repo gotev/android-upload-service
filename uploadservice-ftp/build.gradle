@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: "org.jlleitschuh.gradle.ktlint"
 
@@ -19,10 +19,6 @@ project.ext {
 
 group = library_project_group
 version = library_version
-
-androidExtensions {
-    experimental = true
-}
 
 android {
     compileSdkVersion target_sdk

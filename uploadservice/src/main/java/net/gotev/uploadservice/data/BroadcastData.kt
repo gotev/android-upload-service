@@ -2,7 +2,7 @@ package net.gotev.uploadservice.data
 
 import android.content.Intent
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.network.ServerResponse
 

@@ -1,8 +1,8 @@
 package net.gotev.uploadservice.data
 
 import android.os.Parcelable
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import java.util.ArrayList
 import java.util.Date
 

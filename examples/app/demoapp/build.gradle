@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion target_sdk
@@ -63,7 +62,7 @@ dependencies {
     // Support
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
     implementation "com.google.android.material:material:$androidx_appcompat_version"
-    implementation "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime:$androidx_lifecycle_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
@@ -74,8 +73,7 @@ dependencies {
     implementation "com.jakewharton:butterknife:${butterKnifeVersion}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 
-    implementation 'com.nononsenseapps:filepicker:4.0.0-beta1'
-    implementation 'net.gotev:recycleradapter:2.8.1'
+    implementation 'net.gotev:recycleradapter:2.10.1'
 
     /*implementation "net.gotev:uploadservice:${libraryVersion}"
     implementation "net.gotev:uploadservice-okhttp:${libraryVersion}"

@@ -39,6 +39,7 @@ public class UploadItem extends AdapterItem<UploadItem.Holder> {
     };
 
     public UploadItem(int type, String title, String subtitle, Delegate delegate) {
+        super(type + title + subtitle);
         mType = type;
         mTitle = title;
         mSubtitle = subtitle;
@@ -80,27 +81,6 @@ public class UploadItem extends AdapterItem<UploadItem.Holder> {
                 item.mDelegate.onRemoveUploadItem(getAdapterPosition());
             }
         }
-    }
-
-    @Override
-    public int compareTo(@NonNull AdapterItem otherItem) {
-        if (otherItem.getClass() != getClass())
-            return -1;
-
-        UploadItem other = (UploadItem) otherItem;
-
-        if (mType > other.mType)
-            return 1;
-
-        if (mType < other.mType)
-            return -1;
-
-        return mTitle.compareTo(other.mTitle);
-    }
-
-    @Override
-    public String diffingId() {
-        return UploadItem.class.getName() + mTitle + mSubtitle;
     }
 
     public int getType() {

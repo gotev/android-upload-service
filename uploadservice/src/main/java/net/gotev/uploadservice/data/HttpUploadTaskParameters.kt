@@ -1,7 +1,7 @@
 package net.gotev.uploadservice.data
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import net.gotev.uploadservice.persistence.Persistable
 import net.gotev.uploadservice.persistence.PersistableData
 import java.util.ArrayList

@@ -2,8 +2,8 @@ package net.gotev.uploadservice.data
 
 import android.os.Parcelable
 import java.util.LinkedHashMap
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.persistence.Persistable
 import net.gotev.uploadservice.persistence.PersistableData

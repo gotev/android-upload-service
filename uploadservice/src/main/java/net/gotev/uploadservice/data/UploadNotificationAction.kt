@@ -3,7 +3,7 @@ package net.gotev.uploadservice.data
 import android.app.PendingIntent
 import android.os.Parcelable
 import androidx.core.app.NotificationCompat
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 /**
  * Class which represents a notification action.

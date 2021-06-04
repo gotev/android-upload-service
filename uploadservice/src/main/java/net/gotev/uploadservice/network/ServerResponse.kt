@@ -2,8 +2,8 @@ package net.gotev.uploadservice.network
 
 import android.os.Parcelable
 import java.io.Serializable
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ServerResponse(

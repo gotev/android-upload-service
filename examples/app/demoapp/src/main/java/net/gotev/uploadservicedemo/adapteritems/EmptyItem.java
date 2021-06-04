@@ -23,13 +23,8 @@ public class EmptyItem extends AdapterItem<EmptyItem.Holder> {
     int text;
 
     public EmptyItem(@StringRes int textResource) {
+        super(textResource);
         text = textResource;
-    }
-
-    @NonNull
-    @Override
-    public String diffingId() {
-        return EmptyItem.class.getName();
     }
 
     @Override

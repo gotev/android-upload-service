@@ -3,7 +3,6 @@ buildscript {
     apply from: 'manifest.gradle'
 
     repositories {
-        jcenter()
         google()
         mavenCentral()
         maven {
@@ -24,7 +23,6 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         google()
         mavenCentral()
     }

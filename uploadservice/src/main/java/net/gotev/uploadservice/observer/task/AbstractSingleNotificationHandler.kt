@@ -4,7 +4,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Parcelable
 import androidx.core.app.NotificationCompat
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.UploadInfo
