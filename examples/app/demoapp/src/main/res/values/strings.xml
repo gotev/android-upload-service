@@ -9,6 +9,7 @@
     </string-array>
 
     <string name="app_name">Upload Service</string>
+    <string name="visit_library_home">Visit Upload Service Home Page</string>
     <string name="cancel_all_uploads">Cancel all uploads</string>
     <string name="select_file">Select file to upload</string>
     <string name="parameter_name_hint">Parameter name</string>

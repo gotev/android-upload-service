@@ -16,7 +16,11 @@ class GlobalRequestObserverDelegate : RequestObserverDelegate {
         Log.e("RECEIVER", "Progress: $uploadInfo")
     }
 
-    override fun onSuccess(context: Context, uploadInfo: UploadInfo, serverResponse: ServerResponse) {
+    override fun onSuccess(
+        context: Context,
+        uploadInfo: UploadInfo,
+        serverResponse: ServerResponse
+    ) {
         Log.e("RECEIVER", "Success: $serverResponse")
     }
 

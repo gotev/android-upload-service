@@ -5,7 +5,8 @@ import androidx.core.app.NotificationCompat
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.observer.task.AbstractSingleNotificationHandler
 
-class ExampleSingleNotificationHandler(service: UploadService) : AbstractSingleNotificationHandler(service) {
+class ExampleSingleNotificationHandler(service: UploadService) :
+    AbstractSingleNotificationHandler(service) {
     override fun updateNotification(
         notificationManager: NotificationManager,
         notificationBuilder: NotificationCompat.Builder,

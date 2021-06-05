@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.gotev.uploadservicedemo">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -14,7 +12,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask">
             <intent-filter>
@@ -24,20 +22,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MultipartUploadActivity"
+            android:name=".activities.MultipartUploadActivity"
             android:label="@string/multipart_upload"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".BinaryUploadActivity"
+            android:name=".activities.BinaryUploadActivity"
             android:label="@string/binary_upload"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".FTPUploadActivity"
+            android:name=".activities.FTPUploadActivity"
             android:label="@string/ftp_upload"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
     </application>
 
 </manifest>
