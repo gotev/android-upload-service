@@ -36,9 +36,6 @@ android {
     }
 }
 
-def butterKnifeVersion = "10.0.0"
-def stethoVersion = "1.4.2"
-
 dependencies {
     // Testing - https://developer.android.com/training/testing/set-up-project
     testImplementation "junit:junit:$junit_version"
@@ -68,10 +65,6 @@ dependencies {
 
     // Debugging
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
-
-    // ButterKnife
-    implementation "com.jakewharton:butterknife:${butterKnifeVersion}"
-    annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 
     implementation 'net.gotev:recycleradapter:2.10.1'
 

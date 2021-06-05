@@ -18,7 +18,6 @@ ext {
     // Gradle classpath dependencies versions
     kotlin_version = '1.4.32'
     gradle_version = '4.1.3'
-    gradle_versions_plugin_version = '0.28.0'
     kotlin_lint_version = '9.0.0'
 
     // Library and app testing dependencies versions

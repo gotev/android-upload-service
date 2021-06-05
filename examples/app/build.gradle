@@ -1,6 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply plugin: 'com.github.ben-manes.versions'
-
 buildscript {
     apply from: '../../manifest.gradle'
 
@@ -18,8 +16,6 @@ buildscript {
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$kotlin_lint_version"
 
         //classpath dependencies to import library project
-        classpath "com.github.ben-manes:gradle-versions-plugin:$gradle_versions_plugin_version"
-
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
