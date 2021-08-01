@@ -1,6 +1,6 @@
 ---
 name: Help
-about: Check the Wiki before opening a help issue. Fill in the required information requested. Issues without them may be closed without further notice.
+about: [Check the Wiki](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) before opening a help issue. Fill in the required information requested. Issues without them may be closed without further notice.
 title: ''
 labels: support
 assignees: ''
