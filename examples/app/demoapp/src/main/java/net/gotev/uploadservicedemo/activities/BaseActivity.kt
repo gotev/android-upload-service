@@ -34,7 +34,7 @@ open class BaseActivity : AppCompatActivity() {
         @StringRes title: Int
     ): UploadNotificationConfig {
         val clickIntent = PendingIntent.getActivity(
-            this, 1, Intent(this, MainActivity::class.java), flagsCompat(PendingIntent.FLAG_ONE_SHOT)
+            this, 1, Intent(this, MainActivity::class.java), flagsCompat(PendingIntent.FLAG_UPDATE_CURRENT)
         )
 
         val autoClear = false
