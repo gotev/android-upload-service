@@ -200,13 +200,17 @@ fun Context.getNotificationActionIntent(
         putExtra(uploadIdKey, uploadId)
     }
 
+    var flags = PendingIntent.FLAG_ONE_SHOT
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        flags = flags or PendingIntent.FLAG_IMMUTABLE
+    }
     return PendingIntent.getBroadcast(
         this,
         // this is to prevent duplicate PendingIntent request codes which can cause cancelling
         // the wrong upload
         uploadId.hashCode(),
         intent,
-        PendingIntent.FLAG_ONE_SHOT
+        flags
     )
 }
 

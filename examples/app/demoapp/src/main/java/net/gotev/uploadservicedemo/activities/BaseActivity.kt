@@ -31,9 +31,14 @@ open class BaseActivity : AppCompatActivity() {
         uploadId: String,
         @StringRes title: Int
     ): UploadNotificationConfig {
+        var flags = PendingIntent.FLAG_ONE_SHOT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags = flags or PendingIntent.FLAG_IMMUTABLE
+        }
         val clickIntent = PendingIntent.getActivity(
-            this, 1, Intent(this, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+            this, 1, Intent(this, MainActivity::class.java), flags
         )
+
 
         val autoClear = false
         val largeIcon: Bitmap? = null

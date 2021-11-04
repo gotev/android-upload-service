@@ -12,7 +12,7 @@ ext {
     library_version = '4.6.0'
     version_code = 47
     min_sdk = 21
-    target_sdk = 30
+    target_sdk = 31
     demo_app_id = 'net.gotev.uploadservicedemo'
 
     // Gradle classpath dependencies versions
