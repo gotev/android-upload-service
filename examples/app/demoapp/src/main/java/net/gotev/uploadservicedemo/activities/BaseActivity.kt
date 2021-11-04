@@ -4,11 +4,13 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import net.gotev.uploadservice.data.UploadNotificationAction
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadNotificationStatusConfig
+import net.gotev.uploadservice.extensions.flagsCompat
 import net.gotev.uploadservice.extensions.getCancelUploadIntent
 import net.gotev.uploadservicedemo.App
 import net.gotev.uploadservicedemo.CustomPlaceholdersProcessor
@@ -31,14 +33,9 @@ open class BaseActivity : AppCompatActivity() {
         uploadId: String,
         @StringRes title: Int
     ): UploadNotificationConfig {
-        var flags = PendingIntent.FLAG_ONE_SHOT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            flags = flags or PendingIntent.FLAG_IMMUTABLE
-        }
         val clickIntent = PendingIntent.getActivity(
-            this, 1, Intent(this, MainActivity::class.java), flags
+            this, 1, Intent(this, MainActivity::class.java), flagsCompat(PendingIntent.FLAG_ONE_SHOT)
         )
-
 
         val autoClear = false
         val largeIcon: Bitmap? = null

@@ -10,6 +10,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import kotlinx.parcelize.Parcelize
+import net.gotev.uploadservice.extensions.flagsCompat
 import java.util.ArrayList
 
 @Parcelize
@@ -69,15 +70,11 @@ data class UploadNotificationStatusConfig @JvmOverloads constructor(
     val onDismissed: PendingIntent? = null
 ) : Parcelable {
     fun getClickIntent(context: Context): PendingIntent {
-        var flags = PendingIntent.FLAG_UPDATE_CURRENT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            flags = flags or PendingIntent.FLAG_IMMUTABLE
-        }
         return clickIntent ?: PendingIntent.getBroadcast(
             context,
             0,
             Intent(),
-            flags
+            flagsCompat(PendingIntent.FLAG_UPDATE_CURRENT)
         )
     }
 }

@@ -200,17 +200,13 @@ fun Context.getNotificationActionIntent(
         putExtra(uploadIdKey, uploadId)
     }
 
-    var flags = PendingIntent.FLAG_ONE_SHOT
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        flags = flags or PendingIntent.FLAG_IMMUTABLE
-    }
     return PendingIntent.getBroadcast(
         this,
         // this is to prevent duplicate PendingIntent request codes which can cause cancelling
         // the wrong upload
         uploadId.hashCode(),
         intent,
-        flags
+        flagsCompat(PendingIntent.FLAG_ONE_SHOT)
     )
 }
 
@@ -222,3 +218,12 @@ val Intent.uploadIdToCancel: String?
         if (getStringExtra(actionKey) != cancelUploadAction) return null
         return getStringExtra(uploadIdKey)
     }
+
+// Adjusts flags for Android 12+
+fun flagsCompat(flags: Int): Int {
+    if (Build.VERSION.SDK_INT > 30) {
+        return flags or PendingIntent.FLAG_IMMUTABLE
+    }
+
+    return flags
+}
