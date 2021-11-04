@@ -10,7 +10,7 @@ jobs:
 
   android-test:
     runs-on: macos-latest
-
+    if: ${{ false }} # skip job as it currently does not support Android API 31
     steps:
     - name: checkout
       uses: actions/checkout@v2
@@ -26,7 +26,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: set up JDK 1.8
+    - name: set up JDK
       uses: actions/setup-java@v1
       with:
         java-version: 11
@@ -43,7 +43,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: set up JDK 1.8
+    - name: set up JDK
       uses: actions/setup-java@v1
       with:
         java-version: 11
