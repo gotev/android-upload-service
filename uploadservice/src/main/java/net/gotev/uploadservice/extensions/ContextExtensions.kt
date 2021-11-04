@@ -206,7 +206,7 @@ fun Context.getNotificationActionIntent(
         // the wrong upload
         uploadId.hashCode(),
         intent,
-        PendingIntent.FLAG_ONE_SHOT
+        flagsCompat(PendingIntent.FLAG_ONE_SHOT)
     )
 }
 
@@ -218,3 +218,12 @@ val Intent.uploadIdToCancel: String?
         if (getStringExtra(actionKey) != cancelUploadAction) return null
         return getStringExtra(uploadIdKey)
     }
+
+// Adjusts flags for Android 12+
+fun flagsCompat(flags: Int): Int {
+    if (Build.VERSION.SDK_INT > 30) {
+        return flags or PendingIntent.FLAG_IMMUTABLE
+    }
+
+    return flags
+}

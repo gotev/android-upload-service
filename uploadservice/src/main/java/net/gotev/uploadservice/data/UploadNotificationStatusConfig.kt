@@ -9,6 +9,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import kotlinx.parcelize.Parcelize
+import net.gotev.uploadservice.extensions.flagsCompat
 import java.util.ArrayList
 
 @Parcelize
@@ -72,7 +73,7 @@ data class UploadNotificationStatusConfig @JvmOverloads constructor(
             context,
             0,
             Intent(),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            flagsCompat(PendingIntent.FLAG_UPDATE_CURRENT)
         )
     }
 }

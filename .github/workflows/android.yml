@@ -10,7 +10,7 @@ jobs:
 
   android-test:
     runs-on: macos-latest
-
+    if: ${{ false }} # skip job as it currently does not support Android API 31
     steps:
     - name: checkout
       uses: actions/checkout@v2
@@ -18,7 +18,7 @@ jobs:
     - name: run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
+        api-level: 31
         script: ./gradlew connectedCheck
 
   unit-test-and-build:
@@ -26,10 +26,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: set up JDK 1.8
+    - name: set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: 11
     - name: Unit Test
       run: ./gradlew testDebugUnitTest
     - name: Android Test Report
@@ -43,9 +43,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: set up JDK 1.8
+    - name: set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: 11
     - name: Build with Gradle
-      run: cd examples/app && ./gradlew clean build
+      run: cd examples/app && ./gradlew clean assembleDebug
