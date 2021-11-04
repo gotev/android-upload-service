@@ -4,8 +4,6 @@
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) ![Maven Central](https://img.shields.io/maven-central/v/net.gotev/uploadservice) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-### 🏄 Are you interested in getting up to speed fast with file transfers and be able to easily troubleshoot issues? [Participate to this survey](https://forms.gle/wBEWZ6v4f32AsHvA9)
-
 | :information_source: | [Get started](https://github.com/gotev/android-upload-service/wiki/Getting-Started-with-4.x) |
 |--|--|
 | :book: | [Check the Wiki](https://github.com/gotev/android-upload-service/wiki) to learn how to use the library and get help |
@@ -25,7 +23,7 @@ Screencasts from the example app included in this repository:
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
 ## Features <a name="features"></a>
-* Android 5.0 (API 21) to Android 11 (API 30) support
+* Android 5.0 (API 21) to Android 12 (API 31) support
 * 100% Kotlin and fully interoperable with Java
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or `Binary` data requests
 * upload requests can be serialized and executed later
