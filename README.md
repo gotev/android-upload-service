@@ -22,8 +22,14 @@ Screencasts from the example app included in this repository:
 ![compose-upload](https://user-images.githubusercontent.com/16792495/28752871-de82540e-7529-11e7-9037-de86b8f0ca27.gif)
 ![upload](https://user-images.githubusercontent.com/16792495/28752872-de9a8894-7529-11e7-823a-e51eda59f5b7.gif)
 
+At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. You are safe launching upload requests from your fragments, activities and services without worrying about locking the thread in which you are. [Check the wiki](https://github.com/gotev/android-upload-service/wiki) to learn how you can use it in your App.
+
+You are also safe if your app is put in the background. All the uploads will continue to be executed also when your device is idle.
+
+Bear in mind that if you kill your app, the service gets killed as well, as it's attached to your app's process and all the currently running uploads will be terminated abruptly.
+
 ## Features <a name="features"></a>
-* Android 5.0 (API 21) to Android 12 (API 31) support
+* Android 5.0 (API 21) to Android 12 (API 31) support. Beware you cannot start uploads while your app is the background on Android 12 due to recent Service limitations
 * 100% Kotlin and fully interoperable with Java
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or `Binary` data requests
 * upload requests can be serialized and executed later
@@ -37,12 +43,6 @@ Screencasts from the example app included in this repository:
 * easily customize the notification with text, icons and actions for the different states
 * Possibility to implement your own notification handler
 * Lifecycle-Aware RequestObserver to monitor your uploads
-
-At the core of the library there is a `Service` which handles multiple concurrent upload tasks in the background. It publishes broadcast intents to notify status. This way the logic is completely decoupled from the UI. You are safe launching upload requests from your fragments, activities and services without worrying about locking the thread in which you are. [Check the wiki](https://github.com/gotev/android-upload-service/wiki) to learn how you can use it in your App.
-
-You are also safe if your app is put in the background. All the uploads will continue to be executed also when your device is idle.
-
-Bear in mind that if you kill your app, the service gets killed as well, as it's attached to your app's process and all the currently running uploads will be terminated abruptly.
 
 ## Powered by Android Upload Service <a name="powered"></a>
 Apps and libraries powered by this library. To be included in the following list, simply create an issue and provide the app name and a link.
