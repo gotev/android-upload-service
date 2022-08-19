@@ -29,7 +29,7 @@ You are also safe if your app is put in the background. All the uploads will con
 Bear in mind that if you kill your app, the service gets killed as well, as it's attached to your app's process and all the currently running uploads will be terminated abruptly.
 
 ## Features <a name="features"></a>
-* Android 5.0 (API 21) to Android 12 (API 31) support. Beware you cannot start uploads while your app is the background on Android 12 due to recent Service limitations
+* Android 5.0 (API 21) to Android 12 (API 31) support. Beware you cannot start uploads while your app is the background on Android 12 (when your app is targeting API 31) due to recent Service limitations
 * 100% Kotlin and fully interoperable with Java
 * upload files to a server with `FTP`, `HTTP multipart/form-data` or `Binary` data requests
 * upload requests can be serialized and executed later
