@@ -30,7 +30,7 @@ Bear in mind that if you kill your app, the service gets killed as well, as it's
 
 ## Features <a name="features"></a>
 * Android 5.0 (API 21) to Android 12 (API 31) support. 
-  * *Android 12 Note*:
+  * *Android 12 Note, for apps targeting API 31 or newer*:
     * What's supported: uploads initiated while the app is in foreground, with progress indication notification
     * What's NOT supported: uploads started while the app is in the background or uploads without progress indication notification. This is due to the Service limitations imposed by Google, which requires all background services to display a notification to the user. Current architecture cannot support this. For support of those use-cases, WorkManager is the only option.
 * 100% Kotlin and fully interoperable with Java
