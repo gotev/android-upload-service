@@ -68,7 +68,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    api 'commons-net:commons-net:3.8.0'
+    api 'commons-net:commons-net:3.9.0'
     //api "net.gotev:uploadservice:${version}"
     //comment the previous line and uncomment the next line for development (it uses the local lib)
     api project(':uploadservice')
