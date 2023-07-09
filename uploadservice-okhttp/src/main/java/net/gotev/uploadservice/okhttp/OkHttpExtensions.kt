@@ -1,6 +1,5 @@
 package net.gotev.uploadservice.okhttp
 
-import java.util.Locale
 import net.gotev.uploadservice.network.ServerResponse
 import okhttp3.Response
 
@@ -13,7 +12,7 @@ private fun String.requiresRequestBody() =
 private fun String.permitsRequestBody() = !(this == "GET" || this == "HEAD")
 
 internal fun String.hasBody(): Boolean {
-    val method = trim().toUpperCase(Locale.getDefault())
+    val method = trim().uppercase()
     return method.permitsRequestBody() || method.requiresRequestBody()
 }
 

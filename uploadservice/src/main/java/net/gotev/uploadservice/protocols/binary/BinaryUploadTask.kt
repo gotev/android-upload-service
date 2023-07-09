@@ -3,7 +3,6 @@ package net.gotev.uploadservice.protocols.binary
 import net.gotev.uploadservice.HttpUploadTask
 import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.network.BodyWriter
-import java.util.Locale
 
 /**
  * Implements a binary file upload task.
@@ -16,7 +15,7 @@ class BinaryUploadTask : HttpUploadTask() {
 
     override fun performInitialization() {
         with(httpParams.requestHeaders) {
-            if (none { it.name.toLowerCase(Locale.getDefault()) == "content-type" }) {
+            if (none { it.name.lowercase() == "content-type" }) {
                 addHeader("Content-Type", file.contentType(context))
             }
         }

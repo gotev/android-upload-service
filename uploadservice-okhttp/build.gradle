@@ -20,6 +20,7 @@ group = library_project_group
 version = library_version
 
 android {
+    namespace "net.gotev.uploadservice.okhttp"
     compileSdkVersion target_sdk
 
     defaultConfig {
@@ -38,8 +39,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     lintOptions {
