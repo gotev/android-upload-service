@@ -29,7 +29,9 @@ You are also safe if your app is put in the background. All the uploads will con
 Bear in mind that if you kill your app, the service gets killed as well, as it's attached to your app's process and all the currently running uploads will be terminated abruptly.
 
 ## Features <a name="features"></a>
-* Android 5.0 (API 21) to Android 12 (API 31) support. 
+* Android 5.0 (API 21) to Android 13 (API 33) support.
+  * *Android 13 Note, for apps targeting API 33 or newer*:
+    * Due to new behavior changes, you are [required to request POST_NOTIFICATIONS permission at runtime in your app](https://developer.android.com/develop/ui/views/notifications/notification-permission) or else the upload progress won't be shown. To see an example, please look at the BaseActivity in the `examples/app` folder.
   * *Android 12 Note, for apps targeting API 31 or newer*:
     * What's supported: uploads initiated while the app is in foreground, with progress indication notification
     * What's NOT supported: uploads started while the app is in the background or uploads without progress indication notification. This is due to the Service limitations imposed by Google, which requires all background services to display a notification to the user. Current architecture cannot support this. For support of those use-cases, WorkManager is the only option.
