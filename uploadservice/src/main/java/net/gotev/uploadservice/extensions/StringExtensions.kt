@@ -2,7 +2,6 @@ package net.gotev.uploadservice.extensions
 
 import android.webkit.MimeTypeMap
 import java.net.URL
-import java.util.Locale
 
 internal const val APPLICATION_OCTET_STREAM = "application/octet-stream"
 internal const val VIDEO_MP4 = "video/mp4"
@@ -17,7 +16,7 @@ fun String.autoDetectMimeType(): String {
     val index = lastIndexOf(".")
 
     return if (index in 0 until lastIndex) {
-        val extension = substring(index + 1).toLowerCase(Locale.getDefault())
+        val extension = substring(index + 1).lowercase()
 
         if (extension == "mp4") {
             VIDEO_MP4
@@ -35,7 +34,7 @@ fun String?.isASCII(): Boolean {
         return false
 
     for (index in 0 until length) {
-        if (this[index].toInt() > 127) {
+        if (this[index].code > 127) {
             return false
         }
     }

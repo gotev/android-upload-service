@@ -6,7 +6,6 @@ import net.gotev.uploadservice.data.HttpUploadTaskParameters
 import net.gotev.uploadservice.data.NameValue
 import net.gotev.uploadservice.extensions.addHeader
 import net.gotev.uploadservice.extensions.isValidHttpUrl
-import java.util.Locale
 
 /**
  * Represents a generic HTTP upload request.<br></br>
@@ -104,7 +103,7 @@ abstract class HttpUploadRequest<B : HttpUploadRequest<B>>(context: Context, ser
      * @return self instance
      */
     fun setMethod(method: String): B {
-        httpParams.method = method.toUpperCase(Locale.ROOT)
+        httpParams.method = method.uppercase()
         return self()
     }
 

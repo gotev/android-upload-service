@@ -18,7 +18,7 @@ jobs:
     - name: run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 31
+        api-level: 33
         script: ./gradlew connectedCheck
 
   unit-test-and-build:
@@ -29,7 +29,7 @@ jobs:
     - name: set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 11
+        java-version: 17
     - name: Unit Test
       run: ./gradlew testDebugUnitTest
     - name: Android Test Report
@@ -46,6 +46,6 @@ jobs:
     - name: set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 11
+        java-version: 17
     - name: Build with Gradle
       run: cd examples/app && ./gradlew clean assembleDebug

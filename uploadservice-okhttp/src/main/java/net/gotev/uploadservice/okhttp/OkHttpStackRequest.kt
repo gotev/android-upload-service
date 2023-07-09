@@ -12,7 +12,6 @@ import okhttp3.RequestBody
 import okio.BufferedSink
 import java.io.IOException
 import java.net.URL
-import java.util.Locale
 import java.util.UUID
 
 /**
@@ -41,7 +40,7 @@ class OkHttpStackRequest(
     @Throws(IOException::class)
     override fun setHeaders(requestHeaders: List<NameValue>): HttpRequest {
         for (param in requestHeaders) {
-            if ("content-type" == param.name.trim().toLowerCase(Locale.getDefault()))
+            if ("content-type" == param.name.trim().lowercase())
                 contentType = param.value.trim().toMediaTypeOrNull()
 
             requestBuilder.header(param.name.trim(), param.value.trim())
