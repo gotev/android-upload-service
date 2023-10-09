@@ -182,7 +182,7 @@ class UploadService : Service() {
 
         if (UploadServiceConfig.isForegroundService && uploadTasksMap.isEmpty()) {
             UploadServiceLogger.debug(TAG, NA) { "All tasks completed, stopping foreground execution" }
-            stopForeground(true)
+            stopForeground(STOP_FOREGROUND_REMOVE)
             shutdownIfThereArentAnyActiveTasks()
         }
     }
@@ -248,7 +248,7 @@ class UploadService : Service() {
 
         if (UploadServiceConfig.isForegroundService) {
             UploadServiceLogger.debug(TAG, NA) { "Stopping foreground execution" }
-            stopForeground(true)
+            stopForeground(STOP_FOREGROUND_REMOVE)
         }
 
         wakeLock.safeRelease()

@@ -1,6 +1,7 @@
 package net.gotev.uploadservice.data
 
 import android.content.Intent
+import android.os.Build
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import net.gotev.uploadservice.UploadServiceConfig
@@ -17,7 +18,11 @@ internal data class BroadcastData @JvmOverloads constructor(
         private const val paramName = "broadcastData"
 
         fun fromIntent(intent: Intent): BroadcastData? {
-            return intent.getParcelableExtra(paramName)
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(paramName, BroadcastData::class.java)
+            } else {
+                intent.getParcelableExtra(paramName)
+            }
         }
     }
 
