@@ -3,7 +3,9 @@ package net.gotev.uploadservice.observer.request
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import net.gotev.uploadservice.UploadService
+import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.UploadServiceConfig.broadcastNotificationAction
 import net.gotev.uploadservice.UploadServiceConfig.broadcastNotificationActionIntentFilter
 import net.gotev.uploadservice.extensions.uploadIdToCancel
@@ -28,7 +30,13 @@ open class NotificationActionsObserver(
     }
 
     fun register() {
-        context.registerReceiver(this, broadcastNotificationActionIntentFilter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(
+                this, broadcastNotificationActionIntentFilter, Context.RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            context.registerReceiver(this, broadcastNotificationActionIntentFilter)
+        }
         UploadServiceLogger.debug(NotificationActionsObserver::class.java.simpleName, NA) {
             "registered"
         }
