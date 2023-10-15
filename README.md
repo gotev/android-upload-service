@@ -68,7 +68,7 @@ Created my free logo at [LogoMakr.com](https://logomakr.com)
 
 ## License <a name="license"></a>
 
-    Copyright (C) 2013-2021 Aleksandar Gotev
+    Copyright (C) 2013-2023 Aleksandar Gotev
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
