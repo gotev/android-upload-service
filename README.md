@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="uploadservice-logo.png">
+  <img src="uploadservice-logo.png"><br>
+  10 years! Since 2013
 </p>
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Upload%20Service-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2161) [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) ![Maven Central](https://img.shields.io/maven-central/v/net.gotev/uploadservice) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
