@@ -6,6 +6,7 @@ import android.content.Intent
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig.broadcastNotificationAction
 import net.gotev.uploadservice.UploadServiceConfig.broadcastNotificationActionIntentFilter
+import net.gotev.uploadservice.extensions.registerReceiverCompat
 import net.gotev.uploadservice.extensions.uploadIdToCancel
 import net.gotev.uploadservice.logger.UploadServiceLogger
 import net.gotev.uploadservice.logger.UploadServiceLogger.NA
@@ -28,7 +29,7 @@ open class NotificationActionsObserver(
     }
 
     fun register() {
-        context.registerReceiver(this, broadcastNotificationActionIntentFilter)
+        context.registerReceiverCompat(this, broadcastNotificationActionIntentFilter)
         UploadServiceLogger.debug(NotificationActionsObserver::class.java.simpleName, NA) {
             "registered"
         }

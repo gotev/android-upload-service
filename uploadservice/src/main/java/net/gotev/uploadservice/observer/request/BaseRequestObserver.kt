@@ -7,6 +7,7 @@ import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.BroadcastData
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadStatus
+import net.gotev.uploadservice.extensions.registerReceiverCompat
 
 open class BaseRequestObserver(
     private val context: Context,
@@ -33,7 +34,7 @@ open class BaseRequestObserver(
     }
 
     open fun register() {
-        context.registerReceiver(this, UploadServiceConfig.broadcastStatusIntentFilter)
+        context.registerReceiverCompat(this, UploadServiceConfig.broadcastStatusIntentFilter)
     }
 
     open fun unregister() {

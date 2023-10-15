@@ -1,9 +1,14 @@
 package net.gotev.uploadservice.extensions
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.RECEIVER_NOT_EXPORTED
 import android.content.Intent
-import android.os.Build
+import android.content.IntentFilter
+import android.os.Build.VERSION.SDK_INT
+import android.os.Parcelable
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.UploadTask
@@ -43,7 +48,7 @@ fun Context.startNewUpload(
          */
         startService(intent)
     } catch (exc: Throwable) {
-        if (Build.VERSION.SDK_INT >= 26 && exc is IllegalStateException) {
+        if (SDK_INT >= 26 && exc is IllegalStateException) {
             /*
             this is a bugged Android API and Google is not going to fix it
 
@@ -79,7 +84,6 @@ data class UploadTaskCreationParameters(
     val notificationConfig: UploadNotificationConfig
 )
 
-@Suppress("UNCHECKED_CAST")
 fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
     if (this == null || action != UploadServiceConfig.uploadAction) {
         UploadServiceLogger.error(
@@ -92,7 +96,7 @@ fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
         return null
     }
 
-    val params: UploadTaskParameters = getParcelableExtra(taskParametersKey) ?: run {
+    val params: UploadTaskParameters = parcelableCompat(taskParametersKey) ?: run {
         UploadServiceLogger.error(
             component = UploadService.TAG,
             uploadId = NA,
@@ -129,7 +133,7 @@ fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
     }
 
     val notificationConfig: UploadNotificationConfig =
-        getParcelableExtra(taskNotificationConfig) ?: run {
+        parcelableCompat(taskNotificationConfig) ?: run {
             UploadServiceLogger.error(
                 component = UploadService.TAG,
                 uploadId = NA,
@@ -148,7 +152,6 @@ fun Intent?.getUploadTaskCreationParameters(): UploadTaskCreationParameters? {
 
 /**
  * Creates a new task instance based on the requested task class in the intent.
- * @param intent intent passed to the service
  * @return task instance or null if the task class is not supported or invalid
  */
 @Suppress("UNCHECKED_CAST")
@@ -221,9 +224,23 @@ val Intent.uploadIdToCancel: String?
 
 // Adjusts flags for Android 12+
 fun flagsCompat(flags: Int): Int {
-    if (Build.VERSION.SDK_INT > 30) {
+    if (SDK_INT > 30) {
         return flags or PendingIntent.FLAG_IMMUTABLE
     }
 
     return flags
+}
+
+inline fun <reified T : Parcelable> Intent.parcelableCompat(key: String): T? = when {
+    SDK_INT >= 34 -> getParcelableExtra(key, T::class.java)
+    else -> @Suppress("DEPRECATION") getParcelableExtra(key) as? T
+}
+
+@SuppressLint("UnspecifiedRegisterReceiverFlag")
+fun Context.registerReceiverCompat(receiver: BroadcastReceiver, filter: IntentFilter) {
+    if (SDK_INT >= 34) {
+        registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
+    } else {
+        registerReceiver(receiver, filter)
+    }
 }

@@ -22,9 +22,9 @@ version = library_version
 
 android {
     namespace "net.gotev.uploadservice"
-    compileSdkVersion target_sdk
 
     defaultConfig {
+        compileSdk target_sdk
         minSdkVersion min_sdk
         targetSdkVersion target_sdk
         versionCode version_code
