@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
@@ -165,6 +166,15 @@ class UploadService : Service() {
         return false
     }
 
+    private fun stopServiceForeground() {
+        if (Build.VERSION.SDK_INT >= 24) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+    }
+
     /**
      * Called by each task when it is completed (either successfully, with an error or due to
      * user cancellation).
@@ -182,7 +192,7 @@ class UploadService : Service() {
 
         if (UploadServiceConfig.isForegroundService && uploadTasksMap.isEmpty()) {
             UploadServiceLogger.debug(TAG, NA) { "All tasks completed, stopping foreground execution" }
-            stopForeground(true)
+            stopServiceForeground()
             shutdownIfThereArentAnyActiveTasks()
         }
     }
@@ -248,7 +258,7 @@ class UploadService : Service() {
 
         if (UploadServiceConfig.isForegroundService) {
             UploadServiceLogger.debug(TAG, NA) { "Stopping foreground execution" }
-            stopForeground(true)
+            stopServiceForeground()
         }
 
         wakeLock.safeRelease()
