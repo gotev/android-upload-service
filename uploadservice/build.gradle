@@ -36,6 +36,7 @@ android {
         buildConfigField 'String', 'VERSION_NAME', "\"$library_version\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {
