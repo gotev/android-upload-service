@@ -4,7 +4,7 @@ import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.IBinder
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
@@ -167,7 +167,7 @@ class UploadService : Service() {
     }
 
     private fun stopServiceForeground() {
-        if (Build.VERSION.SDK_INT >= 24) {
+        if (SDK_INT >= 24) {
             stopForeground(STOP_FOREGROUND_REMOVE)
         } else {
             @Suppress("DEPRECATION")
@@ -213,11 +213,16 @@ class UploadService : Service() {
             "Starting UploadService. Debug info: $UploadServiceConfig"
         }
 
-        val notification = NotificationCompat.Builder(this, UploadServiceConfig.defaultNotificationChannel!!)
+        val builder = NotificationCompat.Builder(this, UploadServiceConfig.defaultNotificationChannel!!)
             .setSmallIcon(android.R.drawable.ic_menu_upload)
             .setOngoing(true)
             .setGroup(UploadServiceConfig.namespace)
-            .build()
+
+        if (SDK_INT >= 31) {
+            builder.foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
+        }
+
+        val notification = builder.build()
 
         startForeground(UPLOAD_NOTIFICATION_BASE_ID, notification)
 
