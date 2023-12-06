@@ -36,6 +36,7 @@ object UploadServiceConfig {
 
     private const val fileScheme = "/"
     private const val contentScheme = "content://"
+    private var autoClear = false
 
     /**
      * Default User Agent used by default Http Stack constructors.
@@ -57,9 +58,10 @@ object UploadServiceConfig {
      * @param debug set this to your BuildConfig.DEBUG
      */
     @JvmStatic
-    fun initialize(context: Application, defaultNotificationChannel: String, debug: Boolean) {
+    fun initialize(context: Application, defaultNotificationChannel: String, debug: Boolean, autoClear: Boolean = false) {
         this.namespace = context.packageName
         this.defaultNotificationChannel = defaultNotificationChannel
+        this.autoClear = autoClear
         UploadServiceLogger.setDevelopmentMode(debug)
     }
 
@@ -144,7 +146,8 @@ object UploadServiceConfig {
             ),
             success = UploadNotificationStatusConfig(
                 title = title,
-                message = "Upload completed successfully in ${Placeholder.ElapsedTime}"
+                message = "Upload completed successfully in ${Placeholder.ElapsedTime}",
+                autoClear = autoClear
             ),
             error = UploadNotificationStatusConfig(
                 title = title,
