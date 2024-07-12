@@ -238,7 +238,7 @@ inline fun <reified T : Parcelable> Intent.parcelableCompat(key: String): T? = w
 
 @SuppressLint("UnspecifiedRegisterReceiverFlag")
 fun Context.registerReceiverCompat(receiver: BroadcastReceiver, filter: IntentFilter) {
-    if (SDK_INT >= 34) {
+    if (SDK_INT >= 33) {
         registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
     } else {
         registerReceiver(receiver, filter)
