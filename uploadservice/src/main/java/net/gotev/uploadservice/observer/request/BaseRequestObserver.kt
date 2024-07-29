@@ -34,7 +34,11 @@ open class BaseRequestObserver(
     }
 
     open fun register() {
-        context.registerReceiverCompat(this, UploadServiceConfig.broadcastStatusIntentFilter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+             context.registerReceiverCompat(this, UploadServiceConfig.broadcastStatusIntentFilter, Context.RECEIVER_EXPORTED);
+        }else {
+            context.registerReceiverCompat(this, UploadServiceConfig.broadcastStatusIntentFilter)
+        }
     }
 
     open fun unregister() {
