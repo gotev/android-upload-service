@@ -272,4 +272,8 @@ class UploadService : Service() {
 
         UploadServiceLogger.debug(TAG, NA) { "UploadService destroyed" }
     }
+
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        stopSelf()
+    }
 }
